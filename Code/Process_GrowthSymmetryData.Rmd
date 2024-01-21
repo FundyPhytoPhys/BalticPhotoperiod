@@ -52,9 +52,9 @@ library(stringi)
 Project <- "BalticPhotoperiod"
 DataOut <- file.path("..", "Data", "ProcessedData", "ProcessedGrowthSymmetryData")
 
-PlotsPath <- file.path("..", "Output", "Plots")
-RDSPlotPath <- file.path("..", "Output", "PlotsRDS")
-RDSTablePath <- file.path("..", "Output", "TablesRDS")
+FigPath <- file.path("..", "Output", "Figures")
+FigRdsPath <- file.path("..", "Output", "FiguresRds")
+TableRdsPath <- file.path("..", "Output", "TablesRDS")
 
 FileID <- "Smooth"
 FileEncode <- "UTF-8" 
@@ -288,7 +288,7 @@ rm(data_text_y0Exp, data_text_yfExp, data_text_lambdaExp, data_text_y0St, data_t
 # Save plot 
 
 ```{r save plot}
-ggsave(file = file.path(PlotsPath, paste("GS_Plot",".png",sep = "")), height=10, width= 8,  dpi = 300, limitsize = TRUE)
+ggsave(file = file.path(FigPath, paste("Fig_GS",".png",sep = "")), height=10, width= 8,  dpi = 300, limitsize = TRUE)
 ```
 
 
@@ -419,10 +419,10 @@ fittedmodelPhase<-fittedmodel
 ```
 
 
-# Save RDS that create stats and tables
+# Save Rds that create stats and tables
 
 ```{r}
-saveRDS(AnovaTest_GS_Param, file.path(RDSTablePath, paste(Project, "GSAnova.Rds", sep = "_"), fsep = .Platform$file.sep), ascii = FALSE, version = NULL, compress = "xz", refhook = NULL)
+saveRDS(AnovaTest_GS_Param, file.path(TableRdsPath, paste(Project, "Anova_GS.Rds", sep = "_"), fsep = .Platform$file.sep), ascii = FALSE, version = NULL, compress = "xz", refhook = NULL)
 
 # saveRDS(TukeyHSDTest_y0_alpha, file.path(RDSTablePath, paste(Project, "GSTukey_y0.Rds", sep = "_"), fsep = .Platform$file.sep), ascii = FALSE, version = NULL, compress = "xz", refhook = NULL)
 ```
@@ -536,7 +536,7 @@ GScatalogMeta %>%
 # Save plot 
 
 ```{r save plot}
-ggsave(file = file.path(PlotsPath, paste("AccLen_Plot",".png",sep = "")), height=10, width= 8,  dpi = 300, limitsize = TRUE)
+ggsave(file = file.path(FigPath, paste("Fig_AccLen",".png",sep = "")), height=10, width= 8,  dpi = 300, limitsize = TRUE)
 ```
 
 ```{r AccLen Plot, fig.height = 8, fig.width = 8, warning = FALSE}
@@ -579,7 +579,7 @@ labs(y = "AccLen (h)", x = "Photoperiod (h)") +
 # Save plot 
 
 ```{r save plot}
-ggsave(file = file.path(PlotsPath, paste("AccLen_SupPlot",".png",sep = "")), height=10, width= 8,  dpi = 300, limitsize = TRUE)
+ggsave(file = file.path(FigPath, paste("SFig_AccLen",".png",sep = "")), height=10, width= 8,  dpi = 300, limitsize = TRUE)
 ```
 
 # Calculated Anova and Tukey test from AccLen data points
@@ -660,7 +660,7 @@ labs(y = "TDG ("~OD[680]~")", x = "Elapsed time (h)") +
 # Save plot 
 
 ```{r save plot}
-ggsave(file = file.path(PlotsPath, paste("TDG_SupPlot",".png",sep = "")), height=10, width= 8,  dpi = 300, limitsize = TRUE)
+ggsave(file = file.path(FigPath, paste("Fig_TDG",".png",sep = "")), height=10, width= 8,  dpi = 300, limitsize = TRUE)
 ```
 
 # Removed unnecessary files from the environment
@@ -672,9 +672,9 @@ rm(data_hlineGS8, data_hlineGS12, data_hlineGS16, GScatalog, GScatalogMetaExp,  
 # Save Rds that create plot
 
 ```{r}
-saveRDS(GScatalogMeta, file.path(RDSPlotPath, paste(Project, "Plot_GrowthSymmetry_1.Rds", sep = "_"), fsep = .Platform$file.sep), ascii = FALSE, version = NULL, compress = "xz", refhook = NULL)
+saveRDS(GScatalogMeta, file.path(FigRdsPath, paste(Project, "Fig_GrowthSymmetry_1.Rds", sep = "_"), fsep = .Platform$file.sep), ascii = FALSE, version = NULL, compress = "xz", refhook = NULL)
 
-saveRDS(fitted_GS_Param, file.path(RDSPlotPath, paste(Project, "Plot_GrowthSymmetry_2.Rds", sep = "_"), fsep = .Platform$file.sep), ascii = FALSE, version = NULL, compress = "xz", refhook = NULL)
+saveRDS(fitted_GS_Param, file.path(FigRdsPath, paste(Project, "Fig_GrowthSymmetry_2.Rds", sep = "_"), fsep = .Platform$file.sep), ascii = FALSE, version = NULL, compress = "xz", refhook = NULL)
 ```
 
 

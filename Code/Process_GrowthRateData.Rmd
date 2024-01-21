@@ -57,9 +57,9 @@ Project <- "BalticPhotoperiod"
 DataOut <- file.path("..", "Data", "ProcessedData", "ProcessedGrowthRateData")
 DataIn <- file.path("..", "Data", "CleanData", "CleanedMCData", fsep = .Platform$file.sep)
 
-PlotsPath <- file.path("..", "Output", "Plots")
-RDSPlotPath <- file.path("..", "Output", "PlotsRDS")
-RDSTablePath <- file.path("..", "Output", "TablesRDS")
+FigPath <- file.path("..", "Output", "Figures")
+FigRdsPath <- file.path("..", "Output", "FiguresRds")
+TableRdsPath <- file.path("..", "Output", "TablesRDS")
 
 FileEncode <- "UTF-8" 
 Delimiter <- ""
@@ -136,9 +136,9 @@ TukeyHSDTest_GrowthRate<-TukeyHSD(model, which = c("Par_ue", "Photoperiod", "Str
 # Save RDS that create stats and tables
 
 ```{r}
-saveRDS(AnovaTest_GrowthRate, file.path(RDSTablePath, paste(Project, "GrowthRateAnova.Rds", sep = "_"), fsep = .Platform$file.sep), ascii = FALSE, version = NULL, compress = "xz", refhook = NULL)
+saveRDS(AnovaTest_GrowthRate, file.path(TableRdsPath, paste(Project, "Anova_GrowthRate.Rds", sep = "_"), fsep = .Platform$file.sep), ascii = FALSE, version = NULL, compress = "xz", refhook = NULL)
 
-saveRDS(TukeyHSDTest_GrowthRate, file.path(RDSTablePath, paste(Project, "GrowthRateTukey.Rds", sep = "_"), fsep = .Platform$file.sep), ascii = FALSE, version = NULL, compress = "xz", refhook = NULL)
+saveRDS(TukeyHSDTest_GrowthRate, file.path(TableRdsPath, paste(Project, "HSD_GrowthRate.Rds", sep = "_"), fsep = .Platform$file.sep), ascii = FALSE, version = NULL, compress = "xz", refhook = NULL)
 ```
 
 # Cleaning the environment
@@ -146,7 +146,6 @@ saveRDS(TukeyHSDTest_GrowthRate, file.path(RDSTablePath, paste(Project, "GrowthR
 ```{r}
 rm(MCGrowthRateStats, model)
 ```
-
 
 # Load processed Pigment Rds (contained PUR and pigments data)
 
@@ -732,20 +731,18 @@ TukeyHSDTest_GrowthRateFitParam_Photoperiod<-TukeyHSD(model, which = c("Fit", "S
 # Save RDS that create stats and tables
 
 ```{r}
-saveRDS(AnovaTest_GrowthRateFitParam_Light, file.path(RDSTablePath, paste(Project, "AnovaTest_GrowthRateFitParam_Light.Rds", sep = "_"), fsep = .Platform$file.sep), ascii = FALSE, version = NULL, compress = "xz", refhook = NULL)
+# saveRDS(AnovaTest_GrowthRateFitParam_Light, file.path(TableRdsPath, paste(Project, "Anova_GrowthRateFitParam_Light.Rds", sep = "_"), fsep = .Platform$file.sep), ascii = FALSE, version = NULL, compress = "xz", refhook = NULL)
 
-saveRDS(TukeyHSDTest_GrowthRateFitParam_Light, file.path(RDSTablePath, paste(Project, "TukeyHSDTest_GrowthRateFitParam_Light.Rds", sep = "_"), fsep = .Platform$file.sep), ascii = FALSE, version = NULL, compress = "xz", refhook = NULL)
+# saveRDS(TukeyHSDTest_GrowthRateFitParam_Light, file.path(TableRdsPath, paste(Project, "HSD_GrowthRateFitParam_Light.Rds", sep = "_"), fsep = .Platform$file.sep), ascii = FALSE, version = NULL, compress = "xz", refhook = NULL)
 
-saveRDS(AnovaTest_GrowthRateFitParam_Photoperiod, file.path(RDSTablePath, paste(Project, "AnovaTest_GrowthRateFitParam_Photoperiod.Rds", sep = "_"), fsep = .Platform$file.sep), ascii = FALSE, version = NULL, compress = "xz", refhook = NULL)
+# saveRDS(AnovaTest_GrowthRateFitParam_Photoperiod, file.path(TableRdsPath, paste(Project, "Anova_GrowthRateFitParam_Photoperiod.Rds", sep = "_"), fsep = .Platform$file.sep), ascii = FALSE, version = NULL, compress = "xz", refhook = NULL)
 
-saveRDS(TukeyHSDTest_GrowthRateFitParam_Photoperiod, file.path(RDSTablePath, paste(Project, "TukeyHSDTest_GrowthRateFitParam_Photoperiod.Rds", sep = "_"), fsep = .Platform$file.sep), ascii = FALSE, version = NULL, compress = "xz", refhook = NULL)
+# saveRDS(TukeyHSDTest_GrowthRateFitParam_Photoperiod, file.path(TableRdsPath, paste(Project, "HSD_GrowthRateFitParam_Photoperiod.Rds", sep = "_"), fsep = .Platform$file.sep), ascii = FALSE, version = NULL, compress = "xz", refhook = NULL)
 ```
-
 
 # Exstracting models for each fit (for each light and all light together)
 
 ```{r}
-
 MCGrowthSPAllModel<-GRCplatt_PredictGrowthAll %>% 
   dplyr::select(c(Strain, GRCplatt_Model))
   MCGrowthSPAllModel$Fit <- 'All'
@@ -777,11 +774,9 @@ MCModelAll_Light<-MCModelAll_Light %>%
 # rm(MCGrowthSPAllModel, MCGrowthSP30Model, MCGrowthSP90Model, MCGrowthSP180Model, MCGrowthSP300Model, MCGrowthSP900Model, GRCplatt_PredictGrowthAll, GRCplatt_PredictGrowth30, GRCplatt_PredictGrowth90, GRCplatt_PredictGrowth180, GRCplatt_PredictGrowth300, GRCplatt_PredictGrowth900)
 ```
 
-
 # Exstracting models for each fit (for each photoperiod and all photoperiod together)
 
 ```{r}
-
 MCGrowthSPAllModel<-GRCplatt_PredictGrowthAll %>% 
   dplyr::select(c(Strain, GRCplatt_Model))
   MCGrowthSPAllModel$Fit <- 'All'
@@ -893,7 +888,6 @@ AnovaTest_GrowthRateModel_Light <-AnovaTest_GrowthRateModel_Light %>%
   drop_na(Df) 
   #rm(anova056, anova077, anova048, anova127, MCModelAll_BA56, MCModelAll_BA77, MCModelAll_BA48, MCModelAll_BA127)
 ```
-
 
 # Anova from the model - compare fit from all photoperiod to selected one photoperiod
 
@@ -1036,9 +1030,8 @@ ggplot(MCGrowthSP, aes(PARPhotonDose_day, deltaOD_Lmu_corr)) +
 # Save plot 
 
 ```{r save plot}
-ggsave(file = file.path(PlotsPath, paste("GrowthRateLight_Plot",".png",sep = "")), height=10, width= 8,  dpi = 300, limitsize = TRUE)
+ggsave(file = file.path(FigPath, paste("SFig_GrowthRate",".png",sep = "")), height=10, width= 8,  dpi = 300, limitsize = TRUE)
 ```
-
 
 # Create plot - Photoperiod
 
@@ -1083,7 +1076,7 @@ ggplot(MCGrowthSP, aes(PARPhotonDose_day, deltaOD_Lmu_corr)) +
 # Save plot 
 
 ```{r save plot}
-ggsave(file = file.path(PlotsPath, paste("GrowthRatePhotoperiod_Plot",".png",sep = "")), height=10, width= 8,  dpi = 300, limitsize = TRUE)
+ggsave(file = file.path(FigPath, paste("Fig_GrowthRate",".png",sep = "")), height=10, width= 8,  dpi = 300, limitsize = TRUE)
 ```
 
 # Save RDS that create plot
@@ -1108,16 +1101,14 @@ ggsave(file = file.path(PlotsPath, paste("GrowthRatePhotoperiod_Plot",".png",sep
 # Save RDS that create stats and tables
 
 ```{r}
-saveRDS(AnovaTest_GrowthRateModel_Light, file.path(RDSTablePath, paste(Project, "GrowthRateAnovaModel_Light.Rds", sep = "_"), fsep = .Platform$file.sep), ascii = FALSE, version = NULL, compress = "xz", refhook = NULL)
+saveRDS(AnovaTest_GrowthRateModel_Light, file.path(TableRdsPath, paste(Project, "AnovaModel_GrowthRate_Light.Rds", sep = "_"), fsep = .Platform$file.sep), ascii = FALSE, version = NULL, compress = "xz", refhook = NULL)
 
-saveRDS(AnovaTest_GrowthRateModel_Photoperiod, file.path(RDSTablePath, paste(Project, "GrowthRateAnovaModel_Photoperiod.Rds", sep = "_"), fsep = .Platform$file.sep), ascii = FALSE, version = NULL, compress = "xz", refhook = NULL)
+saveRDS(AnovaTest_GrowthRateModel_Photoperiod, file.path(TableRdsPath, paste(Project, "AnovaModel_GrowthRate_Photoperiod.Rds", sep = "_"), fsep = .Platform$file.sep), ascii = FALSE, version = NULL, compress = "xz", refhook = NULL)
 
-saveRDS(MCParamAll_Light, file.path(RDSTablePath, paste(Project, "GrowthRate_FitParam_Light.Rds", sep = "_"), fsep = .Platform$file.sep), ascii = FALSE, version = NULL, compress = "xz", refhook = NULL)
+saveRDS(MCParamAll_Light, file.path(TableRdsPath, paste(Project, "Tab_GrowthRate_FitParam_Light.Rds", sep = "_"), fsep = .Platform$file.sep), ascii = FALSE, version = NULL, compress = "xz", refhook = NULL)
 
-saveRDS(MCParamAll_Photoperiod, file.path(RDSTablePath, paste(Project, "GrowthRate_FitParam_Photoperiod.Rds", sep = "_"), fsep = .Platform$file.sep), ascii = FALSE, version = NULL, compress = "xz", refhook = NULL)
+saveRDS(MCParamAll_Photoperiod, file.path(TableRdsPath, paste(Project, "Tab_GrowthRate_FitParam_Photoperiod.Rds", sep = "_"), fsep = .Platform$file.sep), ascii = FALSE, version = NULL, compress = "xz", refhook = NULL)
 ```
-
-
 
 # Removed unneccessary df from the environment
 
@@ -1132,7 +1123,6 @@ saveRDS(MCGrowthRateAll, file.path(DataOut, paste(Project, "Processed_GrowthRate
 
 saveRDS(MCGrowthRateExp, file.path(DataOut, paste(Project, "Processed_GrowthRateExp.Rds", sep = "_"), fsep = .Platform$file.sep), ascii = FALSE, version = NULL, compress = "xz", refhook = NULL)
 ```
-
 
 # Variable names used in Data Dictionary
 

@@ -51,8 +51,9 @@ Project <- "BalticPhotoperiod"
 DataOut <- file.path("..", "Data", "ProcessedData", "ProcessedGrowthCurveData")
 DataIn <- file.path("..", "Data", "ImportedData", "ImportedMCData", fsep = .Platform$file.sep)
 
-PlotsPath <- file.path("..", "Output", "Plots")
-RDSPlotPath <- file.path("..", "Output", "PlotsRDS")
+FigPath <- file.path("..", "Output", "Figures")
+FigRdsPath <- file.path("..", "Output", "FiguresRds")
+TableRdsPath <- file.path("..", "Output", "TablesRDS")
 
 FileEncode <- "UTF-8" 
 Delimiter <- ""
@@ -538,7 +539,7 @@ MultiCultiDataAll %>%
 # Save plot 
 
 ```{r save plot}
-ggsave(file = file.path(PlotsPath, paste("GrowthCurve_SupPlot",".png",sep = "")), height=10, width= 8,  dpi = 300, limitsize = TRUE)
+ggsave(file = file.path(FigPath, paste("SFig_GrowthCurve",".png",sep = "")), height=10, width= 8,  dpi = 300, limitsize = TRUE)
 ```
 
 # Create preliminary plot - loop
@@ -558,12 +559,16 @@ MultiCultiDataAll %>%
 rm(tMaxAGLines_056, tMaxAGLines_077, tMaxAGLines_048, tMaxAGLines_127, tmaxAG, MultiCultiData)
 ```
 
-# Save rds for further analysis
+# Save Fig Rds
+
+```{r}
+saveRDS(MultiCultiDataAll, file.path(FigRdsPath, paste(Project, "Fig_GrowthCurve_1.Rds", sep = "_"), fsep = .Platform$file.sep), ascii = FALSE, version = NULL, compress = "xz", refhook = NULL)
+```
+
+# Save Rds for further analysis
 
 ```{r save rds}
 saveRDS(MultiCultiDataAll, file.path(DataOut, paste(Project, "Processed_GrowthCurve.Rds", sep = "_"), fsep = .Platform$file.sep), ascii = FALSE, version = NULL, compress = "xz", refhook = NULL)
-
-saveRDS(MultiCultiDataAll, file.path(RDSPlotPath, paste(Project, "Plot_GrowthCurve.Rds", sep = "_"), fsep = .Platform$file.sep), ascii = FALSE, version = NULL, compress = "xz", refhook = NULL)
 ```
 
 # Variable names used in Data Dictionary

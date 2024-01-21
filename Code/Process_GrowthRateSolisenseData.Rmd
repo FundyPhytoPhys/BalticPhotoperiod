@@ -56,8 +56,9 @@ DataInGrowthRate <- file.path("..", "Data", "ProcessedData", "ProcessedGrowthRat
 
 DataInSolisense <- file.path("..", "Data", "ProcessedData", "ProcessedSolisenseData", fsep = .Platform$file.sep)
 
-PlotsPath <- file.path("..", "Output", "Plots")
-RDSPlotPath <- file.path("..", "Output", "PlotsRDS")
+FigPath <- file.path("..", "Output", "Figures")
+FigRdsPath <- file.path("..", "Output", "FiguresRds")
+TableRdsPath <- file.path("..", "Output", "TablesRDS")
 
 FileEncode <- "UTF-8" 
 Delimiter <- ""

@@ -50,8 +50,9 @@ Project <- "BalticPhotoperiod"
 DataOut <- file.path("..", "Data", "ProcessedData", "ProcessedPigmentsData")
 DataIn <- file.path("..", "Data", "ImportedData", "ImportedPigmentsData", fsep = .Platform$file.sep)
 
-PlotsPath <- file.path("..", "Output", "Plots")
-RDSPlotPath <- file.path("..", "Output", "PlotsRDS")
+FigPath <- file.path("..", "Output", "Figures")
+FigRdsPath <- file.path("..", "Output", "FiguresRds")
+TableRdsPath <- file.path("..", "Output", "TablesRDS")
 
 FileEncode <- "UTF-8" 
 Delimiter <- ""
@@ -278,7 +279,7 @@ MCPigmentPlot %>%
 # Save plot 
 
 ```{r save plot}
-ggsave(file = file.path(PlotsPath, paste("Pigmentstest_SupPlot",".png",sep = "")), height=10, width= 8,  dpi = 300, limitsize = TRUE)
+ggsave(file = file.path(PlotsPath, paste("SFig_Pigments",".png",sep = "")), height=10, width= 8,  dpi = 300, limitsize = TRUE)
 ```
 
 # Combine phyco/Chla ratio and car/chla ratio in one column for final plot
@@ -462,17 +463,17 @@ ggarrange(Plot1,Plot2,
 # Save plot 
 
 ```{r save plot}
-ggsave(file = file.path(PlotsPath, paste("PigRatioPUR_Plot",".png",sep = "")), height=10, width= 8,  dpi = 300, limitsize = TRUE)
+ggsave(file = file.path(FigPath, paste("Fig_PigRatioPUR",".png",sep = "")), height=10, width= 8,  dpi = 300, limitsize = TRUE)
 ```
 
-# Save Plot RDS
+# Save Fig Rds
 
 ```{r}
-saveRDS(MCPigmentPlot, file.path(RDSPlotPath, paste(Project, "Plot_Pigment.Rds", sep = "_"), fsep = .Platform$file.sep), ascii = FALSE, version = NULL, compress = "xz", refhook = NULL)
+saveRDS(MCPigmentPlot, file.path(FigRdsPath, paste(Project, "Fig_Pigment_1.Rds", sep = "_"), fsep = .Platform$file.sep), ascii = FALSE, version = NULL, compress = "xz", refhook = NULL)
 
-saveRDS(MCPigmentRatioPlot, file.path(RDSPlotPath, paste(Project, "Plot_PigmentRatioA.Rds", sep = "_"), fsep = .Platform$file.sep), ascii = FALSE, version = NULL, compress = "xz", refhook = NULL)
+saveRDS(MCPigmentRatioPlot, file.path(FigRdsPath, paste(Project, "Fig_PigmentRatioA_1.Rds", sep = "_"), fsep = .Platform$file.sep), ascii = FALSE, version = NULL, compress = "xz", refhook = NULL)
 
-saveRDS(OLISAllPURTidy, file.path(RDSPlotPath, paste(Project, "Plot_PigmentRatioB.Rds", sep = "_"), fsep = .Platform$file.sep), ascii = FALSE, version = NULL, compress = "xz", refhook = NULL)
+saveRDS(OLISAllPURTidy, file.path(FigRdsPath, paste(Project, "Fig_PigmentRatioB_2.Rds", sep = "_"), fsep = .Platform$file.sep), ascii = FALSE, version = NULL, compress = "xz", refhook = NULL)
 ```
 
 # Cleaning df before saving as rds and removed unnecessary files from the environment

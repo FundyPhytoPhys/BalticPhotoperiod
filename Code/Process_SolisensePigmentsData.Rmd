@@ -56,9 +56,9 @@ Project <- "BalticPhotoperiod"
 DataOut <- file.path("..", "Data", "ProcessedData", "ProcessedSolisenseData")
 DataIn <- file.path("..", "Data", "ImportedData", "ImportedSolisenseData", fsep = .Platform$file.sep)
 
-PlotsPath <- file.path("..", "Output", "Plots")
-RDSPlotPath <- file.path("..", "Output", "PlotsRDS")
-RDSTablePath <- file.path("..", "Output", "TablesRDS")
+FigPath <- file.path("..", "Output", "Figures")
+FigRdsPath <- file.path("..", "Output", "FiguresRds")
+TableRdsPath <- file.path("..", "Output", "TablesRDS")
 ```
 
 # List and read Imported_Solisense RDS
@@ -778,7 +778,7 @@ ggplot(SolFitsExpFitAll590, aes(x = PARPhotonDose_day, y = Sig_nm2psii)) +
 # Save plot 
 
 ```{r save plot}
-ggsave(file = file.path(PlotsPath, paste("Sigma590_SupPlot",".png",sep = "")), height=10, width= 8,  dpi = 300, limitsize = TRUE)
+ggsave(file = file.path(FigPath, paste("SFig_Sigma590",".png",sep = "")), height=10, width= 8,  dpi = 300, limitsize = TRUE)
 ```
 
 # Calculated Anova and Tukey test from data points
@@ -981,7 +981,7 @@ ggplot(SolFitsExpFitAll445, aes(x = PARPhotonDose_day, y = Sig_nm2psii)) +
 # Save plot 
 
 ```{r save plot}
-ggsave(file = file.path(PlotsPath, paste("Sigma445_SupPlot",".png",sep = "")), height=10, width= 8,  dpi = 300, limitsize = TRUE)
+ggsave(file = file.path(FigPath, paste("SFig_Sigma445",".png",sep = "")), height=10, width= 8,  dpi = 300, limitsize = TRUE)
 ```
 
 # Exstracting models for each fit
@@ -1063,11 +1063,11 @@ fittedmodel445<-fitted445  %>%
 # Save RDS that create plot
 
 ```{r}
-saveRDS(SolFitsExpFitAll, file.path(RDSPlotPath, paste(Project, "Plot_Sigma_1.Rds", sep = "_"), fsep = .Platform$file.sep), ascii = FALSE, version = NULL, compress = "xz", refhook = NULL)
-
-saveRDS(augmented590, file.path(RDSPlotPath, paste(Project, "Plot_Sigma_2.Rds", sep = "_"), fsep = .Platform$file.sep), ascii = FALSE, version = NULL, compress = "xz", refhook = NULL)
-
-saveRDS(fitted_Param590, file.path(RDSPlotPath, paste(Project, "Plot_Sigma_3.Rds", sep = "_"), fsep = .Platform$file.sep), ascii = FALSE, version = NULL, compress = "xz", refhook = NULL)
+# saveRDS(SolFitsExpFitAll, file.path(FigRdsPath, paste(Project, "Fig_Sigma_1.Rds", sep = "_"), fsep = .Platform$file.sep), ascii = FALSE, version = NULL, compress = "xz", refhook = NULL)
+# 
+# saveRDS(augmented590, file.path(FigRdsPath, paste(Project, "Fig_Sigma_2.Rds", sep = "_"), fsep = .Platform$file.sep), ascii = FALSE, version = NULL, compress = "xz", refhook = NULL)
+# 
+# saveRDS(fitted_Param590, file.path(FigRdsPath, paste(Project, "Fig_Sigma_3.Rds", sep = "_"), fsep = .Platform$file.sep), ascii = FALSE, version = NULL, compress = "xz", refhook = NULL)
 ```
 
 # Removed unneccessary df from the environment
@@ -2150,7 +2150,7 @@ filter(Ex_WL == 590) %>%
 # Save plot 
 
 ```{r save plot}
-ggsave(file = file.path(PlotsPath, paste("SigmavsPigments590Phasetest_SupPlot",".png",sep = "")), height=10, width= 8,  dpi = 300, limitsize = TRUE)
+ggsave(file = file.path(FigPath, paste("Fig_SigmaPig590",".png",sep = "")), height=10, width= 8,  dpi = 300, limitsize = TRUE)
 ```
 
 

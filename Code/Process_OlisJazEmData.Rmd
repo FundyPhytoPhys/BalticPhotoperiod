@@ -60,8 +60,9 @@ DataOut <- file.path("..", "Data", "ProcessedData", "ProcessedOlisJazData")
 DataInOlis <- file.path("..", "Data", "ImportedData", "ImportedOlisData", fsep = .Platform$file.sep)
 DataInJaz <- file.path("..", "Data", "ImportedData", "ImportedJazEmData", fsep = .Platform$file.sep)
 
-PlotsPath <- file.path("..", "Output", "Plots")
-RDSPlotPath <- file.path("..", "Output", "PlotsRDS")
+FigPath <- file.path("..", "Output", "Figures")
+FigRdsPath <- file.path("..", "Output", "FiguresRds")
+TableRdsPath <- file.path("..", "Output", "TablesRDS")
 
 FileEncode <- "UTF-8" 
 Delimiter <- ""
@@ -345,7 +346,7 @@ OLISSpectraMetaPURShort %>%
 # Save plot 
 
 ```{r save plot}
-ggsave(file = file.path(PlotsPath, paste("OlisSpectra_Plot",".png",sep = "")), height=10, width= 8,  dpi = 300, limitsize = TRUE)
+ggsave(file = file.path(FigPath, paste("Fig_OlisSpectra",".png",sep = "")), height=10, width= 8,  dpi = 300, limitsize = TRUE)
 ```
 
 ```{r Create plot, fig.height = 6, fig.width = 8}
@@ -627,14 +628,18 @@ OLISAllPURTidy %>%
 rm(tMaxAGLines_056Select, tMaxAGLines_077Select, tMaxAGLines_048Select, tMaxAGLines_127Select, tmaxAG, tmaxAGSelect)
 ```
 
-# Save rds for further analysis
+# Save Fig Rds
 
-```{r save rds}
+```{r}
+saveRDS(OLISSpectraMetaPURShort, file.path(FigRdsPath, paste(Project, "Fig_OlisSpectra_1.Rds", sep = "_"), fsep = .Platform$file.sep), ascii = FALSE, version = NULL, compress = "xz", refhook = NULL)
+```
+
+# Save Rds for further analysis
+
+```{r save Rds}
 saveRDS(OLISSpectraMetaPUR, file.path(DataOut, paste(Project, "Processed_OlisSpectraAll.Rds", sep = "_"), fsep = .Platform$file.sep), ascii = FALSE, version = NULL, compress = "xz", refhook = NULL)
 
 saveRDS(OLISAllPURTidy, file.path(DataOut, paste(Project, "Processed_OlisSpectraTidy.Rds", sep = "_"), fsep = .Platform$file.sep), ascii = FALSE, version = NULL, compress = "xz", refhook = NULL)
-
-saveRDS(OLISSpectraMetaPURShort, file.path(RDSPlotPath, paste(Project, "Plot_OlisSpectra.Rds", sep = "_"), fsep = .Platform$file.sep), ascii = FALSE, version = NULL, compress = "xz", refhook = NULL)
 ```
 
 # Variable names used in Data Dictionary
