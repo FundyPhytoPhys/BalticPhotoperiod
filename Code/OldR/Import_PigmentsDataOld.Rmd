@@ -1,0 +1,605 @@
+---
+title: "Import_PigmentData"
+author:
+- Naaman M. Omar 
+- Sylwia Sliwinska-Wilczewska
+- Douglas A. Campbell
+date: "`r format(Sys.Date())`"
+output:
+bookdown::html_document2:
+    code_folding: show
+    keep_md: yes
+    toc: TRUE
+    toc_float: TRUE
+    toc_depth: 6
+    fig_caption: yes
+bibliography: BalticPhotoperiod.bib
+csl: plos-one.csl
+editor_options: 
+  markdown: 
+    wrap: 72
+---
+
+# Set Chunk Options
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE)
+knitr::opts_chunk$set(fig.path='Figs/')
+```
+
+# Introduction
+
+Import_PigmentData.Rmd imports: PAMAS files from Data/RawData/PAMASData.zip folder; and ...
+
+and stored in Data/ImportedData/ImportedPigmentData folder as: 
+Baltic_Photoperiod_Imported_PigmentData.Rds
+
+# Load Libraries and set Project Variables
+
+```{r load libraries}
+library(kableExtra)
+library(tidyverse)
+library(lubridate)
+library(stringr)
+library(broom)
+library(knitr)
+library(OneR)
+library(zoo)
+library(strucchange)
+library(dplyr)
+library(magrittr)
+library(googledrive)
+library(googlesheets4)
+library(readxl)
+```
+
+```{r set project variables}
+Project <- "Baltic_Photoperiod"
+DataOut <- file.path("..", "Data", "ImportedData", "ImportedPigmentsData")
+#DataIn <- file.path("..", "Data", "RawData", "PamasData", fsep = .Platform$file.sep)
+
+PlotsPath <- file.path("..", "Output", "Plots")
+RDSPlotPath <- file.path("..", "Output", "PlotsRDS")
+RDSTablePath <- file.path("..", "Output", "TablesRDS")
+```
+
+# IMPORT PAMAS CORRELATION DATA
+
+```{r set project variables}
+Project <- "Baltic_Photoperiod"
+DataIn <- file.path("..", "Data", "RawData", "PAMAS", fsep = .Platform$file.sep)
+
+FileID <- "PAMAS"
+
+FileEncode <- "UTF-8" 
+HeaderRows <- 9
+Delimiter <- "\t"
+```
+
+# List files in the extracted folder 
+
+```{r}
+CountFiles <- list.files(path = DataIn, pattern = FileID, full.names = TRUE)
+CountFiles
+unique(duplicated(CountFiles))
+```
+
+```{r data read adds filename and cdate, warning=FALSE, message=FALSE, echo=FALSE}
+#design choice 2 file reading functions or add a filetype variable to a single function
+
+read.delim_plus <- function(flnm, file_encode, delimiter, header_rows){read.delim(flnm, fileEncoding = file_encode, sep = delimiter,  skip = header_rows, row.names = NULL) %>%
+    mutate(filename = flnm, cdatetime = ymd_hms(file.info(flnm)$ctime))
+}
+```
+
+```{r read Pamas file}
+
+CountTidy <- CountFiles %>%
+  map_df(~read.delim_plus(flnm =., file_encode = FileEncode, delimiter = Delimiter, header_rows = HeaderRows))
+```
+
+
+```{r tidy CountTidy}
+CountTidy <- CountTidy %>% 
+  mutate(filename = str_remove(string = filename, pattern = ".txt")) %>%
+  mutate(filename = str_remove(string = filename, pattern = "../PAMAS/")) %>%
+  separate(filename, into = c("FP1", "FP2", "Date", "Strain", "Dilution", "Device"), sep = "([\\/\\/\\_\\_\\_\\_])", remove = FALSE) 
+```
+
+# Remove a unrelated character (RawDa) in data frame column
+
+```{r remove a unrelated character}
+CountTidy$Date<-gsub("RawDa","",as.character(CountTidy$Date))
+
+CountTidy<-CountTidy %>% 
+  mutate(Date = as.double(`Date`)) %>%
+  mutate(Date = ymd_hm(`Date`)) %>% 
+  select(-c("FP1", "FP2"))
+```
+
+
+```{r tidy TargetPamasData}
+#figur out how to read and rename these columns from the file rather than manually
+NewNames <- c("PAMASDate", "Time", ">0.70",">0.80", ">0.90", ">1.00", ">1.20", ">1.50", ">2.00",">3.00", ">4.00", ">5.00", ">6.00", ">7.00", ">10.00", ">12.00",
+">15.00",">20.00", "Filename", "Date","Strain", "Dilution", "Device", "cdatetime")
+
+OldNames <- colnames(CountTidy)
+
+PamasTidy <- CountTidy %>%
+rename_with(~NewNames[which(OldNames == .x)], .cols = OldNames) %>%
+  mutate(datetime = paste(PAMASDate, Time),
+         datetime = mdy_hms(datetime))
+```
+
+```{r}
+PamasTidy <- PamasTidy %>%
+mutate(`S0.7` = as.numeric(`>0.70`) - as.numeric(`>0.80`),
+       `S0.8` = as.numeric(`>0.80`) - as.numeric(`>0.90`),
+       `S0.9` = as.numeric(`>0.90`) - as.numeric(`>1.00`),
+       `S1.0` = as.numeric(`>1.00`) - as.numeric(`>1.20`),
+       `S1.2` = as.numeric(`>1.20`) - as.numeric(`>1.50`),
+       `S1.5` = as.numeric(`>1.50`) - as.numeric(`>2.00`),
+       `S2.0` = as.numeric(`>2.00`) - as.numeric(`>3.00`),
+       `S3.0` = as.numeric(`>3.00`) - as.numeric(`>4.00`),
+       `S4.0` = as.numeric(`>4.00`) - as.numeric(`>5.00`),
+       `S5.0` = as.numeric(`>5.00`) - as.numeric(`>6.00`),
+       `S6.0` = as.numeric(`>6.00`) - as.numeric(`>7.00`),
+       `S7.0` = as.numeric(`>7.00`) - as.numeric(`>10.00`),
+       `S10.0` = as.numeric(`>10.00`) - as.numeric(`>12.00`),
+       `S12.0` = as.numeric(`>12.00`) - as.numeric(`>15.00`),
+       `S15.0` = as.numeric(`>15.00`) - as.numeric(`>20.00`),
+       `S20.0` = as.numeric(`>20.00`))
+
+PamasTidy <- PamasTidy %>%
+  # select(Date, Time, Filename, SampleID, `S0.7`, `S0.8`, `S0.9`, `S1.0`, `S1.2`, `S1.5`, `S2.0`, `S3.0`, `S4.0`, `S5.0`, `S6.0`, `S7.0`, `S10.0`, `S12.0`, `S15.0`, `S20.0`) %>%
+  pivot_longer(., cols = c("S0.7", "S0.8", "S0.9", "S1.0", "S1.2", "S1.5", "S2.0", "S3.0", "S4.0", "S5.0", "S6.0", "S7.0", "S10.0", "S12.0", "S15.0", "S20.0"), names_to = "CellSize_um", values_to = "Count") %>%
+  mutate_at("CellSize_um", str_replace, "S", "") %>%
+  mutate(CellSize_um = as.numeric(CellSize_um)) %>%
+  group_by(CellSize_um, Strain, Dilution) %>%
+  mutate(meanCount = mean(Count), 
+         sdCount = sd(Count)) %>%
+  ungroup() %>%
+  select(c(PAMASDate, Filename, Date, Strain, Dilution, cdatetime, CellSize_um, Count, meanCount, sdCount))
+```
+
+```{r}
+PamasTidy<-PamasTidy %>% 
+  rename(ObsDate=Date) %>%
+  rename(FilenamePAMAS=Filename) %>% 
+  select(-c(cdatetime, PAMASDate))
+```
+
+# Create preliminary plot
+```{r preliminary plot}
+PamasTidy %>%
+  mutate(meanCount104 = meanCount/10000) %>%
+  mutate(sdCount104 = sdCount/10000) %>%
+  filter(CellSize_um < 4) %>% 
+  ggplot() +
+  geom_point(aes(x = Dilution, y =meanCount104, label = Strain)) +
+  geom_errorbar(aes(x = Dilution, ymin = meanCount104-sdCount104, ymax = meanCount104+sdCount104)) +
+  labs(y = "Number of cells (N" ~10^4 ~mL^-1~")", x = "Culture concentration (mL)") +
+  scale_y_continuous(breaks=seq(0, 12, by = 4)) +
+  coord_cartesian(ylim = c (0, 12)) +
+  ggh4x::facet_nested(rows = vars(CellSize_um), cols = vars(Strain), labeller = labeller(Ex_WL = label_both, strain = label_value, WL = label_both, Photoperiod = label_both, Par_ue = label_both)) +
+  theme_bw()
+```
+# Removed unnecessary files from the environment
+
+```{r removed unnecessary files from the environment}
+rm(CountTidy)
+```
+
+# Save rds for further analysis
+
+```{r save rds}
+# saveRDS(PamasTidy, file.path(DataOut, paste(Project, "Imported_PamasData.Rds", sep = "_"), fsep = .Platform$file.sep), ascii = FALSE, version = NULL, compress = "xz", refhook = NULL)
+```
+
+# IMPORT MD PICO CORRELATION DATA
+
+```{r set project variables}
+Project <- "Baltic_Photoperiod"
+DataIn <- file.path("..", "Data", "RawData", "MDPicoData", fsep = .Platform$file.sep)
+
+FileEncode <- "UTF-8" 
+Delimiter <- ","
+HeaderRows <- 0
+FileID <- "ExperimentSummaryData"
+```
+
+# MDPico catalog 
+
+```{r load local metadatacatalog, message = FALSE, warning = FALSE, echo=FALSE}
+gs4_deauth()
+MDPicoCatalog <- read_sheet("https://docs.google.com/spreadsheets/d/1xDZ5eiCFgqJ-AgO7jhCSKS7oyO39KpwjZm0UpdP2p2c/edit#gid=0") %>%
+  mutate(Date = ymd_hm(`Date`)) %>%
+  separate(Date, into = c("Date_count", "Time_count"), sep = " ", remove = FALSE) %>%
+  mutate(Date_count = ymd(`Date_count`)) 
+```
+
+```{r}
+CountFiles <- list.files(path = DataIn, pattern = FileID, full.names = TRUE)
+CountFiles
+unique(duplicated(CountFiles))
+```
+
+```{r data read adds filename and cdate, warning=FALSE, message=FALSE, echo=FALSE}
+#design choice 2 file reading functions or add a filetype variable to a single function
+
+read.delim_plus <- function(flnm, file_encode, delimiter, header_rows){read.delim(flnm, fileEncoding = file_encode, sep = delimiter,  skip = header_rows, row.names = NULL) %>% mutate(filename = flnm, cdatetime = ymd_hms(file.info(flnm)$ctime))
+}
+```
+
+purrr::map to read all files
+```{r read MDPico file}
+CountTidy <- CountFiles %>%
+  map_df(~read.delim_plus(flnm =., file_encode = FileEncode, delimiter = Delimiter, header_rows = HeaderRows))
+```
+
+```{r tidy CountTidy}
+
+CountTidy <- CountTidy %>% 
+  #filter(!grepl("----", DATE)) %>% # remove rows with "----"
+  select(-c("Concentration", "Group", "Compound")) %>% # remove superfluous columns
+  mutate(filename = str_remove(string = filename, pattern = ".csv")) %>%
+  mutate(filename = str_remove(string = filename, pattern = "../MDPico/")) %>%
+  separate(filename, into = c("fp0", "fp1", "fp2", "Method", "ObsDate", "Project", "Initials",  "PlateNr", "Correlation", "Methods", "Organism"), sep = "([\\/\\/\\_\\_\\_\\_])", remove = FALSE) %>%
+  mutate(cdatetime = ymd_hms(cdatetime)) %>%
+  mutate(ObsDate = ymd_hm(ObsDate)) %>% 
+  select(-c(fp0, fp1, fp2, Method, Project))
+```
+
+```{r}
+CountMeta<- CountTidy %>%
+  mutate(PlateNr = as.double(PlateNr)) %>%
+  left_join(., MDPicoCatalog, by = c("Well.Name" = "WellNumber", "PlateNr" = "PlateNumber"))
+```
+
+```{r}
+CountMeta <- CountMeta %>%
+  mutate(culture_inocul_L = as.double(culture_inocul_L)) %>%
+  mutate(CapAreaPercentage = as.double(CapAreaPercentage)) %>%
+  mutate(cellsml = (`Cell.Count` * (0.001/culture_inocul_L)) /(CapAreaPercentage/100)) %>%
+group_by(Date, Strain, Dilution) %>%
+
+summarize(Well.Name, Cell.Count, filename, ObsDate, PlateNr, PlateID, Strain,Dilution,Date, Date_count, Time_count, media_inocul_L, culture_inocul_L, CapAreaPercentage, TotArea_mm2, CapArea_mm2, cellsml, 
+          meancellsml = mean(cellsml), 
+          sdcellsml = sd(cellsml)) %>%
+ungroup() 
+
+
+CountMeta <- CountMeta %>%
+  rename(CellCount=Cell.Count) %>%
+  rename(WellName=Well.Name) %>%
+  rename(MolDev_FileName=filename) %>% 
+  rename(DateCollect=Date_count) %>% 
+  rename(TimeCollect=Time_count) %>% 
+  select(-c(TotArea_mm2, CapArea_mm2, Date))
+```
+
+# Create preliminary plot
+
+```{r}
+CountMeta %>%
+  ggplot() +
+  geom_point(aes(x = Dilution, y = meancellsml)) +
+  # geom_errorbar(aes(x = E_days, ymin = meancellsml107-sdcellsml107, ymax = meancellsml107+sdcellsml107)) +
+  labs(y = "Number of cells/mL", x = "Time (d)") +
+  ggh4x::facet_nested(cols = vars(Strain), labeller = labeller(Ex_WL = label_both, strain = label_value, WL = label_both, Photoperiod = label_both, Par_ue = label_both)) +
+  theme_bw()
+```
+# Removed unnecessary files from the environment
+
+```{r removed unnecessary files from the environment}
+rm(CountTidy, MDPicoCatalog)
+```
+
+# Save rds for further analysis
+
+```{r save rds}
+# saveRDS(CountMeta, file.path(DataOut, paste(Project, "Imported_MDPicoData.Rds", sep = "_"), fsep = .Platform$file.sep), ascii = FALSE, version = NULL, compress = "xz", refhook = NULL)
+```
+
+# IMPORT PIGMENTS CORRELATION DATA FROM CLARIOSTAR (FILTERS)
+
+```{r}
+Project <- "Baltic_Photoperiod"
+#DataIn <- file.path("..", "Data", "RawData", "MDPicoData", fsep = .Platform$file.sep) 
+FileEncode <- "UTF-8" 
+Delimiter <- ","
+HeaderRows <- 0
+```
+
+# Load Pigment catalog
+
+```{r load local metadatacatalog, message = FALSE, warning = FALSE, echo=FALSE}
+gs4_deauth()
+PigmentData <- read_sheet("https://docs.google.com/spreadsheets/d/1EvogE5pFlGT9H304E3dqXKwh26dWI9r_snSPhZCHWiU/edit#gid=0") %>%
+  mutate(Date = as.numeric(Date)) %>%
+  mutate(Date = ymd(`Date`)) %>%
+  mutate(MeasDate = ymd(`MeasDate`))
+```
+
+# Read MetaData
+
+```{r read locally stored metadata from rds}
+CultureCatalog <- readRDS(file = file.path("..", "Data", "ImportedData", "ImportedMetaData", "CultureCatalog.Rds"))
+
+CultureCatalog<-CultureCatalog %>% 
+  select(-c(PrimaryOperator, Temp_c, ExpCul, ExpStartTime, O2_Category, Optode, OptodeCh, OptodeMeasure))
+```
+
+```{r}
+PigmentsClario <- PigmentData %>%
+  left_join(., CultureCatalog, by = c("CultureID" = "SampleID"))
+```
+
+```{r data read adds filename and cdate, warning=FALSE, message=FALSE, echo=FALSE}
+PigmentsClario <- PigmentsClario %>%
+  mutate(OD480 = as.double(OD480), OD565 = as.double(OD565), OD620 = as.double(OD620), OD650 = as.double(OD650),OD665 = as.double(OD665), OD750 = as.double(OD750)) %>%
+  mutate(Vacetone_mL = as.double(Vacetone_mL)) %>%
+  mutate(Vculture_mL = as.double(Vculture_mL)) %>%
+  
+  mutate(Chla_ugmL = case_when(Analysis == 'ChlaCar' ~ 11.236*(OD665-OD750)*Vacetone_mL/Vculture_mL)) %>%
+  mutate(Car_ugmL = case_when(Analysis == 'ChlaCar' ~  4*(OD480-OD750)*Vacetone_mL/Vculture_mL)) %>%
+  mutate(PC_ugmL = case_when(Analysis == 'Phyco' ~ (((OD620-OD750)-0.7*(OD650-OD750))/7.38)*(Vacetone_mL/Vculture_mL)*1000)) %>%
+  mutate(APC_ugmL = case_when(Analysis == 'Phyco' ~ (((OD650-OD750)-0.19*(OD620-OD750))/5.65)*(Vacetone_mL/Vculture_mL)*1000)) %>%
+  mutate(PE_ugmL = case_when(Analysis == 'Phyco' ~  (((OD565-OD750)*1000-2.8*PC_ugmL-1.34*APC_ugmL)/12.7)*(Vacetone_mL/Vculture_mL))) %>%
+  
+  mutate(CarChlaRatio = Car_ugmL/Chla_ugmL) %>%
+  mutate(PhycoTot = PC_ugmL + APC_ugmL + PE_ugmL) %>%
+  mutate(PCPERatio = PC_ugmL/PE_ugmL) %>%
+  mutate(PEPCRatio = PE_ugmL/PC_ugmL) %>%
+  
+  mutate(PhycoChlaRatio = PhycoTot/Chla_ugmL) %>%
+  mutate(PhycoCarRatio = PhycoTot/Car_ugmL)
+```
+
+```{r}
+PigmentsClario <- PigmentsClario %>%
+group_by(CultureID, Date, Analysis) %>%
+mutate(meanChla_ugmL = mean(Chla_ugmL), meanCar_ugmL = mean(Car_ugmL), meanCarChlaRatio = mean(CarChlaRatio), meanPC_ugmL = mean(PC_ugmL), meanAPC_ugmL = mean(APC_ugmL), meanPE_ugmL = mean(PE_ugmL), meanPhycoTot = mean(PhycoTot), meanPCPERatio = mean(PCPERatio), meanPEPCRatio = mean(PEPCRatio), meanPhycoChlaRatio = mean(PhycoChlaRatio), meanPhycoCarRatio = mean(PhycoCarRatio), sdChla_ugmL = sd(Chla_ugmL), sdCar_ugmL = sd(Car_ugmL), sdCarChlaRatio = sd(CarChlaRatio), sdPC_ugmL = sd(PC_ugmL), sdAPC_ugmL = sd(APC_ugmL), sdPE_ugmL = sd(PE_ugmL), sdPhycoTot = sd(PhycoTot), sdPCPERatio = sd(PCPERatio), sdPEPCRatio = sd(PEPCRatio), sdPhycoChlaRatio = sd(PhycoChlaRatio), sdPhycoCarRatio = sd(PhycoCarRatio)) %>%
+ungroup() %>%
+  
+select(c(PlateAb, WellAb, CultureID, Date, MeasDate, MeasTime, Analysis, Vculture_mL, Vacetone_mL, OD480, OD565, OD620, OD650, OD665, OD750, ClariostarFileName, Device, Run, Strain, ExpDate, Par_ue, Photoperiod, Tube, O2, WL, LightShape, ExpEndDate, PARPhotonDose_day, Chla_ugmL, Car_ugmL, CarChlaRatio, PC_ugmL, APC_ugmL, PE_ugmL, PhycoTot, PCPERatio, PEPCRatio, PhycoChlaRatio, PhycoCarRatio, meanChla_ugmL, meanCar_ugmL, meanCarChlaRatio, meanPC_ugmL, meanAPC_ugmL, meanPE_ugmL, meanPhycoTot, meanPCPERatio, meanPEPCRatio, meanPhycoChlaRatio, meanPhycoCarRatio, sdChla_ugmL, sdCar_ugmL, sdCarChlaRatio, sdPC_ugmL, sdAPC_ugmL, sdPE_ugmL, sdPhycoTot, sdPCPERatio, sdPEPCRatio, sdPhycoChlaRatio, sdPhycoCarRatio)) %>%
+
+group_by(CultureID) %>%
+  arrange(Date) %>%
+  mutate(E_days = as.numeric((Date - ExpDate[1]))) %>%
+ungroup()
+
+# Designations:
+# Date <- day when the sample was taken from the MultiCulti 
+# ExpDate <- day indicating the start of the multiculti experiment
+
+PigmentsClario<-PigmentsClario %>% 
+  rename(SampleID=CultureID) %>% 
+  rename(DateCollect=Date) %>% 
+  rename(ObsDate=MeasDate) %>% 
+  rename(ObsTime=MeasTime)
+```
+
+# Create Preliminary plot
+
+```{r create preliminary plot}
+
+PigmentsClario %>%
+  ggplot() +
+  geom_point(aes(x = E_days, y = meanChla_ugmL)) +
+  #geom_errorbar(aes(x = E_days, ymin = meanChla_ugmL-sdChla_ugmL, ymax = meanChla_ugmL+sdChla_ugmL)) +
+  labs(y = "Chl a content (µg" ~mL^-1~")", x = "Time (d)") +
+  scale_x_continuous(breaks=seq(0, 14, by = 7)) +
+  coord_cartesian(xlim = c (-1, 15)) +
+  ggh4x::facet_nested(rows = vars(Par_ue), cols = vars(Strain, Photoperiod), labeller = labeller(Ex_WL = label_both, strain = label_value, Par_ue = label_both, WL = label_both, Photoperiod = label_value)) +
+  theme_bw()
+```
+
+# Removed unnecessary files from the environment
+
+```{r removed unnecessary files from the environment}
+rm(PigmentData)
+```
+
+# Save rds for further analysis
+
+```{r save rds}
+# saveRDS(PigmentsClario, file.path(DataOut, paste(Project, "Imported_PigmentsClarioData.Rds", sep = "_"), fsep = .Platform$file.sep), ascii = FALSE, version = NULL, compress = "xz", refhook = NULL)
+```
+
+# IMPORT CLARIOSTAR CORRELATION DATA
+
+```{r}
+Project <- "Baltic_Photoperiod"
+
+FileEncode <- "UTF-8" 
+Delimiter <- ","
+HeaderRows <- 0
+```
+
+
+
+# Load ClarioSTAR catalog
+
+```{r load local metadatacatalog, message = FALSE, warning = FALSE, echo=FALSE}
+gs4_deauth()
+MetaData <- read_sheet("https://docs.google.com/spreadsheets/d/1a318QMEFfB6F-eS4DC4y0hK9nXHYY6kpLOubl12z-as/edit#gid=0") %>%
+  mutate(MeasDate = ymd(`MeasDate`))
+
+```
+
+```{r}
+MetaDataAll <- MetaData %>%
+  left_join(., CultureCatalog, by = c("CultureID" = "SampleID"))
+```
+
+
+```{r}
+GrowthClario <- MetaDataAll %>%
+mutate(OD750 = as.numeric(OD750), OD720 = as.numeric(OD720), OD680 = as.numeric(OD680)) %>%
+
+group_by(CultureID, MeasDate) %>%
+mutate(meanOD750 = mean(OD750), meanOD720 = mean(OD720), meanOD680 = mean(OD680), sdOD750 = sd(OD750), sdOD720 = sd(OD720), sdOD680 = sd(OD680)) %>% 
+ungroup() %>%
+
+select(c(PlateAb, WellAb, CultureID, MeasDate, MeasTime, Analysis, OD750, OD720, OD680, ClariostarFileName, Device, Run, Strain, ExpDate, Par_ue, Photoperiod, PARPhotonDose_day, Tube, O2, WL, LightShape, ExpEndDate, meanOD750, meanOD720, meanOD680, sdOD750, sdOD720, sdOD680)) %>%
+
+
+group_by(CultureID) %>%
+  arrange(MeasDate) %>%
+  mutate(E_days = as.numeric((MeasDate - ExpDate[1]))) %>%
+ungroup()
+
+# Designations:
+# E_days <- day of the experiment on which the sample was taken using R
+# InnocDate <- day indicating the innoculation of the multiculti experiment
+# ExpDate <- day indicating the start of the multiculti experiment
+
+GrowthClario<-GrowthClario %>% 
+  rename(ObsDate=MeasDate) %>% 
+  rename(ObsTime=MeasTime)
+```
+
+# Create preliminary plot
+```{r prelimplots}
+
+GrowthClario %>%
+  ggplot() +
+  geom_point(aes(x = E_days, y = meanOD750)) +
+  geom_errorbar(aes(x = E_days, ymin = meanOD750-sdOD750, ymax = meanOD750+sdOD750)) +
+  labs(y = "Absorbance" ~ "("~OD[750]~")", x = "Time (d)") +
+  ggh4x::facet_nested(rows = vars(Par_ue), cols = vars(Strain, Photoperiod), labeller = labeller(Ex_WL = label_both, strain = label_value, Par_ue = label_both, WL = label_both, Photoperiod = label_value)) +
+  theme_bw()
+
+```
+
+From flowcytometer from Poland (BD Accuri)
+```{r}
+  
+# GrowthClarioN <- GrowthClario %>%
+#   mutate(OD750N = case_when(
+#           Strain == 'BA77G' ~ 5766620.03*OD750+5146.44,
+#          Strain == 'BA56G' ~ 815627.77*OD750-6499.89, 
+#          Strain == 'BA48R' ~ 110516351.55*OD750-568505.87,
+#          Strain == 'BA127R' ~ 124271003.22*OD750-1691760.02))
+
+```
+
+
+```{r}
+# GrowthClarioN <- GrowthClarioN %>%
+# mutate(OD750N = as.numeric(OD750N)) %>%
+# 
+# group_by(CultureID, MeasDate) %>%
+# mutate(meanOD750N = mean(OD750N), 
+#        sdOD750N = sd(OD750N)) %>% 
+# ungroup() %>%
+# 
+# select(c(CultureID, MeasDate, Analysis, OD750, OD720, OD680, E_days, Run, Strain, ExpDate, Par_ue, Photoperiod, PARPhotonDose_day, Tube, O2, WL, LightShape, meanOD750, meanOD720, meanOD680, sdOD750, sdOD720, sdOD680, OD750N, meanOD750N, sdOD750N)) 
+  
+```
+
+WW Photoperiod N by BDAccuri Plot
+```{r fig.height = 6, fig.width = 8, echo = FALSE}
+
+# GrowthClarioN %>%
+#   ggplot() +
+#   geom_point(aes(x = E_days, y = meanOD750N)) +
+#   geom_errorbar(aes(x = E_days, ymin = meanOD750N-sdOD750N, ymax = meanOD750N+sdOD750N)) +
+#   labs(y = "Number of cells (N" ~ ~mL^-1~")", x = "Time (d)") +
+#   ggh4x::facet_nested(rows = vars(Par_ue), cols = vars(Strain, Photoperiod), labeller = labeller(Ex_WL = label_both, strain = label_value, Par_ue = label_both, WL = label_both, Photoperiod = label_value)) +
+#   theme_bw()
+```
+
+
+
+```{r}
+colnames(GrowthClario)
+
+GrowthClario<-GrowthClario %>% 
+  rename(ObsDate=MeasDate) %>% 
+  rename(ObsTime=MeasTime)
+```
+
+
+```{r}
+# saveRDS(GrowthClario, file.path(DataOut, paste(Project, "ClarioAbGrowth.Rds", sep = "_"), fsep = .Platform$file.sep))
+```
+
+
+
+
+
+```{r}
+Project <- "Baltic_Photoperiod"
+
+FileEncode <- "UTF-8" 
+Delimiter <- ","
+HeaderRows <- 0
+```
+
+
+Load metadatacatalog
+```{r load local metadatacatalog, message = FALSE, warning = FALSE, echo=FALSE}
+gs4_deauth()
+
+MetaData2 <- read_sheet("https://docs.google.com/spreadsheets/d/1cfyxO1bFSeEMlMnx1vAyuskk3Un_bqkE9-uUSc-jwhE/edit#gid=0") %>%
+  mutate(MeasDate = ymd(`MeasDate`))
+```
+
+```{r}
+GrowthClarioCorrelation <- MetaData2 %>%
+mutate(OD750 = as.numeric(OD750), OD720 = as.numeric(OD720), OD680 = as.numeric(OD680)) %>%
+
+group_by(Strain, MeasDate, Dilution) %>%
+mutate(meanOD750 = mean(OD750), meanOD720 = mean(OD720), meanOD680 = mean(OD680), sdOD750 = sd(OD750), sdOD720 = sd(OD720), sdOD680 = sd(OD680)) %>% 
+ungroup() %>%
+
+select(c(PlateAb, WellAb, Strain, Dilution, MeasDate, MeasTime, Analysis, OD750, OD720, OD680, ClariostarFileName, Device, meanOD750, meanOD720, meanOD680, sdOD750, sdOD720, sdOD680)) 
+
+# Designations:
+# E_days <- day of the experiment on which the sample was taken using R
+# ExpDate <- day indicating the start of the multiculti experiment
+
+GrowthClarioCorrelation<-GrowthClarioCorrelation %>% 
+  rename(ObsDate=MeasDate) %>% 
+  rename(ObsTime=MeasTime)
+```
+
+Some examle of plot
+```{r prelimplots}
+
+GrowthClarioCorrelation %>%
+  ggplot() +
+  geom_point(aes(x = Dilution, y = meanOD750, label = Strain)) +
+  geom_errorbar(aes(x = Dilution, ymin = meanOD750-sdOD750, ymax = meanOD750+sdOD750)) +
+  labs(y = "Absorbance" ~ "("~OD[750]~")") +
+  ggh4x::facet_nested(cols = vars(Strain), labeller = labeller(Ex_WL = label_both, strain = label_value, Par_ue = label_both, WL = label_both, Photoperiod = label_value)) +
+  theme_bw()
+
+```
+
+# Removed unnecessary files from the environment
+
+```{r removed unnecessary files from the environment}
+rm(PigmentData)
+```
+
+# Save rds for further analysis
+
+```{r save rds}
+# saveRDS(PigmentsClario, file.path(DataOut, paste(Project, "Imported_PigmentsClarioData.Rds", sep = "_"), fsep = .Platform$file.sep), ascii = FALSE, version = NULL, compress = "xz", refhook = NULL)
+```
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,1269 @@
+---
+title: "Import_PigmentData"
+author:
+- Naaman M. Omar 
+- Sylwia Sliwinska-Wilczewska
+- Douglas A. Campbell
+date: "`r format(Sys.Date())`"
+output:
+bookdown::html_document2:
+    code_folding: show
+    keep_md: yes
+    toc: TRUE
+    toc_float: TRUE
+    toc_depth: 6
+    fig_caption: yes
+bibliography: BalticPhotoperiod.bib
+csl: plos-one.csl
+editor_options: 
+  markdown: 
+    wrap: 72
+---
+
+# Set Chunk Options
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE)
+knitr::opts_chunk$set(fig.path='Figs/')
+```
+
+# Introduction
+
+Import_PigmentData.Rmd imports: PAMAS files from Data/RawData/PAMASData.zip folder; and ...
+
+and stored in Data/ImportedData/ImportedPigmentData folder as: 
+Baltic_Photoperiod_Imported_PigmentData.Rds
+
+# Load Libraries and set Project Variables
+
+```{r load libraries}
+library(kableExtra)
+library(tidyverse)
+library(lubridate)
+library(stringr)
+library(broom)
+library(knitr)
+library(OneR)
+library(zoo)
+library(strucchange)
+library(dplyr)
+library(magrittr)
+library(googledrive)
+library(googlesheets4)
+library(readxl)
+
+library(ggspectra)
+library(ggpubr)
+library(caret)
+library(gcookbook)
+library(scales)
+```
+
+```{r set project variables}
+Project <- "Baltic_Photoperiod"
+DataOut <- file.path("..", "Data", "ImportedData", "ImportedPigmentsData")
+#DataIn <- file.path("..", "Data", "RawData", "PamasData", fsep = .Platform$file.sep)
+
+PlotsPath <- file.path("..", "Output", "Plots")
+RDSPlotPath <- file.path("..", "Output", "PlotsRDS")
+RDSTablePath <- file.path("..", "Output", "TablesRDS")
+```
+
+# IMPORT PAMAS CORRELATION DATA
+
+# Set project variables and list files in the extracted folder
+
+```{r set project variables, warning = FALSE, echo = FALSE}
+Project <- "Baltic_Photoperiod"
+zip_file <- file.path("..", "Data", "RawData", "PamasData.zip")
+
+# List files in the extracted folder with a ".txt" extension
+CountFiles <- unzip(zip_file, list = TRUE)
+CountFiles <- CountFiles[grepl(".txt$", CountFiles$Name), "Name"]
+print(CountFiles)
+
+FileID <- "PAMAS"
+FileEncode <- "UTF-8" 
+HeaderRows <- 9
+DelimCS <- "\t"
+```
+
+# Read fread_plus function
+
+```{r data read adds filename and cdate, warning=FALSE, message=FALSE, echo=FALSE}
+# Define function to read and process each file
+fread_plus <- function(Flnm, FileEncode, Delim) {
+  con <- unz(zip_file, Flnm)
+  
+  # Read the file using read.table
+  data <- read.table(con, skip = HeaderRows, encoding = FileEncode, sep = Delim, header = TRUE)
+  
+  # Use tryCatch to handle errors during the closing of the connection
+  tryCatch(
+    close(con),
+    error = function(e) {
+      warning("Error closing connection: ", e$message)
+    })
+  
+  data <- data %>%
+    mutate(Filename = Flnm, CDateTime = ymd_hms(file.info(zip_file)$ctime)) 
+  return(data)
+}
+
+# Use map_df to read and process all files in CountFiles
+CountTidy <- CountFiles %>%
+  map_df(~fread_plus(Flnm = ., FileEncode = FileEncode, Delim = DelimCS))
+```
+
+```{r warning = FALSE, echo = FALSE}
+# Clean up the filename column
+CountTidy <- CountTidy %>% 
+  mutate(Filename = str_remove(string = Filename, pattern = ".txt")) %>%
+  mutate(Filename = str_remove(string = Filename, pattern = "../PamasData/")) %>%
+  separate(Filename, into = c("Date", "Strain", "Dilution", "Device"), sep = "([\\/\\/\\_\\_\\_\\_])", remove = FALSE) %>% 
+  mutate(Date = as.double(`Date`)) %>%
+  mutate(Date = ymd_hm(`Date`))
+```
+
+
+```{r tidy TargetPamasData}
+#figur out how to read and rename these columns from the file rather than manually
+NewNames <- c("PAMASDate", "Time", ">0.70",">0.80", ">0.90", ">1.00", ">1.20", ">1.50", ">2.00",">3.00", ">4.00", ">5.00", ">6.00", ">7.00", ">10.00", ">12.00",
+">15.00",">20.00", "Filename", "Date","Strain", "Dilution", "Device", "cdatetime")
+
+OldNames <- colnames(CountTidy)
+
+PamasTidy <- CountTidy %>%
+rename_with(~NewNames[which(OldNames == .x)], .cols = OldNames) %>%
+  mutate(datetime = paste(PAMASDate, Time),
+         datetime = mdy_hms(datetime))
+```
+
+```{r}
+PamasTidy <- PamasTidy %>%
+mutate(`S0.7` = as.numeric(`>0.70`) - as.numeric(`>0.80`),
+       `S0.8` = as.numeric(`>0.80`) - as.numeric(`>0.90`),
+       `S0.9` = as.numeric(`>0.90`) - as.numeric(`>1.00`),
+       `S1.0` = as.numeric(`>1.00`) - as.numeric(`>1.20`),
+       `S1.2` = as.numeric(`>1.20`) - as.numeric(`>1.50`),
+       `S1.5` = as.numeric(`>1.50`) - as.numeric(`>2.00`),
+       `S2.0` = as.numeric(`>2.00`) - as.numeric(`>3.00`),
+       `S3.0` = as.numeric(`>3.00`) - as.numeric(`>4.00`),
+       `S4.0` = as.numeric(`>4.00`) - as.numeric(`>5.00`),
+       `S5.0` = as.numeric(`>5.00`) - as.numeric(`>6.00`),
+       `S6.0` = as.numeric(`>6.00`) - as.numeric(`>7.00`),
+       `S7.0` = as.numeric(`>7.00`) - as.numeric(`>10.00`),
+       `S10.0` = as.numeric(`>10.00`) - as.numeric(`>12.00`),
+       `S12.0` = as.numeric(`>12.00`) - as.numeric(`>15.00`),
+       `S15.0` = as.numeric(`>15.00`) - as.numeric(`>20.00`),
+       `S20.0` = as.numeric(`>20.00`))
+
+PamasTidy <- PamasTidy %>%
+  # select(Date, Time, Filename, SampleID, `S0.7`, `S0.8`, `S0.9`, `S1.0`, `S1.2`, `S1.5`, `S2.0`, `S3.0`, `S4.0`, `S5.0`, `S6.0`, `S7.0`, `S10.0`, `S12.0`, `S15.0`, `S20.0`) %>%
+  pivot_longer(., cols = c("S0.7", "S0.8", "S0.9", "S1.0", "S1.2", "S1.5", "S2.0", "S3.0", "S4.0", "S5.0", "S6.0", "S7.0", "S10.0", "S12.0", "S15.0", "S20.0"), names_to = "CellSize_um", values_to = "Count") %>%
+  mutate_at("CellSize_um", str_replace, "S", "") %>%
+  mutate(CellSize_um = as.numeric(CellSize_um)) %>%
+  group_by(CellSize_um, Strain, Dilution) %>%
+  mutate(meanCount = mean(Count), 
+         sdCount = sd(Count)) %>%
+  ungroup() %>%
+  select(c(PAMASDate, Filename, Date, Strain, Dilution, cdatetime, CellSize_um, Count, meanCount, sdCount))
+```
+
+```{r}
+PamasTidy<-PamasTidy %>% 
+  rename(ObsDate=Date) %>%
+  rename(FilenamePAMAS=Filename) %>% 
+  select(-c(cdatetime, PAMASDate))
+```
+
+# Create preliminary plot
+```{r preliminary plot}
+PamasTidy %>%
+  mutate(meanCount104 = meanCount/10000) %>%
+  mutate(sdCount104 = sdCount/10000) %>%
+  filter(CellSize_um < 4) %>% 
+  ggplot() +
+  geom_point(aes(x = Dilution, y =meanCount104, label = Strain)) +
+  geom_errorbar(aes(x = Dilution, ymin = meanCount104-sdCount104, ymax = meanCount104+sdCount104)) +
+  labs(y = "Number of cells (N" ~10^4 ~mL^-1~")", x = "Culture concentration (mL)") +
+  scale_y_continuous(breaks=seq(0, 12, by = 4)) +
+  coord_cartesian(ylim = c (0, 12)) +
+  ggh4x::facet_nested(rows = vars(CellSize_um), cols = vars(Strain), labeller = labeller(Ex_WL = label_both, strain = label_value, WL = label_both, Photoperiod = label_both, Par_ue = label_both)) +
+  theme_bw()
+```
+# Removed unnecessary files from the environment
+
+```{r removed unnecessary files from the environment}
+rm(CountTidy)
+```
+
+# Save rds for further analysis
+
+```{r save rds}
+# saveRDS(PamasTidy, file.path(DataOut, paste(Project, "Imported_PamasData.Rds", sep = "_"), fsep = .Platform$file.sep), ascii = FALSE, version = NULL, compress = "xz", refhook = NULL)
+```
+
+# IMPORT MD PICO CORRELATION DATA
+
+```{r set project variables}
+Project <- "Baltic_Photoperiod"
+DataIn <- file.path("..", "Data", "RawData", "MDPicoData", fsep = .Platform$file.sep)
+
+FileEncode <- "UTF-8" 
+Delimiter <- ","
+HeaderRows <- 0
+FileID <- "ExperimentSummaryData"
+```
+
+# MDPico catalog 
+
+```{r load local metadatacatalog, message = FALSE, warning = FALSE, echo=FALSE}
+gs4_deauth()
+MDPicoCatalog <- read_sheet("https://docs.google.com/spreadsheets/d/1xDZ5eiCFgqJ-AgO7jhCSKS7oyO39KpwjZm0UpdP2p2c/edit#gid=0") %>%
+  mutate(Date = ymd_hm(`Date`)) %>%
+  separate(Date, into = c("Date_count", "Time_count"), sep = " ", remove = FALSE) %>%
+  mutate(Date_count = ymd(`Date_count`)) 
+```
+
+```{r}
+CountFiles <- list.files(path = DataIn, pattern = FileID, full.names = TRUE)
+CountFiles
+unique(duplicated(CountFiles))
+```
+
+```{r data read adds filename and cdate, warning=FALSE, message=FALSE, echo=FALSE}
+#design choice 2 file reading functions or add a filetype variable to a single function
+
+read.delim_plus <- function(flnm, file_encode, delimiter, header_rows){read.delim(flnm, fileEncoding = file_encode, sep = delimiter,  skip = header_rows, row.names = NULL) %>% mutate(filename = flnm, cdatetime = ymd_hms(file.info(flnm)$ctime))
+}
+```
+
+purrr::map to read all files
+```{r read MDPico file}
+CountTidy <- CountFiles %>%
+  map_df(~read.delim_plus(flnm =., file_encode = FileEncode, delimiter = Delimiter, header_rows = HeaderRows))
+```
+
+```{r tidy CountTidy}
+
+CountTidy <- CountTidy %>% 
+  #filter(!grepl("----", DATE)) %>% # remove rows with "----"
+  select(-c("Concentration", "Group", "Compound")) %>% # remove superfluous columns
+  mutate(filename = str_remove(string = filename, pattern = ".csv")) %>%
+  mutate(filename = str_remove(string = filename, pattern = "../MDPico/")) %>%
+  separate(filename, into = c("fp0", "fp1", "fp2", "Method", "ObsDate", "Project", "Initials",  "PlateNr", "Correlation", "Methods", "Organism"), sep = "([\\/\\/\\_\\_\\_\\_])", remove = FALSE) %>%
+  mutate(cdatetime = ymd_hms(cdatetime)) %>%
+  mutate(ObsDate = ymd_hm(ObsDate)) %>% 
+  select(-c(fp0, fp1, fp2, Method, Project))
+```
+
+```{r}
+CountMeta<- CountTidy %>%
+  mutate(PlateNr = as.double(PlateNr)) %>%
+  left_join(., MDPicoCatalog, by = c("Well.Name" = "WellNumber", "PlateNr" = "PlateNumber"))
+```
+
+```{r}
+CountMeta <- CountMeta %>%
+  mutate(culture_inocul_L = as.double(culture_inocul_L)) %>%
+  mutate(CapAreaPercentage = as.double(CapAreaPercentage)) %>%
+  mutate(cellsml = (`Cell.Count` * (0.001/culture_inocul_L)) /(CapAreaPercentage/100)) %>%
+group_by(Date, Strain, Dilution) %>%
+
+summarize(Well.Name, Cell.Count, filename, ObsDate, PlateNr, PlateID, Strain,Dilution,Date, Date_count, Time_count, media_inocul_L, culture_inocul_L, CapAreaPercentage, TotArea_mm2, CapArea_mm2, cellsml, 
+          meancellsml = mean(cellsml), 
+          sdcellsml = sd(cellsml)) %>%
+ungroup() 
+
+
+CountMeta <- CountMeta %>%
+  rename(CellCount=Cell.Count) %>%
+  rename(WellName=Well.Name) %>%
+  rename(MolDev_FileName=filename) %>% 
+  rename(DateCollect=Date_count) %>% 
+  rename(TimeCollect=Time_count) %>% 
+  select(-c(TotArea_mm2, CapArea_mm2, Date))
+```
+
+# Create preliminary plot
+
+```{r}
+CountMeta %>%
+  ggplot() +
+  geom_point(aes(x = Dilution, y = meancellsml)) +
+  # geom_errorbar(aes(x = E_days, ymin = meancellsml107-sdcellsml107, ymax = meancellsml107+sdcellsml107)) +
+  labs(y = "Number of cells/mL", x = "Time (d)") +
+  ggh4x::facet_nested(cols = vars(Strain), labeller = labeller(Ex_WL = label_both, strain = label_value, WL = label_both, Photoperiod = label_both, Par_ue = label_both)) +
+  theme_bw()
+```
+# Removed unnecessary files from the environment
+
+```{r removed unnecessary files from the environment}
+rm(CountTidy, MDPicoCatalog)
+```
+
+# Save rds for further analysis
+
+```{r save rds}
+# saveRDS(CountMeta, file.path(DataOut, paste(Project, "Imported_MDPicoData.Rds", sep = "_"), fsep = .Platform$file.sep), ascii = FALSE, version = NULL, compress = "xz", refhook = NULL)
+```
+
+# IMPORT PIGMENTS CORRELATION DATA FROM CLARIOSTAR (FILTERS)
+
+```{r}
+Project <- "Baltic_Photoperiod"
+#DataIn <- file.path("..", "Data", "RawData", "MDPicoData", fsep = .Platform$file.sep) 
+FileEncode <- "UTF-8" 
+Delimiter <- ","
+HeaderRows <- 0
+```
+
+# Load Pigment catalog
+
+```{r load local metadatacatalog, message = FALSE, warning = FALSE, echo=FALSE}
+gs4_deauth()
+PigmentData <- read_sheet("https://docs.google.com/spreadsheets/d/1EvogE5pFlGT9H304E3dqXKwh26dWI9r_snSPhZCHWiU/edit#gid=0") %>%
+  mutate(Date = as.numeric(Date)) %>%
+  mutate(Date = ymd(`Date`)) %>%
+  mutate(MeasDate = ymd(`MeasDate`))
+```
+
+# Read MetaData
+
+```{r read locally stored metadata from rds}
+CultureCatalog <- readRDS(file = file.path("..", "Data", "ImportedData", "ImportedMetaData", "CultureCatalog.Rds"))
+
+CultureCatalog<-CultureCatalog %>% 
+  select(-c(PrimaryOperator, Temp_c, ExpCul, ExpStartTime, O2_Category, Optode, OptodeCh, OptodeMeasure))
+```
+
+```{r}
+PigmentsClario <- PigmentData %>%
+  left_join(., CultureCatalog, by = c("CultureID" = "SampleID"))
+```
+
+```{r data read adds filename and cdate, warning=FALSE, message=FALSE, echo=FALSE}
+PigmentsClario <- PigmentsClario %>%
+  mutate(OD480 = as.double(OD480), OD565 = as.double(OD565), OD620 = as.double(OD620), OD650 = as.double(OD650),OD665 = as.double(OD665), OD750 = as.double(OD750)) %>%
+  mutate(Vacetone_mL = as.double(Vacetone_mL)) %>%
+  mutate(Vculture_mL = as.double(Vculture_mL)) %>%
+  
+  mutate(Chla_ugmL = case_when(Analysis == 'ChlaCar' ~ 11.236*(OD665-OD750)*Vacetone_mL/Vculture_mL)) %>%
+  mutate(Car_ugmL = case_when(Analysis == 'ChlaCar' ~  4*(OD480-OD750)*Vacetone_mL/Vculture_mL)) %>%
+  mutate(PC_ugmL = case_when(Analysis == 'Phyco' ~ (((OD620-OD750)-0.7*(OD650-OD750))/7.38)*(Vacetone_mL/Vculture_mL)*1000)) %>%
+  mutate(APC_ugmL = case_when(Analysis == 'Phyco' ~ (((OD650-OD750)-0.19*(OD620-OD750))/5.65)*(Vacetone_mL/Vculture_mL)*1000)) %>%
+  mutate(PE_ugmL = case_when(Analysis == 'Phyco' ~  (((OD565-OD750)*1000-2.8*PC_ugmL-1.34*APC_ugmL)/12.7)*(Vacetone_mL/Vculture_mL))) %>%
+  
+  mutate(CarChlaRatio = Car_ugmL/Chla_ugmL) %>%
+  mutate(PhycoTot = PC_ugmL + APC_ugmL + PE_ugmL) %>%
+  mutate(PCPERatio = PC_ugmL/PE_ugmL) %>%
+  mutate(PEPCRatio = PE_ugmL/PC_ugmL) %>%
+  
+  mutate(PhycoChlaRatio = PhycoTot/Chla_ugmL) %>%
+  mutate(PhycoCarRatio = PhycoTot/Car_ugmL)
+```
+
+```{r}
+PigmentsClario <- PigmentsClario %>%
+group_by(CultureID, Date, Analysis) %>%
+mutate(meanChla_ugmL = mean(Chla_ugmL), meanCar_ugmL = mean(Car_ugmL), meanCarChlaRatio = mean(CarChlaRatio), meanPC_ugmL = mean(PC_ugmL), meanAPC_ugmL = mean(APC_ugmL), meanPE_ugmL = mean(PE_ugmL), meanPhycoTot = mean(PhycoTot), meanPCPERatio = mean(PCPERatio), meanPEPCRatio = mean(PEPCRatio), meanPhycoChlaRatio = mean(PhycoChlaRatio), meanPhycoCarRatio = mean(PhycoCarRatio), sdChla_ugmL = sd(Chla_ugmL), sdCar_ugmL = sd(Car_ugmL), sdCarChlaRatio = sd(CarChlaRatio), sdPC_ugmL = sd(PC_ugmL), sdAPC_ugmL = sd(APC_ugmL), sdPE_ugmL = sd(PE_ugmL), sdPhycoTot = sd(PhycoTot), sdPCPERatio = sd(PCPERatio), sdPEPCRatio = sd(PEPCRatio), sdPhycoChlaRatio = sd(PhycoChlaRatio), sdPhycoCarRatio = sd(PhycoCarRatio)) %>%
+ungroup() %>%
+  
+select(c(PlateAb, WellAb, CultureID, Date, MeasDate, MeasTime, Analysis, Vculture_mL, Vacetone_mL, OD480, OD565, OD620, OD650, OD665, OD750, ClariostarFileName, Device, Run, Strain, ExpDate, Par_ue, Photoperiod, Tube, O2, WL, LightShape, ExpEndDate, PARPhotonDose_day, Chla_ugmL, Car_ugmL, CarChlaRatio, PC_ugmL, APC_ugmL, PE_ugmL, PhycoTot, PCPERatio, PEPCRatio, PhycoChlaRatio, PhycoCarRatio, meanChla_ugmL, meanCar_ugmL, meanCarChlaRatio, meanPC_ugmL, meanAPC_ugmL, meanPE_ugmL, meanPhycoTot, meanPCPERatio, meanPEPCRatio, meanPhycoChlaRatio, meanPhycoCarRatio, sdChla_ugmL, sdCar_ugmL, sdCarChlaRatio, sdPC_ugmL, sdAPC_ugmL, sdPE_ugmL, sdPhycoTot, sdPCPERatio, sdPEPCRatio, sdPhycoChlaRatio, sdPhycoCarRatio)) %>%
+
+group_by(CultureID) %>%
+  arrange(Date) %>%
+  mutate(E_days = as.numeric((Date - ExpDate[1]))) %>%
+ungroup()
+
+# Designations:
+# Date <- day when the sample was taken from the MultiCulti 
+# ExpDate <- day indicating the start of the multiculti experiment
+
+PigmentsClario<-PigmentsClario %>% 
+  rename(SampleID=CultureID) %>% 
+  rename(DateCollect=Date) %>% 
+  rename(ObsDate=MeasDate) %>% 
+  rename(ObsTime=MeasTime)
+```
+
+# Create Preliminary plot
+
+```{r create preliminary plot}
+
+PigmentsClario %>%
+  ggplot() +
+  geom_point(aes(x = E_days, y = meanChla_ugmL)) +
+  #geom_errorbar(aes(x = E_days, ymin = meanChla_ugmL-sdChla_ugmL, ymax = meanChla_ugmL+sdChla_ugmL)) +
+  labs(y = "Chl a content (µg" ~mL^-1~")", x = "Time (d)") +
+  scale_x_continuous(breaks=seq(0, 14, by = 7)) +
+  coord_cartesian(xlim = c (-1, 15)) +
+  ggh4x::facet_nested(rows = vars(Par_ue), cols = vars(Strain, Photoperiod), labeller = labeller(Ex_WL = label_both, strain = label_value, Par_ue = label_both, WL = label_both, Photoperiod = label_value)) +
+  theme_bw()
+```
+
+# Removed unnecessary files from the environment
+
+```{r removed unnecessary files from the environment}
+rm(PigmentData)
+```
+
+# Save rds for further analysis
+
+```{r save rds}
+# saveRDS(PigmentsClario, file.path(DataOut, paste(Project, "Imported_PigmentsClarioData.Rds", sep = "_"), fsep = .Platform$file.sep), ascii = FALSE, version = NULL, compress = "xz", refhook = NULL)
+```
+
+# IMPORT CLARIOSTAR ABSORBANCE CORRELATION DATA
+
+```{r}
+Project <- "Baltic_Photoperiod"
+
+FileEncode <- "UTF-8" 
+Delimiter <- ","
+HeaderRows <- 0
+```
+
+# Load Clario Growth Correlatin Catalog 
+
+```{r load local metadatacatalog, message = FALSE, warning = FALSE, echo=FALSE}
+gs4_deauth()
+
+ClarioGrowth <- read_sheet("https://docs.google.com/spreadsheets/d/1cfyxO1bFSeEMlMnx1vAyuskk3Un_bqkE9-uUSc-jwhE/edit#gid=0") %>%
+  mutate(MeasDate = ymd(`MeasDate`))
+```
+
+```{r}
+ClarioGrowth <- ClarioGrowth %>%
+mutate(OD750 = as.numeric(OD750), OD720 = as.numeric(OD720), OD680 = as.numeric(OD680)) %>%
+
+group_by(Strain, MeasDate, Dilution) %>%
+mutate(meanOD750 = mean(OD750), meanOD720 = mean(OD720), meanOD680 = mean(OD680), sdOD750 = sd(OD750), sdOD720 = sd(OD720), sdOD680 = sd(OD680)) %>% 
+ungroup() %>%
+
+select(c(PlateAb, WellAb, Strain, Dilution, MeasDate, MeasTime, Analysis, OD750, OD720, OD680, ClariostarFileName, Device, meanOD750, meanOD720, meanOD680, sdOD750, sdOD720, sdOD680)) 
+
+# Designations:
+# E_days <- day of the experiment on which the sample was taken using R
+# ExpDate <- day indicating the start of the multiculti experiment
+
+ClarioGrowth<-ClarioGrowth %>% 
+  rename(ObsDate=MeasDate) %>% 
+  rename(ObsTime=MeasTime)
+```
+
+Some examle of plot
+```{r prelimplots}
+ClarioGrowth %>%
+  ggplot() +
+  geom_point(aes(x = Dilution, y = meanOD750, label = Strain)) +
+  geom_errorbar(aes(x = Dilution, ymin = meanOD750-sdOD750, ymax = meanOD750+sdOD750)) +
+  labs(y = "Absorbance" ~ "("~OD[750]~")") +
+  ggh4x::facet_nested(cols = vars(Strain), labeller = labeller(Ex_WL = label_both, strain = label_value, Par_ue = label_both, WL = label_both, Photoperiod = label_value)) +
+  theme_bw()
+```
+
+# Save rds for further analysis
+
+```{r save rds}
+# saveRDS(ClarioGrowth, file.path(DataOut, paste(Project, "Imported_ClarioGrowthCorrData.Rds", sep = "_"), fsep = .Platform$file.sep), ascii = FALSE, version = NULL, compress = "xz", refhook = NULL)
+```
+
+# CORRELATION PAMAS-CLARIOSTAR GROWTH
+
+# Preparing PAMAS to correlation - 4 replica; only 1.5 um size
+
+```{r}
+PamasTidyCorr <- PamasTidy %>% 
+  filter(Strain == "BA127R" | Strain == "BA48R" | Strain == "BA48R2" | Strain == "BA48R3" | Strain == "BA56G" | Strain == "BA77G") %>% 
+  filter(CellSize_um == 1.5) %>% 
+  unique()
+
+PamasTidyCorr$ObsDate2 <- format(PamasTidyCorr$ObsDate, format="%Y-%m-%d")
+
+PamasTidyCorr <- PamasTidyCorr %>% 
+mutate(ObsDate2 = as.Date(ObsDate2, format="%Y-%m-%d")) %>% 
+mutate(ObsDate=ObsDate2) %>% 
+select(-c(ObsDate2))
+```
+
+# Preparing ClarioAb to correlation
+
+```{r}
+ClarioGrowthCorr <- ClarioGrowth %>% 
+  filter(Strain == "BA127R" | Strain == "BA48R" | Strain == "BA48R2" | Strain == "BA48R3" | Strain == "BA56G" | Strain == "BA77G") 
+
+ClarioGrowthCorr <- ClarioGrowthCorr %>%
+  select(-c(Device, Analysis, ObsTime))
+```
+
+
+```{r}
+ClarioPamasCorr <- ClarioGrowthCorr %>%
+  full_join(., PamasTidyCorr, by = c("Strain" = "Strain", "Dilution" = "Dilution", "ObsDate" = "ObsDate"))  
+```
+
+```{r}
+ClarioPamasCorr <- ClarioPamasCorr %>% 
+  filter(OD720 < 0.16)
+```
+
+
+# Create preliminary plots
+
+```{r prelimplots}
+ClarioPamasCorr %>%
+  ggplot() +
+  geom_point(aes(x = OD720, y = Count)) +
+  labs(y = "Number of cells (N/mL)", x = "Absorbance" ~ "("~OD[720]~")") +
+  ggh4x::facet_nested(rows = vars(Strain), labeller = labeller(Ex_WL = label_both, strain = label_value, Par_ue = label_both, WL = label_both, Photoperiod = label_value)) +
+  theme_bw()
+
+ClarioPamasCorr %>%
+  ggplot() +
+  geom_point(aes(x = OD750, y = Count)) +
+  labs(y = "Number of cells (N/mL)", x = "Absorbance" ~ "("~OD[750]~")") +
+  ggh4x::facet_nested(rows = vars(Strain), labeller = labeller(Ex_WL = label_both, strain = label_value, Par_ue = label_both, WL = label_both, Photoperiod = label_value)) +
+  theme_bw()
+
+ClarioPamasCorr %>%
+  ggplot() +
+  geom_point(aes(x = OD680, y = Count)) +
+  labs(y = "Number of cells (N/mL)", x = "Absorbance" ~ "("~OD[680]~")") +
+  ggh4x::facet_nested(rows = vars(Strain), labeller = labeller(Ex_WL = label_both, strain = label_value, Par_ue = label_both, WL = label_both, Photoperiod = label_value)) +
+  theme_bw()
+```
+
+Pearson Correlation Coefficient and Linear Regression and coefficient of determination or R²  - filter
+https://www.datacamp.com/tutorial/linear-regression-R
+
+OD720
+```{r}
+
+ClarioPamasCorrCleanOD720 <- ClarioPamasCorr %>% 
+  filter(Strain == "BA127R")
+my_dataOD720<- ClarioPamasCorrCleanOD720
+ggscatter(my_dataOD720, x = "OD720", y = "Count", 
+          add = "reg.line", conf.int = TRUE, 
+          cor.coef = TRUE, cor.method = "pearson")
+my_dataOD720
+lmOD720 = lm(Count~OD720, data = my_dataOD720)
+summary(lmOD720)
+# NmL = (OD720*803505)+2786
+# Adjusted R-squared: 0.879
+# R=0.94
+
+
+ClarioPamasCorrCleanOD720 <- ClarioPamasCorr %>% 
+  filter(Strain == "BA48R")
+my_dataOD720<- ClarioPamasCorrCleanOD720
+ggscatter(my_dataOD720, x = "OD720", y = "Count", 
+          add = "reg.line", conf.int = TRUE, 
+          cor.coef = TRUE, cor.method = "pearson")
+my_dataOD720
+lmOD720 = lm(Count~OD720, data = my_dataOD720)
+summary(lmOD720)
+# NmL = (AOD720*600583)+14873
+# Adjusted R-squared: 0.9173
+# R=0.96
+
+
+ClarioPamasCorrCleanOD720 <- ClarioPamasCorr %>% 
+  filter(Strain == "BA56G")
+my_dataOD720<- ClarioPamasCorrCleanOD720
+ggscatter(my_dataOD720, x = "OD720", y = "Count", 
+          add = "reg.line", conf.int = TRUE, 
+          cor.coef = TRUE, cor.method = "pearson")
+my_dataOD720
+lmOD720 = lm(Count~OD720, data = my_dataOD720)
+summary(lmOD720)
+# NmL = (OD720*218497)+34902
+# Adjusted R-squared: 0.6167
+# R=0.79
+
+
+ClarioPamasCorrCleanOD720 <- ClarioPamasCorr %>% 
+  filter(Strain == "BA77G")
+my_dataOD720<- ClarioPamasCorrCleanOD720
+ggscatter(my_dataOD720, x = "OD720", y = "Count", 
+          add = "reg.line", conf.int = TRUE, 
+          cor.coef = TRUE, cor.method = "pearson")
+my_dataOD720
+lmOD720 = lm(Count~OD720, data = my_dataOD720)
+summary(lmOD720)
+# NmL = (OD720*264482)+38766
+# Adjusted R-squared: 0.8278
+# R=0.91
+ 
+
+
+```
+OD680
+```{r}
+
+ClarioPamasCorrCleanOD680 <- ClarioPamasCorr %>% 
+  filter(Strain == "BA127R")
+my_dataOD680<- ClarioPamasCorrCleanOD680
+ggscatter(my_dataOD680, x = "OD680", y = "Count", 
+          add = "reg.line", conf.int = TRUE, 
+          cor.coef = TRUE, cor.method = "pearson")
+my_dataOD680
+lmOD680 = lm(Count~OD680, data = my_dataOD680)
+summary(lmOD680)
+# NmL = (OD680*614649)+1446
+# Adjusted R-squared: 0.8846
+# R=0.94
+
+ClarioPamasCorrCleanOD680 <- ClarioPamasCorr %>% 
+  filter(Strain == "BA48R")
+my_dataOD680<- ClarioPamasCorrCleanOD680
+ggscatter(my_dataOD680, x = "OD680", y = "Count", 
+          add = "reg.line", conf.int = TRUE, 
+          cor.coef = TRUE, cor.method = "pearson")
+my_dataOD680
+lmOD680 = lm(Count~OD680, data = my_dataOD680)
+summary(lmOD680)
+# NmL = (OD680*450190)+14516
+# Adjusted R-squared: 0.9168
+# R=0.96
+
+
+ClarioPamasCorrCleanOD680 <- ClarioPamasCorr %>% 
+  filter(Strain == "BA56G")
+my_dataOD680<- ClarioPamasCorrCleanOD680
+ggscatter(my_dataOD680, x = "OD680", y = "Count", 
+          add = "reg.line", conf.int = TRUE, 
+          cor.coef = TRUE, cor.method = "pearson")
+my_dataOD680
+lmOD680 = lm(Count~OD680, data = my_dataOD680)
+summary(lmOD680)
+# NmL = (OD680*160489)+34573
+# Adjusted R-squared: 0.6395
+# R=0.8
+ 
+
+ClarioPamasCorrCleanOD680 <- ClarioPamasCorr %>% 
+  filter(Strain == "BA77G")
+my_dataOD680<- ClarioPamasCorrCleanOD680
+ggscatter(my_dataOD680, x = "OD680", y = "Count", 
+          add = "reg.line", conf.int = TRUE, 
+          cor.coef = TRUE, cor.method = "pearson")
+my_dataOD680
+lmOD680 = lm(Count~OD680, data = my_dataOD680)
+summary(lmOD680)
+# NmL = (OD680*204581)+38483
+# Adjusted R-squared: 0.8314
+# R=0.91
+
+```
+
+
+plot cells pamas vs ClarioAb and Pearson correlation OD720
+```{r}
+data_textPaersonBA56G_720 <- data.frame(Equation = c('N/mL = 218497*x + 34902'), Strain = c("PC-rich_056"), OD = c("720"))
+data_textPaersonBA77G_720 <- data.frame(Equation = c('N/mL = 264482*x + 38766'), Strain = c("PC-rich_077"), OD = c("720"))
+data_textPaersonBA48R_720 <- data.frame(Equation = c('N/mL = 600583*x + 14873'), Strain = c("PE-rich_048"), OD = c("720"))
+data_textPaersonBA127R_720 <- data.frame(Equation = c('N/mL = 803505*x + 2786'), Strain = c("PE-rich_127"), OD = c("720"))
+
+GrowthCorrelation_720<-rbind(data_textPaersonBA56G_720, data_textPaersonBA77G_720, data_textPaersonBA48R_720, data_textPaersonBA127R_720)
+
+ClarioPamasCorrBA127R_720 <- ClarioPamasCorr %>% 
+  filter(Strain == "BA127R") %>% 
+  ggplot(aes(x = OD720, y = Count)) +
+  geom_point(aes(x = OD720, y = Count), show.legend = "none", colour = "midnightblue", size = 3, alpha = 0.4) +
+  geom_text(data=data_textPaersonBA127R_720, aes(x=0.06, y=20000, label=Equation), size=4) +
+  geom_smooth(method=lm, se=FALSE, colour = "gray22") +
+  stat_cor(method="pearson") +
+  labs(y = "Number of cells (N" ~mL^-1 ~")", x = "Absorbance (720 nm)") +
+  theme_bw() +
+  theme(panel.grid.minor = element_blank(),
+        panel.grid.major = element_blank(),
+        axis.text = element_text(size=12),
+        axis.title = element_text(size=14),
+        strip.background = element_rect(fill="white"),
+        strip.text = element_text(size=12),
+        axis.title.y = element_text(margin=margin(r=10)),
+        axis.title.x = element_text(margin=margin(t=10)),
+        legend.background = element_rect(fill="transparent"),
+        legend.position = c(0.92,0.94),
+        legend.text = element_text(size=12))
+ClarioPamasCorrBA127R_720
+
+
+ClarioPamasCorrBA48R_720 <- ClarioPamasCorr %>% 
+  filter(Strain == "BA48R") %>% 
+  ggplot(aes(x = OD720, y = Count)) +
+  geom_point(aes(x = OD720, y = Count), show.legend = "none", colour = "midnightblue", size = 3, alpha = 0.4) +
+  geom_text(data=data_textPaersonBA48R_720, aes(x=0.06, y=20000, label=Equation), size=4) +
+  geom_smooth(method=lm, se=FALSE, colour = "gray22") +
+  stat_cor(method="pearson") +
+  labs(y = "Number of cells (N" ~mL^-1 ~")", x = "Absorbance (720 nm)") +
+  theme_bw() +
+  theme(panel.grid.minor = element_blank(),
+        panel.grid.major = element_blank(),
+        axis.text = element_text(size=12),
+        axis.title = element_text(size=14),
+        strip.background = element_rect(fill="white"),
+        strip.text = element_text(size=12),
+        axis.title.y = element_text(margin=margin(r=10)),
+        axis.title.x = element_text(margin=margin(t=10)),
+        legend.background = element_rect(fill="transparent"),
+        legend.position = c(0.92,0.94),
+        legend.text = element_text(size=12))
+ClarioPamasCorrBA48R_720
+
+
+ClarioPamasCorrBA56G_720 <- ClarioPamasCorr %>% 
+  filter(Strain == "BA56G") %>% 
+  ggplot(aes(x = OD720, y = Count)) +
+  geom_point(aes(x = OD720, y = Count), show.legend = "none", colour = "midnightblue", size = 3, alpha = 0.4) +
+  geom_text(data=data_textPaersonBA56G_720, aes(x=0.06, y=20000, label=Equation), size=4) +
+  geom_smooth(method=lm, se=FALSE, colour = "gray22") +
+  stat_cor(method="pearson") +
+  labs(y = "Number of cells (N" ~mL^-1 ~")", x = "Absorbance (720 nm)") +
+  theme_bw() +
+  theme(panel.grid.minor = element_blank(),
+        panel.grid.major = element_blank(),
+        axis.text = element_text(size=12),
+        axis.title = element_text(size=14),
+        strip.background = element_rect(fill="white"),
+        strip.text = element_text(size=12),
+        axis.title.y = element_text(margin=margin(r=10)),
+        axis.title.x = element_text(margin=margin(t=10)),
+        legend.background = element_rect(fill="transparent"),
+        legend.position = c(0.92,0.94),
+        legend.text = element_text(size=12))
+ClarioPamasCorrBA56G_720
+
+
+ClarioPamasCorrBA77G_720 <- ClarioPamasCorr %>% 
+  filter(Strain == "BA77G") %>% 
+  ggplot(aes(x = OD720, y = Count)) +
+  geom_point(aes(x = OD720, y = Count), show.legend = "none", colour = "midnightblue", size = 3, alpha = 0.4) +
+  geom_text(data=data_textPaersonBA77G_720, aes(x=0.06, y=20000, label=Equation), size=4) +
+  geom_smooth(method=lm, se=FALSE, colour = "gray22") +
+  stat_cor(method="pearson") +
+  labs(y = "Number of cells (N" ~mL^-1 ~")", x = "Absorbance (720 nm)") +
+  theme_bw() +
+  theme(panel.grid.minor = element_blank(),
+        panel.grid.major = element_blank(),
+        axis.text = element_text(size=12),
+        axis.title = element_text(size=14),
+        strip.background = element_rect(fill="white"),
+        strip.text = element_text(size=12),
+        axis.title.y = element_text(margin=margin(r=10)),
+        axis.title.x = element_text(margin=margin(t=10)),
+        legend.background = element_rect(fill="transparent"),
+        legend.position = c(0.92,0.94),
+        legend.text = element_text(size=12))
+ClarioPamasCorrBA77G_720
+```
+
+```{r fig.height = 8, fig.width = 8, warning = FALSE}
+
+ggarrange(ClarioPamasCorrBA127R_720, ClarioPamasCorrBA48R_720, ClarioPamasCorrBA56G_720,  ClarioPamasCorrBA77G_720,
+          ncol = 2, nrow = 2)
+
+rm(ClarioPamasCorrBA127R_720, ClarioPamasCorrBA48R_720, ClarioPamasCorrBA56G_720,  ClarioPamasCorrBA77G_720)
+```
+
+
+# Plot cells pamas vs ClarioAb and Pearson correlation OD680
+
+```{r}
+
+data_textPaersonBA56G_680 <- data.frame(Equation = c('N/mL = 160489*x + 34573'), Strain = c("PC-rich_056"), OD = c("680"))
+data_textPaersonBA77G_680 <- data.frame(Equation = c('N/mL = 204581*x + 38483'), Strain = c("PC-rich_077"), OD = c("680"))
+data_textPaersonBA48R_680 <- data.frame(Equation = c('N/mL = 450190*x + 14516'), Strain = c("PE-rich_048"), OD = c("680"))
+data_textPaersonBA127R_680 <- data.frame(Equation = c('N/mL = 614649*x + 1446'), Strain = c("PE-rich_127"), OD = c("680"))
+
+GrowthCorrelation_680<-rbind(data_textPaersonBA56G_680, data_textPaersonBA77G_680, data_textPaersonBA48R_680, data_textPaersonBA127R_680)
+
+
+ClarioPamasCorrBA127R_680 <- ClarioPamasCorr %>% 
+  filter(Strain == "BA127R") %>% 
+  ggplot(aes(x = OD680, y = Count)) +
+  geom_point(aes(x = OD680, y = Count), show.legend = "none", colour = "midnightblue", size = 3, alpha = 0.4) +
+  geom_text(data=data_textPaersonBA127R_680, aes(x=0.06, y=20000, label=Equation), size=4) +
+  geom_smooth(method=lm, se=FALSE, colour = "gray22") +
+  stat_cor(method="pearson") +
+  labs(y = "Number of cells (N" ~mL^-1 ~")", x = "Absorbance (OD680 nm)") +
+  theme_bw() +
+  theme(panel.grid.minor = element_blank(),
+        panel.grid.major = element_blank(),
+        axis.text = element_text(size=12),
+        axis.title = element_text(size=14),
+        strip.background = element_rect(fill="white"),
+        strip.text = element_text(size=12),
+        axis.title.y = element_text(margin=margin(r=10)),
+        axis.title.x = element_text(margin=margin(t=10)),
+        legend.background = element_rect(fill="transparent"),
+        legend.position = c(0.92,0.94),
+        legend.text = element_text(size=12))
+ClarioPamasCorrBA127R_680
+
+
+ClarioPamasCorrBA48R_680 <- ClarioPamasCorr %>% 
+  filter(Strain == "BA48R") %>% 
+  ggplot(aes(x = OD680, y = Count)) +
+  geom_point(aes(x = OD680, y = Count), show.legend = "none", colour = "midnightblue", size = 3, alpha = 0.4) +
+  geom_text(data=data_textPaersonBA48R_680, aes(x=0.06, y=20000, label=Equation), size=4) +
+  geom_smooth(method=lm, se=FALSE, colour = "gray22") +
+  stat_cor(method="pearson") +
+  labs(y = "Number of cells (N" ~mL^-1 ~")", x = "Absorbance (OD680 nm)") +
+  theme_bw() +
+  theme(panel.grid.minor = element_blank(),
+        panel.grid.major = element_blank(),
+        axis.text = element_text(size=12),
+        axis.title = element_text(size=14),
+        strip.background = element_rect(fill="white"),
+        strip.text = element_text(size=12),
+        axis.title.y = element_text(margin=margin(r=10)),
+        axis.title.x = element_text(margin=margin(t=10)),
+        legend.background = element_rect(fill="transparent"),
+        legend.position = c(0.92,0.94),
+        legend.text = element_text(size=12))
+ClarioPamasCorrBA48R_680
+
+
+ClarioPamasCorrBA56G_680 <- ClarioPamasCorr %>% 
+  filter(Strain == "BA56G") %>% 
+  ggplot(aes(x = OD680, y = Count)) +
+  geom_point(aes(x = OD680, y = Count), show.legend = "none", colour = "midnightblue", size = 3, alpha = 0.4) +
+  geom_text(data=data_textPaersonBA56G_680, aes(x=0.06, y=20000, label=Equation), size=4) +
+  geom_smooth(method=lm, se=FALSE, colour = "gray22") +
+  stat_cor(method="pearson") +
+  labs(y = "Number of cells (N" ~mL^-1 ~")", x = "Absorbance (OD680 nm)") +
+  theme_bw() +
+  theme(panel.grid.minor = element_blank(),
+        panel.grid.major = element_blank(),
+        axis.text = element_text(size=12),
+        axis.title = element_text(size=14),
+        strip.background = element_rect(fill="white"),
+        strip.text = element_text(size=12),
+        axis.title.y = element_text(margin=margin(r=10)),
+        axis.title.x = element_text(margin=margin(t=10)),
+        legend.background = element_rect(fill="transparent"),
+        legend.position = c(0.92,0.94),
+        legend.text = element_text(size=12))
+ClarioPamasCorrBA56G_680
+
+
+ClarioPamasCorrBA77G_680 <- ClarioPamasCorr %>% 
+  filter(Strain == "BA77G") %>% 
+  ggplot(aes(x = OD680, y = Count)) +
+  geom_point(aes(x = OD680, y = Count), show.legend = "none", colour = "midnightblue", size = 3, alpha = 0.4) +
+  geom_text(data=data_textPaersonBA77G_680, aes(x=0.06, y=20000, label=Equation), size=4) +
+  geom_smooth(method=lm, se=FALSE, colour = "gray22") +
+  stat_cor(method="pearson") +
+  labs(y = "Number of cells (N" ~mL^-1 ~")", x = "Absorbance (OD680 nm)") +
+  theme_bw() +
+  theme(panel.grid.minor = element_blank(),
+        panel.grid.major = element_blank(),
+        axis.text = element_text(size=12),
+        axis.title = element_text(size=14),
+        strip.background = element_rect(fill="white"),
+        strip.text = element_text(size=12),
+        axis.title.y = element_text(margin=margin(r=10)),
+        axis.title.x = element_text(margin=margin(t=10)),
+        legend.background = element_rect(fill="transparent"),
+        legend.position = c(0.92,0.94),
+        legend.text = element_text(size=12))
+ClarioPamasCorrBA77G_680
+```
+
+```{r fig.height = 8, fig.width = 8, warning = FALSE}
+
+  ggarrange(ClarioPamasCorrBA127R_680, ClarioPamasCorrBA48R_680, ClarioPamasCorrBA56G_680,  ClarioPamasCorrBA77G_680,
+          ncol = 2, nrow = 2)
+
+rm(ClarioPamasCorrBA127R_680, ClarioPamasCorrBA48R_680, ClarioPamasCorrBA56G_680,  ClarioPamasCorrBA77G_680)
+```
+# Create table with equations (for calculate number of cells based on OD)
+
+```{r}
+GrowthCorrelation<-rbind(GrowthCorrelation_680, GrowthCorrelation_720)
+```
+
+# Removed unnecessary files from the environment
+
+```{r}
+rm(ClarioPamasCorrCleanOD680, ClarioPamasCorrCleanOD720, lmOD680, lmOD720, my_dataOD680, my_dataOD720, PamasTidyCorr, ClarioGrowthCorr, data_textPaersonBA56G_680, data_textPaersonBA77G_680, data_textPaersonBA48R_680, data_textPaersonBA127R_680, data_textPaersonBA56G_720, data_textPaersonBA77G_720, data_textPaersonBA48R_720, data_textPaersonBA127R_720, GrowthCorrelation_680, GrowthCorrelation_720)
+```
+
+# Save Rds for stats and tables
+
+```{r save rds}
+# saveRDS(GrowthCorrelation, file.path(DataOut, paste(Project, "Table_GrowthCorrelation.Rds", sep = "_"), fsep = .Platform$file.sep), ascii = FALSE, version = NULL, compress = "xz", refhook = NULL)
+```
+
+# Save Rds for further analysis
+
+```{r save rds}
+# saveRDS(ClarioPamasCorr, file.path(DataOut, paste(Project, "Imported_ClarioPamasCorr.Rds", sep = "_"), fsep = .Platform$file.sep), ascii = FALSE, version = NULL, compress = "xz", refhook = NULL)
+```
+
+# Correlations from Polish flowcytometer (BD Accuri)
+
+```{r}
+# GrowthClarioN <- GrowthClario %>%
+#   mutate(OD750N = case_when(
+#           Strain == 'BA77G' ~ 5766620.03*OD750+5146.44,
+#          Strain == 'BA56G' ~ 815627.77*OD750-6499.89, 
+#          Strain == 'BA48R' ~ 110516351.55*OD750-568505.87,
+#          Strain == 'BA127R' ~ 124271003.22*OD750-1691760.02))
+
+```
+
+# IMPORT OLIS DATA FOR PIGMENTS CORRELATION
+
+
+```{r set project variables}
+Project <- "Baltic_Photoperiod"
+DataIn <- file.path("..", "Data", "ProcessedData", "ProcessedOlisJazData")
+```
+
+# List and read Imported_Solisense RDS
+
+```{r Exported Rmd}
+list.files(path = DataIn, pattern = Project, full.names = TRUE)
+```
+
+```{r read ProcessFile Sol}
+OlisFile <- "../Data/ProcessedData/ProcessedOlisJazData/Baltic_Photoperiod_Processed_OlisSpectraAll.Rds"  
+
+OlisFileName <- str_split(string = OlisFile, "/")[[1]][3] %>%
+  str_remove(pattern = ".Rds")
+
+Olis <- readRDS(OlisFile)  %>%
+  ungroup()
+```
+
+# CORRELATION OLIS PIGMENTS (FILTERS) DATA
+
+665 - chl
+480 - car
+565	- PE
+620	- PC
+650 - APC
+
+pigments corelation - to get raw spectra (without dilution factor from olis, I multipied Absorbance *7; 1ml culture and 7 ml of f2 media from olis)
+
+```{r}
+
+Olis <- Olis %>% 
+  mutate(Absorbance = Absorbance*7)
+
+Absorbance665 <- Olis %>% 
+  filter(nm == 665) %>%
+  mutate(Abs665 = Absorbance) %>%
+  select(SampleID, Strain, Abs665, Par_ue, Photoperiod, E_days)
+OLISSpectraMeta665 <- Olis %>%
+  left_join(., Absorbance665) 
+
+Absorbance480 <- OLISSpectraMeta665 %>% 
+  filter(nm == 480) %>%
+  mutate(Abs480 = Absorbance) %>%
+  select(SampleID, Strain, Abs480, Par_ue, Photoperiod, E_days)
+OLISSpectraMeta480 <- OLISSpectraMeta665 %>%
+  left_join(., Absorbance480) 
+
+Absorbance565 <- OLISSpectraMeta480 %>% 
+  filter(nm == 565) %>%
+  mutate(Abs565 = Absorbance) %>%
+  select(SampleID, Strain, Abs565, Par_ue, Photoperiod, E_days)
+OLISSpectraMeta565 <- OLISSpectraMeta480 %>%
+  left_join(., Absorbance565) 
+
+Absorbance620 <- OLISSpectraMeta565 %>% 
+  filter(nm == 620) %>%
+  mutate(Abs620 = Absorbance) %>%
+  select(SampleID, Strain, Abs620, Par_ue, Photoperiod, E_days)
+OLISSpectraMeta620 <- OLISSpectraMeta565 %>%
+  left_join(., Absorbance620) 
+
+Absorbance650 <- OLISSpectraMeta620 %>% 
+  filter(nm == 650) %>%
+  mutate(Abs650 = Absorbance) %>%
+  select(SampleID, Strain, Abs650, Par_ue, Photoperiod, E_days)
+OLISSpectraMeta650 <- OLISSpectraMeta620 %>%
+  left_join(., Absorbance650) 
+
+OLISSpectraMeta<-OLISSpectraMeta650
+
+```
+
+```{r}
+OLISSpectraMetaClean <- OLISSpectraMeta %>%
+  select(-c(SumAb, SumAbNorm, AbsNorm440, nm, Absorbance, CountsMean, EmNormJaz439, EmJaz439, Abs440, PURNorm, PURNormSum)) %>% 
+  unique()
+
+rm(Absorbance650, Absorbance620, Absorbance565, Absorbance480, Absorbance665, OLISSpectraMeta650, OLISSpectraMeta620, OLISSpectraMeta565, OLISSpectraMeta480, OLISSpectraMeta665)
+```
+
+
+# Adding Pigments clario - filters 
+
+```{r}
+
+ClarioPigmentFileDataClean <- PigmentsClario %>%
+  summarise(SampleID, Run, Strain, ExpDate, Par_ue, Photoperiod, Tube, O2, WL, LightShape, Chla_ugmL, Car_ugmL, PC_ugmL, APC_ugmL, PE_ugmL, E_days) %>% 
+
+unique()
+```
+
+```{r}
+ClarioPigmentFileDataAll <- ClarioPigmentFileDataClean %>%
+  full_join(., OLISSpectraMetaClean, by = c("SampleID"="SampleID", "Strain"="Strain", "Run"="Run", "ExpDate"="ExpDate", "Par_ue"="Par_ue", "Photoperiod"="Photoperiod", "Tube"="Tube", "O2"="O2", "WL"="WL", "LightShape"="LightShape", "E_days")) 
+
+ClarioPigmentFileDataAll2 <- ClarioPigmentFileDataAll %>%
+  filter(WL == "WW")
+```
+
+# Save data set
+```{r save}
+# saveRDS(ClarioPigmentFileDataAll2, file.path(DataOut, paste(Project, "ClarioPigmentFileDataAll2.Rds", sep = "_"), fsep = .Platform$file.sep))
+```
+
+
+Pearson Correlation Coefficient and Linear Regression and coefficient of determination or R²  - filter
+https://www.datacamp.com/tutorial/linear-regression-R
+
+```{r}
+
+ClarioPigmentFileDataAll2Chla <- ClarioPigmentFileDataAll2 %>% 
+    filter(Strain != "BA127R") 
+my_dataChla <- ClarioPigmentFileDataAll2Chla
+ggscatter(my_dataChla, x = "Abs665", y = "Chla_ugmL", 
+          add = "reg.line", conf.int = TRUE, 
+          cor.coef = TRUE, cor.method = "pearson")
+my_dataChla
+lmChla = lm(Chla_ugmL~Abs665, data = my_dataChla)
+summary(lmChla)
+# ChlaugmL = (Abs665*13.411029)+0.154793
+# Adjusted R-squared: 0.8654
+# R=0.93
+
+
+ClarioPigmentFileDataAll2Car <- ClarioPigmentFileDataAll2 %>% 
+    filter(Strain != "BA127R") 
+my_dataCar <- ClarioPigmentFileDataAll2Car
+ggscatter(my_dataCar, x = "Abs480", y = "Car_ugmL", 
+          add = "reg.line", conf.int = TRUE, 
+          cor.coef = TRUE, cor.method = "pearson")
+my_dataCar
+lmCar = lm(Car_ugmL~Abs480, data = my_dataCar)
+summary(lmCar)
+# CarugmL = (Abs480*5.469880)+0.089971
+# Adjusted R-squared: 0.7913
+# R=0.89
+
+
+
+ClarioPigmentFileDataAll2PE <- ClarioPigmentFileDataAll2 %>% 
+    filter(PE_ugmL < 10) %>% 
+    filter(Strain != "BA56G")
+my_dataPE <- ClarioPigmentFileDataAll2PE
+ggscatter(my_dataPE, x = "Abs565", y = "PE_ugmL", 
+          add = "reg.line", conf.int = TRUE, 
+          cor.coef = TRUE, cor.method = "pearson")
+my_dataPE
+lmPE = lm(PE_ugmL~Abs565, data = my_dataPE)
+summary(lmPE)
+# PEugmL = (Abs565*26.760737)-0.143872
+# Adjusted R-squared:  0.6979
+# R=0.84
+
+
+ClarioPigmentFileDataAll2PC <- ClarioPigmentFileDataAll2 %>% 
+    filter(Strain != "BA56G")
+my_dataPC <- ClarioPigmentFileDataAll2PC
+ggscatter(my_dataPC, x = "Abs620", y = "PC_ugmL", 
+          # color = "Strain",
+          add = "reg.line", conf.int = TRUE, 
+          cor.coef = TRUE, cor.method = "pearson")
+my_dataPC
+lmPC = lm(PC_ugmL~Abs620, data = my_dataPC)
+summary(lmPC)
+# PCugmL = (Abs620*29.979866)-0.182611
+# Adjusted R-squared:  0.8073
+# R=0.9
+
+
+ClarioPigmentFileDataAll2APC <- ClarioPigmentFileDataAll2 
+my_dataAPC <- ClarioPigmentFileDataAll2APC
+ggscatter(my_dataAPC, x = "Abs650", y = "APC_ugmL", 
+          # color = "Strain",
+          add = "reg.line", conf.int = TRUE, 
+          cor.coef = TRUE, cor.method = "pearson")
+my_dataAPC
+lmPC = lm(APC_ugmL~Abs650, data = my_dataAPC)
+summary(lmPC)
+# APCugmL = (Abs620*3.873803)+0.021964
+# Adjusted R-squared:  0.08721
+# R=0.19
+
+
+
+```
+
+Calculated pigment content based on Olis calibration
+```{r}
+ClarioPigmentFileDataAll2Olis <- ClarioPigmentFileDataAll2 %>% 
+
+  mutate(ChlaugmL = (Abs665*13.411029)+0.154793) %>% 
+  mutate(CarugmL = (Abs480*5.469880)+0.089971) %>% 
+  mutate(PEugmL = (Abs565*26.760737)-0.143872) %>% 
+  mutate(PCugmL = (Abs620*29.979866)-0.182611) %>% 
+  mutate(APCugmL = (Abs650*3.873803)+0.021964) 
+
+```
+
+# Change Strain name for consistency
+
+```{r}
+ClarioPigmentFileDataAll2Olis<-ClarioPigmentFileDataAll2Olis %>% 
+      mutate(Strain=case_when(Strain=="BA127R"~"PE-rich_127",
+         Strain=="BA48R"~"PE-rich_048",
+        Strain=="BA56G"~"PC-rich_056",
+         Strain=="BA77G"~"PC-rich_077"))
+```
+
+
+# Removed pigmnents data from filters - keeping only pigments based on correlation (OLIS)
+```{r}
+ClarioPigmentFileDataAll2Olis<-ClarioPigmentFileDataAll2Olis %>% 
+  select(-c(Chla_ugmL, Car_ugmL, PE_ugmL, PC_ugmL, APC_ugmL, FilenameJaz, FilenameOlis, SumEmNormJaz439)) %>% 
+  rename(ObsDateOlis = ObsDate)
+```
+
+# Cleaning the environment
+
+```{r}
+rm(lmCar, lmChla, lmPC, lmPE, my_dataAPC, my_dataCar, my_dataChla, my_dataPC, my_dataPE)
+```
+
+
+# IMPORT GROWTH CURVE DATA FOR CORRELATION
+
+```{r set project variables}
+Project <- "Baltic_Photoperiod"
+DataIn <- file.path("..", "Data", "ProcessedData", "ProcessedGrowthCurveData")
+```
+
+# List and read Imported_Solisense RDS
+
+```{r Exported Rmd}
+list.files(path = DataIn, pattern = Project, full.names = TRUE)
+```
+
+```{r read ProcessFile Sol}
+GrowthCurveFile <- "../Data/ProcessedData/ProcessedGrowthCurveData/Baltic_Photoperiod_Processed_GrowthCurve.Rds"  
+
+GrowthCurveFileName <- str_split(string = GrowthCurveFile, "/")[[1]][3] %>%
+  str_remove(pattern = ".Rds")
+
+GrowthCurve <- readRDS(GrowthCurveFile)  %>%
+  ungroup()
+
+#GrowthCurve contain already mean OD per h
+```
+
+
+Calculated Number of cells/ml based on flow cytometer calibration from pamas
+```{r}
+# based on PAMAS calibration
+MultiCultiOD750SmallBA56G <- GrowthCurve %>% 
+filter(Strain == "PC-rich_056") %>% 
+mutate(cellml_OD680 = 218497*meanOD680_h+34902)
+
+MultiCultiOD750SmallBA77G <- GrowthCurve %>% 
+filter(Strain == "PC-rich_077") %>% 
+mutate(cellml_OD680 = 264482*meanOD680_h+38766)
+
+MultiCultiOD750SmallBA48R <- GrowthCurve %>% 
+filter(Strain == "PE-rich_048") %>% 
+mutate(cellml_OD680 = 600583*meanOD680_h+34902)
+
+MultiCultiOD750SmallBA127R <- GrowthCurve %>% 
+filter(Strain == "PE-rich_127") %>% 
+mutate(cellml_OD680 = 803505*meanOD680_h+2786)
+
+MultiCultiOD750Smallcellml <- rbind(MultiCultiOD750SmallBA127R, MultiCultiOD750SmallBA48R, MultiCultiOD750SmallBA56G, MultiCultiOD750SmallBA77G)
+
+```
+
+
+```{r}
+
+MultiCultiOD750SmallcellmlPigment <- MultiCultiOD750Smallcellml %>%
+  left_join(., ClarioPigmentFileDataAll2Olis, by = c("SampleID"="SampleID", "Run" = "Run", "Strain" = "Strain", "ExpDate" = "ExpDate", "Par_ue" = "Par_ue", "Photoperiod" = "Photoperiod", "Tube" = "Tube", "O2" = "O2", "WL" = "WL", "LightShape" = "LightShape", "ExpEndDate"="ExpEndDate","E_days" = "E_days")) 
+```
+
+Pigments Olis per cell - based on calibration form Pamas
+```{r}
+
+MultiCultiOD750SmallcellmlPigmentAll <- MultiCultiOD750SmallcellmlPigment %>%
+  mutate(Chlapgcell = (ChlaugmL/cellml_OD680)*1000000) %>% 
+  mutate(Carpgcell = (CarugmL/cellml_OD680)*1000000) %>% 
+  mutate(PEpgcell = (PEugmL/cellml_OD680)*1000000) %>% 
+  mutate(PCpgcell = (PCugmL/cellml_OD680)*1000000) %>% 
+  mutate(APCpgcell = (APCugmL/cellml_OD680)*1000000) %>% 
+  
+  mutate(Phycopgcell = PEpgcell+PCpgcell+APCpgcell) %>% 
+  mutate(CarChlaRatio = Carpgcell/Chlapgcell) %>% 
+  mutate(PhycoChlaRatio = Phycopgcell/Chlapgcell) %>% 
+  mutate(PEPCRatio = PEpgcell/PCpgcell) 
+  
+```
+
+
+```{r}
+MultiCultiPigmentMax <- MultiCultiOD750SmallcellmlPigmentAll 
+  
+```
+
+test plot
+```{r}
+lab1=c(expression("PE-rich_127"), expression("PE-rich_048"), expression("PC-rich_056"), expression("PC-rich_077"))
+#lab1=c(expression("BA127R"), expression("BA48R"), expression("BA56G"), expression("BA77G"))
+Par_ue.labs <- c("30 µE", "90 µE", "180 µE", "300 µE", "600 µE", "900 µE")
+names(Par_ue.labs) <- c("30", "90", "180", "300", "600","900")
+Photoperiod.labs <- c("8 h", "12 h", "16 h", "24 h")
+names(Photoperiod.labs) <- c("8", "12", "16", "24")
+WL.labs <- c("Photoperiod")
+names(WL.labs) <- c("WW")
+O2.labs <- c("Light level")
+names(O2.labs) <- c(21)
+
+MultiCultiPigmentMax %>%
+  ggplot() +
+  geom_point(aes(x = E_days, y = Chlapgcell, colour = as.factor(Strain)),  alpha = 0.9, size = 3, show.legend = T) +
+  scale_colour_discrete(type=c("brown4", "brown1", "palegreen4", "palegreen3"), name="", labels = lab1) +
+  scale_y_continuous(breaks=seq(0, 15, by = 3)) +
+  coord_cartesian(ylim = c(-0.5, 15.5)) +
+  labs(y = "Chl" ~italic(a)~ "content ( pg " ~ cell^-1~")", x = "Elapsed time (h)") +
+  ggh4x::facet_nested(cols = vars(WL, Photoperiod), rows = vars(O2, Par_ue), labeller = labeller(Photoperiod = Photoperiod.labs,  Strain = label_value, Par_ue = Par_ue.labs, WL = WL.labs, O2 = O2.labs)) +
+  theme_bw() +
+  theme(panel.grid.minor = element_blank(),
+        panel.grid.major = element_blank(),
+        axis.text = element_text(size=12),
+        axis.title = element_text(size=16),
+        strip.background = element_rect(fill="white"),
+        strip.text = element_text(size=12),
+        axis.title.y = element_text(margin=margin(r=10)),
+        axis.title.x = element_text(margin=margin(t=10)),
+        legend.background = element_rect(fill="transparent"),
+        legend.position = c(0.07,0.95),
+        #legend.key = element_rect(size = 0.1, fill = "transparent"),
+        legend.key.height= unit(0.005, 'cm'),
+        legend.key.width= unit(0.005, 'cm'),
+        legend.spacing.x = unit(0.01, 'cm'),
+        legend.text = element_text(size=10))
+
+```
+
+
+
+
