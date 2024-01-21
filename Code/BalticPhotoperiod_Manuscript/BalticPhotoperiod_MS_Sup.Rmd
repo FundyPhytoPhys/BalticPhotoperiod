@@ -46,7 +46,6 @@ output:
   #     - '--lua-filter=author-info-blocks.lua'
 bibliography: [BalticPhotoperiod.bib, packages.bib]
 csl: plos-one.csl
-
 ---
 
 <style>
@@ -106,4 +105,26 @@ knitr::include_graphics(file.path( FiguresFP,"Pigments_SupPlot.png"))
 Sigma445_SupPlot_cap<- glue("Effective absorption cross section of PSII (\u03C3~PSII~'; nm^2^ quanta^-1^) measured under diel peak PAR growth light under Ex445 nm (blue) excitation in two PhycoCyanin(PC)-rich cultures (056, 077) and two PhycoErythrin(PE)-rich cultures (048, 127) (Culture Collection of Baltic Algae) of *Synechococcus* sp. grown at 30, 90, 180, 300, 600, or 900 peak diel PAR µmol photons m^−2^s^−1^; and photoperiods of 8, 12, or 16 h. n = 3, +/- SD. Line shows single phase exponential decay fit.", .sep = " ")
 knitr::include_graphics(file.path( FiguresFP,"Sigma445_SupPlot.png"))
 ```
+
+```{r GrowthCorrelation, echo = TRUE}
+GrowthCorrelation_cap <- glue("Pearson Correlation for two PhycoCyanin(PC)-rich cultures (056, 077) and two PhycoErythrin(PE)-rich cultures (048, 127) (Culture Collection of Baltic Algae) of *Synechococcus* sp.")
+                          
+readRDS(file.path("..", "..", "Output", "TablesRDS", "GrowthCorrelation.Rds")) %>% 
+  as.data.frame() %>% 
+  kable(caption = GrowthCorrelation_cap) %>% 
+  kableExtra::kable_classic()
+```
+
+```{r PigmentsCorrelation, echo = TRUE}
+PigmentsCorrelation_cap <- glue("Pearson Correlation for two PhycoCyanin(PC)-rich cultures (056, 077) and two PhycoErythrin(PE)-rich cultures (048, 127) (Culture Collection of Baltic Algae) of *Synechococcus* sp.")
+                          
+readRDS(file.path("..", "..", "Output", "TablesRDS", "PigmentsCorrelation.Rds")) %>% 
+  as.data.frame() %>% 
+  kable(caption = PigmentsCorrelation_cap) %>% 
+  kableExtra::kable_classic()
+```
+
+
+
+
 
