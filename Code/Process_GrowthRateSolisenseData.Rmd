@@ -28,7 +28,7 @@ knitr::opts_chunk$set(fig.path='Figs/')
 
 # Introduction
 
-Process_GrowthRateSolisenseData.Rmd processes and combines Baltic_Photoperiod_Processed_GrowthRate.Rds from Data/ProcessedData/ProcessedGrowthRateData folder and Baltic_Photoperiod_Processed_SolisensePigmentsExp.Rds from Data/ProcessedData/ProcessedSolisenseData folder. This .Rmd generates xxx.Rds (stored in xxxa folder) and xxx_Plot.png (stored in Output/Plots folder).
+Process_GrowthRateSolisenseData.Rmd processes and combines BalticPhotoperiod_Processed_GrowthRate.Rds from Data/ProcessedData/ProcessedGrowthRateData folder and BalticPhotoperiod_Processed_SolisensePigmentsExp.Rds from Data/ProcessedData/ProcessedSolisenseData folder. This .Rmd generates xxx.Rds (stored in xxxa folder) and xxx_Plot.png (stored in Output/Plots folder).
 
 # Load Libraries and set Project Variables
 
@@ -50,7 +50,7 @@ library(minpack.lm) #Standard 'nls' framework that uses 'nls.lm' for fitting
 ```
 
 ```{r set project variables}
-Project <- "Baltic_Photoperiod"
+Project <- "BalticPhotoperiod"
 DataOut <- file.path("..", "Data", "ProcessedData", "ProcessedGrowthRateData")
 DataInGrowthRate <- file.path("..", "Data", "ProcessedData", "ProcessedGrowthRateData", fsep = .Platform$file.sep)
 
@@ -72,7 +72,7 @@ list.files(path = DataInSolisense, pattern = Project, full.names = TRUE)
 ```
 
 ```{r read ProcessFile}
-GrowthRateFile <- "../Data/ProcessedData/ProcessedGrowthRateData/Baltic_Photoperiod_Processed_GrowthRate.Rds"
+GrowthRateFile <- "../Data/ProcessedData/ProcessedGrowthRateData/BalticPhotoperiod_Processed_GrowthRate.Rds"
 GrowthRateFileName <- str_split(string = GrowthRateFile, "/")[[1]][3] %>%
   str_remove(pattern = ".Rds")
 
@@ -88,7 +88,7 @@ GrowthRate<-GrowthRate %>%
 ```
 
 ```{r read ProcessFile}
-SolisenseFile <- "../Data/ProcessedData/ProcessedSolisenseData/Baltic_Photoperiod_Processed_SolisensePigmentsExp.Rds"
+SolisenseFile <- "../Data/ProcessedData/ProcessedSolisenseData/BalticPhotoperiod_Processed_SolisensePigmentsExp.Rds"
 SolisenseFileName <- str_split(string = SolisenseFile, "/")[[1]][3] %>%
   str_remove(pattern = ".Rds")
 

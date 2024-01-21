@@ -28,7 +28,7 @@ knitr::opts_chunk$set(fig.path='Figs/')
 
 # Introduction
 
-Process_PigmentsData.Rmd processes and combines pigment catalog from a google sheet and Baltic_Photoperiod_Processed_OlisSpectraTidy.Rds from Data/ProcessedData/ProcessedOlisJazData folder. This .Rmd generates Baltic_Photoperiod_Processed_PigmentAll.Rds and Baltic_Photoperiod_Processed_PigmentsExp.Rds (both stored in Data/ProcessedData/ProcessedPigmentsData folder) and two plots: Pigments_SupPlot.png and  PigRatioPUR_Plot.png (stored in Output/Plots folder).
+Process_PigmentsData.Rmd processes and combines pigment catalog from a google sheet and BalticPhotoperiod_Processed_OlisSpectraTidy.Rds from Data/ProcessedData/ProcessedOlisJazData folder. This .Rmd generates BalticPhotoperiod_Processed_PigmentAll.Rds and BalticPhotoperiod_Processed_PigmentsExp.Rds (both stored in Data/ProcessedData/ProcessedPigmentsData folder) and two plots: Pigments_SupPlot.png and  PigRatioPUR_Plot.png (stored in Output/Plots folder).
 
 # Load Libraries and set Project Variables
 
@@ -46,7 +46,7 @@ library(caret)
 ```
 
 ```{r set project variables}
-Project <- "Baltic_Photoperiod"
+Project <- "BalticPhotoperiod"
 DataOut <- file.path("..", "Data", "ProcessedData", "ProcessedPigmentsData")
 DataIn <- file.path("..", "Data", "ImportedData", "ImportedPigmentsData", fsep = .Platform$file.sep)
 
@@ -67,7 +67,7 @@ list.files(path = DataIn, pattern = Project, full.names = TRUE)
 ```{r read pigments File}
 #df ontained mean OD per day from Multiculti and Abs from Olis spectra for selected nm. Based on this I calculated pigments per mL and per cell (pg/cell)
 
-MCPigmentFile <- "../Data/ImportedData/ImportedPigmentsData/Baltic_Photoperiod_Imported_PigmentData.Rds"
+MCPigmentFile <- "../Data/ImportedData/ImportedPigmentsData/BalticPhotoperiod_Imported_PigmentData.Rds"
 MCPigmentFileName <- str_split(string = MCPigmentFile, "/")[[1]][3] %>%
   str_remove(pattern = ".Rds")
 MCPigment <- readRDS(MCPigmentFile)  %>%
@@ -383,7 +383,7 @@ Plot1
 # Set project variables
 
 ```{r set project variables}
-Project <- "Baltic_Photoperiod"
+Project <- "BalticPhotoperiod"
 DataIn <- file.path("..", "Data", "ProcessedData", "ProcessedOlisJazData", fsep = .Platform$file.sep)
 ```
 
@@ -394,7 +394,7 @@ list.files(path = DataIn, pattern = Project, full.names = TRUE)
 ```
 
 ```{r Read processed Olis and jaz tidy file for PUR/PAR ratio plot}
-OLISAllPURTidyFile <- "../Data/ProcessedData/ProcessedOlisJazData/Baltic_Photoperiod_Processed_OlisSpectraTidy.Rds"
+OLISAllPURTidyFile <- "../Data/ProcessedData/ProcessedOlisJazData/BalticPhotoperiod_Processed_OlisSpectraTidy.Rds"
 OLISAllPURTidyFileName <- str_split(string = OLISAllPURTidyFile, "/")[[1]][3] %>%
   str_remove(pattern = ".Rds")
 OLISAllPURTidy <- readRDS(OLISAllPURTidyFile)  %>%

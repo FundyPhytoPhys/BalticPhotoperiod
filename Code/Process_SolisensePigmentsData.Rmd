@@ -28,7 +28,7 @@ knitr::opts_chunk$set(fig.path='Figs/')
 
 # Introduction
 
-Process_SolisensePigmentsData.Rmd processes and combines Baltic_Photoperiod_Imported_SolisenseDarkafterLight.Rds and Baltic_Photoperiod_Imported_SolisenseLight.Rds from Data/ImportedData/ImportedSolisenseData folder. This .Rmd generates Baltic_Photoperiod_Processed_SolisensePigmentsExp.Rds (stored in Data/ProcessedData/ProcessedSolisenseData folder) and three plots: Sigma_SupPlot.png, SigmavsPigments590_Plot, SigmavsPigments445_SupPlot.png (stored in Output/Plots folder).
+Process_SolisensePigmentsData.Rmd processes and combines BalticPhotoperiod_Imported_SolisenseDarkafterLight.Rds and BalticPhotoperiod_Imported_SolisenseLight.Rds from Data/ImportedData/ImportedSolisenseData folder. This .Rmd generates BalticPhotoperiod_Processed_SolisensePigmentsExp.Rds (stored in Data/ProcessedData/ProcessedSolisenseData folder) and three plots: Sigma_SupPlot.png, SigmavsPigments590_Plot, SigmavsPigments445_SupPlot.png (stored in Output/Plots folder).
 
 # Load Libraries and set Project Variables
 
@@ -52,7 +52,7 @@ library(readxl)
 ```
 
 ```{r set project variables}
-Project <- "Baltic_Photoperiod"
+Project <- "BalticPhotoperiod"
 DataOut <- file.path("..", "Data", "ProcessedData", "ProcessedSolisenseData")
 DataIn <- file.path("..", "Data", "ImportedData", "ImportedSolisenseData", fsep = .Platform$file.sep)
 
@@ -71,7 +71,7 @@ list.files(path = DataIn, pattern = Project, full.names = TRUE)
 # Also, conteined mean sig - mean for replica measured on the same day
 
 ```{r read ProcessFile Sol}
-SolisenseFile <- "../Data/ImportedData/ImportedSolisenseData/Baltic_Photoperiod_Imported_SolisenseLight.Rds"  
+SolisenseFile <- "../Data/ImportedData/ImportedSolisenseData/BalticPhotoperiod_Imported_SolisenseLight.Rds"  
 
 SolisenseFileName <- str_split(string = SolisenseFile, "/")[[1]][3] %>%
   str_remove(pattern = ".Rds")
@@ -84,7 +84,7 @@ SolFits <- readRDS(SolisenseFile)  %>%
 # Also, conteined mean for sig1s - mean for replica measured on the same day
 
 ```{r read ProcessFile Sol1s}
-Solisense1sFile <- "../Data/ImportedData/ImportedSolisenseData/Baltic_Photoperiod_Imported_SolisenseDarkafterLight.Rds"
+Solisense1sFile <- "../Data/ImportedData/ImportedSolisenseData/BalticPhotoperiod_Imported_SolisenseDarkafterLight.Rds"
 
 Solisense1sFileName <- str_split(string = Solisense1sFile, "/")[[1]][3] %>%
   str_remove(pattern = ".Rds")
@@ -1083,7 +1083,7 @@ Issue - not always pigment based on Olis correspond to Solisense data-> I combin
 Later - come back to OD680data from Multiculti and choose cell/ml (based on pamas corr) corresponding with the same day of sigma and JVPSII!!! Before calculations! Fix this Sylwia!!!!!
 
 ```{r set project variables}
-Project <- "Baltic_Photoperiod"
+Project <- "BalticPhotoperiod"
 DataIn <- file.path("..", "Data", "ProcessedData", "ProcessedPigmentsData", fsep = .Platform$file.sep)
 ```
 
@@ -1094,7 +1094,7 @@ list.files(path = DataIn, pattern = Project, full.names = TRUE)
 ```{r read pigments File}
 #df ontained mean OD per day from Multiculti and Abs from Olis spectra for selected nm. Based on this I calculated pigments per mL and per cell (pg/cell)
 
-MCPigmentAllFile <- "../Data/ProcessedData/ProcessedPigmentsData/Baltic_Photoperiod_Processed_PigmentAll.Rds"
+MCPigmentAllFile <- "../Data/ProcessedData/ProcessedPigmentsData/BalticPhotoperiod_Processed_PigmentAll.Rds"
 MCPigmentAllFileName <- str_split(string = MCPigmentAllFile, "/")[[1]][3] %>%
   str_remove(pattern = ".Rds")
 MCPigmentAll <- readRDS(MCPigmentAllFile)  %>%

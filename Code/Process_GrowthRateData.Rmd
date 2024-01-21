@@ -28,7 +28,7 @@ knitr::opts_chunk$set(fig.path='Figs/')
 
 # Introduction
 
-Process_GrowthRateData.Rmd processes and combines PICO_NestedFitsData.Rds from Data/CleanData/CleanedMCData folder and Baltic_Photoperiod_Processed_OlisSpectraTidy.Rds from Data/ProcessedData/ProcessedOlisJazData. This .Rmd generates Baltic_Photoperiod_Processed_GrowthRate.Rds (stored in Data/ProcessedData/ProcessesGrowthRateData folder) and GrowthRate_Plot.png (stored in Output/Plots folder).
+Process_GrowthRateData.Rmd processes and combines PICO_NestedFitsData.Rds from Data/CleanData/CleanedMCData folder and BalticPhotoperiod_Processed_OlisSpectraTidy.Rds from Data/ProcessedData/ProcessedOlisJazData. This .Rmd generates BalticPhotoperiod_Processed_GrowthRate.Rds (stored in Data/ProcessedData/ProcessesGrowthRateData folder) and GrowthRate_Plot.png (stored in Output/Plots folder).
 
 # Load Libraries and set Project Variables
 
@@ -53,7 +53,7 @@ library(tidyverse)
 ```
 
 ```{r set project variables}
-Project <- "Baltic_Photoperiod"
+Project <- "BalticPhotoperiod"
 DataOut <- file.path("..", "Data", "ProcessedData", "ProcessedGrowthRateData")
 DataIn <- file.path("..", "Data", "CleanData", "CleanedMCData", fsep = .Platform$file.sep)
 
@@ -151,7 +151,7 @@ rm(MCGrowthRateStats, model)
 # Load processed Pigment Rds (contained PUR and pigments data)
 
 ```{r set project variables}
-Project <- "Baltic_Photoperiod"
+Project <- "BalticPhotoperiod"
 DataIn <- file.path("..", "Data", "ProcessedData", "ProcessedPigmentsData", fsep = .Platform$file.sep)
 ```
 
@@ -162,7 +162,7 @@ list.files(path = DataIn, pattern = Project, full.names = TRUE)
 ```
 
 ```{r read imported Olis file}
-PigmentFile <- "../Data/ProcessedData/ProcessedPigmentsData/Baltic_Photoperiod_Processed_PigmentsExp.Rds"
+PigmentFile <- "../Data/ProcessedData/ProcessedPigmentsData/BalticPhotoperiod_Processed_PigmentsExp.Rds"
 PigmentFileName <- str_split(string = PigmentFile, "/")[[1]][3] %>%
   str_remove(pattern = ".Rds")
 PigmentExp <- readRDS(PigmentFile)  %>%
@@ -170,7 +170,7 @@ PigmentExp <- readRDS(PigmentFile)  %>%
 ```
 
 ```{r read imported Olis file}
-PigmentAllFile <- "../Data/ProcessedData/ProcessedPigmentsData/Baltic_Photoperiod_Processed_PigmentAll.Rds"
+PigmentAllFile <- "../Data/ProcessedData/ProcessedPigmentsData/BalticPhotoperiod_Processed_PigmentAll.Rds"
 PigmentAllFileName <- str_split(string = PigmentAllFile, "/")[[1]][3] %>%
   str_remove(pattern = ".Rds")
 PigmentAll <- readRDS(PigmentAllFile)  %>%
