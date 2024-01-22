@@ -72,7 +72,7 @@ knitr:: write_bib(c("tidyverse", "glue", "googlesheets4", "kableExtra"), "packag
 ```
 
 ```{r defining filepaths, include = FALSE}
-FiguresFP <- file.path("..", "..", "Output", "Figures")
+FiguresFP <- file.path("..", "Output", "Figures")
 ```
 
 ```{r setup, include=FALSE}
@@ -109,7 +109,7 @@ knitr::include_graphics(file.path( FiguresFP,"SFig_Sigma445.png"))
 ```{r GrowthCorrelation, echo = TRUE}
 GrowthCorrelation_cap <- glue("Pearson Correlation for two PhycoCyanin(PC)-rich cultures (056, 077) and two PhycoErythrin(PE)-rich cultures (048, 127) (Culture Collection of Baltic Algae) of *Synechococcus* sp.")
                           
-readRDS(file.path("..", "..", "Output", "TablesRds", "BalticPhotoperiod_Tab_GrowthCorrelation.Rds")) %>% 
+readRDS(file.path("..", "Output", "TablesRds", "BalticPhotoperiod_Tab_GrowthCorrelation.Rds")) %>% 
   as.data.frame() %>% 
   kable(caption = GrowthCorrelation_cap) %>% 
   kableExtra::kable_classic()
@@ -118,7 +118,7 @@ readRDS(file.path("..", "..", "Output", "TablesRds", "BalticPhotoperiod_Tab_Grow
 ```{r PigmentsCorrelation, echo = TRUE}
 PigmentsCorrelation_cap <- glue("Pearson Correlation for two PhycoCyanin(PC)-rich cultures (056, 077) and two PhycoErythrin(PE)-rich cultures (048, 127) (Culture Collection of Baltic Algae) of *Synechococcus* sp.")
                           
-readRDS(file.path("..", "..", "Output", "TablesRds", "BalticPhotoperiod_Tab_PigmentsCorrelation.Rds")) %>% 
+readRDS(file.path("..", "Output", "TablesRds", "BalticPhotoperiod_Tab_PigmentsCorrelation.Rds")) %>% 
   as.data.frame() %>% 
   kable(caption = PigmentsCorrelation_cap) %>% 
   kableExtra::kable_classic()
