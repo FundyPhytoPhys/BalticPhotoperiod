@@ -55,7 +55,7 @@ library(tidyverse)
 ```{r set project variables}
 Project <- "BalticPhotoperiod"
 DataOut <- file.path("..", "Data", "ProcessedData", "ProcessedGrowthRateData")
-DataIn <- file.path("..", "Data", "CleanData", "CleanedMCData", fsep = .Platform$file.sep)
+DataIn <- file.path("..", "Data", "CleanedData", "CleanedMCData", fsep = .Platform$file.sep)
 
 FigPath <- file.path("..", "Output", "Figures")
 FigRdsPath <- file.path("..", "Output", "FiguresRds")
@@ -73,7 +73,7 @@ list.files(path = DataIn, full.names = TRUE)
 ```
 
 ```{r read file}
-MultiCultiGrowthFile <- "../Data/CleanData/CleanedMCData/PICO_NestedFitsData.Rds"
+MultiCultiGrowthFile <- "../Data/CleanedData/CleanedMCData/PICO_Cleaned_MCData.Rds"
 
 MultiCultiGrowthFileName <- str_split(string = MultiCultiGrowthFile, "/")[[1]][3] %>%
   str_remove(pattern = ".Rds") 
