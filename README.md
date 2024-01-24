@@ -106,7 +106,7 @@ BalticPhotoperiod_Imported_SolisenseDarkafterLight.Rds contained data taken from
 
 - Process_GrowthCurveData.Rmd separately processes and combines all .Rds from Data/ImportedData/ImportedMCData folder. This .Rmd generates BalticPhotoperiod_Processed_GrowthCurve.Rds which is stored in Data/ProcessedData/ProcessedGrowthCurveData folder and one plot which is stored in Output/Figures folder.
 
-XXXX- Process_GrowthRateData.Rmd processes and combines PICO_Cleaned_MCData.Rds from Data/CleanedData/CleanedMCData folder and BalticPhotoperiod_Processed_OlisSpectraTidy.Rds from Data/ProcessedData/ProcessedOlisJazData. This .Rmd generates BalticPhotoperiod_Processed_GrowthRate.Rds (stored in Data/ProcessedData/ProcessesGrowthRateData folder) and 2 plots (stored in Output/Figures folder).
+XXXX- Process_GrowthRateData.Rmd processes and combines PICO_Cleaned_MCData.Rds from Data/CleanedData/CleanedMCData folder and BalticPhotoperiod_Processed_PigmentsExp.Rds from Data/ProcessedData/ProcessedPigmentsData. This .Rmd generates BalticPhotoperiod_Processed_GrowthRateExp.Rds and BalticPhotoperiod_Processed_GrowthRateAll.Rds (both stored in Data/ProcessedData/ProcessesGrowthRateData folder) and 2 plots (stored in Output/Figures folder).
 
 XXXX- Process_GrowthRateSolisenseData.Rmd processes and combines BalticPhotoperiod_Processed_GrowthRate.Rds from  Data/ProcessedData/ProcessedGrowthRateData folder and BalticPhotoperiod_Processed_SolisensePigmentsExp.Rds from Data/ProcessedData/ProcessedSolisenseData folder. This .Rmd generates xxx.Rds (stored in xxxa folder) and xxx_Plot.png (stored in Output/Figures folder).
 
@@ -132,9 +132,9 @@ This .Rmd implements logistic growth curve fits to MultiCulti growth trajectorie
 
 - Process_OlisJazEmData.Rmd processes and combines BalticPhotoperiod_Imported_JazEmData.Rds from Data/ImportedData/ImportedJazEmData folder and BalticPhotoperiod_Imported_OlisData.Rds from Data/ImportedData/ImportedOlisData folder. This .Rmd generates BalticPhotoperiod_Processed_OlisSpectraAll.Rds and BalticPhotoperiod_Processed_OlisSpectraTidy.Rds (both stored in Data/ProcessedData/ProcessedOlisJazData folder) and 1 plot (stored in Output/Figures folder).
 
-XXXX- Process_PigmentsData.Rmd processes and combines pigment catalog from a google sheet and BalticPhotoperiod_Processed_OlisSpectraTidy.Rds from Data/ProcessedData/ProcessedOlisJazData folder. This .Rmd generates BalticPhotoperiod_Processed_PigmentAll.Rds and BalticPhotoperiod_Processed_PigmentsExp.Rds (both stored in Data/ProcessedData/ProcessedPigmentsData folder) and two plots (stored in Output/Figures folder).
+- Process_PigmentsData.Rmd processes and combines BalticPhotoperiod_Imported_PigmentsData.Rds from Data/ImportedData/ImportedPigmentsData and BalticPhotoperiod_Processed_OlisSpectraTidy.Rds from Data/ProcessedData/ProcessedOlisJazData folder. This .Rmd generates BalticPhotoperiod_Processed_PigmentAll.Rds and BalticPhotoperiod_Processed_PigmentsExp.Rds (both stored in Data/ProcessedData/ProcessedPigmentsData folder) and two plots (stored in Output/Figures folder).
 
-XXXX- Process_SolisensePigmentsData.Rmd processes and combines BalticPhotoperiod_Imported_SolisenseDarkafterLight.Rds and BalticPhotoperiod_Imported_SolisenseLight.Rds from Data/ImportedData/ImportedSolisenseData folder. This .Rmd generates BalticPhotoperiod_Processed_SolisensePigmentsExp.Rds (stored in Data/ProcessedData/ProcessedSolisenseData folder) and three plots (stored in Output/Figures folder).
+- Process_SolisensePigmentsData.Rmd processes and combines BalticPhotoperiod_Imported_SolisenseDarkafterLight.Rds or BalticPhotoperiod_Imported_SolisenseLight.Rds from Data/ImportedData/ImportedSolisenseData folder and BalticPhotoperiod_Processed_PigmentsAll.Rds from Data/ProcessedData/ProcessedPigmentsData folder. This .Rmd generates BalticPhotoperiod_Processed_SolisensePigmentsAll.Rds (stored in Data/ProcessedData/ProcessedSolisenseData folder) and 4 plots (stored in Output/Figures folder).
 
 ### Data/CleanedData
 
@@ -150,7 +150,7 @@ Imported data in formats for long-term storage.
 
 ImportedData folder contains 6 folders: ImportedJazEmData, ImportedMCData, ImportedMetaData, ImportedOlisData, ImportedPigmentsData, ImportedSolisenseData.
 
-- Folder ImportedJazEmData contains Baltic_Photoperiod_Imported_JazEmData.Rds generated from Import_JazEmData.Rmd (stored in Code folder).
+- Folder ImportedJazEmData contains BalticPhotoperiod_Imported_JazEmData.Rds generated from Import_JazEmData.Rmd (stored in Code folder).
 
 - Folder ImportedMCData contains 
 20211214_PICO_MC247_RUN39_TargetDataMetaFilter.Rds, 
@@ -182,18 +182,19 @@ Processed data in formats for long-term storage.
 
 ProcessedData folder contains 7 folders: ProcessedGrowthCurveData, ProcessedGrowthRateData, ProcessedGrowthSymmetryData, ProcessedMCData, ProcessedOlisJazData, ProcessedPigmentsData, ProcessedSolisenseData.
 
-- Folder ProcessedGrowthCurveData contains Baltic_Photoperiod_Processed_GrowthCurve.Rds generated from Process_GrowthCurveData.Rmd (stored in Code folder).
+- Folder ProcessedGrowthCurveData contains BalticPhotoperiod_Processed_GrowthCurve.Rds generated from Process_GrowthCurveData.Rmd (stored in Code folder).
 
-- Folder ProcessedGrowthRateData contains Baltic_Photoperiod_Processed_GrowthRate.Rds generated from Process_GrowthRateData.Rmd (stored in Code folder).
+- Folder ProcessedGrowthRateData contains BalticPhotoperiod_Processed_GrowthRateAll.Rds and BalticPhotoperiod_Processed_GrowthRateExp.Rds generated from Process_GrowthRateData.Rmd (stored in Code folder).
 
-- Folder ProcessedGrowthSymmetryData contains Baltic_Photoperiod_Processed_GrowthSymmetryData.Rds generated from Process_GrowthSymmetryData.Rmd (stored in Code folder).
+- Folder ProcessedGrowthSymmetryData contains BalticPhotoperiod_Processed_GrowthSymmetryData.Rds generated from Process_GrowthSymmetryData.Rmd (stored in Code folder).
 
 - Folder ProcessedMCData contains 20211214_PICO_MC247_RUN39_ProcessDataNestGrowth.Rds, 
 20211223_PICO_MC257_RUN40_ProcessDataNestGrowth.Rds, 
 20211229_PICO_MC247_RUN43_ProcessDataNestGrowth.Rds, 
 20220107_PICO_MC257_RUN44_ProcessDataNestGrowth.Rds, 
 20220113_PICO_MC247_RUN45_ProcessDataNestGrowth.Rds, 
-20220122_PICO_MC257_RUN46_ProcessDataNestGrowth.Rds, 
+20220122_PICO_MC257_RUN46_ProcessDataNestGrowth.Rds,
+20220206_PICO_MC257_RUN50_ProcessDataNestGrowth.Rds, 
 20220405_PICO_MC247_RUN60_ProcessDataNestGrowth.Rds, 
 20220410_PICO_MC257_RUN62_ProcessDataNestGrowth.Rds, 
 20220420_PICO_MC257_RUN65_ProcessDataNestGrowth.Rds, 
@@ -202,42 +203,43 @@ ProcessedData folder contains 7 folders: ProcessedGrowthCurveData, ProcessedGrow
 20220615_PICO_MC257_RUN77_ProcessDataNestGrowth.Rds, and
 20230816_PICO_MC257_RUN121_ProcessDataNestGrowth.Rds generated from Process_MCData.Rmd (stored in Code folder).
 
-- Folder ProcessedOlisJazData contains Baltic_Photoperiod_Processed_OlisSpectraAll.Rds and Baltic_Photoperiod_Processed_OlisSpectraTidy.Rds generated from Process_OlisJazEmData.Rmd (stored in Code folder).
+- Folder ProcessedOlisJazData contains BalticPhotoperiod_Processed_OlisSpectraAll.Rds and BalticPhotoperiod_Processed_OlisSpectraTidy.Rds generated from Process_OlisJazEmData.Rmd (stored in Code folder).
 
-- Folder ProcessedPigmentsData contains Baltic_Photoperiod_Processed_PigmentAll.Rds and Baltic_Photoperiod_Processed_PigmentsExp.Rds generated from Process_PigmentsData.Rmd (stored in Code folder).
+- Folder ProcessedPigmentsData contains BalticPhotoperiod_Processed_PigmentAll.Rds and BalticPhotoperiod_Processed_PigmentsExp.Rds generated from Process_PigmentsData.Rmd (stored in Code folder).
 
-- Folder ProcessedSolisenseData contains Baltic_Photoperiod_Processed_SolisensePigmentsExp.Rds generated from Process_SolisensePigmentsData.Rmd (stored in Code folder).
+- Folder ProcessedSolisenseData contains BalticPhotoperiod_Processed_SolisensePigmentsAll.Rds generated from Process_SolisensePigmentsData.Rmd (stored in Code folder).
 
 ### Data/RawData
 
 Raw data files in various formats contains original files generated by analytical equipment, received from a data provider or outside contractor.
 Subfolders contain files from a single instrument.
 
-RawData folder contains 5 zipped folders: JazEmData.zip, MCData.zip, OlisData.zip, SolisenseNSData.zip, and SolisenseOSData.zip.
+RawData folder contains 6 zipped folders: JazEmData.zip, MCData.zip, OlisData.zip, PamasData.zip, SolisenseNSData.zip, and SolisenseOSData.zip.
 
 - Folder JazEmData.zip contains files generated from Jaz radiospectrometer.
 - Folder MCData.zip contains files generated from Multi-Cultivator MC247 and MC257.
 - Folder OlisData.zip contains files generated from OLIS CLARiTY spectrophotometer.
+- Folder PamasData.zip contains files generated from PAMAS counter.
 - Folder SolisenseNSData.zip contains files generated from Solisense FRR kinetic fluorometer new software (NS).
 - Folder SolisenseOSData.zip contains files generated from Solisense FRR kinetic fluorometer old software (OS).
-
-### MetaDataCatalog
-
-URL for MetaDataCatalog:
-https://docs.google.com/spreadsheets/d/1ZXpwR7Gfto-uRzVdXzMpQF4frbrvMLH_IyLqonFZRSw/edit#gid=0
 
 ### Docs
 
 Docs folder contains: BalticPhotoperiod.bib and INSTRUCTIONS.md.
 
+### Manuscript
+
+Manuscript folder contains all the files needed to generate the manuscript.
+
 ### Output
 
 Output from knit .Rmd, Figures and tables produced from analysis.
 
-The Output folder contains two folders: Plots and PlotsRDS. 
-- Folder Plots contains all plots that will be used in the final manuscript.
-- Folder PlotsRDS contains all .Rds needed to generate these plots.
-
+The Output folder contains 3 folders: Figures, FiguresRds, and TablesRds. 
+- Folder Figures contains all plots that will be used in the final manuscript.
+- Folder FiguresRds contains all .Rds needed to generate these plots.
+- Folder TablesRds contains all tables that will be used in the final manuscript (also contain stats analysis).
+  
 ### Data Dictionary
 
 URL for Data Dictionary:
