@@ -684,7 +684,7 @@ rm(tMaxAGLines_056, tMaxAGLines_077, tMaxAGLines_048, tMaxAGLines_127, MCPigment
 # Save rds for further analysis
 
 ```{r save rds}
-saveRDS(MCPigmenttMaxAG, file.path(DataOut, paste(Project, "Processed_PigmentAll.Rds", sep = "_"), fsep = .Platform$file.sep), ascii = FALSE, version = NULL, compress = "xz", refhook = NULL)
+saveRDS(MCPigmenttMaxAG, file.path(DataOut, paste(Project, "Processed_PigmentsAll.Rds", sep = "_"), fsep = .Platform$file.sep), ascii = FALSE, version = NULL, compress = "xz", refhook = NULL)
 
 saveRDS(MCPigmenttMaxAGChoosenExp, file.path(DataOut, paste(Project, "Processed_PigmentsExp.Rds", sep = "_"), fsep = .Platform$file.sep))
 ```

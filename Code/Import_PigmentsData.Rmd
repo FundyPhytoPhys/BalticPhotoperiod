@@ -32,8 +32,8 @@ knitr::opts_chunk$set(fig.path='Figs/')
 
 Import_PigmentData.Rmd imports: 
 PAMAS files from Data/RawData/PAMASData.zip folder, 
-ClarioPigments from ClarioPigments catalog,
-ClarioGrowth from ClarioGrowth catalog,
+ClarioPigments from ClarioPigments Catalog,
+ClarioGrowth from ClarioGrowth Catalog,
 GrowthCurveData from BalticPhotoperiod_Processed_GrowthCurve.Rds, 
 and OlisJazData from BalticPhotoperiod_Processed_OlisSpectraAll.Rds
 
@@ -233,7 +233,7 @@ HeaderRows <- 0
 
 # Load pigment catalog
 
-```{r load local metadatacatalog, message = FALSE, warning = FALSE, echo=FALSE}
+```{r load local pigment catalog, message = FALSE, warning = FALSE, echo=FALSE}
 gs4_deauth()
 PigmentData <- read_sheet("https://docs.google.com/spreadsheets/d/1EvogE5pFlGT9H304E3dqXKwh26dWI9r_snSPhZCHWiU/edit#gid=0") %>%
   mutate(Date = as.numeric(Date)) %>%
@@ -1101,7 +1101,7 @@ rm(MCBA127R, MCBA48R, MCBA56G, MCBA77G, MC_cellmL, CultureCatalog, GrowthCurve, 
 # Save rds for further analysis
 
 ```{r save rds}
-saveRDS(MC_cellmLPigment, file.path(DataOut, paste(Project, "Imported_PigmentData.Rds", sep = "_"), fsep = .Platform$file.sep), ascii = FALSE, version = NULL, compress = "xz", refhook = NULL)
+saveRDS(MC_cellmLPigment, file.path(DataOut, paste(Project, "Imported_PigmentsData.Rds", sep = "_"), fsep = .Platform$file.sep), ascii = FALSE, version = NULL, compress = "xz", refhook = NULL)
 ```
 
 # Variable names used in Data Dictionary
