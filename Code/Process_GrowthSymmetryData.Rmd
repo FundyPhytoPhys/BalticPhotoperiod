@@ -28,7 +28,7 @@ knitr::opts_chunk$set(fig.path='Figs/')
 
 # Introduction
 
-Process_GrowthSymmetryData.Rmd processes Growth Symmetry (GS) catalog from a google sheet. This .Rmd generates BalticPhotoperiod_Processed_GrowthSymmetryData.Rds (stored in Data/ProcessedData/ProcessedGrowthSymmetryData folder) and four plots: AccLen_Plot_Plot.png, AccLen_SupPlot_Plot.png, GS_Plot.png, and TDG_SupPlot.png (stored in Output/Plots folder).
+Process_GrowthSymmetryData.Rmd processes Growth Symmetry (GS) catalog from a google sheet. This .Rmd generates BalticPhotoperiod_Processed_GrowthSymmetryData.Rds (stored in Data/ProcessedData/ProcessedGrowthSymmetryData folder) and 4 plots (stored in Output/Figures folder).
 
 # Load Libraries and set Project Variables
 
@@ -674,7 +674,7 @@ rm(data_hlineGS8, data_hlineGS12, data_hlineGS16, GScatalog, GScatalogMetaExp,  
 ```{r}
 saveRDS(GScatalogMeta, file.path(FigRdsPath, paste(Project, "Fig_GrowthSymmetry_1.Rds", sep = "_"), fsep = .Platform$file.sep), ascii = FALSE, version = NULL, compress = "xz", refhook = NULL)
 
-saveRDS(fitted_GS_Param, file.path(FigRdsPath, paste(Project, "Fig_GrowthSymmetry_2.Rds", sep = "_"), fsep = .Platform$file.sep), ascii = FALSE, version = NULL, compress = "xz", refhook = NULL)
+saveRDS(augmented, file.path(FigRdsPath, paste(Project, "Fig_GrowthSymmetry_2.Rds", sep = "_"), fsep = .Platform$file.sep), ascii = FALSE, version = NULL, compress = "xz", refhook = NULL)
 ```
 
 
