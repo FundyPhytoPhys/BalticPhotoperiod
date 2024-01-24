@@ -1,4 +1,4 @@
-# Baltic_Photoperiod
+# BalticPhotoperiod
 
 ## Summary
 
