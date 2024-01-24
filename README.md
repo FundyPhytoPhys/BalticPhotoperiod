@@ -244,3 +244,5 @@ The Output folder contains 3 folders: Figures, FiguresRds, and TablesRds.
 
 URL for Data Dictionary:
 https://docs.google.com/spreadsheets/d/1hduAE5hZWdkxe7IJNJswQthYpaWIuwpBJBoXRqgDZss/edit#gid=0
+
+https://docs.google.com/spreadsheets/d/1byJ7NV2LrHfzkcw9GQgZdQijKw1UbdzvtvZ1d1KL_cY/edit#gid=0
