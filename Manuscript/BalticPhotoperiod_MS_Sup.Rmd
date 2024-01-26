@@ -1,6 +1,5 @@
 ---
-title: "Changing diel growth symmetries and light-capture in PhycoCyanin and PhycoErythrin-rich
-  picocyanobacteria across photic regimes and growth phases"
+title: "Changing diel growth symmetries and light-capture in PhycoCyanin and PhycoErythrin-rich picocyanobacteria, across photic regimes and growth phases"
 author:
 - Sylwia Śliwińska-Wilczewska:
     institute:
@@ -88,17 +87,19 @@ knitr::opts_chunk$set(echo = TRUE)
 COMMENT: /as supplemental data show the plots of deltaOD vs elapsed time with the overlaid logistic fits.
 
 ```{r GrowthCurve, fig.cap = GrowthCurve_cap, fig.height = 8, fig.width = 6, echo = FALSE}
-GrowthCurve_cap<- glue("Example of representative growth curves (tracked as OD~680~) of two PhycoCyanin(PC)-rich cultures (light green line; 056, dark green line; 077) and two PhycoErythrin(PE)-rich cultures (light red line; 048, dark red line; 127) (Culture Collection of Baltic Algae) of *Synechococcus* sp. grown at 30, 90, 180, 300, or 900 peak diel PAR µmol photons m^−2^s^−1^; and photoperiods of 8, 12, 16, or 24 h. The vertical lines represent the time when the cultures reached their maximum absolute hourly growth (tMaxAG), taken as an index of transition from exponential to pre-stationary growth phases. The orange area represents the photoperiods, with peak PAR x 1/1000 to scale to the Y axis.", .sep = " ")
+GrowthCurve_cap<- glue("Example of representative growth curves (tracked as OD~680~) of two PhycoCyanin(PC)-rich cultures (light green line; 056, dark green line; 077) and two PhycoErythrin(PE)-rich cultures (light red line; 048, dark red line; 127) (Culture Collection of Baltic Algae) of *Synechococcus* sp. grown at 30, 90, 180, 300, or 900 peak PAR µmol photons m^−2^s^−1^; and photoperiods of 8, 12, 16, or 24 h. The vertical lines represent the time when the cultures reached their maximum absolute hourly growth (tMaxAG), taken as an index of transition from exponential to pre-stationary growth phases. The orange area represents the photoperiods, with peak PAR x 1/1000 to scale to the Y axis.", .sep = " ")
 knitr::include_graphics(file.path(FiguresFP, "SFig_GrowthCurve.png"))
 ```
 
+
 ```{r GrowthRate, fig.cap = GrowthRate_cap, fig.height = 8, fig.width = 6, echo = FALSE}
-GrowthRate_cap<- glue("Chlorophyll specific exponential growth rates, estimated from logistic fits of chlorophyll proxy OD~680~-OD~720~ vs. elapsed time, for two PhycoCyanin(PC)-rich cultures (056, 077) and two PhycoErythrin(PE)-rich cultures (048, 127) (Culture Collection of Baltic Algae) of *Synechococcus* sp. grown at 30, 90, 180, 300, 600, or 900 peak diel PAR µmol photons m^−2^s^−1^; and photoperiods of 8, 12, 16, or 24 h. Growth rates (+/- SE from logistic model; SE falls within symbol sizes) are plotted vs. cumulative diel µmol photons m^−2^d^−1^, and pool fit with curve (Harrison and Platt, 1986) was shown as solid blue line. Separate lines (dashed) fit for growth under 30 (dark gray), 90 (light gray), 180 (purple), 300 (red), 600 together with 900 (orange) peak diel PAR µmol photons m^−2^s^−1^ when they were significantly different (ANOVA, *p* < 0.05) from the pool fit.", .sep = " ")
+GrowthRate_cap<- glue("Chlorophyll specific exponential growth rates, estimated from logistic fits of chlorophyll proxy OD~680~-OD~720~ vs. elapsed time, for two PhycoCyanin(PC)-rich cultures (056, 077) and two PhycoErythrin(PE)-rich cultures (048, 127) (Culture Collection of Baltic Algae) of *Synechococcus* sp. grown at 30, 90, 180, 300, 600, or 900 peak PAR µmol photons m^−2^s^−1^; and photoperiods of 8, 12, 16, or 24 h. Growth rates (+/- SE from logistic model; SE falls within symbol sizes) are plotted vs. cumulative diel µmol photons m^−2^d^−1^. Solid blue line shows fit of the pooled data with a three parameter model (Harrison and Platt, 1986). We also fit separate lines for growth under 30 (dark gray line), 90 (light gray line), 180 (purple line), 300 (red line), 600 together with 900 (orange line) peak PAR µmol photons m^−2^s^−1^, only when they were significantly different (ANOVA, *p* < 0.05) from the pooled fit.", .sep = " ")
 knitr::include_graphics(file.path(FiguresFP,"SFig_GrowthRate.png"))
 ```
 
+
 ```{r AccLen, fig.cap = AccLen_cap, fig.height = 8, fig.width = 6, echo = FALSE}
-AccLen_cap<- glue("Hours of photoperiod to reach maximum hourly growth increment (AccLen), for two PhycoCyanin(PC)-rich cultures (056, 077) and two PhycoErythrin(PE)-rich cultures (048, 127) (Culture Collection of Baltic Algae) of *Synechococcus* sp. grown at 30, 90, 180, 300, or 900 peak diel PAR µmol photons m^−2^s^−1^; and photoperiods of 8, 12, or 16 h. Figure represents all data (small symbols) and means (big symbols) for n = 0-5 days from exponential phase, prior to reaching maximum absolute hourly growth; or from pre-stationary growth phase, after reaching maximum absolute hourly growth. The diagonal dashed lines indicate the time (h) to reach the maximum light during the day.", .sep = " ")
+AccLen_cap<- glue("Hours of photoperiod to reach maximum hourly growth increment (AccLen), for two PhycoCyanin(PC)-rich cultures (056, 077) and two PhycoErythrin(PE)-rich cultures (048, 127) (Culture Collection of Baltic Algae) of *Synechococcus* sp. grown at 30, 90, 180, 300, or 900 peak PAR µmol photons m^−2^s^−1^; and photoperiods of 8, 12, or 16 h. The diagonal dashed lines indicate the time (h) to reach the maximum light during the day. Figure represents all data (small symbols) and means (big symbols) for n = 0-5 days from exponential phase, or from pre-stationary growth phase.", .sep = " ")
 knitr::include_graphics(file.path(FiguresFP,"SFig_AccLen.png"))
 ```
 
@@ -108,6 +109,34 @@ knitr::include_graphics(file.path(FiguresFP,"SFig_Pigments.png"))
 ```
 
 ```{r Sigma445, fig.cap = Sigma445_cap, fig.height = 8, fig.width = 6, echo = FALSE}
-Sigma445_cap<- glue("Effective absorption cross section of PSII (\u03C3~PSII~'; nm^2^ quanta^-1^) measured under diel peak PAR growth light under Ex445 nm (blue) excitation in two PhycoCyanin(PC)-rich cultures (056, 077) and two PhycoErythrin(PE)-rich cultures (048, 127) (Culture Collection of Baltic Algae) of *Synechococcus* sp. grown at 30, 90, 180, 300, 600, or 900 peak diel PAR µmol photons m^−2^s^−1^; and photoperiods of 8, 12, 16, or 24 h. Blue solid line shows linnear model fit.", .sep = " ")
+Sigma445_cap<- glue("Effective absorption cross section of PSII (\u03C3~PSII~'; nm^2^ quanta^-1^) measured under diel peak PAR growth light under Ex445 nm (blue) excitation in two PhycoCyanin(PC)-rich cultures (056, 077) and two PhycoErythrin(PE)-rich cultures (048, 127) (Culture Collection of Baltic Algae) of *Synechococcus* sp. grown at 30, 90, 180, 300, 600, or 900 peak PAR µmol photons m^−2^s^−1^; and photoperiods of 8, 12, 16, or 24 h. Figure represents all data (small symbols) and means (big symbols) from exponential phase, or from pre-stationary growth phase. Blue solid line shows linear model fit.", .sep = " ")
 knitr::include_graphics(file.path(FiguresFP,"SFig_Sigma445.png"))
 ```
+
+
+Other plot?
+
+## Changes of TDG {.unnumbered}
+
+```{r TDG, fig.cap = TDG_cap, fig.height = 6, fig.width = 8, echo = FALSE}
+TDG_cap<- glue("Changes of TDG (tracked as daily change in OD~680~ increment) of two PhycoCyanin(PC)-rich cultures (056, 077) and two PhycoErythrin(PE)-rich cultures (048, 127) (Culture Collection of Baltic Algae) of *Synechococcus* sp. grown at 30, 90, 180, 300, or 900 peak PAR µmol photons m^−2^s^−1^; and photoperiods of 8, 12, or 16 h. The vertical lines represent the time when the strains reached their maximum absolute hourly growth (tMaxAG).", .sep = " ")
+knitr::include_graphics(file.path(FiguresFP,"SFig_TDG.png"))
+```
+
+## Changes in total Phyco/Chl *a* ratio and PUR/PAR ratio {.unnumbered}
+
+```{r PigRatioPUR, fig.cap = PigRatioPUR_cap, fig.height = 6, fig.width = 8, echo = FALSE}
+PigRatioPUR_cap<- glue("Changes of total Phyco/Chl *a* ratio (A) and PUR/PAR ratio (B) of two PhycoCyanin(PC)-rich cultures (056, 077) and two PhycoErythrin(PE)-rich cultures (048, 127) (Culture Collection of Baltic Algae) of *Synechococcus* sp. at selected cumulative diel µmol photons m^−2^d^−1^ over time (h). The vertical lines represent the time when the strains reached their maximum absolute hourly growth (tMaxAG).", .sep = " ")
+knitr::include_graphics(file.path(FiguresFP,"SFig_PigRatioPUR.png"))
+```
+
+
+
+
+
+
+
+
+
+
+
