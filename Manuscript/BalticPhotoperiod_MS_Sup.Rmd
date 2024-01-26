@@ -103,6 +103,13 @@ AccLen_cap<- glue("Hours of photoperiod to reach maximum hourly growth increment
 knitr::include_graphics(file.path(FiguresFP,"SFig_AccLen.png"))
 ```
 
+## Changes of TDG {.unnumbered}
+
+```{r TDG, fig.cap = TDG_cap, fig.height = 6, fig.width = 8, echo = FALSE}
+TDG_cap<- glue("Changes of TDG (tracked as daily change in OD~680~ increment) of two PhycoCyanin(PC)-rich cultures (056, 077) and two PhycoErythrin(PE)-rich cultures (048, 127) (Culture Collection of Baltic Algae) of *Synechococcus* sp. grown at 30, 90, 180, 300, or 900 peak PAR µmol photons m^−2^s^−1^; and photoperiods of 8, 12, or 16 h. The vertical lines represent the time when the strains reached their maximum absolute hourly growth (tMaxAG).", .sep = " ")
+knitr::include_graphics(file.path(FiguresFP,"SFig_TDG.png"))
+```
+
 ```{r Pigments, fig.cap = Pigments_cap, fig.height = 8, fig.width = 6, echo = FALSE}
 Pigments_cap<- glue("Changes of cell-specific pigment content of two PhycoCyanin(PC)-rich cultures (056, 077) and two PhycoErythrin(PE)-rich cultures (048, 127) (Culture Collection of Baltic Algae) of *Synechococcus* sp. at selected cumulative diel µmol photons m^−2^d^−1^ over time (h). The vertical lines represent the time when the strains reached their maximum absolute hourly growth (tMaxAG).", .sep = " ")
 knitr::include_graphics(file.path(FiguresFP,"SFig_Pigments.png"))
@@ -116,12 +123,6 @@ knitr::include_graphics(file.path(FiguresFP,"SFig_Sigma445.png"))
 
 Other plot?
 
-## Changes of TDG {.unnumbered}
-
-```{r TDG, fig.cap = TDG_cap, fig.height = 6, fig.width = 8, echo = FALSE}
-TDG_cap<- glue("Changes of TDG (tracked as daily change in OD~680~ increment) of two PhycoCyanin(PC)-rich cultures (056, 077) and two PhycoErythrin(PE)-rich cultures (048, 127) (Culture Collection of Baltic Algae) of *Synechococcus* sp. grown at 30, 90, 180, 300, or 900 peak PAR µmol photons m^−2^s^−1^; and photoperiods of 8, 12, or 16 h. The vertical lines represent the time when the strains reached their maximum absolute hourly growth (tMaxAG).", .sep = " ")
-knitr::include_graphics(file.path(FiguresFP,"SFig_TDG.png"))
-```
 
 ## Changes in total Phyco/Chl *a* ratio and PUR/PAR ratio {.unnumbered}
 
