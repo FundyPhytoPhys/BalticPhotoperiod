@@ -674,14 +674,6 @@ SolFitsExpFitAll %>%
   scale_colour_manual(values = c("darkslategray", "lightblue4", "hotpink4", "indianred3",  "goldenrod2", "khaki2"), name="", labels = lab2) +
   ggh4x::facet_nested(cols = vars(Phase), rows = vars(Strain), labeller = label_parsed) +
   theme_bw() 
-
-SolFitsExpFitAll %>% 
-  ggplot() +
-  geom_point(aes(x = PARPhotonDose_day, y = Sig_nm2psii, colour = as.factor(Par_ue), shape = as.factor(Photoperiod)), size = 3.5, show.legend = T) +
-  scale_shape_manual(values = c(15, 16, 17,18), name="", labels = lab1) +
-  scale_colour_manual(values = c("darkslategray", "lightblue4", "hotpink4", "indianred3",  "goldenrod2", "khaki2"), name="", labels = lab2) +
-  ggh4x::facet_nested(cols = vars(Phase, Ex_WL), rows = vars(Strain), labeller = label_parsed) +
-  theme_bw() 
 ```
 
 # Fit the data to exponential decays
@@ -1032,40 +1024,7 @@ fittedmodel445<-fitted445  %>%
 #   drop_na(Df) 
 #   rm(anova056077Exp, anova048127Exp, anova056048Exp, anova077048Exp, anova056127Exp, anova077127Exp)
 # 
-# #Comparing model for strains from St phase
-# fittedmodelStrainSt<-fittedmodel445
-#   anova056077St<-anova(fittedmodelStrainSt[[3]][[5]], fittedmodelStrainSt[[3]][[6]])
-#   anova056077St$FitComparison <- '056_077'
-#   anova048127St<-anova(fittedmodelStrainSt[[3]][[7]], fittedmodelStrainSt[[3]][[8]])
-#   anova048127St$FitComparison <- '048_127'
-#   anova056048St<-anova(fittedmodelStrainSt[[3]][[5]], fittedmodelStrainSt[[3]][[7]])
-#   anova056048St$FitComparison <- '056_048'
-#   anova077048St<-anova(fittedmodelStrainSt[[3]][[6]], fittedmodelStrainSt[[3]][[7]])
-#   anova077048St$FitComparison <- '077_048'
-#   anova056127St<-anova(fittedmodelStrainSt[[3]][[5]], fittedmodelStrainSt[[3]][[8]])
-#   anova056127St$FitComparison <- '056_127'
-#   anova077127St<-anova(fittedmodelStrainSt[[3]][[6]], fittedmodelStrainSt[[3]][[8]])
-#   anova077127St$FitComparison <- '077_127'
-#   anovaStrainSt445<-rbind(anova056077St, anova048127St, anova056048St, anova077048St, anova056127St, anova077127St)
-#   anovaStrainSt445 <-anovaStrainSt445 %>% 
-#   drop_na(Df) 
-#   rm(anova056077St, anova048127St, anova056048St, anova077048St, anova056127St, anova077127St)
-#   
-#   
-# #Comparing model for each strains from different phase (Exp vs St)
-# fittedmodelPhase<-fittedmodel445
-#   anova056ExpSt<-anova(fittedmodelPhase[[3]][[1]], fittedmodelPhase[[3]][[5]])
-#   anova056ExpSt$FitComparison <- '056_Exp_St'
-#   anova077ExpSt<-anova(fittedmodelPhase[[3]][[2]], fittedmodelPhase[[3]][[6]])
-#   anova077ExpSt$FitComparison <- '077_Exp_St'
-#   anova048ExpSt<-anova(fittedmodelPhase[[3]][[3]], fittedmodelPhase[[3]][[7]])
-#   anova048ExpSt$FitComparison <- '048_Exp_St'
-#   anova127ExpSt<-anova(fittedmodelPhase[[3]][[4]], fittedmodelPhase[[3]][[8]])
-#   anova127ExpSt$FitComparison <- '127_Exp_St'
-#   anovaPhase445<-rbind(anova056ExpSt, anova077ExpSt, anova048ExpSt, anova127ExpSt)
-#   anovaPhase445 <-anovaPhase445 %>% 
-#   drop_na(Df) 
-#   rm(anova056ExpSt, anova077ExpSt, anova048ExpSt, anova127ExpSt)
+
 
 ```
 
@@ -1459,23 +1418,23 @@ lab1=c(expression("8 h"), expression("12 h"), expression("16 h"), expression("24
 lab2=c(expression("30 µE"), expression("90 µE"), expression("180 µE"), expression("300 µE"), expression("600 µE"), expression("900 µE"))
 
 SolFitsPigmentExp %>% 
-  filter(Ex_WL==590) %>% 
-  ggplot() +
-  geom_point(aes(x = AllmeanPhycoChlaRatio, y = AllmeanSig_nm2psii, colour = as.factor(Par_ue), shape = as.factor(Photoperiod)), size = 3.5, show.legend = T) +
-  # geom_errorbar(aes(x = AllmeanPhycoChlaRatio, ymin = AllmeanSig_nm2psii - AllsdSig_nm2psii, ymax = AllmeanSig_nm2psii + AllsdSig_nm2psii, colour=as.factor(Par_ue))) +
-  scale_shape_manual(values = c(15, 16, 17,18), name="", labels = lab1) +
-  scale_colour_manual(values = c("darkslategray", "lightblue4", "hotpink4", "indianred3", "goldenrod2", "khaki2"), name="", labels = lab2) +
-  ggh4x::facet_nested(cols = vars(Phase), rows = vars(facetsStrain, Strain), labeller = label_parsed) +
-  theme_bw()
-
-
-SolFitsPigmentExp %>% 
   ggplot() +
   geom_point(aes(x = AllmeanPhycoChlaRatio, y = AllmeanSig_nm2psii, colour = as.factor(Par_ue), shape = as.factor(Photoperiod)), size = 3.5, show.legend = T) +
   # geom_errorbar(aes(x = AllmeanPhycoChlaRatio, ymin = AllmeanSig_nm2psii - AllsdSig_nm2psii, ymax = AllmeanSig_nm2psii + AllsdSig_nm2psii, colour=as.factor(Par_ue))) +
   scale_shape_manual(values = c(15, 16, 17,18), name="", labels = lab1) +
   scale_colour_manual(values = c("darkslategray", "lightblue4", "hotpink4", "indianred3","goldenrod2", "khaki2"), name="", labels = lab2) +
   ggh4x::facet_nested(cols = vars(Phase, Ex_WL), rows = vars(Strain), labeller = label_parsed) +
+  theme_bw()
+
+
+SolFitsPigmentExp %>% 
+  filter(Ex_WL==590) %>% 
+  ggplot() +
+  geom_point(aes(x = AllmeanPhycoChlaRatio, y = AllmeanSig_nm2psii, colour = as.factor(Par_ue), shape = as.factor(Photoperiod)), size = 3.5, show.legend = T) +
+  # geom_errorbar(aes(x = AllmeanPhycoChlaRatio, ymin = AllmeanSig_nm2psii - AllsdSig_nm2psii, ymax = AllmeanSig_nm2psii + AllsdSig_nm2psii, colour=as.factor(Par_ue))) +
+  scale_shape_manual(values = c(15, 16, 17,18), name="", labels = lab1) +
+  scale_colour_manual(values = c("darkslategray", "lightblue4", "hotpink4", "indianred3", "goldenrod2", "khaki2"), name="", labels = lab2) +
+  ggh4x::facet_nested(cols = vars(Phase), rows = vars(Strain), labeller = label_parsed) +
   theme_bw()
 
 
@@ -1494,7 +1453,7 @@ SolFitsPigmentExp %>%
   geom_errorbar(aes(x = AllmeanPhycoChlaRatio, ymin = AllmeanSigdark_nm2psii - AllsdSigdark_nm2psii, ymax = AllmeanSigdark_nm2psii + AllsdSigdark_nm2psii, colour=as.factor(Par_ue))) +
   scale_shape_manual(values = c(15, 16, 17,18), name="", labels = lab1) +
   scale_colour_manual(values = c("darkslategray", "lightblue4", "hotpink4", "indianred3","goldenrod2", "khaki2"), name="", labels = lab2) +
-  ggh4x::facet_nested(cols = vars(facetsExcitation, Ex_WL), rows = vars(facetsStrain, Strain), labeller = label_parsed) +
+  ggh4x::facet_nested(cols = vars(Ex_WL), rows = vars(Strain), labeller = label_parsed) +
   theme_bw() 
 
 
@@ -1503,7 +1462,7 @@ SolFitsPigmentExp %>%
   geom_point(aes(x = AllmeanPhycoChlaRatio, y = AllmeanSigdark_nm2psii, colour = as.factor(Strain)), size = 3.5, show.legend = T) +
   geom_errorbar(aes(x = AllmeanPhycoChlaRatio, ymin = AllmeanSigdark_nm2psii - AllsdSigdark_nm2psii, ymax = AllmeanSigdark_nm2psii + AllsdSigdark_nm2psii, colour=as.factor(Strain))) +
   scale_colour_discrete(type=c("seagreen4", "palegreen3", "brown1", "brown4")) +
-  ggh4x::facet_nested(cols = vars(facetsExcitation, Ex_WL), rows = vars(Par_ue), labeller = label_parsed) +
+  ggh4x::facet_nested(cols = vars(Ex_WL), rows = vars(Par_ue), labeller = label_parsed) +
   theme_bw() 
 
 
@@ -1540,14 +1499,15 @@ SolFitsAllPigmentPCPE<-rbind(SolFitsAllPigmentPC, SolFitsAllPigmentPE)
 rm(SolFitsAllPigmentPC, SolFitsAllPigmentPE)
 
 
-SolFitsAllPigmentPC1s<-SolFitsPigmentExp1s %>% 
-  filter(Strain == "PC-rich_056" | Strain == "PC-rich_077") 
-SolFitsAllPigmentPC1s$StrainGroup = "PC-rich"
-SolFitsAllPigmentPE1s<-SolFitsPigmentExp1s %>% 
-  filter(Strain == "PE-rich_048" | Strain == "PE-rich_127")  
-SolFitsAllPigmentPE1s$StrainGroup = "PE-rich"
-  
-SolFitsAllPigmentPCPE1s<-rbind(SolFitsAllPigmentPC1s, SolFitsAllPigmentPE1s)
+# SolFitsAllPigmentPC1s<-SolFitsPigmentExp1s %>% 
+#   filter(Strain == "PC-rich_056" | Strain == "PC-rich_077") 
+# SolFitsAllPigmentPC1s$StrainGroup = "PC-rich"
+# SolFitsAllPigmentPE1s<-SolFitsPigmentExp1s %>% 
+#   filter(Strain == "PE-rich_048" | Strain == "PE-rich_127")  
+# SolFitsAllPigmentPE1s$StrainGroup = "PE-rich"
+#   
+# SolFitsAllPigmentPCPE1s<-rbind(SolFitsAllPigmentPC1s, SolFitsAllPigmentPE1s)
+
 #rm(SolFitsAllPigmentPC1s, SolFitsAllPigmentPE1s)
 ```
 
@@ -1557,8 +1517,8 @@ SolFitsAllPigmentPCPE1s<-rbind(SolFitsAllPigmentPC1s, SolFitsAllPigmentPE1s)
 SolFitsAllPigmentPCPE<-SolFitsAllPigmentPCPE %>%
   filter(E_days>=2) 
 
-SolFitsAllPigmentPCPE1s<-SolFitsAllPigmentPCPE1s %>%
-  filter(E_days>=2) 
+# SolFitsAllPigmentPCPE1s<-SolFitsAllPigmentPCPE1s %>%
+#   filter(E_days>=2) 
 ```
 
 # Linear fit per Ex_WL
@@ -1582,13 +1542,13 @@ SolFitsAllPigmentfitPhycoChlalineardarkExWL <- SolFitsAllPigmentPCPE %>%
          Linear_Model_Glance = map(Linear_Model, possibly(glance)))
 
 
-SolFitsAllPigmentfitPhycoChlalinearExWL1s <- SolFitsAllPigmentPCPE1s %>%  
-  select(c(Strain, Par_ue, Photoperiod, Ex_WL, meanSig1s_nm2psii, AllmeanPhycoChlaRatio, O2, WL, Phase)) %>% 
-  nest(data = -c("Ex_WL", "Phase")) %>% 
-  mutate(Linear_Model = map(data, ~lm(meanSig1s_nm2psii ~ AllmeanPhycoChlaRatio, data = .x))) %>%    
-  mutate(Linear_Model_Param = map(Linear_Model, tidy),          
-         Linear_Model_Predict = map(Linear_Model, possibly(augment)),          
-         Linear_Model_Glance = map(Linear_Model, possibly(glance)))
+# SolFitsAllPigmentfitPhycoChlalinearExWL1s <- SolFitsAllPigmentPCPE1s %>%  
+#   select(c(Strain, Par_ue, Photoperiod, Ex_WL, meanSig1s_nm2psii, AllmeanPhycoChlaRatio, O2, WL, Phase)) %>% 
+#   nest(data = -c("Ex_WL", "Phase")) %>% 
+#   mutate(Linear_Model = map(data, ~lm(meanSig1s_nm2psii ~ AllmeanPhycoChlaRatio, data = .x))) %>%    
+#   mutate(Linear_Model_Param = map(Linear_Model, tidy),          
+#          Linear_Model_Predict = map(Linear_Model, possibly(augment)),          
+#          Linear_Model_Glance = map(Linear_Model, possibly(glance)))
 ```
 
 # Creat preliminary plot
@@ -1618,14 +1578,14 @@ SolFitsAllPigmentfitPhycoChlalineardarkExWL %>%
   theme_bw() 
 
 
-SolFitsAllPigmentfitPhycoChlalinearExWL1s %>% 
-  unnest(Linear_Model_Predict) %>% 
-  ggplot() +
-  geom_point(aes(x = AllmeanPhycoChlaRatio, y = meanSig1s_nm2psii, colour=as.factor(Strain)), size = 3.5, show.legend = T, SolFitsAllPigmentPCPE1s) + 
-  geom_line(aes(x = AllmeanPhycoChlaRatio, y = `.fitted`), show.legend = F) +   
-  scale_colour_discrete(type=c("seagreen4", "palegreen3", "brown1", "brown4")) +
-  ggh4x::facet_nested(cols = vars(Ex_WL, Phase), labeller = label_parsed) +
-  theme_bw() 
+# SolFitsAllPigmentfitPhycoChlalinearExWL1s %>% 
+#   unnest(Linear_Model_Predict) %>% 
+#   ggplot() +
+#   geom_point(aes(x = AllmeanPhycoChlaRatio, y = meanSig1s_nm2psii, colour=as.factor(Strain)), size = 3.5, show.legend = T, SolFitsAllPigmentPCPE1s) + 
+#   geom_line(aes(x = AllmeanPhycoChlaRatio, y = `.fitted`), show.legend = F) +   
+#   scale_colour_discrete(type=c("seagreen4", "palegreen3", "brown1", "brown4")) +
+#   ggh4x::facet_nested(cols = vars(Ex_WL, Phase), labeller = label_parsed) +
+#   theme_bw() 
 ```
 
 # Linear fit per par_ue
@@ -1652,24 +1612,24 @@ SolFitsAllPigmentfitPhycoChlalineardark <- SolFitsAllPigmentPCPE %>%
          Linear_Model_Glance = map(Linear_Model, possibly(glance)))
 
 
-SolFitsAllPigmentfitPhycoChlalinear1s <- SolFitsAllPigmentPCPE1s %>%  
-    drop_na(Par_ue, Ex_WL, Phase, meanSig1s_nm2psii, AllmeanPhycoChlaRatio) %>% 
-  select(c(Strain, Par_ue, Photoperiod, Ex_WL, meanSig1s_nm2psii, AllmeanPhycoChlaRatio, O2, WL, Phase)) %>% 
-  nest(data = -c("Par_ue", "Ex_WL", "Phase")) %>%   
-  mutate(Linear_Model = map(data, ~lm(meanSig1s_nm2psii ~ AllmeanPhycoChlaRatio, data = .x))) %>%     
-  mutate(Linear_Model_Param = map(Linear_Model, tidy),          
-         Linear_Model_Predict = map(Linear_Model, possibly(augment)),          
-         Linear_Model_Glance = map(Linear_Model, possibly(glance)))
-
-
-SolFitsAllPigmentfitPhycoChlalinearPCPE1s <- SolFitsAllPigmentPCPE1s %>%   
-    drop_na(Par_ue, Ex_WL, Phase, meanSig1s_nm2psii, AllmeanPhycoChlaRatio) %>% 
-  select(c(StrainGroup, Par_ue, Photoperiod, Ex_WL, meanSig1s_nm2psii, AllmeanPhycoChlaRatio, O2, WL, Phase)) %>%  
-  nest(data = -c("Par_ue", "Ex_WL", "StrainGroup", "Phase")) %>%  
-  mutate(Linear_Model = map(data, ~lm(meanSig1s_nm2psii ~ AllmeanPhycoChlaRatio, data = .x))) %>%    
-  mutate(Linear_Model_Param = map(Linear_Model, tidy),          
-         Linear_Model_Predict = map(Linear_Model, possibly(augment)),          
-         Linear_Model_Glance = map(Linear_Model, possibly(glance)))
+# SolFitsAllPigmentfitPhycoChlalinear1s <- SolFitsAllPigmentPCPE1s %>%  
+#     drop_na(Par_ue, Ex_WL, Phase, meanSig1s_nm2psii, AllmeanPhycoChlaRatio) %>% 
+#   select(c(Strain, Par_ue, Photoperiod, Ex_WL, meanSig1s_nm2psii, AllmeanPhycoChlaRatio, O2, WL, Phase)) %>% 
+#   nest(data = -c("Par_ue", "Ex_WL", "Phase")) %>%   
+#   mutate(Linear_Model = map(data, ~lm(meanSig1s_nm2psii ~ AllmeanPhycoChlaRatio, data = .x))) %>%     
+#   mutate(Linear_Model_Param = map(Linear_Model, tidy),          
+#          Linear_Model_Predict = map(Linear_Model, possibly(augment)),          
+#          Linear_Model_Glance = map(Linear_Model, possibly(glance)))
+# 
+# 
+# SolFitsAllPigmentfitPhycoChlalinearPCPE1s <- SolFitsAllPigmentPCPE1s %>%   
+#     drop_na(Par_ue, Ex_WL, Phase, meanSig1s_nm2psii, AllmeanPhycoChlaRatio) %>% 
+#   select(c(StrainGroup, Par_ue, Photoperiod, Ex_WL, meanSig1s_nm2psii, AllmeanPhycoChlaRatio, O2, WL, Phase)) %>%  
+#   nest(data = -c("Par_ue", "Ex_WL", "StrainGroup", "Phase")) %>%  
+#   mutate(Linear_Model = map(data, ~lm(meanSig1s_nm2psii ~ AllmeanPhycoChlaRatio, data = .x))) %>%    
+#   mutate(Linear_Model_Param = map(Linear_Model, tidy),          
+#          Linear_Model_Predict = map(Linear_Model, possibly(augment)),          
+#          Linear_Model_Glance = map(Linear_Model, possibly(glance)))
 ```
 
 # Create preliminary plot
@@ -1702,53 +1662,53 @@ SolFitsAllPigmentfitPhycoChlalineardark %>%
   theme_bw() 
 
 
-SolFitsAllPigmentfitPhycoChlalinear1s %>% 
-  unnest(Linear_Model_Predict) %>% 
-  ggplot() +
-  geom_point(aes(x = AllmeanPhycoChlaRatio, y = meanSig1s_nm2psii, colour=as.factor(Strain)), size = 3.5, show.legend = T, SolFitsAllPigmentPCPE1s) + 
-  geom_errorbar(aes(x = AllmeanPhycoChlaRatio, ymin = meanSig1s_nm2psii - sdSig1s_nm2psii, ymax = meanSig1s_nm2psii + sdSig1s_nm2psii, colour=as.factor(Strain)), SolFitsAllPigmentPCPE1s) +
-  geom_line(aes(x = AllmeanPhycoChlaRatio, y = `.fitted`), show.legend = F) + 
-  scale_colour_discrete(type=c("seagreen4", "palegreen3", "brown1", "brown4")) +
-  ggh4x::facet_nested(cols = vars(Ex_WL, Phase), rows = vars(Par_ue), labeller = label_parsed) +
-  theme_bw()
+# SolFitsAllPigmentfitPhycoChlalinear1s %>% 
+#   unnest(Linear_Model_Predict) %>% 
+#   ggplot() +
+#   geom_point(aes(x = AllmeanPhycoChlaRatio, y = meanSig1s_nm2psii, colour=as.factor(Strain)), size = 3.5, show.legend = T, SolFitsAllPigmentPCPE1s) + 
+#   geom_errorbar(aes(x = AllmeanPhycoChlaRatio, ymin = meanSig1s_nm2psii - sdSig1s_nm2psii, ymax = meanSig1s_nm2psii + sdSig1s_nm2psii, colour=as.factor(Strain)), SolFitsAllPigmentPCPE1s) +
+#   geom_line(aes(x = AllmeanPhycoChlaRatio, y = `.fitted`), show.legend = F) + 
+#   scale_colour_discrete(type=c("seagreen4", "palegreen3", "brown1", "brown4")) +
+#   ggh4x::facet_nested(cols = vars(Ex_WL, Phase), rows = vars(Par_ue), labeller = label_parsed) +
+#   theme_bw()
 ```
 
 # Combine 590 sigma and sigma in the dark
 
 ```{r}
-SolFitsAllPigmentPCPE$facetsPar_ue = factor(SolFitsAllPigmentPCPE$O2, labels = c("PAR~(µmol~photons~m^{-2}~s^{-1})"))
-SolFitsAllPigmentPCPE$facetsExcitation590 = factor(SolFitsAllPigmentPCPE$O2, labels = c("Excitation~590~nm"))
-
-SolFitsAllPigmentPCPEMerge1<-SolFitsAllPigmentPCPE %>% 
-  select(c(Strain, Ex_WL, WL, Par_ue, Photoperiod, Sig_nm2psii, AllmeanSig_nm2psii, AllsdSig_nm2psii, AllmeanPhycoChlaRatio, facetsPar_ue, facetsExcitation590)) %>% 
-  filter(Ex_WL ==590) %>% 
-  mutate(DifferentSigma = WL) %>%
-  mutate(DifferentSigma = case_when(DifferentSigma=="WW"~"Light~condition")) %>% 
-  rename(Sigma_value = Sig_nm2psii) %>% 
-  rename(AllmeanSigma_value = AllmeanSig_nm2psii) %>% 
-  rename(AllsdSigma_value = AllsdSig_nm2psii)
-
-SolFitsAllPigmentPCPEMerge2<-SolFitsAllPigmentPCPE %>% 
-  select(c(Strain, Ex_WL, WL, Par_ue, Photoperiod, Sigdark_nm2psii, AllmeanSigdark_nm2psii, AllsdSigdark_nm2psii, AllmeanPhycoChlaRatio, facetsPar_ue, facetsExcitation590)) %>% 
-  filter(Ex_WL ==590) %>% 
-  mutate(DifferentSigma = WL) %>%
-  mutate(DifferentSigma = case_when(DifferentSigma=="WW"~"Dark~condition")) %>% 
-  rename(Sigma_value = Sigdark_nm2psii) %>% 
-  rename(AllmeanSigma_value = AllmeanSigdark_nm2psii) %>% 
-  rename(AllsdSigma_value = AllsdSigdark_nm2psii)
-
-SolFitsAllPigmentPCPEMerge590<-rbind(SolFitsAllPigmentPCPEMerge1, SolFitsAllPigmentPCPEMerge2)
-  rm(SolFitsAllPigmentPCPEMerge1, SolFitsAllPigmentPCPEMerge2)
-
-
-SolFitsAllPigmentfitPhycoChlalinearMerge590 <- SolFitsAllPigmentPCPEMerge590 %>%   
-  drop_na(Sigma_value, AllmeanPhycoChlaRatio) %>% 
-  select(c(Strain, Par_ue, Photoperiod, Ex_WL, Sigma_value, AllmeanPhycoChlaRatio, WL, DifferentSigma, facetsPar_ue, facetsExcitation590)) %>%  
-  nest(data = -c("Par_ue", "DifferentSigma", "facetsPar_ue", "facetsExcitation590")) %>%   
-  mutate(Linear_Model = map(data, ~lm(Sigma_value ~ AllmeanPhycoChlaRatio, data = .x))) %>%     
-  mutate(Linear_Model_Param = map(Linear_Model, tidy),          
-         Linear_Model_Predict = map(Linear_Model, possibly(augment)),          
-         Linear_Model_Glance = map(Linear_Model, possibly(glance)))
+# SolFitsAllPigmentPCPE$facetsPar_ue = factor(SolFitsAllPigmentPCPE$O2, labels = c("PAR~(µmol~photons~m^{-2}~s^{-1})"))
+# SolFitsAllPigmentPCPE$facetsExcitation590 = factor(SolFitsAllPigmentPCPE$O2, labels = c("Excitation~590~nm"))
+# 
+# SolFitsAllPigmentPCPEMerge1<-SolFitsAllPigmentPCPE %>% 
+#   select(c(Strain, Ex_WL, WL, Par_ue, Photoperiod, Sig_nm2psii, AllmeanSig_nm2psii, AllsdSig_nm2psii, AllmeanPhycoChlaRatio, facetsPar_ue, facetsExcitation590)) %>% 
+#   filter(Ex_WL ==590) %>% 
+#   mutate(DifferentSigma = WL) %>%
+#   mutate(DifferentSigma = case_when(DifferentSigma=="WW"~"Light~condition")) %>% 
+#   rename(Sigma_value = Sig_nm2psii) %>% 
+#   rename(AllmeanSigma_value = AllmeanSig_nm2psii) %>% 
+#   rename(AllsdSigma_value = AllsdSig_nm2psii)
+# 
+# SolFitsAllPigmentPCPEMerge2<-SolFitsAllPigmentPCPE %>% 
+#   select(c(Strain, Ex_WL, WL, Par_ue, Photoperiod, Sigdark_nm2psii, AllmeanSigdark_nm2psii, AllsdSigdark_nm2psii, AllmeanPhycoChlaRatio, facetsPar_ue, facetsExcitation590)) %>% 
+#   filter(Ex_WL ==590) %>% 
+#   mutate(DifferentSigma = WL) %>%
+#   mutate(DifferentSigma = case_when(DifferentSigma=="WW"~"Dark~condition")) %>% 
+#   rename(Sigma_value = Sigdark_nm2psii) %>% 
+#   rename(AllmeanSigma_value = AllmeanSigdark_nm2psii) %>% 
+#   rename(AllsdSigma_value = AllsdSigdark_nm2psii)
+# 
+# SolFitsAllPigmentPCPEMerge590<-rbind(SolFitsAllPigmentPCPEMerge1, SolFitsAllPigmentPCPEMerge2)
+#   rm(SolFitsAllPigmentPCPEMerge1, SolFitsAllPigmentPCPEMerge2)
+# 
+# 
+# SolFitsAllPigmentfitPhycoChlalinearMerge590 <- SolFitsAllPigmentPCPEMerge590 %>%   
+#   drop_na(Sigma_value, AllmeanPhycoChlaRatio) %>% 
+#   select(c(Strain, Par_ue, Photoperiod, Ex_WL, Sigma_value, AllmeanPhycoChlaRatio, WL, DifferentSigma, facetsPar_ue, facetsExcitation590)) %>%  
+#   nest(data = -c("Par_ue", "DifferentSigma", "facetsPar_ue", "facetsExcitation590")) %>%   
+#   mutate(Linear_Model = map(data, ~lm(Sigma_value ~ AllmeanPhycoChlaRatio, data = .x))) %>%     
+#   mutate(Linear_Model_Param = map(Linear_Model, tidy),          
+#          Linear_Model_Predict = map(Linear_Model, possibly(augment)),          
+#          Linear_Model_Glance = map(Linear_Model, possibly(glance)))
 
 ```
 
@@ -1756,51 +1716,37 @@ SolFitsAllPigmentfitPhycoChlalinearMerge590 <- SolFitsAllPigmentPCPEMerge590 %>%
 
 ```{r preliminary plot}
 
-SolFitsAllPigmentfitPhycoChlalinearMerge590 %>% 
-  unnest(Linear_Model_Predict) %>% 
-  ggplot() +
-  geom_point(aes(x = AllmeanPhycoChlaRatio, y = AllmeanSigma_value, colour=as.factor(Strain)), size = 3.5, show.legend = T, SolFitsAllPigmentPCPEMerge590) + 
-  geom_errorbar(aes(x = AllmeanPhycoChlaRatio, ymin = AllmeanSigma_value - AllsdSigma_value, ymax = AllmeanSigma_value + AllsdSigma_value, colour=as.factor(Strain)), SolFitsAllPigmentPCPEMerge590) +
-  geom_line(aes(x = AllmeanPhycoChlaRatio, y = `.fitted`), show.legend = F) +   
-  scale_colour_discrete(type=c("seagreen4", "palegreen3", "brown1", "brown4")) +
-  ggh4x::facet_nested(cols = vars(facetsExcitation590, DifferentSigma), rows = vars(facetsPar_ue, Par_ue), labeller = label_parsed) +
-  theme_bw() 
+# SolFitsAllPigmentfitPhycoChlalinearMerge590 %>% 
+#   unnest(Linear_Model_Predict) %>% 
+#   ggplot() +
+#   geom_point(aes(x = AllmeanPhycoChlaRatio, y = AllmeanSigma_value, colour=as.factor(Strain)), size = 3.5, show.legend = T, SolFitsAllPigmentPCPEMerge590) + 
+#   geom_errorbar(aes(x = AllmeanPhycoChlaRatio, ymin = AllmeanSigma_value - AllsdSigma_value, ymax = AllmeanSigma_value + AllsdSigma_value, colour=as.factor(Strain)), SolFitsAllPigmentPCPEMerge590) +
+#   geom_line(aes(x = AllmeanPhycoChlaRatio, y = `.fitted`), show.legend = F) +   
+#   scale_colour_discrete(type=c("seagreen4", "palegreen3", "brown1", "brown4")) +
+#   ggh4x::facet_nested(cols = vars(facetsExcitation590, DifferentSigma), rows = vars(facetsPar_ue, Par_ue), labeller = label_parsed) +
+#   theme_bw() 
 ```
 
 # Create Sigma vs pigments ratio plot
 
 ```{r}
-scientific_10 <- function(x) {   parse(text=gsub("e\\+*", " %*% 10^", scales::scientific_format()(x))) }
-lab1=c(expression("8 h"), expression("12 h"), expression("16 h"), expression("24 h"))
-lab2=c(expression("30 µE"), expression("90 µE"), expression("180 µE"), expression("300 µE"), expression("600 µE"),expression("900 µE"))
-
-SolFitsAllPigmentfitPhycoChlalinearMerge590 %>% 
-  unnest(Linear_Model_Predict) %>% 
-  ggplot() +
-  geom_point(aes(x = AllmeanPhycoChlaRatio, y = AllmeanSigma_value, colour=as.factor(Strain)), size = 3.5, show.legend = T, SolFitsAllPigmentPCPEMerge590) + 
-  geom_point(aes(x = AllmeanPhycoChlaRatio, y = Sigma_value, colour=as.factor(Strain)), size = 1, show.legend = F, SolFitsAllPigmentPCPEMerge590) +
-  geom_errorbar(aes(x = AllmeanPhycoChlaRatio, ymin = AllmeanSigma_value - AllsdSigma_value, ymax = AllmeanSigma_value + AllsdSigma_value, colour = as.factor(Strain)), show.legend = F, width=0, size=0.3, SolFitsAllPigmentPCPEMerge590) +
-  geom_line(aes(x = AllmeanPhycoChlaRatio, y = `.fitted`), show.legend = F) +   
-  scale_colour_discrete(type=c("seagreen4", "palegreen3", "brown1", "brown4")) +
-  scale_y_continuous(breaks=seq(0, 12, by = 3)) +
-  coord_cartesian(ylim = c(0, 12)) +
-  labs(y=expression(paste(sigma,""["PSII"]*" (nm"^"2"*" quanta"^"-1"*")")), x = "Total phyco/Chl" ~italic(a)~ "ratio") +
-  ggh4x::facet_nested(cols = vars(facetsExcitation590, DifferentSigma), rows = vars(facetsPar_ue, Par_ue), labeller = label_parsed) +
-  theme_bw() +
-  theme(panel.grid.minor = element_blank(),
-        panel.grid.major = element_blank(),
-        axis.text = element_text(size=12),
-        axis.title = element_text(size=16),
-        strip.background = element_rect(fill="white"),
-        strip.text = element_text(size=12),
-        axis.title.y = element_text(margin=margin(r=10)),
-        axis.title.x = element_text(margin=margin(t=10)),
-        legend.background = element_rect(fill="transparent"),
-        legend.position = c(0.09,0.94),
-        legend.key.height= unit(0.005, 'cm'),
-        legend.spacing.y = unit(-0.1, "cm"),
-        legend.title = element_blank(),
-        legend.text = element_text(size=10))
+# scientific_10 <- function(x) {   parse(text=gsub("e\\+*", " %*% 10^", scales::scientific_format()(x))) }
+# lab1=c(expression("8 h"), expression("12 h"), expression("16 h"), expression("24 h"))
+# lab2=c(expression("30 µE"), expression("90 µE"), expression("180 µE"), expression("300 µE"), expression("600 µE"),expression("900 µE"))
+# 
+# SolFitsAllPigmentfitPhycoChlalinearMerge590 %>% 
+#   unnest(Linear_Model_Predict) %>% 
+#   ggplot() +
+#   geom_point(aes(x = AllmeanPhycoChlaRatio, y = AllmeanSigma_value, colour=as.factor(Strain)), size = 3.5, show.legend = T, SolFitsAllPigmentPCPEMerge590) + 
+#   geom_point(aes(x = AllmeanPhycoChlaRatio, y = Sigma_value, colour=as.factor(Strain)), size = 1, show.legend = F, SolFitsAllPigmentPCPEMerge590) +
+#   geom_errorbar(aes(x = AllmeanPhycoChlaRatio, ymin = AllmeanSigma_value - AllsdSigma_value, ymax = AllmeanSigma_value + AllsdSigma_value, colour = as.factor(Strain)), show.legend = F, width=0, size=0.3, SolFitsAllPigmentPCPEMerge590) +
+#   geom_line(aes(x = AllmeanPhycoChlaRatio, y = `.fitted`), show.legend = F) +   
+#   scale_colour_discrete(type=c("seagreen4", "palegreen3", "brown1", "brown4")) +
+#   scale_y_continuous(breaks=seq(0, 12, by = 3)) +
+#   coord_cartesian(ylim = c(0, 12)) +
+#   labs(y=expression(paste(sigma,""["PSII"]*" (nm"^"2"*" quanta"^"-1"*")")), x = "Total phyco/Chl" ~italic(a)~ "ratio") +
+#   ggh4x::facet_nested(cols = vars(facetsExcitation590, DifferentSigma), rows = vars(facetsPar_ue, Par_ue), labeller = label_parsed) +
+#   theme_bw() 
 ```
 
 # Save RDS that create plot
@@ -1819,43 +1765,42 @@ SolFitsAllPigmentfitPhycoChlalinearMerge590 %>%
 
 
 
-
 # Combine 445 sigma and sigma in the dark
 
 ```{r}
 
-SolFitsAllPigmentPCPE$facetsExcitation445 = factor(SolFitsAllPigmentPCPE$O2, labels = c("Excitation~445~nm"))
-
-SolFitsAllPigmentPCPEMerge1<-SolFitsAllPigmentPCPE %>% 
-  select(c(Strain, Ex_WL, WL, Par_ue, Photoperiod, Sig_nm2psii, AllmeanSig_nm2psii, AllsdSig_nm2psii, AllmeanPhycoChlaRatio, facetsPar_ue, facetsExcitation445)) %>% 
-  filter(Ex_WL ==445) %>% 
-  mutate(DifferentSigma = WL) %>%
-  mutate(DifferentSigma = case_when(DifferentSigma=="WW"~"Light~condition")) %>% 
-  rename(Sigma_value = Sig_nm2psii) %>% 
-  rename(AllmeanSigma_value = AllmeanSig_nm2psii) %>% 
-  rename(AllsdSigma_value = AllsdSig_nm2psii)
-
-SolFitsAllPigmentPCPEMerge2<-SolFitsAllPigmentPCPE %>% 
-  select(c(Strain, Ex_WL, WL, Par_ue, Photoperiod, Sigdark_nm2psii, AllmeanSigdark_nm2psii, AllsdSigdark_nm2psii, AllmeanPhycoChlaRatio, facetsPar_ue, facetsExcitation445)) %>% 
-  filter(Ex_WL ==445) %>% 
-  mutate(DifferentSigma = WL) %>%
-  mutate(DifferentSigma = case_when(DifferentSigma=="WW"~"Dark~condition")) %>% 
-  rename(Sigma_value = Sigdark_nm2psii) %>% 
-  rename(AllmeanSigma_value = AllmeanSigdark_nm2psii) %>% 
-  rename(AllsdSigma_value = AllsdSigdark_nm2psii)
-
-SolFitsAllPigmentPCPEMerge445<-rbind(SolFitsAllPigmentPCPEMerge1, SolFitsAllPigmentPCPEMerge2)
-  rm(SolFitsAllPigmentPCPEMerge1, SolFitsAllPigmentPCPEMerge2)
-
-
-SolFitsAllPigmentfitPhycoChlalinearMerge445 <- SolFitsAllPigmentPCPEMerge445 %>%   
-  drop_na(Sigma_value, AllmeanPhycoChlaRatio) %>% 
-  select(c(Strain, Par_ue, Photoperiod, Ex_WL, Sigma_value, AllmeanPhycoChlaRatio, WL, DifferentSigma, facetsPar_ue, facetsExcitation445)) %>%  
-  nest(data = -c("Par_ue", "DifferentSigma", "facetsPar_ue", "facetsExcitation445")) %>%   
-  mutate(Linear_Model = map(data, ~lm(Sigma_value ~ AllmeanPhycoChlaRatio, data = .x))) %>%     
-  mutate(Linear_Model_Param = map(Linear_Model, tidy),          
-         Linear_Model_Predict = map(Linear_Model, possibly(augment)),          
-         Linear_Model_Glance = map(Linear_Model, possibly(glance)))
+# SolFitsAllPigmentPCPE$facetsExcitation445 = factor(SolFitsAllPigmentPCPE$O2, labels = c("Excitation~445~nm"))
+# 
+# SolFitsAllPigmentPCPEMerge1<-SolFitsAllPigmentPCPE %>% 
+#   select(c(Strain, Ex_WL, WL, Par_ue, Photoperiod, Sig_nm2psii, AllmeanSig_nm2psii, AllsdSig_nm2psii, AllmeanPhycoChlaRatio, facetsPar_ue, facetsExcitation445)) %>% 
+#   filter(Ex_WL ==445) %>% 
+#   mutate(DifferentSigma = WL) %>%
+#   mutate(DifferentSigma = case_when(DifferentSigma=="WW"~"Light~condition")) %>% 
+#   rename(Sigma_value = Sig_nm2psii) %>% 
+#   rename(AllmeanSigma_value = AllmeanSig_nm2psii) %>% 
+#   rename(AllsdSigma_value = AllsdSig_nm2psii)
+# 
+# SolFitsAllPigmentPCPEMerge2<-SolFitsAllPigmentPCPE %>% 
+#   select(c(Strain, Ex_WL, WL, Par_ue, Photoperiod, Sigdark_nm2psii, AllmeanSigdark_nm2psii, AllsdSigdark_nm2psii, AllmeanPhycoChlaRatio, facetsPar_ue, facetsExcitation445)) %>% 
+#   filter(Ex_WL ==445) %>% 
+#   mutate(DifferentSigma = WL) %>%
+#   mutate(DifferentSigma = case_when(DifferentSigma=="WW"~"Dark~condition")) %>% 
+#   rename(Sigma_value = Sigdark_nm2psii) %>% 
+#   rename(AllmeanSigma_value = AllmeanSigdark_nm2psii) %>% 
+#   rename(AllsdSigma_value = AllsdSigdark_nm2psii)
+# 
+# SolFitsAllPigmentPCPEMerge445<-rbind(SolFitsAllPigmentPCPEMerge1, SolFitsAllPigmentPCPEMerge2)
+#   rm(SolFitsAllPigmentPCPEMerge1, SolFitsAllPigmentPCPEMerge2)
+# 
+# 
+# SolFitsAllPigmentfitPhycoChlalinearMerge445 <- SolFitsAllPigmentPCPEMerge445 %>%   
+#   drop_na(Sigma_value, AllmeanPhycoChlaRatio) %>% 
+#   select(c(Strain, Par_ue, Photoperiod, Ex_WL, Sigma_value, AllmeanPhycoChlaRatio, WL, DifferentSigma, facetsPar_ue, facetsExcitation445)) %>%  
+#   nest(data = -c("Par_ue", "DifferentSigma", "facetsPar_ue", "facetsExcitation445")) %>%   
+#   mutate(Linear_Model = map(data, ~lm(Sigma_value ~ AllmeanPhycoChlaRatio, data = .x))) %>%     
+#   mutate(Linear_Model_Param = map(Linear_Model, tidy),          
+#          Linear_Model_Predict = map(Linear_Model, possibly(augment)),          
+#          Linear_Model_Glance = map(Linear_Model, possibly(glance)))
 
 ```
 
@@ -1863,51 +1808,37 @@ SolFitsAllPigmentfitPhycoChlalinearMerge445 <- SolFitsAllPigmentPCPEMerge445 %>%
 
 ```{r preliminary plot}
 
-SolFitsAllPigmentfitPhycoChlalinearMerge445 %>% 
-  unnest(Linear_Model_Predict) %>% 
-  ggplot() +
-  geom_point(aes(x = AllmeanPhycoChlaRatio, y = AllmeanSigma_value, colour=as.factor(Strain)), size = 3.5, show.legend = T, SolFitsAllPigmentPCPEMerge445) + 
-  geom_errorbar(aes(x = AllmeanPhycoChlaRatio, ymin = AllmeanSigma_value - AllsdSigma_value, ymax = AllmeanSigma_value + AllsdSigma_value, colour=as.factor(Strain)), SolFitsAllPigmentPCPEMerge445) +
-  geom_line(aes(x = AllmeanPhycoChlaRatio, y = `.fitted`), show.legend = F) +   
-  scale_colour_discrete(type=c("seagreen4", "palegreen3", "brown1", "brown4")) +
-  ggh4x::facet_nested(cols = vars(facetsExcitation445, DifferentSigma), rows = vars(facetsPar_ue, Par_ue), labeller = label_parsed) +
-  theme_bw() 
+# SolFitsAllPigmentfitPhycoChlalinearMerge445 %>% 
+#   unnest(Linear_Model_Predict) %>% 
+#   ggplot() +
+#   geom_point(aes(x = AllmeanPhycoChlaRatio, y = AllmeanSigma_value, colour=as.factor(Strain)), size = 3.5, show.legend = T, SolFitsAllPigmentPCPEMerge445) + 
+#   geom_errorbar(aes(x = AllmeanPhycoChlaRatio, ymin = AllmeanSigma_value - AllsdSigma_value, ymax = AllmeanSigma_value + AllsdSigma_value, colour=as.factor(Strain)), SolFitsAllPigmentPCPEMerge445) +
+#   geom_line(aes(x = AllmeanPhycoChlaRatio, y = `.fitted`), show.legend = F) +   
+#   scale_colour_discrete(type=c("seagreen4", "palegreen3", "brown1", "brown4")) +
+#   ggh4x::facet_nested(cols = vars(facetsExcitation445, DifferentSigma), rows = vars(facetsPar_ue, Par_ue), labeller = label_parsed) +
+#   theme_bw() 
 ```
 
 # Create Sigma vs pigments ratio plot
 
 ```{r}
-scientific_10 <- function(x) {   parse(text=gsub("e\\+*", " %*% 10^", scales::scientific_format()(x))) }
-lab1=c(expression("8 h"), expression("12 h"), expression("16 h"), expression("24 h"))
-lab2=c(expression("30 µE"), expression("90 µE"), expression("180 µE"), expression("300 µE"), expression("600 µE"), expression("900 µE"))
-
-SolFitsAllPigmentfitPhycoChlalinearMerge445 %>% 
-  unnest(Linear_Model_Predict) %>% 
-  ggplot() +
-  geom_point(aes(x = AllmeanPhycoChlaRatio, y = AllmeanSigma_value, colour=as.factor(Strain)), size = 3.5, show.legend = T, SolFitsAllPigmentPCPEMerge445) + 
-  geom_point(aes(x = AllmeanPhycoChlaRatio, y = Sigma_value, colour=as.factor(Strain)), size = 1, show.legend = F, SolFitsAllPigmentPCPEMerge445) +
-  geom_errorbar(aes(x = AllmeanPhycoChlaRatio, ymin = AllmeanSigma_value - AllsdSigma_value, ymax = AllmeanSigma_value + AllsdSigma_value, colour = as.factor(Strain)), show.legend = F, width=0, size=0.3, SolFitsAllPigmentPCPEMerge445) +
-  geom_line(aes(x = AllmeanPhycoChlaRatio, y = `.fitted`), show.legend = F) +   
-  scale_colour_discrete(type=c("seagreen4", "palegreen3", "brown1", "brown4")) +
-  scale_y_continuous(breaks=seq(0, 2.5, by = 0.5)) +
-  coord_cartesian(ylim = c(0, 2.5)) +
-  labs(y=expression(paste(sigma,""["PSII"]*" (nm"^"2"*" quanta"^"-1"*")")), x = "Total phyco/Chl" ~italic(a)~ "ratio") +
-  ggh4x::facet_nested(cols = vars(facetsExcitation445, DifferentSigma), rows = vars(facetsPar_ue, Par_ue), labeller = label_parsed) +
-  theme_bw() +
-  theme(panel.grid.minor = element_blank(),
-        panel.grid.major = element_blank(),
-        axis.text = element_text(size=12),
-        axis.title = element_text(size=16),
-        strip.background = element_rect(fill="white"),
-        strip.text = element_text(size=12),
-        axis.title.y = element_text(margin=margin(r=10)),
-        axis.title.x = element_text(margin=margin(t=10)),
-        legend.background = element_rect(fill="transparent"),
-        legend.position = c(0.09,0.94),
-        legend.key.height= unit(0.005, 'cm'),
-        legend.spacing.y = unit(-0.1, "cm"),
-        legend.title = element_blank(),
-        legend.text = element_text(size=10))
+# scientific_10 <- function(x) {   parse(text=gsub("e\\+*", " %*% 10^", scales::scientific_format()(x))) }
+# lab1=c(expression("8 h"), expression("12 h"), expression("16 h"), expression("24 h"))
+# lab2=c(expression("30 µE"), expression("90 µE"), expression("180 µE"), expression("300 µE"), expression("600 µE"), expression("900 µE"))
+# 
+# SolFitsAllPigmentfitPhycoChlalinearMerge445 %>% 
+#   unnest(Linear_Model_Predict) %>% 
+#   ggplot() +
+#   geom_point(aes(x = AllmeanPhycoChlaRatio, y = AllmeanSigma_value, colour=as.factor(Strain)), size = 3.5, show.legend = T, SolFitsAllPigmentPCPEMerge445) + 
+#   geom_point(aes(x = AllmeanPhycoChlaRatio, y = Sigma_value, colour=as.factor(Strain)), size = 1, show.legend = F, SolFitsAllPigmentPCPEMerge445) +
+#   geom_errorbar(aes(x = AllmeanPhycoChlaRatio, ymin = AllmeanSigma_value - AllsdSigma_value, ymax = AllmeanSigma_value + AllsdSigma_value, colour = as.factor(Strain)), show.legend = F, width=0, size=0.3, SolFitsAllPigmentPCPEMerge445) +
+#   geom_line(aes(x = AllmeanPhycoChlaRatio, y = `.fitted`), show.legend = F) +   
+#   scale_colour_discrete(type=c("seagreen4", "palegreen3", "brown1", "brown4")) +
+#   scale_y_continuous(breaks=seq(0, 2.5, by = 0.5)) +
+#   coord_cartesian(ylim = c(0, 2.5)) +
+#   labs(y=expression(paste(sigma,""["PSII"]*" (nm"^"2"*" quanta"^"-1"*")")), x = "Total phyco/Chl" ~italic(a)~ "ratio") +
+#   ggh4x::facet_nested(cols = vars(facetsExcitation445, DifferentSigma), rows = vars(facetsPar_ue, Par_ue), labeller = label_parsed) +
+#   theme_bw() 
 ```
 
 # Save RDS that create plot
@@ -1928,8 +1859,8 @@ SolFitsAllPigmentfitPhycoChlalinearMerge445 %>%
 
 ```{r linear fit}
 SolFitsAllPigmentfitPhycoChlalinearStrain <- SolFitsAllPigmentPCPE %>%  
-  select(c(Strain, Par_ue, Photoperiod, Ex_WL, meanSig_nm2psii, AllmeanPhycoChlaRatio, O2, WL, Phase, facetsExcitation, facetsStrain)) %>%  
-  nest(data = -c("Strain", "Ex_WL", "Phase")) %>%  
+  select(c(Strain, Par_ue, Photoperiod, Ex_WL, meanSig_nm2psii, AllmeanPhycoChlaRatio, O2, WL, Phase, facetsExcitation, facetsStrain, facetsPhase)) %>%  
+  nest(data = -c("Strain", "Ex_WL", "Phase", "facetsPhase", "facetsStrain")) %>%  
   mutate(Linear_Model = map(data, ~lm(meanSig_nm2psii ~ AllmeanPhycoChlaRatio, data = .x))) %>%    
   mutate(Linear_Model_Param = map(Linear_Model, tidy),          
          Linear_Model_Predict = map(Linear_Model, possibly(augment)),          
@@ -1937,49 +1868,49 @@ SolFitsAllPigmentfitPhycoChlalinearStrain <- SolFitsAllPigmentPCPE %>%
 
 
 SolFitsAllPigmentfitPhycoChlalineardarkStrain <- SolFitsAllPigmentPCPE %>%   
-  select(c(Strain, Par_ue, Photoperiod, Ex_WL, meanSigdark_nm2psii, AllmeanPhycoChlaRatio, O2, WL, Phase)) %>%  
-  nest(data = -c("Strain", "Ex_WL", "Phase")) %>% 
+  select(c(Strain, Par_ue, Photoperiod, Ex_WL, meanSigdark_nm2psii, AllmeanPhycoChlaRatio, O2, WL, Phase, facetsExcitation, facetsStrain, facetsPhase)) %>%  
+  nest(data = -c("Strain", "Ex_WL", "Phase", "facetsPhase", "facetsStrain")) %>% 
   mutate(Linear_Model = map(data, ~lm(meanSigdark_nm2psii ~ AllmeanPhycoChlaRatio, data = .x))) %>%     
   mutate(Linear_Model_Param = map(Linear_Model, tidy),          
          Linear_Model_Predict = map(Linear_Model, possibly(augment)),          
          Linear_Model_Glance = map(Linear_Model, possibly(glance)))
 
 
-SolFitsAllPigmentfitPhycoChlalinearStrain1s <- SolFitsAllPigmentPCPE1s %>%  
-  select(c(Strain, Par_ue, Photoperiod, Ex_WL, meanSig1s_nm2psii, AllmeanPhycoChlaRatio, O2, WL, Phase)) %>%  
-  nest(data = -c("Strain", "Ex_WL", "Phase")) %>% 
-  mutate(Linear_Model = map(data, ~lm(meanSig1s_nm2psii ~ AllmeanPhycoChlaRatio, data = .x))) %>%    
-  mutate(Linear_Model_Param = map(Linear_Model, tidy),          
-         Linear_Model_Predict = map(Linear_Model, possibly(augment)),          
-         Linear_Model_Glance = map(Linear_Model, possibly(glance)))
+# SolFitsAllPigmentfitPhycoChlalinearStrain1s <- SolFitsAllPigmentPCPE1s %>%  
+#   select(c(Strain, Par_ue, Photoperiod, Ex_WL, meanSig1s_nm2psii, AllmeanPhycoChlaRatio, O2, WL, Phase)) %>%  
+#   nest(data = -c("Strain", "Ex_WL", "Phase")) %>% 
+#   mutate(Linear_Model = map(data, ~lm(meanSig1s_nm2psii ~ AllmeanPhycoChlaRatio, data = .x))) %>%    
+#   mutate(Linear_Model_Param = map(Linear_Model, tidy),          
+#          Linear_Model_Predict = map(Linear_Model, possibly(augment)),          
+#          Linear_Model_Glance = map(Linear_Model, possibly(glance)))
 
 #xxxxxx
 
-SolFitsAllPigmentfitPhycoChlalinearStrainGroup <- SolFitsAllPigmentPCPE %>%   
-  select(c(StrainGroup, Par_ue, Photoperiod, Ex_WL, meanSig_nm2psii, AllmeanPhycoChlaRatio, O2, WL, Phase)) %>%  
-  nest(data = -c("StrainGroup", "Ex_WL", "Phase")) %>% 
-  mutate(Linear_Model = map(data, ~lm(meanSig_nm2psii ~ AllmeanPhycoChlaRatio, data = .x))) %>%     
-  mutate(Linear_Model_Param = map(Linear_Model, tidy),          
-         Linear_Model_Predict = map(Linear_Model, possibly(augment)),          
-         Linear_Model_Glance = map(Linear_Model, possibly(glance)))
-
-
-SolFitsAllPigmentfitPhycoChlalineardarkStrainGroup <- SolFitsAllPigmentPCPE %>%   
-  select(c(StrainGroup, Par_ue, Photoperiod, Ex_WL, meanSigdark_nm2psii, AllmeanPhycoChlaRatio, O2, WL, Phase)) %>%  
-  nest(data = -c("StrainGroup", "Ex_WL", "Phase")) %>% 
-  mutate(Linear_Model = map(data, ~lm(meanSigdark_nm2psii ~ AllmeanPhycoChlaRatio, data = .x))) %>%     
-  mutate(Linear_Model_Param = map(Linear_Model, tidy),          
-         Linear_Model_Predict = map(Linear_Model, possibly(augment)),          
-         Linear_Model_Glance = map(Linear_Model, possibly(glance)))
-
-
-SolFitsAllPigmentfitPhycoChlalinearStrainGroup1s <- SolFitsAllPigmentPCPE1s %>%   
-  select(c(StrainGroup, Par_ue, Photoperiod, Ex_WL, meanSig1s_nm2psii, AllmeanPhycoChlaRatio, O2, WL, Phase)) %>%
-  nest(data = -c("StrainGroup", "Ex_WL", "Phase")) %>%  
-  mutate(Linear_Model = map(data, ~lm(meanSig1s_nm2psii ~ AllmeanPhycoChlaRatio, data = .x))) %>%     
-  mutate(Linear_Model_Param = map(Linear_Model, tidy),          
-         Linear_Model_Predict = map(Linear_Model, possibly(augment)),          
-         Linear_Model_Glance = map(Linear_Model, possibly(glance)))
+# SolFitsAllPigmentfitPhycoChlalinearStrainGroup <- SolFitsAllPigmentPCPE %>%   
+#   select(c(StrainGroup, Par_ue, Photoperiod, Ex_WL, meanSig_nm2psii, AllmeanPhycoChlaRatio, O2, WL, Phase)) %>%  
+#   nest(data = -c("StrainGroup", "Ex_WL", "Phase")) %>% 
+#   mutate(Linear_Model = map(data, ~lm(meanSig_nm2psii ~ AllmeanPhycoChlaRatio, data = .x))) %>%     
+#   mutate(Linear_Model_Param = map(Linear_Model, tidy),          
+#          Linear_Model_Predict = map(Linear_Model, possibly(augment)),          
+#          Linear_Model_Glance = map(Linear_Model, possibly(glance)))
+# 
+# 
+# SolFitsAllPigmentfitPhycoChlalineardarkStrainGroup <- SolFitsAllPigmentPCPE %>%   
+#   select(c(StrainGroup, Par_ue, Photoperiod, Ex_WL, meanSigdark_nm2psii, AllmeanPhycoChlaRatio, O2, WL, Phase)) %>%  
+#   nest(data = -c("StrainGroup", "Ex_WL", "Phase")) %>% 
+#   mutate(Linear_Model = map(data, ~lm(meanSigdark_nm2psii ~ AllmeanPhycoChlaRatio, data = .x))) %>%     
+#   mutate(Linear_Model_Param = map(Linear_Model, tidy),          
+#          Linear_Model_Predict = map(Linear_Model, possibly(augment)),          
+#          Linear_Model_Glance = map(Linear_Model, possibly(glance)))
+# 
+# 
+# SolFitsAllPigmentfitPhycoChlalinearStrainGroup1s <- SolFitsAllPigmentPCPE1s %>%   
+#   select(c(StrainGroup, Par_ue, Photoperiod, Ex_WL, meanSig1s_nm2psii, AllmeanPhycoChlaRatio, O2, WL, Phase)) %>%
+#   nest(data = -c("StrainGroup", "Ex_WL", "Phase")) %>%  
+#   mutate(Linear_Model = map(data, ~lm(meanSig1s_nm2psii ~ AllmeanPhycoChlaRatio, data = .x))) %>%     
+#   mutate(Linear_Model_Param = map(Linear_Model, tidy),          
+#          Linear_Model_Predict = map(Linear_Model, possibly(augment)),          
+#          Linear_Model_Glance = map(Linear_Model, possibly(glance)))
 ```
 
 # Create preliminary plot
@@ -1987,7 +1918,6 @@ SolFitsAllPigmentfitPhycoChlalinearStrainGroup1s <- SolFitsAllPigmentPCPE1s %>%
 ```{r preliminary plot}
 lab1=c(expression("8 h"), expression("12 h"), expression("16 h"), expression("24 h"))
 lab2=c(expression("30 µE"), expression("90 µE"), expression("180 µE"), expression("300 µE"), expression("600 µE"), expression("900 µE"))
-
 
 SolFitsAllPigmentfitPhycoChlalinearStrain %>% 
   unnest(Linear_Model_Predict) %>% 
@@ -2009,31 +1939,31 @@ SolFitsAllPigmentfitPhycoChlalineardarkStrain %>%
   geom_errorbar(aes(x = AllmeanPhycoChlaRatio, ymin = meanSigdark_nm2psii - sdSigdark_nm2psii, ymax = meanSigdark_nm2psii + sdSigdark_nm2psii, colour=as.factor(Strain)), SolFitsAllPigmentPCPE) +
   geom_line(aes(x = AllmeanPhycoChlaRatio, y = `.fitted`), show.legend = F) + 
   scale_colour_discrete(type=c("seagreen4", "palegreen3", "brown1", "brown4")) +
-  ggh4x::facet_nested(cols = vars(Ex_WL, Phase), rows = vars(Strain),labeller = label_parsed) +
+  ggh4x::facet_nested(cols = vars(Ex_WL, facetsPhase, Phase), rows = vars(facetsStrain, Strain),labeller = label_parsed) +
   theme_bw() 
   
   
-SolFitsAllPigmentfitPhycoChlalinearStrain1s %>% 
-  unnest(Linear_Model_Predict) %>% 
-  ggplot() +
-  geom_point(aes(x = AllmeanPhycoChlaRatio, y = meanSig1s_nm2psii, colour=as.factor(Strain)), size = 3.5, show.legend = T, SolFitsAllPigmentPCPE1s) + 
-  geom_errorbar(aes(x = AllmeanPhycoChlaRatio, ymin = meanSig1s_nm2psii - sdSig1s_nm2psii, ymax = meanSig1s_nm2psii + sdSig1s_nm2psii, colour=as.factor(Strain)), SolFitsAllPigmentPCPE1s) +
-  geom_line(aes(x = AllmeanPhycoChlaRatio, y = `.fitted`), show.legend = F) +   
-  scale_colour_discrete(type=c("seagreen4", "palegreen3", "brown1", "brown4")) +
-  ggh4x::facet_nested(cols = vars(Ex_WL, Phase), rows = vars(Strain), labeller = label_parsed) +
-  theme_bw() 
-  
-  #xxxxxxxx
-  
-SolFitsAllPigmentfitPhycoChlalineardarkStrainGroup %>% 
-  unnest(Linear_Model_Predict) %>% 
-  ggplot() +
-  geom_point(aes(x = AllmeanPhycoChlaRatio, y = meanSigdark_nm2psii, colour=as.factor(Strain)), size = 3.5, show.legend = T, SolFitsAllPigmentPCPE) + 
-  geom_errorbar(aes(x = AllmeanPhycoChlaRatio, ymin = meanSigdark_nm2psii - sdSigdark_nm2psii, ymax = meanSigdark_nm2psii + sdSigdark_nm2psii, colour=as.factor(Strain)), SolFitsAllPigmentPCPE) +
-  geom_line(aes(x = AllmeanPhycoChlaRatio, y = `.fitted`), show.legend = F) + 
-  scale_colour_discrete(type=c("seagreen4", "palegreen3", "brown1", "brown4")) +
-  ggh4x::facet_nested(cols = vars(Ex_WL, Phase), rows = vars(StrainGroup),labeller = label_parsed) +
-  theme_bw() 
+# SolFitsAllPigmentfitPhycoChlalinearStrain1s %>% 
+#   unnest(Linear_Model_Predict) %>% 
+#   ggplot() +
+#   geom_point(aes(x = AllmeanPhycoChlaRatio, y = meanSig1s_nm2psii, colour=as.factor(Strain)), size = 3.5, show.legend = T, SolFitsAllPigmentPCPE1s) + 
+#   geom_errorbar(aes(x = AllmeanPhycoChlaRatio, ymin = meanSig1s_nm2psii - sdSig1s_nm2psii, ymax = meanSig1s_nm2psii + sdSig1s_nm2psii, colour=as.factor(Strain)), SolFitsAllPigmentPCPE1s) +
+#   geom_line(aes(x = AllmeanPhycoChlaRatio, y = `.fitted`), show.legend = F) +   
+#   scale_colour_discrete(type=c("seagreen4", "palegreen3", "brown1", "brown4")) +
+#   ggh4x::facet_nested(cols = vars(Ex_WL, Phase), rows = vars(Strain), labeller = label_parsed) +
+#   theme_bw() 
+#   
+#   #xxxxxxxx
+#   
+# SolFitsAllPigmentfitPhycoChlalineardarkStrainGroup %>% 
+#   unnest(Linear_Model_Predict) %>% 
+#   ggplot() +
+#   geom_point(aes(x = AllmeanPhycoChlaRatio, y = meanSigdark_nm2psii, colour=as.factor(Strain)), size = 3.5, show.legend = T, SolFitsAllPigmentPCPE) + 
+#   geom_errorbar(aes(x = AllmeanPhycoChlaRatio, ymin = meanSigdark_nm2psii - sdSigdark_nm2psii, ymax = meanSigdark_nm2psii + sdSigdark_nm2psii, colour=as.factor(Strain)), SolFitsAllPigmentPCPE) +
+#   geom_line(aes(x = AllmeanPhycoChlaRatio, y = `.fitted`), show.legend = F) + 
+#   scale_colour_discrete(type=c("seagreen4", "palegreen3", "brown1", "brown4")) +
+#   ggh4x::facet_nested(cols = vars(Ex_WL, Phase), rows = vars(StrainGroup),labeller = label_parsed) +
+#   theme_bw() 
 ```
 
 # Create Sigma vs pigments ratio plot
@@ -2086,7 +2016,7 @@ SolFitsAllPigmentfitPhycoChlalineardarkStrainGroup %>%
 ```{r unnest, preparing df to preparing final plot, echo=FALSE, warning = FALSE}
 augmented590pigment<-SolFitsAllPigmentfitPhycoChlalinearStrain  %>%
   unnest(Linear_Model_Predict) %>%
-  select(c(Strain, Ex_WL, meanSig_nm2psii, AllmeanPhycoChlaRatio, Phase, .fitted)) %>% 
+  select(c(Strain, Ex_WL, meanSig_nm2psii, AllmeanPhycoChlaRatio, Phase, .fitted, facetsPhase, facetsStrain)) %>% 
   filter(Ex_WL == 590)
 
 
@@ -2121,7 +2051,7 @@ filter(Ex_WL == 590) %>%
   scale_y_continuous(breaks=seq(0, 8, by = 2)) +
   coord_cartesian(ylim = c(0, 9)) +
   labs(y=expression(paste(sigma,""["PSII"]*"' (nm"^"2"*" quanta"^"-1"*")")), x = "Total phyco/Chl" ~italic(a)~ "ratio") +
-  ggh4x::facet_nested(cols = vars(Phase), rows = vars(Strain), labeller = label_parsed) +
+  ggh4x::facet_nested(cols = vars(facetsPhase, Phase), rows = vars(facetsStrain, Strain), labeller = label_parsed) +
   theme_bw() +
   theme(panel.grid.minor = element_blank(),
         panel.grid.major = element_blank(),
