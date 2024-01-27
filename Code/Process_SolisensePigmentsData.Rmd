@@ -2019,7 +2019,8 @@ augmented590pigment<-SolFitsAllPigmentfitPhycoChlalinearStrain  %>%
   select(c(Strain, Ex_WL, meanSig_nm2psii, AllmeanPhycoChlaRatio, Phase, .fitted, facetsPhase, facetsStrain)) %>% 
   filter(Ex_WL == 590)
 
-
+SolFitsAllPigmentPCPE590<-SolFitsAllPigmentPCPE %>% 
+filter(Ex_WL == 590) 
 #SolFitsAllPigmentPCPE590$facetsStrain <- 'Strain'
 # SolFitsAllPigmentPCPE590$facetsPhase <- "Phase~of~growth"
 ```
@@ -2035,16 +2036,12 @@ scientific_10 <- function(x) {   parse(text=gsub("e\\+*", " %*% 10^", scales::sc
 lab1=c(expression("8 h"), expression("12 h"), expression("16 h"), expression("24 h"))
 lab2=c(expression("30 µE"), expression("90 µE"), expression("180 µE"), expression("300 µE"), expression("600 µE"), expression("900 µE"))
 
-
+  
 SolFitsAllPigmentPCPE590 %>% 
-filter(Ex_WL == 590) %>% 
-    ggplot() +
+  ggplot() +
   geom_point(aes(x = AllmeanPhycoChlaRatio, y = AllmeanSig_nm2psii, colour = as.factor(Par_ue), shape = as.factor(Photoperiod)), size = 3.5, show.legend = T, SolFitsAllPigmentPCPE590) + 
   geom_point(aes(x = AllmeanPhycoChlaRatio, y = Sig_nm2psii, colour = as.factor(Par_ue), shape = as.factor(Photoperiod)), size = 1, show.legend = F, SolFitsAllPigmentPCPE590) + 
-  
   geom_errorbar(aes(x = AllmeanPhycoChlaRatio, ymin = AllmeanSig_nm2psii - AllsdSig_nm2psii, ymax = AllmeanSig_nm2psii + AllsdSig_nm2psii, colour = as.factor(Par_ue)), show.legend = F, width=0, size=0.3, SolFitsAllPigmentPCPE590) +
-  # geom_errorbar(aes(y = AllmeanSig_nm2psii, xmin = AllmeanPhycoChlaRatio - AllsdPhycoChlaRatio, xmax = AllmeanPhycoChlaRatio + AllsdPhycoChlaRatio, colour = as.factor(Par_ue)), show.legend = F, width=0, size=0.3, SolFitsAllPigmentPCPE590) +
-  
   geom_line(aes(x = AllmeanPhycoChlaRatio, y = `.fitted`), colour = "blue", linetype = "solid", size = 0.3, show.legend = F, augmented590pigment) +   
   scale_shape_manual(values = c(15, 16, 17,18), name="", labels = lab1) +
   scale_colour_manual(values = c("darkslategray", "lightblue4", "hotpink4", "indianred3", "goldenrod2", "khaki2"), name="", labels = lab2) +
@@ -2075,6 +2072,67 @@ filter(Ex_WL == 590) %>%
 ```{r save plot}
 ggsave(file = file.path(FigPath, paste("Fig_SigmaPig590",".png",sep = "")), height=10, width= 8,  dpi = 300, limitsize = TRUE)
 ```
+
+```{r unnest, preparing df to preparing final plot, echo=FALSE, warning = FALSE}
+augmented590pigmentdark<-SolFitsAllPigmentfitPhycoChlalineardarkStrain  %>%
+  unnest(Linear_Model_Predict) %>%
+  select(c(Strain, Ex_WL, meanSigdark_nm2psii, AllmeanPhycoChlaRatio, Phase, .fitted, facetsPhase, facetsStrain)) %>% 
+  filter(Ex_WL == 590)
+
+SolFitsAllPigmentPCPE590dark <- SolFitsAllPigmentPCPE %>% 
+filter(Ex_WL == 590) 
+
+#SolFitsAllPigmentPCPE590$facetsStrain <- 'Strain'
+# SolFitsAllPigmentPCPE590$facetsPhase <- "Phase~of~growth"
+```
+
+```{r fig.height = 8, fig.width = 8, warning = FALSE}
+# WL.labs <- c("Excitation (nm)")
+# names(WL.labs) <- c("WW")
+# O2.labs <- c("Strain")
+# names(O2.labs) <- c(21)
+
+scientific_10 <- function(x) {   parse(text=gsub("e\\+*", " %*% 10^", scales::scientific_format()(x))) }
+lab1=c(expression("8 h"), expression("12 h"), expression("16 h"), expression("24 h"))
+lab2=c(expression("30 µE"), expression("90 µE"), expression("180 µE"), expression("300 µE"), expression("600 µE"), expression("900 µE"))
+
+
+SolFitsAllPigmentPCPE590dark %>% 
+  ggplot() +
+  geom_point(aes(x = AllmeanPhycoChlaRatio, y = AllmeanSigdark_nm2psii, colour = as.factor(Par_ue), shape = as.factor(Photoperiod)), size = 3.5, show.legend = T, SolFitsAllPigmentPCPE590dark) + 
+  geom_point(aes(x = AllmeanPhycoChlaRatio, y = Sigdark_nm2psii, colour = as.factor(Par_ue), shape = as.factor(Photoperiod)), size = 1, show.legend = F, SolFitsAllPigmentPCPE590dark) + 
+  geom_errorbar(aes(x = AllmeanPhycoChlaRatio, ymin = AllmeanSigdark_nm2psii - AllsdSigdark_nm2psii, ymax = AllmeanSigdark_nm2psii + AllsdSigdark_nm2psii, colour = as.factor(Par_ue)), show.legend = F, width=0, size=0.3, SolFitsAllPigmentPCPE590dark) +
+  geom_line(aes(x = AllmeanPhycoChlaRatio, y = `.fitted`), colour = "blue", linetype = "solid", size = 0.3, show.legend = F, augmented590pigmentdark) +   
+  scale_shape_manual(values = c(15, 16, 17,18), name="", labels = lab1) +
+  scale_colour_manual(values = c("darkslategray", "lightblue4", "hotpink4", "indianred3", "goldenrod2", "khaki2"), name="", labels = lab2) +
+  scale_y_continuous(breaks=seq(0, 8, by = 2)) +
+  coord_cartesian(ylim = c(0, 9)) +
+  labs(y=expression(paste(sigma,""["PSII"]*" (nm"^"2"*" quanta"^"-1"*")")), x = "Total phyco/Chl" ~italic(a)~ "ratio") +
+  ggh4x::facet_nested(cols = vars(facetsPhase, Phase), rows = vars(facetsStrain, Strain), labeller = label_parsed) +
+  theme_bw() +
+  theme(panel.grid.minor = element_blank(),
+        panel.grid.major = element_blank(),
+        axis.text = element_text(size=12),
+        axis.title = element_text(size=16),
+        strip.background = element_rect(fill="white"),
+        strip.text = element_text(size=12),
+        axis.title.y = element_text(margin=margin(r=10)),
+        axis.title.x = element_text(margin=margin(t=10)),
+        legend.background = element_rect(fill="white"),
+        legend.position = c(0.92,0.88),
+        legend.key.height= unit(0.005, 'cm'),
+        legend.spacing.y = unit(-0.1, "cm"),
+        legend.title = element_blank(),
+        legend.text = element_text(size=10))
+```
+
+# Save plot 
+
+```{r save plot}
+ggsave(file = file.path(FigPath, paste("Fig_SigmaPig590dark",".png",sep = "")), height=10, width= 8,  dpi = 300, limitsize = TRUE)
+```
+
+
 
 
 The anova() function will take the model objects as arguments, and return an ANOVA testing whether the more complex model is significantly better at capturing the data than the simpler model. If the resulting p-value is sufficiently low (usually less than 0.05), we conclude that the more complex model is significantly better than the simpler model, and thus favor the more complex model. If the p-value is not sufficiently low (usually greater than 0.05), we should favor the simpler model.
