@@ -1,0 +1,206 @@
+---
+title: "Process_OlisJazEmData"
+author:
+- Mireille Savoie
+- Sylwia Sliwinska-Wilczewska
+- Douglas A. Campbell
+date: "`r format(Sys.Date())`"
+output:
+bookdown::html_document2:
+    code_folding: show
+    keep_md: yes
+    toc: TRUE
+    toc_float: TRUE
+    toc_depth: 6
+    fig_caption: yes
+bibliography: Manuscript_O2.bib
+csl: plos-one.csl
+editor_options: 
+  markdown: 
+    wrap: 72
+---
+
+# Set Chunk Options
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE)
+knitr::opts_chunk$set(fig.path='Figs/')
+```
+
+# Introduction
+
+Process_OlisSpectraJazEmData.Rmd processes and combines Baltic_Photoperiod_Imported_JazEmData.Rds from Data/ImportedData/ImportedJazEmData folder and Baltic_Photoperiod_Imported_OlisData.Rds from Data/ImportedData/ImportedOlisData folder. This .Rmd generates Baltic_Photoperiod_Processed_OlisSpectraAll.Rds and Baltic_Photoperiod_Processed_OlisSpectraTidy.Rds (both stored in Data/ProcessedData/ProcessedOlisJazData folder) and OlisSpectra_Plot.png (stored in Output/Plots folder).
+
+# Load Libraries
+```{r load libraries, warning = FALSE, echo=FALSE} 
+
+library(tidyverse)
+library(lubridate)
+library(broom)
+library(knitr)
+library(zoo)
+library(photobiologyWavebands)
+
+```
+
+```{r set project variables}
+
+Project <- "PICO"
+
+DataInOlis <- file.path("..", "Data", "ImportedData", "ImportedOlisData", fsep = .Platform$file.sep)
+DataInJaz <- file.path("..", "Data", "ImportedData", "ImportedJazEmData", fsep = .Platform$file.sep)
+DataOut <- file.path("..", "Data", "ProcessedData", "ProcessedOlisJazData")
+PlotsPath <- file.path("..", "Output", "Plots")
+
+SectoHour <- 3600 #convert seconds to hours for PUR photon dose per day
+
+```
+
+# List imported Olis and Jaz files
+```{r exported Rmd only first time in session}
+list.files(path = DataInOlis, pattern = ".Rds", full.names = TRUE)
+list.files(path = DataInJaz, pattern = ".Rds", full.names = TRUE)
+```
+# Read Olis whole cell absorbance and MultiCulti Jaz emission files
+```{r read imported Olis and Jaz file}
+OLISSpectraFile <- readRDS(file = file.path(DataInOlis,"PICO_Imported_OlisData.Rds"))
+
+JazEmFile <- readRDS(file = file.path(DataInJaz,"PICO_Imported_JazEmData.Rds"))
+```
+
+# Filter out the white light emission data for mixed light color MC since not used. Calculate MC normalized emission to the emission maxima for each wavelength.
+```{r calculate normalized emission for each WL}
+JazEmFile <- JazEmFile %>% 
+  filter(MC_SpectralID != "MCMIX004_WW",
+         MCSetPar_uE == 30 |
+         MCSetPar_uE == 15) %>% 
+  select(-c( FilenameJaz, MC)) %>% 
+  unnest(Spectra) %>%  
+  group_by(WL) %>% 
+  mutate(MC_NormEm = round(Emission / Emission[which.max(Emission)], digits = 4)) %>% 
+  select(-c(ObsDate, MCSetPar_uE, MC_SpectralID, MCMeasuredPar_uE)) %>% 
+ungroup()
+```
+
+# Unnest the Olis whole cell absorbance data and extract absorbance maxima for 675 nm (red) and 450 (blue) regions and extract nm (wavelength) at that absorbance maxima 
+```{r}
+OLISSpectraUnnest <- OLISSpectraFile %>% 
+  unnest(AbsSpectra) 
+
+
+OlisSpectra_red <- OLISSpectraUnnest %>% 
+  group_by(SampleID, E_days) %>%
+  filter(OlisAbs_nm >= 625 & OlisAbs_nm <= 750) %>% 
+   mutate(RedMaxima_nm = round(OlisAbs_nm[which.max(Absorbance)]),
+          MaxAbs_Red = Absorbance[which.max(Absorbance)]) %>% 
+  filter(OlisAbs_nm == 675) %>% # filter only 675 nm to get df that matches the nested df to join
+  select(SampleID, Run, Strain, RedMaxima_nm, MaxAbs_Red, Par_ue, E_days) %>% 
+     ungroup()
+
+
+OlisSpectra_blue <- OLISSpectraUnnest %>% 
+  group_by(SampleID, E_days) %>%
+  filter(OlisAbs_nm >= 400 & OlisAbs_nm <= 460) %>% 
+   mutate(BlueMaxima_nm = round(OlisAbs_nm[which.max(Absorbance)]),
+          MaxAbs_Blue = Absorbance[which.max(Absorbance)])  %>% 
+  filter(OlisAbs_nm == 440) %>% # filter only 440 nm to get df that matches the nested df to join
+  select(SampleID, Run, Strain, BlueMaxima_nm, MaxAbs_Blue,  Par_ue, E_days) %>% 
+  ungroup()
+
+ OlisSpectraMeta <- left_join(OLISSpectraFile, OlisSpectra_red)
+ OlisSpectraMeta <- left_join(OlisSpectraMeta, OlisSpectra_blue)
+ 
+ 
+
+remove(OlisSpectra_red)
+remove(OlisSpectra_blue)
+remove(OLISSpectraUnnest)
+
+```
+
+
+# Left join Olis whole cell absorbance data with Jaz MC emission data. Emission measurements were performed on the mixed color MCMIX004 and the white light MC257
+```{r join whole cell absorbance with MC emission data}
+
+OlisSpectraMeta <- OlisSpectraMeta %>% 
+  unnest(AbsSpectra) 
+
+
+OlisJazMetaData <- left_join(OlisSpectraMeta, JazEmFile, by = c("WL", "OlisAbs_nm" = "MCEm_nm")) %>% 
+  mutate(MCEm_nm = OlisAbs_nm)
+
+
+remove(OlisSpectraMeta)
+remove(JazEmFile)
+remove(OLISSpectraFile)
+```
+
+# Normalization. Used max peak of each spectra to normalize peaks to red Chla region (625 to 750 nm) and blue Chla region (400 to 460 nm).
+```{r normalization }
+
+OlisJazMetaData <- OlisJazMetaData %>% 
+  group_by(SampleID, E_days) %>%
+ mutate(AbsNorm440 = Absorbance / MaxAbs_Blue,
+        AbsNorm675 = Absorbance / MaxAbs_Red) %>% 
+  ungroup()
+
+glimpse(OlisJazMetaData)
+```
+
+# Calculate Photosynthetic Usable Radiation (PUR) from MC normalized emission and normalized Olis whole cell absorbance spectrums.  
+```{r PUR}
+OlisJazMetaPUR <- OlisJazMetaData %>%
+    filter(OlisAbs_nm >= 400 &
+           OlisAbs_nm <= 700) %>%
+  mutate(PURAbsWholeCell_Norm440 = MC_NormEm * AbsNorm440) %>% 
+  group_by(SampleID, E_days) %>% 
+  mutate(SumPURAbsWholeCell_Norm440 = sum(MC_NormEm * AbsNorm440),
+         CalcPur_ue = round(Par_ue * (SumPURAbsWholeCell_Norm440 / sum(MC_NormEm)))) %>% 
+ungroup() %>% 
+  select(-SumPURAbsWholeCell_Norm440)
+
+remove(OlisJazMetaData)
+glimpse(OlisJazMetaPUR)
+
+```
+
+# Find Strain specific average PUR for each spectral color and each growth PAR
+```{r Calc mean PUR}
+
+OlisJazMetaPUR <- OlisJazMetaPUR %>%
+  group_by(Strain, WL, Par_ue) %>% 
+  mutate(Pur_ue = round(mean(CalcPur_ue)),
+         PurParRatio = (Pur_ue / Par_ue))%>% 
+ungroup()  %>% 
+  select(-c(CalcPur_ue))
+
+glimpse(OlisJazMetaPUR)
+```
+
+
+# Calculate daily PUR photon dose
+```{r calculate PUR Photon dose}
+
+OlisJazMetaPUR <- OlisJazMetaPUR %>%
+ mutate(PURPhotonDose_day = case_when(LightShape == 'Sine' ~ Pur_ue/2 * SectoHour * Photoperiod,
+                                  LightShape == 'Square' ~ Pur_ue * SectoHour * Photoperiod))
+
+glimpse(OlisJazMetaPUR)
+```
+
+# Nest whole cell absorbance and emission data
+```{r Nest spectra data}
+
+OlisJazMetaPUR <- OlisJazMetaPUR %>% 
+  group_by(SampleID, E_days) %>% 
+  nest(PurData = c(OlisAbs_nm, Absorbance, AbsNorm440, AbsNorm675, PURAbsWholeCell_Norm440, BlueMaxima_nm, MaxAbs_Blue, RedMaxima_nm, MaxAbs_Red, MCEm_nm, Emission, MC_NormEm, EmMax_nm))
+
+glimpse(OlisJazMetaPUR)
+```
+
+# Save nested rds for further analysis
+```{r save rds}
+saveRDS(OlisJazMetaPUR, file.path(DataOut, paste(Project, "Processed_OlisJazMetaPUR.Rds", sep = "_"), fsep = .Platform$file.sep), ascii = FALSE, version = NULL, compress = "xz", refhook = NULL)
+
+```
+

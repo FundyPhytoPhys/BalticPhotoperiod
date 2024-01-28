@@ -1,0 +1,171 @@
+---
+title: "Import_OlisData"
+author:
+- Douglas A. Campbell
+- Sarah Gore
+- Adrian Kryk
+- Sylwia Sliwinska-Wilczewska
+- Mireille Savoie
+date: "`r format(Sys.Date())`"
+output:
+bookdown::html_document2:
+    code_folding: show
+    keep_md: yes
+    toc: TRUE
+    toc_float: TRUE
+    toc_depth: 6
+    fig_caption: yes
+bibliography: [Manuscript_O2, RPackages.bib]
+csl: plos-one.csl
+editor_options: 
+  markdown: 
+    wrap: 72
+---
+
+# Set Chunk Options
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE)
+knitr::opts_chunk$set(fig.path='Figs/')
+```
+
+# Introduction
+
+Import_OlisData.Rmd imports OLIS CLARiTY spectrophotometer files from Data/RawData/OlisData.zip folder and stored in Data/ImportedData/ImportedOlisData folder as: 
+Baltic_Photoperiod_Imported_OlisData.Rds
+
+# Load Libraries and set Project Variables
+
+```{r load libraries, warning = FALSE, echo=FALSE} 
+
+library(lubridate)
+library(broom)
+library(knitr)
+library(tidyverse)
+
+```
+
+```{r set project variables, read zipped files, list available files, warning = FALSE, echo=FALSE}
+Project <- "PICO"
+DataOut <- file.path("..", "Data", "ImportedData", "ImportedOlisData")
+
+# Set the path to the zip folder and the destination folder
+DataIn <- file.path("..", "Data", "RawData", "OlisData.zip")
+
+#List files in the extracted folder with a ".asc" extension
+OlisFiles <- unzip(DataIn, list = TRUE)
+OlisFiles <- OlisFiles[grepl(".asc$", OlisFiles$Name), "Name"]
+print(OlisFiles)
+
+FileID <- "Smooth"
+FileEncode <- "UTF-8" 
+Delimiter <- ""
+HeaderRows <- 0
+```
+
+# Set up fread_plus and read.delim_long function
+```{r set up fread_plus and read.delim_long, warning = FALSE, echo=FALSE}
+# Define function to read and process each file
+fread_plus <- function(Flnm, Skip, FileEncode, Delim) {
+  con <- unz(DataIn, Flnm)  # Corrected the file path within the zip archive
+  data <- read.table(con, skip = Skip, encoding = FileEncode, sep = Delim, header = FALSE, row.names = NULL)
+  
+# Use tryCatch to handle errors during the closing of the connection
+  tryCatch(
+    close(con),
+    error = function(e) {
+      warning("Error closing connection: ", e$message)
+    })
+  
+  data <- data %>%
+    mutate(Filename = Flnm, CDateTime = ymd_hms(file.info(DataIn)$ctime)) 
+  return(data)
+}
+
+#read.delim_long meant for map over a vector of filepaths to read, convert to long format and tidy the imported data
+read.delim_long <- function(Flnm, FileEncode, Delimiter, HeaderRows){
+  read.delim(Flnm, encoding = FileEncode, sep = Delimiter, skip = HeaderRows, header = FALSE, row.names = NULL) %>%
+  mutate(Filename = flnm, CDateTime = ymd_hms(file.info(flnm)$ctime)) %>%
+  mutate(FirstLastSpec = str_extract(Filename, "_[A-Z][a-z][A-Z][a-z][:digit:][:digit:][:digit:][:digit:]_[A-Z][a-z][A-Z][a-z][:digit:][:digit:][:digit:][:digit:]_")) %>%
+  mutate(SampleNumbers = str_extract_all(FirstLastSpec, "[:digit:][:digit:][:digit:][:digit:]")) %>%
+  mutate(FirstSampleNumber = as.numeric(map(SampleNumbers, ~.[[1]]))) %>%
+  mutate(LastSampleNumber = as.numeric(map(SampleNumbers, ~.[[2]]))) %>%
+  mutate(OperatorID = str_extract(Filename,"[A-Z][a-z][A-Z][a-z]")) %>%
+  pivot_longer(cols = starts_with("X"), names_to = "SpectraID", values_to = "Abs") %>%
+  mutate(SampleCode = as.numeric(str_remove(SpectraID, "X"))) %>%
+  mutate(SampleNumber = SampleCode - min(SampleCode, na.rm = TRUE) + FirstSampleNumber) %>%
+  relocate(OperatorID, SampleNumber) %>%
+  unite(col = SampleID, OperatorID:SampleNumber, sep = "", remove = FALSE) %>%
+  arrange(SampleID, nm) %>%
+  relocate(SampleID, nm, Abs) %>%
+  mutate(SpectraDate = str_extract(Filename, "/[:digit:][:digit:][:digit:][:digit:][:digit:][:digit:][:digit:][:digit:]_"),
+         SpectraDate = str_remove_all(SpectraDate, "_"),
+         SpectraDate = str_remove_all(SpectraDate, "/"),
+         SpectraDate = ymd(SpectraDate)
+  )
+}
+```
+
+# Import and prepare files
+```{r import OLIS Spectra corrected files, warning = FALSE, echo=FALSE}
+TargetFile <-  OlisFiles
+
+TargetSpectra <- TargetFile %>% 
+  map_df(~fread_plus(Flnm = ., FileEncode = FileEncode, Delim = Delimiter, Skip = HeaderRows)) %>% 
+  rename(OlisAbs_nm = `V1`,
+          Absorbance = `V2`) %>% 
+  filter(!is.na(Absorbance))  
+
+TargetSpectraLong <- TargetSpectra %>%
+  separate(col = Filename, into = c("ObsDate", "Project", "SampleID", "Range", "Type", "Correction", "Smooth"), sep = "([\\/\\_\\:])", remove = FALSE) 
+
+TargetSpectraLong <- TargetSpectraLong %>%
+  mutate(FilenameOlis = Filename) %>% 
+  mutate(ObsDate = ymd(str_extract(ObsDate, "202[:digit:][:digit:][:digit:][:digit:][:digit:]"))) %>% 
+  select(-c(Type, Correction, Smooth, Project, Filename, Range)) 
+```
+
+# Read MetaData
+```{r read locally stored metadata from rds}
+CultureCatalog <- readRDS(file = file.path("..", "Data","CultureCatalog.Rds"))
+
+CultureCatalog <- CultureCatalog %>% 
+  select(-c(PrimaryOperator, Temp_c, ExpCul, ExpStartTime, Optode, OptodeCh, OptodeMeasure))
+```
+
+# Merge OlisSpectra with MetaData
+```{r merge OlisSpectra with MetaData, warning = FALSE, echo=FALSE}
+OLISSpectraMeta <- CultureCatalog %>%
+  right_join(., TargetSpectraLong, by = c("SampleID" = "SampleID")) 
+
+OLISSpectraMeta <- OLISSpectraMeta %>%
+group_by(SampleID) %>%
+  arrange(ObsDate) %>%
+  mutate(E_days = as.numeric((ObsDate - ExpDate[1]))) %>%
+  filter(!is.na(MC)) %>%
+   select(-c(CDateTime)) %>% 
+ungroup()
+
+```
+
+
+# Cleaning df before saving as rds and removed unnecessary files from the environment
+```{r nest absorbance spectra}
+OLISSpectraMeta <- OLISSpectraMeta %>% 
+  nest(AbsSpectra = c(OlisAbs_nm, Absorbance)) 
+```
+
+
+```{r removed redundant df }
+rm(CultureCatalog, TargetSpectra, TargetSpectraLong)
+```
+
+# Save rds for further analysis
+```{r save rds}
+saveRDS(OLISSpectraMeta, file.path(DataOut, paste(Project, "Imported_OlisData.Rds", sep = "_"), fsep = .Platform$file.sep), ascii = FALSE, version = NULL, compress = "xz", refhook = NULL)
+```
+
+# Variable names used in Data Dictionary
+```{r}
+colnames(OLISSpectraMeta)
+```
