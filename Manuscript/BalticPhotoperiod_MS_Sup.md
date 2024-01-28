@@ -86,8 +86,7 @@ COMMENT: /as supplemental data show the plots of deltaOD vs elapsed time with th
 ![<span id="fig:Sigma445"></span>Figure 6: Effective absorption cross section of PSII (σ~PSII~'; nm^2^ quanta^-1^) measured under diel peak PAR growth light under Ex445 nm (blue) excitation in two PhycoCyanin(PC)-rich cultures (056, 077) and two PhycoErythrin(PE)-rich cultures (048, 127) (Culture Collection of Baltic Algae) of *Synechococcus* sp. grown at 30, 90, 180, 300, 600, or 900 peak PAR µmol photons m^−2^s^−1^; and photoperiods of 8, 12, 16, or 24 h. Figure represents all data (small symbols) and means (big symbols) from exponential phase, or from pre-stationary growth phase. Blue solid line shows linear model fit.](../Output/Figures/SFig_Sigma445.png)
 
 
-
-
+![<span id="fig:SigmaPig445"></span>Figure 7: Changes of effective absorption cross section of PSII (σ~PSII~'; nm^2^ quanta^-1^) measured under diel peak PAR growth light under Ex445 nm (blue) excitation in relation to the total Phyco/Chl *a* ratio of two PhycoCyanin(PC)-rich cultures (Culture Collection of Baltic Algae; 056, 077) and two PhycoErythrin(PE)-rich cultures (Culture Collection of Baltic Algae; 048, 127) of *Synechococcus* sp. grown at 30, 90, 180, 300, 600, or 900 peak PAR µmol photons m^−2^s^−1^; and photoperiods of 8, 12, 16, or 24 h. Figure represents all data (small symbols) and means (big symbols) from exponential phase, or from pre-stationary growth phase. Blue solid line shows linear model fit.](../Output/Figures/SFig_SigmaPig445.png)
 
 
 
