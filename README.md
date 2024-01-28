@@ -106,7 +106,7 @@ BalticPhotoperiod_Imported_SolisenseDarkafterLight.Rds contained data taken from
 
 - Process_GrowthCurveData.Rmd separately processes and combines all .Rds from Data/ImportedData/ImportedMCData folder. This .Rmd generates BalticPhotoperiod_Processed_GrowthCurve.Rds which is stored in Data/ProcessedData/ProcessedGrowthCurveData folder and one plot which is stored in Output/Figures folder.
 
-XXXX- Process_GrowthRateData.Rmd processes and combines PICO_Cleaned_MCData.Rds from Data/CleanedData/CleanedMCData folder and BalticPhotoperiod_Processed_PigmentsExp.Rds from Data/ProcessedData/ProcessedPigmentsData. This .Rmd generates BalticPhotoperiod_Processed_GrowthRateExp.Rds and BalticPhotoperiod_Processed_GrowthRateAll.Rds (both stored in Data/ProcessedData/ProcessesGrowthRateData folder) and 2 plots (stored in Output/Figures folder).
+- Process_GrowthRateData.Rmd processes and combines PICO_Cleaned_MCData.Rds from Data/CleanedData/CleanedMCData folder and both BalticPhotoperiod_Processed_PigmentsAll.Rds and BalticPhotoperiod_Processed_PigmentsExp.Rds from Data/ProcessedData/ProcessedPigmentsData. This .Rmd generates BalticPhotoperiod_Processed_GrowthRateAll.Rds (stored in Data/ProcessedData/ProcessesGrowthRateData folder) and 2 plots (stored in Output/Figures folder).
 
 XXXX- Process_GrowthRateSolisenseData.Rmd processes and combines BalticPhotoperiod_Processed_GrowthRate.Rds from  Data/ProcessedData/ProcessedGrowthRateData folder and BalticPhotoperiod_Processed_SolisensePigmentsExp.Rds from Data/ProcessedData/ProcessedSolisenseData folder. This .Rmd generates xxx.Rds (stored in xxxa folder) and xxx_Plot.png (stored in Output/Figures folder).
 
