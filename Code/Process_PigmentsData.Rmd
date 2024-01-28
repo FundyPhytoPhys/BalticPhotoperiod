@@ -68,7 +68,7 @@ list.files(path = DataIn, pattern = Project, full.names = TRUE)
 ```{r read pigments File}
 #df ontained mean OD per day from Multiculti and Abs from Olis spectra for selected nm. Based on this I calculated pigments per mL and per cell (pg/cell)
 
-MCPigmentFile <- "../Data/ImportedData/ImportedPigmentsData/BalticPhotoperiod_Imported_PigmentData.Rds"
+MCPigmentFile <- "../Data/ImportedData/ImportedPigmentsData/BalticPhotoperiod_Imported_PigmentsData.Rds"
 MCPigmentFileName <- str_split(string = MCPigmentFile, "/")[[1]][3] %>%
   str_remove(pattern = ".Rds")
 MCPigment <- readRDS(MCPigmentFile)  %>%
@@ -279,8 +279,43 @@ MCPigmentPlot %>%
 # Save plot 
 
 ```{r save plot}
-ggsave(file = file.path(PlotsPath, paste("SFig_Pigments",".png",sep = "")), height=10, width= 8,  dpi = 300, limitsize = TRUE)
+ggsave(file = file.path(FigPath, paste("SFig_Pigments",".png",sep = "")), height=10, width= 8,  dpi = 300, limitsize = TRUE)
 ```
+
+
+# Create pigments per cell plot - pigments photon dose
+
+```{r Final pigments per cell plot, fig.height = 8, fig.width = 8}
+# scientific_10 <- function(x) {   parse(text=gsub("e\\+*", " %*% 10^", scales::scientific_format()(x))) }
+# lab1=c(expression("PC-rich_056"), expression("PC-rich_077"), expression("PE-rich_048"), expression("PE-rich_127"))
+# lab2=c(expression("8 h"), expression("12 h"), expression("16 h"), expression("24 h"))
+# lab3=c(expression("30 µE"), expression("90 µE"), expression("180 µE"), expression("300 µE"), expression("900 µE"))
+# 
+# MCPigmentPlot %>%
+#   ggplot() +
+#   geom_point(aes(x = PARPhotonDose_day, y = Pigmentspgcell, colour = as.factor(Strain)), alpha = 0.8, size = 3, show.legend = T) +
+# 
+#   scale_colour_discrete(type=c("seagreen4", "palegreen3", "brown1", "brown4")) +
+#   labs(y = "Pigments content ( pg  " ~ cell^-1~")", x = "Elapsed time (h)") +
+#   ggh4x::facet_nested(cols = vars(Phase), rows = vars(factor(PigmentsName, levels=c('Chlorophyll~a', 'Total~phycobilins', 'Carotenoids'))), labeller = label_parsed) +
+#   theme_bw() +
+#   theme(panel.grid.minor = element_blank(),
+#         panel.grid.major = element_blank(),
+#         axis.text = element_text(size=12),
+#         axis.title = element_text(size=16),
+#         strip.background = element_rect(fill="white"),
+#         strip.text = element_text(size=12),
+#         axis.title.y = element_text(margin=margin(r=10)),
+#         axis.title.x = element_text(margin=margin(t=10)),
+#         legend.background = element_rect(fill="white"),
+#         legend.position = c(0.087,0.95),
+#         legend.key.height= unit(0.005, 'cm'),
+#         legend.spacing.y = unit(-0.005, "cm"),
+#         legend.spacing.x = unit(-0.005, "cm"),
+#         legend.title = element_blank(),
+#         legend.text = element_text(size=10))
+```
+
 
 # Combine phyco/Chla ratio and car/chla ratio in one column for final plot
 
