@@ -1,0 +1,1384 @@
+---
+title: "SolisenseImportFit"
+author:
+- Maximilian Berthold
+- Douglas A. Campbell
+date: "`r format(Sys.Date())`"
+output:
+  html_document:
+    df_print: paged
+    code_folding: hide
+    keep_md: yes
+    fig_caption: yes
+    toc: TRUE
+    toc_float: TRUE   
+csl: plos-one.csl
+---
+
+This .Rmd imports and tidys fit data from the Solisense kinetic fluorometer software.
+It does not perform the underlying fits of the induction/relaxation profiles from FRRf protocols.
+
+# Done
+Corrected values for Excitation; this 'happens' during the re-fit if the proper calibration file settings are chosen
+  Refit needs to be done separately for data from Cuvette & Data from water jacket; TC/no TC will need to be segregated somehow.
+  
+Corrected values for ActPAR for cuvette (no TC) and for jacket (TC)
+  Recalibration for ActPAR to ActPARCorr done post-hoc herein
+
+Issue: Imported and processing data from more than one MultiCulti RunDate but labelling saved .rds with date of first MultiCultiRun
+  
+# Set Chunk Options
+
+
+```{r setup, include = FALSE}
+# knitr::opts_chunk$set(echo = TRUE, message = FALSE)
+# knitr::opts_chunk$set(fig.path='Figs/')
+```
+
+
+```{r load libraries}
+library(tidyverse)
+library(lubridate)
+library(photobiologyWavebands) #R colours from nm values
+library(broom) #formatting model outputs
+
+#https://googlesheets4.tidyverse.org/
+library(googledrive)
+library(googlesheets4)
+
+library(Cairo) #for greek symbols
+
+```
+
+Doug calibration file
+```{r}
+Path <- file.path("..", "..", "CampbellLabProtocols", "ChlorophyllFluorescence", "SolisenseInformation")
+
+ActPARCrossCal <- read_rds(file.path(Path, "SolisenseInformation_DCCrossParam.Rds"))
+
+ActPARCrossCal <- ActPARCrossCal %>% 
+  mutate(#Intercept = `estimate_(Intercept)`,
+         Slope = `estimate_LIFT_Gen_Developer.cal`,
+         #Intercept_SE = `std.error_(Intercept)`,
+         Slope_SE = `std.error_LIFT_Gen_Developer.cal`) %>% 
+  select(c(DCLamp, Models, Slope, Slope_SE))
+
+
+#intercept set to 0 in lm in SolisenseInformation.Rproj/SolisenseCalibCompare.Rmd
+```
+
+Doug calibration file
+```{r}
+# Project <- "PICO"
+# DataIn <- file.path("..", "ImportedData", "SolisenseDoubletap", fsep = .Platform$file.sep)
+
+#list.files(path = DataIn, pattern = Project, full.names = TRUE)
+
+# ActPARCrossCalFile <- file.path("..", "ImportedData", "SolisenseDoubletap", "PICO_SolisenseInformation_DCCrossParam.Rds")
+# 
+# ActPARCrossCalFileName <- str_split(string = ActPARCrossCalFile, "/")[[1]][3] %>%
+#   str_remove(pattern = ".Rds")
+# 
+# ActPARCrossCal <- readRDS(ActPARCrossCalFile)  %>%
+#   ungroup()
+# 
+# 
+# ActPARCrossCal <- ActPARCrossCal %>% 
+#   rename(#Intercept = `estimate_(Intercept)`,
+#          Slope = `estimate_LIFT_Gen_Developer.cal`,
+#          #Intercept_SE = `std.error_(Intercept)`,
+#          Slope_SE = `std.error_LIFT_Gen_Developer.cal`)
+# 
+# #intercept set to 0 in lm in SolisenseInformation.Rproj/SolisenseCalibCompare.Rmd
+```
+
+
+
+
+# Set Project Variables
+```{r set project variables}
+Project <- "PicoBaltic"
+#DataOut <- file.path("..", "ProcessedData", "Solisense")
+DataOut <- file.path("..", "ImportedData", "SolisenseDoubletap")
+#CalibData <- file.path("..", "Data",  "CalibrationData")
+# Run <- "O2Analyses"
+# ExpDate <- "2023-05-27" #date of first MultiCulti growth start
+#DataIn <- file.path("..", "SolisenseDoubletapRefit", "WWphotoperidRefit", fsep = .Platform$file.sep)
+DataIn <- file.path("..", "SolisenseDoubletap", "SySlWWPhotoperiodAll", fsep = .Platform$file.sep)
+
+FileID <- "fit"
+
+# Catalog <- "https://docs.google.com/spreadsheets/d/1ZXpwR7Gfto-uRzVdXzMpQF4frbrvMLH_IyLqonFZRSw/edit#gid=0"
+# ChlTurner <- "https://docs.google.com/spreadsheets/d/13mQm0B3siS65UuGjNdzvpHFomfuwn6aAg7dBoq1IqrM/edit#gid=0"
+
+FileEncode <- "UTF-8" 
+Delimiter <- ","
+
+HeaderRows <- 0
+
+```
+
+```{r conversions}
+us_s <- 1000000
+photons_umol <- 6.022E17 #Avogardo
+A2_m2 <- 1E20 #for sigma -> angstrom (Å) – a metric unit of length equal to 10^−10 m
+```
+
+Load Multiculti catalog
+```{r load local multiculticatalog, message = FALSE, warning = FALSE, echo=FALSE}
+gs4_deauth()
+
+MetaData <- read_sheet("https://docs.google.com/spreadsheets/d/1ZXpwR7Gfto-uRzVdXzMpQF4frbrvMLH_IyLqonFZRSw/edit#gid=0") %>%
+  drop_na(WL) %>%
+  mutate(WL = unlist(WL))
+
+as.data.frame(MetaData)
+MetaData <- MetaData %>%
+   mutate(ExpDate = ymd(ExpDate),
+          ExpEndDate = ymd_hms(`ExpEndDate`))
+```
+
+Load Turner catalog
+Chl -> chl ug/L
+```{r load turner catalog, message = FALSE, warning = FALSE, echo=FALSE}
+gs4_deauth()
+
+Turnercatalog<- read_sheet("https://docs.google.com/spreadsheets/d/13mQm0B3siS65UuGjNdzvpHFomfuwn6aAg7dBoq1IqrM/edit#gid=0")
+
+as.data.frame(Turnercatalog)
+ChlData <- Turnercatalog 
+
+ChlData <- ChlData %>%  
+  mutate(Chl = as.numeric(Reading_rfu) * as.numeric(Chl_slope) + as.numeric(Chl_intercept)) #ug/L
+
+```
+
+
+
+Load Multiculti catalog and ChlTurner
+```{r load multiculticatalog, message = FALSE, warning = FALSE, echo=FALSE}
+# gs4_deauth()
+# 
+# # imagine this is the URL or ID of a Sheet readable by anyone (with a link)
+# # MultiCulti metadata
+# MetaData <- read_sheet(Catalog)%>%
+#   # read_sheet has an annoying "feature" to set the type of columns it can't parse to a list.
+#   # ggplot/dplyr doesn't like working with a dataframe of lists.
+#   # In this case WL is set to a list since some values are numbers, some are strings, some are blank.
+#   # To fix this, first drop all rows missing WL, then unlist.
+#   # Must first drop NA rows since unlist will collapse NULL lists, then the unlisted WL is a shorter length than original WL column, which mutate doesn't like.
+#   drop_na(WL) %>%
+#   mutate(WL = unlist(WL))
+# 
+# as.data.frame(MetaData)
+# 
+# MetaData <- MetaData %>%
+#    mutate(ExpDate = lubridate::ymd(ExpDate),
+#           ExpEndDate = lubridate::ymd_hms(`ExpEndDate`))
+# # find units for chl
+# ChlData <- read_sheet(ChlTurner) |>
+#   mutate(Chl = as.numeric(Reading_rfu) * as.numeric(Chl_slope) + as.numeric(Chl_intercept))
+
+```
+
+
+Previous Doug script
+```{r read ActPAR calibration files}
+# # ActPARCal <- readRDS("~/Dropbox/CampbellLabProtocols/ChlorophyllFluorescence/SolisenseInformation/SolisenseInformation_DCCalibParam.Rds")
+# 
+# ActPARCrossCal <- list.files(path = CalibData, full.names = TRUE) %>%
+#        map_df(~readRDS(file  = .))
+# 
+# #intercept set to 0 in lm in SolisenseInformation.Rproj/SolisenseCalibCompare.Rmd
+# ActPARCrossCal <- ActPARCrossCal |>
+#   rename(#Intercept = `estimate_(Intercept)`,
+#          Slope = `estimate_LIFT_Gen_Developer.cal`,
+#          #Intercept_SE = `std.error_(Intercept)`,
+#          Slope_SE = `std.error_LIFT_Gen_Developer.cal`)
+```
+
+
+
+```{r set colours}
+Wavelengths_nm = c(445, 470, 505, 535, 590)
+Colours_nm = c(w_length2rgb(Wavelengths_nm[1]), w_length2rgb(Wavelengths_nm[2]), w_length2rgb(Wavelengths_nm[3]), w_length2rgb(Wavelengths_nm[4]), w_length2rgb(Wavelengths_nm[5]))
+
+names(Colours_nm) <- Wavelengths_nm
+Colours_nm
+
+```
+
+```{r list PSI files for file import}
+SolisenseFiles <- list.files(path = DataIn, pattern = FileID, full.names = TRUE, recursive = FALSE)
+
+SolisenseFiles
+
+#test for duplicate file names
+unique(duplicated(SolisenseFiles))
+```
+
+
+```{r data read adds filename and cdate, warning=FALSE, message=FALSE, echo=FALSE}
+#design choice 2 file reading functions or add a filetype variable to a single function
+#stringsAsFactors =FALSE somewhere? 
+# 
+# read.delim_plus <- function(flnm, file_encode, delimiter, header_rows){read.delim(flnm, fileEncoding = file_encode, sep = delimiter,  skip = header_rows, row.names = NULL) %>% mutate(filename = flnm, cdatetime = ymd_hms(file.info(flnm)$ctime))
+# }
+
+#a read function using tidyverse::read_delim that skips a fixed number of header rows, and adds columns to the dataframe containing the filename and the file creation date time.
+read_delim_plus <- function(flnm, delimiter, headerrows, fileencode){read_delim(flnm, delim = delimiter,  col_names = TRUE,  skip = headerrows, escape_double = FALSE,  locale = locale(encoding = fileencode), trim_ws = TRUE) %>%
+    mutate(Filename = flnm)
+  }
+
+
+```
+
+Read Test File
+```{r read example Solisense file}
+#issue with rows with --------;  easy to filter though
+# TestFile <- read.delim_plus(flnm = "../RawData/Solisense/MURIS_202105121400_MaBe3414_445_caloxy_fit.csv", file_encode = FileEncode, delimiter = Delimiter, header_rows = HeaderRows)
+
+```
+
+purrr::map to read all files
+```{r read Solisense files}
+SolFits <- SolisenseFiles %>%
+  map_df(~read_delim_plus(flnm =., delimiter = Delimiter, headerrows = HeaderRows, fileencode = FileEncode))
+
+head(SolFits)
+colnames(SolFits)
+length(unique(SolFits$Filename))
+
+```
+# Save assembled spectra data set
+```{r save Olis}
+
+# saveRDS(SolFitsTrim, file.path(DataOut, paste(Project, "SolFitsTrimAll.Rds", sep = "_"), fsep = .Platform$file.sep))
+
+```
+
+```{r tidy SolFitsTrim}
+# #Think of better ways to do this
+# 
+SolFitsTrim <- SolFits %>%
+  filter(!grepl("----", DATE)) %>% # remove rows with "----" in DATE
+  # select(-c("RFID_User_Data", "Barcode_Data", "PIF",  "Lon", "Lat", "GPS_stat", "LEDSel", "Dur-Wat",  "...39", "Alpha", "Ek", "Pmax" )) %>% # remove superfluous columns for fitted data
+
+  select(-c("RFID_User_Data", "Barcode_Data", "PIF",  "Lon", "Lat", "GPS_stat", "LEDSel", "S/N_raw", "PAR_3", "PAR_4", "PAR_5", "PAR_6", "TPQ_PSI", "QBP_Size", "...58", "Alp4QA", "Tau4QA", "Alp1PQ", "Tau1PQ", "Alp2PQ", "Tau2PQ", "Alp3PQ", "Tau3PQ", "ETR")) %>% # remove superfluous columns for unfit data
+
+  mutate(Filename = str_remove(string = Filename, pattern = "/SolisenseDoubletap/SySlWWPhotoperiodAll/"),
+         Filename = str_remove(string = Filename, pattern = "_fit.csv")
+         ) %>%
+
+  separate(Filename, into = c("Project", "RunDateTime", "CultureID", "Ex_WL"), sep = "([\\/\\_])", remove = FALSE) %>%
+  mutate(RunDateTime = ymd_hm(RunDateTime),
+         TIME = as.character(TIME)) %>%  #time-column may be read in as factor, and as.character changes it to numeric; using lubdridate::hms would only change the format to 13H 4M 2S but does not work later to merge into one DateTime-column
+  mutate(SourceDataFile = `Source DataFile`,
+         ObsDate = DATE,
+         ObsTime = TIME) %>%
+  mutate(Ex_WL = as.factor(as.numeric(Ex_WL))) %>%
+  mutate(across(.cols = c(Light_1:fQB), .fns = as.numeric)) %>%
+  mutate(StartDateTimeSol = RunDateTime) %>%
+  mutate(nm445 = Light_1,
+         nm470 = Light_2,
+         nm505 = Light_3,
+         nm535 = Light_4,
+         nm590 = Light_5,
+         IR = Light_6) %>%
+  drop_na(StartDateTimeSol) %>%
+  mutate(ObsTime = hms(ObsTime),
+         ObsDate = ymd(ObsDate)) %>%
+  mutate(ObsDateTime = ymd_hms(paste(ObsDate, ObsTime))) %>%
+  relocate(ObsDateTime, .after = ObsTime) %>%
+  relocate(CultureID, .before = ObsDate) %>%
+  #mutate(FvFm=as.numeric(FvFm)) %>%
+  select(-c(Light_1,Light_2,Light_3,Light_4,Light_5,Light_6,`Source DataFile`,DATE,TIME,RunDateTime))
+
+
+#for consistency add TempCont column
+SolFitsTrim <- SolFitsTrim %>%
+  mutate(TempCont = "TC") %>%
+  mutate(FvFm = Fv/Fm*1) %>%
+  select(-c("Fv/Fm"))
+
+#str(SolFitsTrim)
+
+```
+
+Filter wrong data - something wrong happen during measurements
+```{r}
+SolFitsTrim <- SolFitsTrim %>%
+  filter(Sig>0)
+
+```
+
+
+works for refit data
+```{r tidy SolFitsTrim}
+
+# SolFitsTrim <- SolFits %>%
+#   filter(!grepl("----", DATE)) %>% # remove rows with "----" in DATE
+# 
+#   select(-c("RFID_User_Data", "Barcode_Data", "PIF",  "Lon", "Lat", "GPS_stat", "LEDSel",  "...39")) %>% # remove superfluous columns for unfit data
+# 
+#   mutate(Filename = str_remove(string = Filename, pattern = "/SolisenseDoubletap/SySlWWPhotoperiodAll/"),
+#          Filename = str_remove(string = Filename, pattern = "rep1_fit.csv")
+#          ) %>%
+# 
+#   separate(Filename, into = c("Project", "RunDateTime", "CultureID", "Ex_WL"), sep = "([\\/\\_])", remove = FALSE) %>%
+#   mutate(RunDateTime = ymd_hm(RunDateTime),
+#          TIME = as.character(TIME)) %>%  #time-column may be read in as factor, and as.character changes it to
+#   mutate(SourceDataFile = `Source DataFile`,
+#          ObsDate = DATE,
+#          ObsTime = TIME) %>%
+#   mutate(Ex_WL = as.factor(as.numeric(Ex_WL))) %>%
+#   mutate(across(.cols = c(Light_1:Pmax), .fns = as.numeric)) %>%
+#   mutate(StartDateTimeSol = RunDateTime) %>%
+#   mutate(nm445 = Light_1,
+#          nm470 = Light_2,
+#          nm505 = Light_3,
+#          nm535 = Light_4,
+#          nm590 = Light_5,
+#          IR = Light_6) %>%
+#   drop_na(StartDateTimeSol) %>%
+#   mutate(ObsTime = hms(ObsTime),
+#          ObsDate = ymd(ObsDate)) %>%
+#   mutate(ObsDateTime = ymd_hms(paste(ObsDate, ObsTime))) %>%
+#   relocate(ObsDateTime, .after = ObsTime) %>%
+#   relocate(CultureID, .before = ObsDate) %>%
+#   select(-c(Light_1,Light_2,Light_3,Light_4,Light_5,Light_6,`Source DataFile`,DATE,TIME,RunDateTime))
+# 
+# 
+# 
+# SolFitsTrim <- SolFitsTrim %>%
+#   mutate(TempCont = "TC") %>%
+#   rename(FvFm = "Fv/Fm")
+
+
+
+```
+
+
+
+```{r actparcorr}
+#Add ActPARcorr with proper correction factors for TC and no TC
+#Intercepts for cross conversions set to 0.
+
+#Some smarter way to do this with map etc....
+SolFitsTrim <- SolFitsTrim %>% 
+  mutate(nm445Corr = case_when(TempCont == "TC" ~ nm445 * ActPARCrossCal$Slope[ActPARCrossCal$DCLamp == "Pwr1_uE" & ActPARCrossCal$Models == "DCWaterJacketlm_tidy"],
+                                 TempCont == "noTC" ~ nm445 * ActPARCrossCal$Slope[ActPARCrossCal$DCLamp == "Pwr1_uE" & ActPARCrossCal$Models == "DCCuvettelm_tidy"]),
+         nm470Corr = case_when(TempCont == "TC" ~ nm470 * ActPARCrossCal$Slope[ActPARCrossCal$DCLamp == "Pwr2_uE" & ActPARCrossCal$Models == "DCWaterJacketlm_tidy"],
+                                 TempCont == "noTC" ~ nm470 * ActPARCrossCal$Slope[ActPARCrossCal$DCLamp == "Pwr2_uE" & ActPARCrossCal$Models == "DCCuvettelm_tidy"]),
+         nm505Corr = case_when(TempCont == "TC" ~ nm505 * ActPARCrossCal$Slope[ActPARCrossCal$DCLamp == "Pwr3_uE" & ActPARCrossCal$Models == "DCWaterJacketlm_tidy"],
+                                 TempCont == "noTC" ~ nm505 * ActPARCrossCal$Slope[ActPARCrossCal$DCLamp == "Pwr3_uE" & ActPARCrossCal$Models == "DCCuvettelm_tidy"]),
+           nm535Corr = case_when(TempCont == "TC" ~ nm535 * ActPARCrossCal$Slope[ActPARCrossCal$DCLamp == "Pwr4_uE" & ActPARCrossCal$Models == "DCWaterJacketlm_tidy"],
+                                 TempCont == "noTC" ~ nm535 * ActPARCrossCal$Slope[ActPARCrossCal$DCLamp == "Pwr4_uE" & ActPARCrossCal$Models == "DCCuvettelm_tidy"]),
+          nm590Corr = case_when(TempCont == "TC" ~ nm590 * ActPARCrossCal$Slope[ActPARCrossCal$DCLamp == "Pwr5_uE" & ActPARCrossCal$Models == "DCWaterJacketlm_tidy"],
+                                 TempCont == "noTC" ~ nm590 * ActPARCrossCal$Slope[ActPARCrossCal$DCLamp == "Pwr5_uE" & ActPARCrossCal$Models == "DCCuvettelm_tidy"]),
+          IRCorr = case_when(TempCont == "TC" ~ IR * ActPARCrossCal$Slope[ActPARCrossCal$DCLamp == "PwrIR_uE" & ActPARCrossCal$Models == "DCWaterJacketlm_tidy"],
+                                 TempCont == "noTC" ~ IR * ActPARCrossCal$Slope[ActPARCrossCal$DCLamp == "PwrIR_uE" & ActPARCrossCal$Models == "DCCuvettelm_tidy"]))
+
+#head(SolFitsTrim)
+
+
+SolFitsTrim <- SolFitsTrim %>%
+  mutate(ActPAR = nm445 + nm470 + nm505 + nm535 + nm590 + IR) %>%  
+  mutate(ActPARCorr = nm445Corr + nm470Corr + nm505Corr + nm535Corr + nm590Corr + IRCorr)#better ways to do this?
+
+#head(SolFitsTrim)
+
+```
+
+```{r durations}
+#generate column with duration of light step in s
+#add a column adding Dark1s based upon any step < 5 s
+#replace NA for first dark with nominal 181;  issue will be changing durations of light steps across each run
+SolFitsTrim2 <- SolFitsTrim %>%
+  group_by(SourceDataFile, Filename, Project, CultureID, ObsDate, Ex_WL, TempCont) %>%
+  #mutate(Step_s = as.numeric(ObsDateTime - lag(ObsDateTime)), .after = ObsDateTime) %>%
+  mutate(Step_s = replace_na(as.numeric(ObsDateTime - lag(ObsDateTime)), 181), .after = ObsDateTime) %>% 
+  mutate(LR_s = as.numeric(ObsDateTime - ObsDateTime[1]), .after = Step_s) %>%
+  mutate(Dark1s = if_else(Step_s > 5, 0, 1), .after = Step_s) %>%
+  relocate(Ex_WL, .after = Dark1s) %>%
+  relocate(ActPAR, .after = Ex_WL) %>%
+  ungroup()
+#Figure out how to cope with final step at 0 PAR, not followed by Dark1s step
+#separate Dark1s rows
+#Figure out how to re-match Dark1s to appropriate light steps
+
+```
+
+```{r}
+# test <- SolFitsTrim %>%
+#   filter(Ex_WL == "505" & CultureID == "SySl1191")
+```
+
+Filter multiculti catalog for SySl WWPhotoperiod paper
+```{r}
+# colnames(MetaData)
+MetaData <- MetaData %>%
+summarize(Run, ID, Strain, InnocDate, ExpDate, Par_ue, Photoperiod, Tube, O2, WL, LightShape)  
+  # filter(Strain == "BA127R" | Strain == "BA77G" | Strain == "BA48R" | Strain == "BA56G") %>%
+  # filter(WL == "WW") %>%
+  # filter(Par_ue != 600) %>% 
+  # filter(Run == "39" | Run == "40" | Run == "43" | Run == "44" |Run == "45" | Run == "46" | Run == "60" | Run == "62" | Run == "65" | Run == "71" | Run == "74" | Run == "77" | Run == "117") 
+  
+  MetaData1 <- MetaData %>%
+  filter(Photoperiod != "24") %>% 
+  mutate(PARPhotonDose =(Par_ue/2)*Photoperiod*3600)
+  
+  MetaData2 <- MetaData %>%
+  filter(Photoperiod == "24") %>% 
+  mutate(PARPhotonDose = Par_ue*Photoperiod*3600) 
+  
+  MetaData <-rbind(MetaData1, MetaData2)
+  rm(MetaData1,MetaData2)
+
+```
+Join with MultiCulti catalog
+```{r}
+SolFitsTrimMeta <- MetaData %>%
+  left_join(., SolFitsTrim2, by = c("ID" = "CultureID")) 
+```
+
+Join with Turner
+```{r}
+# SolFitsTrimMeta3 <- ChlData %>%
+#   left_join(., SolFitsTrimMeta, by = c("CultureID" = "ID"))
+# 
+# SolFitsTrimMeta <- SolFitsTrimMeta3 
+
+#   filter(Strain == "BA127R" | Strain == "BA77G" | Strain == "BA48R" | Strain == "BA56G") %>%
+#   filter(WL == "WW") %>%
+#   filter(Par_ue != 600) %>% 
+#   filter(Run == "39" | Run == "40" | Run == "43" | Run == "44" |Run == "45" | Run == "46" | Run == "60" | Run == "62" | Run == "65" | Run == "71" | Run == "74" | Run == "77" | Run == "117") 
+  
+```
+
+Read already existed Turner MD Pico Rds
+
+```{r}
+Project <- "PicoBaltic"
+DataIn <- file.path("..", "ImportedData", "CombinedData", fsep = .Platform$file.sep)
+FileEncode <- "UTF-8"
+Delimiter <- ","
+HeaderRows <- 0
+```
+
+
+Exported only first time in session
+```{r}
+list.files(path = DataIn, pattern = Project, full.names = TRUE)
+```
+
+Solisense file
+```{r read ProcessFile}
+ChlTurnerMDPicoFile <- "../ImportedData/CombinedData/PicoBaltic_ChlTurnerMDPico.Rds"
+
+ChlTurnerMDPicoFileName <- str_split(string = ChlTurnerMDPicoFile, "/")[[1]][3] %>%
+  str_remove(pattern = ".Rds")
+
+ChlTurnerMDPico <- readRDS(ChlTurnerMDPicoFile)  %>%
+  ungroup()
+
+```
+
+```{r}
+#colnames(ChlTurnerMDPico)
+ChlTurnerMDPico <- ChlTurnerMDPico %>% 
+  select(c(CultureID, DATE, Run, Strain, InnocDate, ExpDate, Par_ue, Photoperiod, O2, WL, Chl_ugL, Chl_ugmL, meanChl_ugmL, sdChl_ugmL, cellsml, meancellsml, sdcellsml)) %>% 
+  mutate(MDcellsml=cellsml*1) %>% 
+  mutate(MDcellsL=MDcellsml*1000) %>% 
+  mutate(meanMDcellsml=meancellsml*1) %>%
+  mutate(meanMDcellsL=meanMDcellsml*1000) %>% 
+  mutate(sdMDcellsml=sdcellsml*1) %>% 
+  mutate(sdMDcellsL=sdMDcellsml*1000) %>% 
+  
+  mutate(TurnerChl_ugL=Chl_ugL*1) %>% 
+  mutate(TurnerChl_ugmL=Chl_ugmL*1) %>% 
+ 
+  mutate(meanTurnerChl_ugmL=meanChl_ugmL*1) %>%  
+  mutate(sdTurnerChl_ugmL=sdChl_ugmL*1) %>% 
+    
+  mutate(meanTurnerChl_ugL=meanTurnerChl_ugmL*1000) %>% 
+  mutate(sdTurnerChl_ugL=sdTurnerChl_ugmL*1000) %>% 
+  
+  select(-c(cellsml, meancellsml, sdcellsml, Chl_ugL, Chl_ugmL, meanChl_ugmL, sdChl_ugmL, MDcellsml, meanMDcellsml, sdMDcellsml, TurnerChl_ugmL, meanTurnerChl_ugmL, sdTurnerChl_ugmL))
+
+
+```
+
+Select data for WW Photoperiod 
+```{r}
+ChlTurnerMDPicoClean <- ChlTurnerMDPico %>% 
+  filter(Strain == "BA48R" | Strain == "BA127R" | Strain == "BA77G" | Strain == "BA56G") %>% 
+  filter(WL== "WW") %>% 
+  filter(O2== 21)
+
+```
+
+
+Join with Turner and MD Pico
+```{r}
+# colnames(ChlTurnerMDPicoClean)
+# colnames(SolFitsTrimMeta)
+
+
+SolFitsTrimMeta3 <- ChlTurnerMDPicoClean %>%
+  left_join(., SolFitsTrimMeta, by = c("CultureID" = "ID", "Run"="Run", "Strain"="Strain",
+                                       "InnocDate"="InnocDate", "ExpDate"="ExpDate", "Par_ue"="Par_ue", 
+                                       "Photoperiod"="Photoperiod", "O2"="O2", "WL"="WL"))
+
+SolFitsTrimMeta <- SolFitsTrimMeta3 
+
+```
+
+
+
+```{r prelimplots}
+SolFitsTrimMeta %>%
+  filter(Dark1s == 0) %>% #take value from light
+  ggplot() +
+  geom_point(aes(x = ActPAR, y = FvFm)) +
+  #scale_colour_manual(values = Colours_nm) +
+  facet_grid(cols = vars(Par_ue), rows = vars(Photoperiod)) +
+  theme_bw()
+
+SolFitsTrimMeta %>%
+  filter(Dark1s == 0) %>%
+  ggplot() +
+  geom_point(aes(x = LR_s, y = FvFm, size = ActPAR)) +
+  #scale_colour_manual(values = Colours_nm) +
+  facet_grid(cols = vars(Par_ue), rows = vars(Photoperiod)) +
+  theme_bw()
+
+SolFitsTrimMeta %>%
+  filter(Dark1s == 0) %>%
+  filter(Tau2QA < 20000) %>%
+  ggplot() +
+  geom_point(aes(x = LR_s, y = Tau2QA, size = LR_s)) +
+  #scale_colour_manual(values = Colours_nm) +
+  facet_grid(cols = vars(Par_ue), rows = vars(Photoperiod)) +
+  theme_bw()
+
+SolFitsTrimMeta %>%
+  #filter(Dark1s != 0) %>%
+  ggplot() +
+  geom_point(aes(x = ActPAR, y = Alp2QA, size = LR_s)) +
+  #scale_colour_manual(values = Colours_nm) +
+  facet_grid(cols = vars(Par_ue), rows = vars(Photoperiod)) +
+  theme_bw() 
+
+```
+
+
+
+
+Oxborough & Baker 1997 for Fo'
+
+Oxborough, K., & Baker, N. R. (1997). Resolving chlorophyll a fluorescence images of photosynthetic efficiency into photochemical and non-photochemical components–calculation of qP and Fv-/Fm-; without measuring Fo. Photosynthesis research, 54, 135-142.
+
+Oxborough, K., & Baker, N. R. (1997). An instrument capable of imaging chlorophyll a fluorescence from intact leaves at very low irradiance and at cellular and subcellular levels of organization. Plant, Cell & Environment, 20(12), 1473-1483.
+
+Oxborough, K., Moore, C. M., Suggett, D. J., Lawson, T., Chan, H. G., & Geider, R. J. (2012). Direct estimation of functional PSII reaction center concentration and PSII electron flux on a volume basis: a new approach to the analysis of Fast Repetition Rate fluorometry (FRRf) data. Limnology and Oceanography: Methods, 10(3), 142-154.
+
+Suggett, D. J., Moore, C. M., Oxborough, K., & Geider, R. J. (2006). Fast repetition rate (FRR) chlorophyll a fluorescence induction measurements. West Molesey: Chelsea Technologies Group, 1-53.
+
+
+
+
+Berge, J., Grant, S., Bjørgum, R., Cohen, J. H., McKee, D., Johnsen, G., Zolich, A., Kopec, T. P., Vogedes, D. L., UiT The Arctic University of Norway (2021).Time series (2017) of irradiance in the PAR (photosynthetically active radiation) region measured under the dome of a light observatory in the Arctic  (Ny-Ålesund, Svalbard, Norway) derived from an USSIMO spectroradiometer [Data set]. Norstore. https://doi.org/10.11582/2021.00040
+
+https://archive.norstore.no/pages/public/datasetDetail.jsf?id=10.11582/2021.00040
+
+PAR is approximated as an integral of micromolespersec=(uirr/(h*c/(lambda*1e-9)))/microavo for wavelengths(lambda) in range from 400 to 700nm, where: uirr = USSIMO irradiance for wavelength equal to lambda, h=6.63e-34 [Js], c=3.00e+08 [m/s], microavo=6.022e17.
+
+
+
+
+
+Fast Repetition Rate fluorometry (FRRf, Kolber et al. 1998) 
+
+σPSII - Effective absorption cross section of PSII photochemistry in darkness -> A2 (quanta)-1 or m2
+ρ - Connectivity between PSII reaction centres in darkness
+
+σPSII′ - Effective absorption cross section of PSII photochemistry under actinic light -> A2 (quanta)-1 or m2
+ρ′ - Connectivity between PSII reaction centres under actinic light
+
+TauPSII - Minimum turnover time of PSII photochemistry -> s-1
+
+F0 or F0’ (Minimum fluorescence in darkness or Minimum fluorescence under actinic light)
+Fm or Fm’ (Maximum fluorescence in darkness or Maximum fluorescence under actinic light)
+F’ (or Fs; Steady state fluorescence at any point)
+Fv = Fm-F0 (Variable fluorescence in darkness)
+Fv’ = Fm’-F0’ (Variable fluorescence under actinic light)
+Fq′ = (Fm′ - F′) (Difference between Fm′ and F′)
+
+Fv/Fm = (Fm-F0)/Fm (The maximum PSII quantum yield/Maximum photochemical efficiency)
+Fv’/Fm’ = (Fm’- F0’)/Fm’ (Maximum PSII efficiency under actinic light)
+
+ΦPSII = (Fm’- F’)/Fm’ = Fq′/Fm′ (Photochemical efficiency under actinic light)
+
+qP = (Fm’- F’)/(Fm’-F0’) = (Fm′ - F′)/Fv′ = Fq′/Fv′ (PSII efficiency factor under actinic light; photochemical quenching coefficient) 
+
+NPQ =(Fm-Fm’)/Fm’ (Non-photochemical quenching coefficien)
+
+
+ETR = PPFD * aPSII * PSII photochemical efficiency (ΦPSII)
+
+ETR^RCII = PPFD * σPSII * Fq′/Fm′ (or ΦPSII) * 21.683
+
+ETR^chl = PPFD * σPSII * n PSII * Fq′/Fm′ (or ΦPSII) * 21.683
+
+
+FRR fluorescence provides a direct measure of light absorption per unit PSII reaction centres (σPSII).
+
+ETR, called the relative electron transport rate, is the product of the effective photochemical yield of
+PSII (ΦPSII) and photosynthetic photon flux density
+
+ETR^RCII(chl) - RCII (Chlorophyll a)-normalised rate of electron transfer by PSII -> mol e- g chla-1 h-1
+
+ETR^chl is the chlorophylla-specific rate of electron transfer (mol e- mol chla-1 h-1 ).
+
+PPFD (=E) - Photosynthetically active photon flux density -> μmol m-2 s-1
+
+a^chlPSII - a^chl only used for PSII photochemistry -> m2 mg chla-1
+
+(factor 21.683 converts seconds to hours, μmol e- to mol e- and A2 quanta-1 to m2 mol RCII-1)
+
+nPSII - photosynthetic unit size of PSII
+
+JVPSII - PSII flux per unit volume -> electrons m–3 s–1
+
+[RCII] - concentration of functional PS II reaction centers -> m-3
+
+aLHII - LHII (light harvesting complex II) absorption coefficient -> m-1
+
+```{r estimate parameters}
+#think about nest_by and map?
+# SolFitsTrimMeta2 <- SolFitsTrimMeta %>%
+#   mutate(WtTau = ((Alp1QA * Tau1QA) + (Alp2QA * Tau2QA) + (Alp3QA * Tau3QA)),
+#          InvWtTau = 1/WtTau,
+#          Sig_m2psii = Sig/1E20,
+#          ActPAR_photonsm2s = ActPAR *  6.022e17,
+#          C_WtTau = 1/(1 + (Sig_m2psii * ActPAR_photonsm2s * (WtTau /us_s)))
+#          ) %>%
+#   nest(.by = c(CultureID, Ex_WL, SourceDataFile, Filename, ObsDate )) %>%
+#    mutate(Fodark = map(data, ~.$Fo[1]),
+#           Fmdark = map(data, ~.$Fm[1]),
+#           Fomin = map(data, ~min(.$Fo, na.rm = TRUE)),
+#           Fmmax = map(data, ~max(.$Fm, na.rm = TRUE)),
+#           Sigdark = map(data, ~.$Sig[1]),
+#           Sigmax = map(data, ~max(.$Sig, na.rm = TRUE)),
+#           qp = map(data, ~(.$Fm - .$Fo)/(.$Fm - lead(.$Fo)))
+#           ) %>%
+#   unnest(cols = c(data, Fodark,Fmdark,Fomin, Fmmax,Sigdark,Sigmax, qp)) %>%
+#   mutate(aLHIIdark = (Fmdark * Fodark)/(Fmdark - Fodark), #LHII absorption coefficient m-1
+#          aLHIIminmax = (Fmmax * Fomin)/(Fmmax - Fomin),
+#          FoOxbo = Fomin/(((Fmmax - Fomin)/Fmmax) + (Fomin/Fm)), #for measuring Fo'
+#          qpOxbo = (Fm - Fo)/(Fm - FoOxbo), #qP = (Fm’- F’)/(Fm’-F0’)?
+#          JVPSII_aLHIIminmax = ActPAR_photonsm2s * aLHIIminmax * FvFm,
+#          JVPSII_aLHIIdark = ActPAR_photonsm2s * aLHIIdark * FvFm, #PSII flux per LHII absorption coefficient?
+#          ETRC_WtTau = Sig_m2psii * C_WtTau * ActPAR_photonsm2s,
+#          ETRqp = Sig_m2psii * qp * ActPAR_photonsm2s,
+#         ETRqpOxbo = Sig_m2psii * qpOxbo * ActPAR_photonsm2s,
+#          JVPSII_ETRC_WtTau = ETRC_WtTau * Fomin/Sigmax * ActPAR_photonsm2s,
+#          JVPSII_ETRqp = ETRqp * Fomin/Sigmax * ActPAR_photonsm2s,
+#          JVPSII_ETRqpOxbo = ETRqpOxbo * Fomin/Sigmax * ActPAR_photonsm2s
+#         )
+
+#JVPSII will be proportional to the fluorescence emitted by open RCII
+
+       
+ #str(SolFitsTrimMeta2)
+
+
+```
+
+Oxborough & Baker 1997 for Fo'
+```{r estimate parameters}
+# #think about nest_by and map?
+# SolFitsTrimMeta2 <- SolFitsTrimMeta %>%
+#   group_by(SourceDataFile, Filename, Project, CultureID, ObsDate, Ex_WL, TempCont) %>%
+#   mutate(Fodark = Fo[1],
+#          Fmdark = Fm[1],
+#          Sigdark = Sig[1],
+#          TauAv = ((Tau1QA * Alp1QA) + (Tau2QA * Alp2QA))/(Alp1QA + Alp2QA),
+#          aLHIIdark = (Fmdark * Fodark)/(Fmdark - Fodark),
+#          Fomin = min(Fo, na.rm = TRUE),
+#          Fmmax = max(Fm, na.rm = TRUE),
+#          FoOxbo = Fomin/(((Fmmax - Fomin)/Fmmax) + (Fomin/Fm)),
+#          Sigmax = max(Sig, na.rm = TRUE),
+#          #aLHIIminmax = (Fmmax * Fomin)/(Fmmax - Fomin),
+#          aLHIIOxbomax = (Fmmax * FoOxbo)/(Fmmax - FoOxbo),
+#          Sig_m2psii = Sig/A2_m2,
+#          ActPARCorr_photonsm2s = ActPARCorr *  photons_umol,
+#          #Ctau1 = 1/(1 + (Sig_m2psii * ActPARCorr_photonsm2s * (Tau1QA/us_s))),
+#          #Ctau2 = 1/(1 + (Sig_m2psii * ActPARCorr_photonsm2s * (Tau2QA/us_s))),
+#          Ctauav = 1/(1 + (Sig_m2psii * ActPARCorr_photonsm2s * (TauAv/us_s))),
+#          #qp = (Fm - Fo)/(Fm - lead(Fo)), #(Fm' - Fs)/(Fm' - Fo'); messes up every 2nd row from double tap data but then filter out rows from 'dark'
+#          qpOxbo = (Fm - Fo)/(Fm - FoOxbo),
+#          #JVPSII_aLHIIminmax = ActPARCorr_photonsm2s * aLHIIminmax * FvFm, #issue with FvFm in cyanobacteria; minimized with blue light excitation
+#          #JVPSII_aLHIIdark = ActPARCorr_photonsm2s * aLHIIdark * FvFm,
+#          JVPSII_aLHIIOxbomax = ActPARCorr_photonsm2s * aLHIIOxbomax * FvFm,
+#          #ETRCtau1 = Sig_m2psii * Ctau1 * ActPARCorr_photonsm2s,
+#          #ETRCtau2 = Sig_m2psii * Ctau2 * ActPARCorr_photonsm2s,
+#          ETRCtauav = Sig_m2psii * Ctauav * ActPARCorr_photonsm2s,
+#          #ETRqp = Sig_m2psii * qp * ActPARCorr_photonsm2s,
+#          ETRqpOxbo = Sig_m2psii * qpOxbo * ActPARCorr_photonsm2s,
+#          #ETRGorbo = (1/TauAv[7])*((ActPARCorr*FvFm)/(ActPARCorr[7]*FvFm[7])) * us_s,
+#          #TestTauAvSat = 1/TauAv[ActPARCorr_photonsm2s == max(ActPARCorr_photonsm2s)],
+#          # ETRGorbo = (1/TauAv[ActPARCorr_photonsm2s == max(ActPARCorr_photonsm2s)])*((ActPARCorr_photonsm2s*FvFm)/(max(ActPARCorr_photonsm2s))*(FvFm[ActPARCorr_photonsm2s == max(ActPARCorr_photonsm2s)])) * us_s,
+#                                                                                     #Pmax x scaling for change in yield and light
+# #relies upon phiPSII which is not absolute in cyanos
+#          JVPSII_ETRtauav_FoSig = ETRCtauav * Fomin/Sigmax, #Sigmax not converted A2_m2
+#          JVPSII_ETRqpOxbo_FoSig = ETRqpOxbo * Fomin/Sigmax,
+#          JVPSII_ETRtauav_aLHII_Sig = ETRCtauav * aLHIIOxbomax/Sigmax,
+#          JVPSII_ETRqpOxbo_aLHII_Sig = ETRqpOxbo * aLHIIOxbomax/Sigmax) %>%
+#   ungroup()
+#        
+#  head(SolFitsTrim2)
+```
+
+Oxborough & Baker 1997 for Fo'
+compare 2 chunks with equations
+```{r estimate parameters}
+
+SolFitsTrimMeta2 <- SolFitsTrimMeta %>%
+  group_by(SourceDataFile, Filename, Project, CultureID, ObsDate, Ex_WL, TempCont) %>%
+  mutate(Sig_m2psii = Sig/A2_m2,
+         
+         Fodark = Fo[1],
+         Fmdark = Fm[1],
+         Sigdark = Sig[1],
+         Sigdark_m2psii = Sigdark/A2_m2,
+         
+         ActPARCorr_photonsm2s = ActPARCorr *  photons_umol, #GIT
+         #ActPAR_photonsm2s = ActPAR *  6.022e17, #Doug
+         
+         TauAv = ((Tau1QA * Alp1QA) + (Tau2QA * Alp2QA))/(Alp1QA + Alp2QA), #GIT
+         #WtTau = ((Alp1QA * Tau1QA) + (Alp2QA * Tau2QA) + (Alp3QA * Tau3QA)), #Doug
+         Ctauav = 1/(1 + (Sig_m2psii * ActPARCorr_photonsm2s * (TauAv/us_s))), #GIT
+         #C_WtTau = 1/(1 + (Sig_m2psii * ActPAR_photonsm2s * (WtTau /us_s))), #Doug
+         #InvWtTau = 1/WtTau, #Doug
+  
+         aLHIIdark = (Fmdark * Fodark)/(Fmdark - Fodark),
+         Fomin = min(Fo, na.rm = TRUE),
+         Fmmax = max(Fm, na.rm = TRUE),
+         Sigmax = max(Sig, na.rm = TRUE),
+         Sigmax_m2psii = Sigmax/A2_m2,
+         
+         FoOxbo = Fomin/(((Fmmax - Fomin)/Fmmax) + (Fomin/Fm)),
+         qpOxbo = (Fm - Fo)/(Fm - FoOxbo),
+         
+         #aLHIIminmax = (Fmmax * Fomin)/(Fmmax - Fomin),
+         aLHIIOxbomax = (Fmmax * FoOxbo)/(Fmmax - FoOxbo),
+
+         #Ctau1 = 1/(1 + (Sig_m2psii * ActPARCorr_photonsm2s * (Tau1QA/us_s))),
+         #Ctau2 = 1/(1 + (Sig_m2psii * ActPARCorr_photonsm2s * (Tau2QA/us_s))),
+         #qp = (Fm - Fo)/(Fm - lead(Fo)), #(Fm' - Fs)/(Fm' - Fo'); messes up every 2nd row from double tap data but then filter out rows from 'dark'
+         
+         #JVPSII_aLHIIminmax = ActPARCorr_photonsm2s * aLHIIminmax * FvFm, #issue with FvFm in cyanobacteria; minimized with blue light excitation
+         #JVPSII_aLHIIdark = ActPARCorr_photonsm2s * aLHIIdark * FvFm,
+         JVPSII_aLHIIOxbomax = ActPARCorr_photonsm2s * aLHIIOxbomax * FvFm,
+         
+         #ETRCtau1 = Sig_m2psii * Ctau1 * ActPARCorr_photonsm2s,
+         #ETRCtau2 = Sig_m2psii * Ctau2 * ActPARCorr_photonsm2s,
+         ETRCtauav = Sig_m2psii * Ctauav * ActPARCorr_photonsm2s,
+         #ETRC_WtTau = Sig_m2psii * C_WtTau * ActPAR_photonsm2s, #Doug
+         #ETRqp = Sig_m2psii * qp * ActPARCorr_photonsm2s,
+         ETRqpOxbo = Sig_m2psii * qpOxbo * ActPARCorr_photonsm2s,
+         #ETRqpOxbo = Sig_m2psii * qpOxbo * ActPAR_photonsm2s, #Doug
+         
+         #ETRGorbo = (1/TauAv[7])*((ActPARCorr*FvFm)/(ActPARCorr[7]*FvFm[7])) * us_s,
+         #TestTauAvSat = 1/TauAv[ActPARCorr_photonsm2s == max(ActPARCorr_photonsm2s)],
+         # ETRGorbo = (1/TauAv[ActPARCorr_photonsm2s == max(ActPARCorr_photonsm2s)])*((ActPARCorr_photonsm2s*FvFm)/(max(ActPARCorr_photonsm2s))*(FvFm[ActPARCorr_photonsm2s == max(ActPARCorr_photonsm2s)])) * us_s,
+                                                                                    #Pmax x scaling for change in yield and light
+#relies upon phiPSII which is not absolute in cyanos
+
+         #JVPSII_ETRC_WtTau = ETRC_WtTau * Fomin/Sigmax * ActPAR_photonsm2s, #Doug
+         #JVPSII_ETRqp = ETRqp * Fomin/Sigmax * ActPAR_photonsm2s, #Doug
+         #JVPSII_ETRqpOxbo = ETRqpOxbo * Fomin/Sigmax * ActPAR_photonsm2s #Doug
+
+
+         JVPSII_ETRtauav_FoSig = ETRCtauav * Fomin/Sigmax_m2psii, #Sigmax converted A2_m2
+         JVPSII_ETRqpOxbo_FoSig = ETRqpOxbo * Fomin/Sigmax_m2psii,
+         JVPSII_ETRtauav_aLHII_Sig = ETRCtauav * aLHIIOxbomax/Sigmax_m2psii,
+         JVPSII_ETRqpOxbo_aLHII_Sig = ETRqpOxbo * aLHIIOxbomax/Sigmax_m2psii) %>%
+  ungroup()
+       
+ head(SolFitsTrim2)
+```
+
+
+
+
+
+
+```{r prelimplots2}
+
+SolFitsTrimMeta2 %>%
+  filter(Dark1s == 0) %>%
+  ggplot() +
+  geom_point(aes(x = ActPAR, y = ETRqpOxbo)) +
+  #geom_line(aes(x = ActPAR, y = ETRqpOxbo)) +
+  #scale_colour_manual(values = Colours_nm) +
+  #facet_grid(cols = vars(Ex_WL), rows = vars(ID)) +
+  facet_grid(cols = vars(Par_ue), rows = vars(Photoperiod)) +
+  theme(strip.text.y = element_text(size = 5, angle=0)) +
+  # scale_y_continuous(sec.axis = sec_axis(~ . , name = "ID", breaks = NULL, labels = NULL)) +
+  # scale_x_continuous(sec.axis = sec_axis(~ . , name = "Ex_WL", breaks = NULL, labels = NULL)) +
+  theme_bw()
+
+SolFitsTrimMeta2 %>%
+  filter(Dark1s == 0) %>%
+  ggplot() +
+  geom_point(aes(x = ActPAR, y = Sig)) +
+  #geom_line(aes(x = ActPAR, y = Sig)) +
+  #scale_colour_manual(values = Colours_nm) +
+  #facet_grid(cols = vars(Ex_WL), rows = vars(ID)) +
+  facet_grid(cols = vars(Par_ue), rows = vars(Photoperiod)) +
+  theme(strip.text.y = element_text(size = 5, angle=0)) +
+  # scale_y_continuous(sec.axis = sec_axis(~ . , name = "ID", breaks = NULL, labels = NULL)) +
+  # scale_x_continuous(sec.axis = sec_axis(~ . , name = "Ex_WL", breaks = NULL, labels = NULL)) +
+  theme_bw()
+
+
+# SolFitsTrimMeta2 %>%
+#   filter(Dark1s == 0) %>%
+#   ggplot() +
+#   geom_point(aes(x = ETRqp, y = ETRqpOxbo)) +
+#   #scale_colour_manual(values = Colours_nm) +
+#   #facet_grid(cols = vars(Ex_WL), rows = vars(ID)) +
+#   facet_grid(cols = vars(Par_ue), rows = vars(Photoperiod)) +
+#   geom_abline(intercept = 0, slope = 1, linetype = "dashed") + 
+#   coord_fixed(ratio = 1) +
+#   theme(strip.text.y = element_text(size = 5, angle=0)) 
+#   # scale_y_continuous(sec.axis = sec_axis(~ . , name = "ID", breaks = NULL, labels = NULL)) +
+#   # scale_x_continuous(sec.axis = sec_axis(~ . , name = "Ex_WL", breaks = NULL, labels = NULL)) 
+
+
+SolFitsTrimMeta2 %>%
+  filter(Dark1s == 0) %>%
+  ggplot() +
+  geom_point(aes(x = Ctauav, y = qpOxbo)) +
+  #scale_colour_manual(values = Colours_nm) +
+  facet_grid(cols = vars(Ex_WL)) +
+  #facet_grid(cols = vars(Par_ue), rows = vars(Photoperiod)) +
+  geom_abline(intercept = 0, slope = 1, linetype = "dashed") + 
+  coord_fixed(xlim = c(0,1), ylim = c(0,1), ratio = 1) +
+  theme(strip.text.y = element_text(size = 5, angle=0)) 
+  # scale_y_continuous(sec.axis = sec_axis(~ . , name = "Strain", breaks = NULL, labels = NULL)) +
+  # scale_x_continuous(sec.axis = sec_axis(~ . , name = "Ex_WL", breaks = NULL, labels = NULL)) 
+
+
+
+SolFitsTrimMeta2 %>%
+  filter(Dark1s == 0) %>%
+  ggplot() +
+  geom_point(aes(x =  JVPSII_aLHIIOxbomax, y = JVPSII_ETRqpOxbo_aLHII_Sig)) +
+  #scale_colour_manual(values = Colours_nm) +
+  geom_abline(intercept = 0, slope = 1, linetype = "dashed") + 
+  #coord_fixed(ratio = 1) +
+  facet_grid(cols = vars(Ex_WL), rows = vars(Strain)) +
+  #facet_grid(cols = vars(Par_ue), rows = vars(Photoperiod)) +
+  theme(strip.text.y = element_text(size = 5, angle=0)) +
+  scale_y_continuous(sec.axis = sec_axis(~ . , name = "Strain", breaks = NULL, labels = NULL)) +
+  scale_x_continuous(sec.axis = sec_axis(~ . , name = "Ex_WL", breaks = NULL, labels = NULL)) 
+
+
+```
+
+```{r fig.height = 6, fig.width = 8, warning = FALSE}
+
+# SolFitsTrimMeta2 %>% 
+#   filter(Dark1s == 0) %>%
+#   filter(Strain == "BA56G" | Strain == "BA77G" | Strain == "BA48R" |Strain == "BA127R") %>% 
+#   ggplot() +
+#   geom_point(aes(x = ActPAR, y = Sig, colour = as.factor(Strain)), show.legend = F) +
+#   scale_colour_discrete(type=c("seagreen4", "palegreen3", "brown1", "brown4")) +
+#   facet_grid(cols = vars(Par_ue), rows = vars(Photoperiod)) +
+#   theme_bw() +
+#   theme(panel.grid.minor = element_blank(),
+#         panel.grid.major = element_blank(),
+#         axis.text = element_text(size=12),
+#         axis.text.x = element_text(size=11),
+#         axis.title = element_text(size=16),
+#         strip.background = element_rect(fill="white"),
+#         strip.text = element_text(size=12),
+#         axis.title.y = element_text(margin=margin(r=10)),
+#         axis.title.x = element_text(margin=margin(t=10)),
+#         legend.background = element_rect(fill="transparent"),
+#         legend.position = c(0.24,0.95),
+#         legend.key.height= unit(0.003, 'cm'),
+#         legend.spacing.y = unit(-0.1, "cm"),
+#         # legend.spacing.x = unit(0.01, 'cm'),
+#         # legend.direction = "vertical", legend.box = "vertical",
+#         legend.title = element_blank(),
+#         legend.text = element_text(size=9))           
+
+```
+
+
+# Save assembled spectra data set
+```{r save Olis}
+
+# saveRDS(SolFitsTrimMeta2, file.path(DataOut, paste(Project, "SolFitsTrimMeta2All.Rds", sep = "_"), fsep = .Platform$file.sep))
+
+```
+
+
+Only light go up for ActPAR - without calibration
+```{r}
+#SolFitsTrimMetaCleanUP<-SolFitsTrimMetaClean 
+  # filter(LR_s == 13 | LR_s ==14 | LR_s ==38 | LR_s ==39| LR_s ==40 | LR_s ==51 | LR_s ==52 |LR_s ==53 | LR_s ==65 |LR_s ==66) %>% 
+  
+    # mutate(Strain=case_when(Strain=="BA127R"~"PE-rich_127",
+    #      Strain=="BA48R"~"PE-rich_048",
+    #     Strain=="BA56G"~"PC-rich_056",
+    #      Strain=="BA77G"~"PC-rich_077")) 
+
+```
+
+FilterData with light calibration
+```{r}
+SolFitsTrimMetaClean30 <- SolFitsTrimMeta2 %>% 
+  filter(Dark1s == 0) %>%
+  filter(Par_ue == 30) %>% 
+  filter(ActPAR == 20) # 39.5 for 445 and 48.7 for 590
+  
+SolFitsTrimMetaClean90 <- SolFitsTrimMeta2 %>% 
+  filter(Dark1s == 0) %>%
+  filter(Par_ue == 90) %>% 
+  filter(ActPAR == 40) # 79.0 for 445 and 97.5 for 590
+
+SolFitsTrimMetaClean180 <- SolFitsTrimMeta2 %>% 
+  filter(Dark1s == 0) %>%
+  filter(Par_ue == 180) %>% 
+  filter(ActPAR == 80) # 158.1 for 445 and 195.0 for 590
+
+SolFitsTrimMetaClean300 <- SolFitsTrimMeta2 %>% 
+  filter(Dark1s == 0) %>%
+  filter(Par_ue == 300) %>% 
+  filter(ActPAR == 160) # 316.2 for 445 and 390.0 for 590
+
+SolFitsTrimMetaClean900 <- SolFitsTrimMeta2 %>% 
+  filter(Dark1s == 0) %>%
+  filter(Par_ue == 900) %>% 
+  filter(ActPAR == 320) # 632.5 for 445 and 780.1 for 590
+
+SolFitsTrimMetaClean<-rbind(SolFitsTrimMetaClean30, SolFitsTrimMetaClean90, SolFitsTrimMetaClean180, SolFitsTrimMetaClean300,SolFitsTrimMetaClean900)
+
+rm(SolFitsTrimMetaClean30, SolFitsTrimMetaClean90, SolFitsTrimMetaClean180, SolFitsTrimMetaClean300,SolFitsTrimMetaClean900)
+
+#colnames(SolFitsTrimMetaClean)
+
+SolFitsTrimMetaClean<-SolFitsTrimMetaClean %>% 
+  select(-c(SourceDataFile, Project))
+
+
+```
+
+convert Sig_m2psii to Sig_nm2psii
+```{r}
+SolFitsTrimMetaClean <- SolFitsTrimMetaClean %>%
+mutate(Sig_nm2psii=Sig_m2psii*1000000000000000000) %>% 
+mutate(Sigdark_nm2psii=Sigdark_m2psii*1000000000000000000)   
+
+```
+
+
+
+Sigma mean
+```{r}
+#colnames(SolFitsTrimMetaCleanUP)
+
+SolFitsTrimMetaClean <- SolFitsTrimMetaClean %>%
+  group_by(CultureID, Ex_WL, ObsDate, Par_ue, Photoperiod, WL, O2) %>%
+
+  summarize(CultureID, Ex_WL, Filename, Run, Strain, InnocDate, ExpDate, Par_ue, Photoperiod, O2, WL, PARPhotonDose, DATE, MDcellsL, meanMDcellsL, sdMDcellsL, TurnerChl_ugL, meanTurnerChl_ugL, sdTurnerChl_ugL,  ObsDate, ObsDateTime, Step_s, Dark1s, ActPAR, ActPARCorr, LR_s, nm445, nm590, nm445Corr, nm590Corr, Fo, Fm, FvFm, Sig, Alp1QA, Tau1QA, Alp2QA, Tau2QA, Alp3QA, Tau3QA, TauAv, Sig_m2psii, Sig_nm2psii, ActPARCorr_photonsm2s, Ctauav, Fodark, Fmdark,  Fomin, Fmmax, Sigdark, Sigdark_m2psii, Sigdark_nm2psii, Sigmax, aLHIIdark, aLHIIOxbomax, FoOxbo, qpOxbo, ETRCtauav, ETRqpOxbo, JVPSII_aLHIIOxbomax, JVPSII_ETRtauav_FoSig, JVPSII_ETRqpOxbo_FoSig, JVPSII_ETRtauav_aLHII_Sig, JVPSII_ETRqpOxbo_aLHII_Sig,
+            
+            meanSig = mean(Sig),
+            sdSig = sd(Sig),
+            meanSig_nm2psii = mean(Sig_nm2psii),
+            sdSig_nm2psii = sd(Sig_nm2psii),
+            meanSigdark_nm2psii = mean(Sigdark_nm2psii),
+            sdSigdark_nm2psii = sd(Sigdark_nm2psii),
+            
+            meanJVPSII_aLHIIOxbomax = mean(JVPSII_aLHIIOxbomax),
+            sdJVPSII_aLHIIOxbomax = sd(JVPSII_aLHIIOxbomax),
+            meanJVPSII_ETRtauav_FoSig = mean(JVPSII_ETRtauav_FoSig),
+            sdJVPSII_ETRtauav_FoSig = sd(JVPSII_ETRtauav_FoSig),
+            meanJVPSII_ETRqpOxbo_FoSig = mean(JVPSII_ETRqpOxbo_FoSig),
+            sdJVPSII_ETRqpOxbo_FoSig = sd(JVPSII_ETRqpOxbo_FoSig),
+            meanJVPSII_ETRtauav_aLHII_Sig = mean(JVPSII_ETRtauav_aLHII_Sig),
+            sdJVPSII_ETRtauav_aLHII_Sig = sd(JVPSII_ETRtauav_aLHII_Sig),
+            meanJVPSII_ETRqpOxbo_aLHII_Sig = mean(JVPSII_ETRqpOxbo_aLHII_Sig),
+            sdJVPSII_ETRqpOxbo_aLHII_Sig = sd(JVPSII_ETRqpOxbo_aLHII_Sig)) %>%
+  ungroup()
+
+SolFitsTrimMetaClean<- SolFitsTrimMetaClean %>%
+group_by(CultureID) %>%
+  arrange(ObsDate) %>%
+  mutate(E_days = as.numeric((ObsDate - ExpDate[1]))) %>%
+ungroup()
+
+SolFitsTrimMetaClean<- SolFitsTrimMetaClean %>%
+  mutate(Time_h = E_days*24)
+
+```
+
+```{r fig.height = 6, fig.width = 8, warning = FALSE}
+
+SolFitsTrimMetaClean %>% 
+  ggplot() +
+  geom_point(aes(x = Par_ue, y = meanSig, colour = as.factor(Strain)), size = 3.5, show.legend = T) +
+  geom_errorbar(aes(x = Par_ue, ymin = meanSig - sdSig, ymax = meanSig + sdSig)) +
+  #geom_point(aes(x = ActPAR, y = Sig, colour = as.factor(Strain)), show.legend = F) +
+  #scale_colour_discrete(type=c("seagreen4", "palegreen3", "brown1", "brown4")) +
+  facet_grid(rows = vars(Ex_WL), cols = vars(Photoperiod)) +
+  theme_bw() +
+  theme(panel.grid.minor = element_blank(),
+        panel.grid.major = element_blank(),
+        axis.text = element_text(size=12),
+        axis.text.x = element_text(size=11),
+        axis.title = element_text(size=16),
+        strip.background = element_rect(fill="white"),
+        strip.text = element_text(size=12),
+        axis.title.y = element_text(margin=margin(r=10)),
+        axis.title.x = element_text(margin=margin(t=10)),
+        legend.background = element_rect(fill="transparent"),
+        legend.position = c(0.08,0.90),
+        legend.key.height= unit(0.003, 'cm'),
+        legend.spacing.y = unit(-0.1, "cm"),
+        # legend.spacing.x = unit(0.01, 'cm'),
+        # legend.direction = "vertical", legend.box = "vertical",
+        legend.title = element_blank(),
+        legend.text = element_text(size=9))           
+
+
+SolFitsTrimMetaClean %>% 
+  filter(Ex_WL == 590) %>% 
+  # filter(PARPhotonDose == 432000 | PARPhotonDose == 864000 | PARPhotonDose == 1944000 | PARPhotonDose == 3888000 | PARPhotonDose == 6480000 | PARPhotonDose == 8640000) %>% 
+  # filter(ExpDay != 1 &  ExpDay != 2 & ExpDay != 3 & ExpDay != 4 & ExpDay != 5) %>%
+  # filter(ExpDay != 14) %>% 
+  ggplot() +
+  geom_point(aes(x = PARPhotonDose, y = meanSig, colour = as.factor(Strain)), size = 3.5, show.legend = F) +
+  geom_errorbar(aes(x = PARPhotonDose, ymin = meanSig - sdSig, ymax = meanSig + sdSig)) +
+  #geom_point(aes(x = ActPAR, y = Sig, colour = as.factor(Strain)), show.legend = F) +
+  scale_colour_discrete(type=c("seagreen4", "palegreen3", "brown1", "brown4")) +
+  # scale_y_continuous(breaks=seq(0, 200, by = 50)) +
+  # coord_cartesian(ylim = c(0, 200)) +
+  facet_grid(rows = vars(Strain)) +
+  #ggh4x::facet_nested(rows = vars(Strain, Ex_WL), cols = vars(Photoperiod), labeller = labeller(Photoperiod = Photoperiod.labs,  Par_ue = Par_ue.labs, WL = WL.labs, O2 = O2.labs, Strain = Strain.labs)) +
+  
+  theme_bw() +
+  theme(panel.grid.minor = element_blank(),
+        panel.grid.major = element_blank(),
+        axis.text = element_text(size=12),
+        axis.text.x = element_text(size=11),
+        axis.title = element_text(size=16),
+        strip.background = element_rect(fill="white"),
+        strip.text = element_text(size=12),
+        axis.title.y = element_text(margin=margin(r=10)),
+        axis.title.x = element_text(margin=margin(t=10)),
+        legend.background = element_rect(fill="transparent"),
+        legend.position = c(0.24,0.95),
+        legend.key.height= unit(0.003, 'cm'),
+        legend.spacing.y = unit(-0.1, "cm"),
+        # legend.spacing.x = unit(0.01, 'cm'),
+        # legend.direction = "vertical", legend.box = "vertical",
+        legend.title = element_blank(),
+        legend.text = element_text(size=9))
+
+
+```
+
+
+
+
+```{r}
+#SolFitsAll <-SolFitsTrimMetaClean %>% 
+#   filter(Strain=="BA127R"| Strain=="BA48R"| Strain=="BA56G"| Strain=="BA77G") %>% 
+#     mutate(Strain=case_when(Strain=="BA127R"~"PE-rich_127",
+#          Strain=="BA48R"~"PE-rich_048",
+#         Strain=="BA56G"~"PC-rich_056",
+#          Strain=="BA77G"~"PC-rich_077"))
+# 
+# SolFitsAll$facetsPhotonDose = factor(SolFitsAll$O2, labels = c("PAR~photon~dose~(µmol~photons~m^{-2}~d^{-1})"))
+# 
+# SolFitsAll$facetsExcitation = factor(SolFitsAll$WL, labels = c("Excitation~(nm)"))
+# 
+# SolFitsAll$facetsStrain = factor(SolFitsAll$WL, labels = c("Strain"))
+
+
+  #labs(y = "Sigma", x = "PAR photon dose ( µmol photons "~m^-2~""~d^-1~")") +
+  #labs(y = "\u03C3 PSII'(m-2)", x = "PAR photon dose ( µmol photons "~m^-2~""~d^-1~")") +
+  #labs(y=expression(paste(sigma,""["PSII"]*"'(m"^"2"*")")), x = "PAR photon dose ( µmol photons "~m^-2~""~d^-1~")") +
+
+```
+
+
+Greek letter :)
+
+\u0391  Α   Greek Capital Letter Alpha
+\u0392  Β   Greek Capital Letter Beta
+\u0393  Γ   Greek Capital Letter Gamma
+\u0394  Δ   Greek Capital Letter Delta
+\u0395  Ε   Greek Capital Letter Epsilon
+\u0396  Ζ   Greek Capital Letter Zeta
+\u0397  Η   Greek Capital Letter Eta
+\u0398  Θ   Greek Capital Letter Theta
+\u0399  Ι   Greek Capital Letter Iota
+\u039A  Κ   Greek Capital Letter Kappa
+\u039B  Λ   Greek Capital Letter Lambda
+\u039C  Μ   Greek Capital Letter Mu
+\u039D  Ν   Greek Capital Letter Nu
+\u039E  Ξ   Greek Capital Letter Xi
+\u039F  Ο   Greek Capital Letter Omicron
+\u03A0  Π   Greek Capital Letter Pi
+\u03A1  Ρ   Greek Capital Letter Rho
+\u03A3  Σ   Greek Capital Letter Sigma
+\u03A4  Τ   Greek Capital Letter Tau
+\u03A5  Υ   Greek Capital Letter Upsilon
+\u03A6  Φ   Greek Capital Letter Phi
+\u03A7  Χ   Greek Capital Letter Chi
+\u03A8  Ψ   Greek Capital Letter Psi
+\u03A9  Ω   Greek Capital Letter Omega
+\u03B1  α   Greek Small Letter alpha
+\u03B2  β   Greek Small Letter beta
+\u03B3  γ   Greek Small Letter gamma
+\u03B4  δ   Greek Small Letter delta
+\u03B5  ε   Greek Small Letter epsilon
+\u03B6  ζ   Greek Small Letter zeta
+\u03B7  η   Greek Small Letter eta
+\u03B8  θ   Greek Small Letter theta
+\u03B9  ι   Greek Small Letter iota
+\u03BA  κ   Greek Small Letter kappa
+\u03BB  λ   Greek Small Letter lambda
+\u03BC  μ   Greek Small Letter mu
+\u03BD  ν   Greek Small Letter nu
+\u03BE  ξ   Greek Small Letter xi
+\u03BF  ο   Greek Small Letter omicron
+\u03C0  π   Greek Small Letter pi
+\u03C1  ρ   Greek Small Letter rho
+\u03C2  ς   Greek Small Letter final sigma
+\u03C3  σ   Greek Small Letter sigma
+\u03C4  τ   Greek Small Letter tau
+\u03C5  υ   Greek Small Letter upsilon
+\u03C6  φ   Greek Small Letter phi
+\u03C7  χ   Greek Small Letter chi
+\u03C8  ψ   Greek Small Letter psi
+\u03C9  ω   Greek Small Letter omega
+
+
+
+
+
+Sigma -> 1s after corresponding light
+
+
+LR_s == 15 (after 20); 28 (after 40); 41 (after 80); 54 (after 160); 67 (after 320); 
+LR_s == 80 (after 160); 93 (after 80); 106 (after 40); 119 (after 20)
+
+1s in dark after corresponding light
+FilterData
+```{r}
+SolFitsTrimMetaDarkafterLight30 <- SolFitsTrimMeta2 %>% 
+  filter(Dark1s == 1) %>%
+  filter(ActPAR == 0) %>% 
+  filter(Par_ue == 30) %>% 
+  filter(LR_s==13|LR_s==14|LR_s==15|LR_s==16|
+         LR_s==118|LR_s==119|LR_s==120|LR_s==112|LR_s==122)
+
+SolFitsTrimMetaDarkafterLight90 <- SolFitsTrimMeta2 %>% 
+  filter(Dark1s == 1) %>%
+  filter(ActPAR == 0) %>% 
+  filter(Par_ue == 90) %>% 
+  filter(LR_s==26|LR_s==27|LR_s==28|LR_s==29|
+         LR_s==105|LR_s==106|LR_s==107|LR_s==108)
+
+SolFitsTrimMetaDarkafterLight180 <- SolFitsTrimMeta2 %>% 
+  filter(Dark1s == 1) %>%
+  filter(ActPAR == 0) %>% 
+  filter(Par_ue == 180) %>% 
+  filter(LR_s==40|LR_s==41|LR_s==42|LR_s==43|
+         LR_s==92|LR_s==93|LR_s==94|LR_s==95)
+
+SolFitsTrimMetaDarkafterLight300 <- SolFitsTrimMeta2 %>% 
+  filter(Dark1s == 1) %>%
+  filter(ActPAR == 0) %>% 
+  filter(Par_ue == 300) %>% 
+  filter(LR_s==53|LR_s==54|LR_s==55|LR_s==56|
+         LR_s==79|LR_s==80|LR_s==81|LR_s==82)
+
+SolFitsTrimMetaDarkafterLight900 <- SolFitsTrimMeta2 %>% 
+  filter(Dark1s == 1) %>%
+  filter(ActPAR == 0) %>% 
+  filter(Par_ue == 900) %>% 
+  filter(LR_s==66|LR_s==67|LR_s==68|LR_s==69)
+
+SolFitsTrimMetaDarkafterLight <- rbind(SolFitsTrimMetaDarkafterLight30, SolFitsTrimMetaDarkafterLight90, SolFitsTrimMetaDarkafterLight180, SolFitsTrimMetaDarkafterLight300, SolFitsTrimMetaDarkafterLight900)
+
+
+
+
+SolFitsTrimMetaDarkafterLight <- SolFitsTrimMetaDarkafterLight %>% 
+  mutate(Sig1s=Sig*1) %>% 
+  mutate(Sig1s_m2psii=Sig_m2psii*1) %>% 
+  select(-c(Sig, Sig_m2psii))
+
+
+#colnames(SolFitsTrimMetaClean)
+
+# SolFitsTrimMetaDarkafterLight<-SolFitsTrimMetaDarkafterLight %>% 
+#   select(-c(SourceDataFile, SampleVol_ul, SolventVol_ul, Reading_rfu, Replicate, Chl_intercept, Chl_slope, Time__mSec, ObsTime, StartExDate))
+
+```
+
+
+
+1s after light
+
+convert Sig1s_m2psii to Sig1s_nm2psii
+```{r}
+SolFitsTrimMetaDarkafterLight <- SolFitsTrimMetaDarkafterLight %>%
+mutate(Sig1s_nm2psii=Sig1s_m2psii*1000000000000000000)    
+
+```
+
+
+Create Sigma1s mean
+ObsDateTime -> (format HMS) problem when I combined "light" data in one df
+
+```{r}
+#colnames(SolFitsTrimMetaCleanUP)
+
+SolFitsTrimMetaDarkafterLight <- SolFitsTrimMetaDarkafterLight %>%
+  group_by(CultureID, Ex_WL, ObsDate, Par_ue, Photoperiod, WL, O2) %>%
+
+  summarize(CultureID, Ex_WL, Filename, Run, Strain, InnocDate, ExpDate, Par_ue, Photoperiod, O2, WL, PARPhotonDose, DATE, MDcellsL, meanMDcellsL, sdMDcellsL, TurnerChl_ugL, meanTurnerChl_ugL, sdTurnerChl_ugL, ObsDate, ObsDateTime, Step_s, Dark1s, ActPAR, ActPARCorr, LR_s, nm445, nm590, nm445Corr, nm590Corr, ActPARCorr_photonsm2s, Sig1s, Sig1s_m2psii, Sig1s_nm2psii, 
+            
+            meanSig1s = mean(Sig1s),
+            sdSig1s = sd(Sig1s),
+            meanSig1s_nm2psii = mean(Sig1s_nm2psii),
+            sdSig1s_nm2psii = sd(Sig1s_nm2psii)) %>%
+  ungroup()
+
+SolFitsTrimMetaDarkafterLight<- SolFitsTrimMetaDarkafterLight %>%
+group_by(CultureID) %>%
+  arrange(ObsDate) %>%
+  mutate(E_days = as.numeric((ObsDate - ExpDate[1]))) %>%
+ungroup()
+
+SolFitsTrimMetaDarkafterLight<- SolFitsTrimMetaDarkafterLight %>%
+  mutate(Time_h = E_days*24)
+
+```
+
+
+
+
+
+```{r}
+# SolFitsTrimMetaDarkafterLightClean <-SolFitsTrimMetaDarkafterLightClean %>% 
+#   filter(Strain=="BA127R"| Strain=="BA48R"| Strain=="BA56G"| Strain=="BA77G") %>% 
+#     mutate(Strain=case_when(Strain=="BA127R"~"PE-rich_127",
+#          Strain=="BA48R"~"PE-rich_048",
+#         Strain=="BA56G"~"PC-rich_056",
+#          Strain=="BA77G"~"PC-rich_077"))
+# 
+# SolFitsTrimMetaDarkafterLightClean$facets = factor(SolFitsTrimMetaDarkafterLightClean$O2, labels = c("PAR~photon~dose~(µmol~photons~m^{-2}~d^{-1})"))
+# 
+# SolFitsTrimMetaDarkafterLightClean$facetsExcitation = factor(SolFitsTrimMetaDarkafterLightClean$WL, labels = c("Excitation~(nm)"))
+# 
+# SolFitsTrimMetaDarkafterLightClean$facetsStrain = factor(SolFitsTrimMetaDarkafterLightClean$WL, labels = c("Strain"))
+# 
+# SolFitsTrimMetaDarkafterLightClean$facetsPhotoperiod = factor(SolFitsTrimMetaDarkafterLightClean$WL, labels = c("Photoperiod~(h)"))
+```
+
+
+```{r fig.height = 8, fig.width = 8, warning = FALSE}
+
+
+SolFitsTrimMetaDarkafterLight %>% 
+  ggplot() +
+  geom_point(aes(x = PARPhotonDose, y = meanSig1s, colour = as.factor(Par_ue), shape = as.factor(Photoperiod)), size = 3.5, show.legend = T) +
+
+  # scale_shape_manual(values = c(15, 16, 17,18), name="", labels = lab1) +
+  # scale_colour_manual(values = c("darkslategray", "lightblue4", "hotpink4", "indianred3", "orange1"), name="", labels = lab2) +
+  #scale_colour_discrete(type=c("seagreen4", "palegreen3", "brown1", "brown4")) +
+  #labs(y = "Sigma (1s darknes after light)", x = "PAR photon dose ( µmol photons "~m^-2~""~d^-1~")") +
+  # scale_y_continuous(breaks=seq(0, 1000, by = 200)) +
+  # coord_cartesian(ylim = c(0, 1000)) +
+  #scale_x_continuous(label=scientific_10) +
+  # scale_x_continuous(breaks=seq(50, 200, by = 50)) +
+  # coord_cartesian(xlim = c(50, 200)) +
+  #facet_grid(cols = vars(PARPhotonDose), rows = vars(Ex_WL), scale="free_y") +
+  ggh4x::facet_nested(cols = vars(Ex_WL), rows = vars(Strain), labeller = label_parsed) +
+  #ggh4x::facet_nested(rows = vars(Strain, Ex_WL), cols = vars(Photoperiod), labeller = labeller(Photoperiod = Photoperiod.labs,  Par_ue = Par_ue.labs, WL = WL.labs, O2 = O2.labs, Strain = Strain.labs)) +
+  
+  theme_bw() +
+  theme(panel.grid.minor = element_blank(),
+        panel.grid.major = element_blank(),
+        axis.text = element_text(size=12),
+        axis.text.x = element_text(size=11),
+        axis.title = element_text(size=16),
+        strip.background = element_rect(fill="white"),
+        strip.text = element_text(size=12),
+        axis.title.y = element_text(margin=margin(r=10)),
+        axis.title.x = element_text(margin=margin(t=10)),
+        legend.background = element_rect(fill="transparent"),
+        legend.position = c(0.44,0.89),
+        legend.key.height= unit(0.003, 'cm'),
+        legend.spacing.y = unit(-0.1, "cm"),
+        legend.spacing.x = unit(-0.1, 'cm'),
+        # legend.direction = "vertical", legend.box = "vertical",
+        legend.title = element_blank(),
+        legend.text = element_text(size=9))
+
+```
+Co0mbine sigma, sigmadark and Sig1s after light- more problems than benefits -> very long df and then need to be filtered separately for sig in light, dark, and sig1s after light 
+```{r}
+# SolFitsTrimMetaCleanAll<-SolFitsTrimMetaClean %>% 
+#   left_join(., SolFitsTrimMetaDarkafterLight, by = c("CultureID"="CultureID", "Ex_WL"="Ex_WL", "Filename"="Filename", "Run"="Run", "Strain"="Strain", "InnocDate"="InnocDate", "ExpDate"="ExpDate", "Par_ue"="Par_ue", "Photoperiod"="Photoperiod", "O2"="O2", "WL"="WL", "PARPhotonDose"="PARPhotonDose", "ObsDate"="ObsDate", "E_days"="E_days", "Time_h"="Time_h")) %>% 
+#   unique()
+# 
+# 
+# SolFitsTrimMetaCleanAll<-SolFitsTrimMetaClean %>% 
+#   left_join(., SolFitsTrimMetaDarkafterLight, by = c("CultureID"="CultureID", "Ex_WL"="Ex_WL", "Filename"="Filename", "Run"="Run", "Strain"="Strain", "InnocDate"="InnocDate", "ExpDate"="ExpDate", "Par_ue"="Par_ue", "Photoperiod"="Photoperiod", "O2"="O2", "WL"="WL", "PARPhotonDose"="PARPhotonDose", "DATE"="DATE", "MDcellsL"="MDcellsL", "meanMDcellsL"="meanMDcellsL", "sdMDcellsL"="sdMDcellsL", "TurnerChl_ugL"="TurnerChl_ugL", "meanTurnerChl_ugL"="meanTurnerChl_ugL", "sdTurnerChl_ugL"="sdTurnerChl_ugL", "ObsDate"="ObsDate", "Step_s"="Step_s", "Dark1s"="Dark1s", "ActPAR"="ActPAR", "ActPARCorr"="ActPARCorr", "LR_s"="LR_s", "nm445"="nm445", "nm590"="nm590", "nm445Corr"="nm445Corr", "nm590Corr"="nm590Corr", "ActPARCorr_photonsm2s"="ActPARCorr_photonsm2s", "E_days"="E_days", "Time_h"="Time_h"))
+
+
+#"ObsDateTime"="ObsDateTime", 
+```
+
+
+# Save assembled spectra data set
+```{r save Olis}
+
+saveRDS(SolFitsTrimMetaClean, file.path(DataOut, paste(Project, "SySlWWPhotoperiodAll.Rds", sep = "_"), fsep = .Platform$file.sep))
+
+
+saveRDS(SolFitsTrimMetaDarkafterLight, file.path(DataOut, paste(Project, "SySlWWPhotoperiodAllDarkafterLight.Rds", sep = "_"), fsep = .Platform$file.sep))
+
+```
+
+
+
+Example of plot with greek letters
+```{r}
+
+# ggplot(data = iris, aes(x=Sepal.Length,y=Sepal.Width)) +
+#   geom_point(col="red",size=1.5)+  
+#   geom_smooth(method="lm", se=TRUE) +
+#   labs(title=expression(Rate~of~decay~vs~tau^2),
+#        subtitle=paste("Water Correlation Coefficient :"),
+#        #y=expression(paste("R"["2obs"]*"(ms"^"-1"*")")), x=expression(paste(tau^2, (ms^2)))) +
+# 
+#   #y=expression(paste("sigma"["PSII"]*"'(m"^"2"*")")), x=expression(paste(sigma, PSII(m^2)))) +
+#      y=expression(paste(sigma,""["PSII"]*"'(m"^"2"*")")), x=expression(paste(sigma, PSII(m^2)))) +
+#   
+#   theme_bw()
+
+```

@@ -722,3 +722,87 @@ colnames(SolFitsMeta)
 ```{r}
 colnames(SolFitsMetaDarkafterLight)
 ```
+
+
+
+Oxborough & Baker 1997 for Fo'
+
+Oxborough, K., & Baker, N. R. (1997). Resolving chlorophyll a fluorescence images of photosynthetic efficiency into photochemical and non-photochemical components–calculation of qP and Fv-/Fm-; without measuring Fo. Photosynthesis research, 54, 135-142.
+
+Oxborough, K., & Baker, N. R. (1997). An instrument capable of imaging chlorophyll a fluorescence from intact leaves at very low irradiance and at cellular and subcellular levels of organization. Plant, Cell & Environment, 20(12), 1473-1483.
+
+Oxborough, K., Moore, C. M., Suggett, D. J., Lawson, T., Chan, H. G., & Geider, R. J. (2012). Direct estimation of functional PSII reaction center concentration and PSII electron flux on a volume basis: a new approach to the analysis of Fast Repetition Rate fluorometry (FRRf) data. Limnology and Oceanography: Methods, 10(3), 142-154.
+
+Suggett, D. J., Moore, C. M., Oxborough, K., & Geider, R. J. (2006). Fast repetition rate (FRR) chlorophyll a fluorescence induction measurements. West Molesey: Chelsea Technologies Group, 1-53.
+
+
+
+
+Berge, J., Grant, S., Bjørgum, R., Cohen, J. H., McKee, D., Johnsen, G., Zolich, A., Kopec, T. P., Vogedes, D. L., UiT The Arctic University of Norway (2021).Time series (2017) of irradiance in the PAR (photosynthetically active radiation) region measured under the dome of a light observatory in the Arctic  (Ny-Ålesund, Svalbard, Norway) derived from an USSIMO spectroradiometer [Data set]. Norstore. https://doi.org/10.11582/2021.00040
+
+https://archive.norstore.no/pages/public/datasetDetail.jsf?id=10.11582/2021.00040
+
+PAR is approximated as an integral of micromolespersec=(uirr/(h*c/(lambda*1e-9)))/microavo for wavelengths(lambda) in range from 400 to 700nm, where: uirr = USSIMO irradiance for wavelength equal to lambda, h=6.63e-34 [Js], c=3.00e+08 [m/s], microavo=6.022e17.
+
+
+
+
+
+Fast Repetition Rate fluorometry (FRRf, Kolber et al. 1998) 
+
+σPSII - Effective absorption cross section of PSII photochemistry in darkness -> A2 (quanta)-1 or m2
+ρ - Connectivity between PSII reaction centres in darkness
+
+σPSII′ - Effective absorption cross section of PSII photochemistry under actinic light -> A2 (quanta)-1 or m2
+ρ′ - Connectivity between PSII reaction centres under actinic light
+
+TauPSII - Minimum turnover time of PSII photochemistry -> s-1
+
+F0 or F0’ (Minimum fluorescence in darkness or Minimum fluorescence under actinic light)
+Fm or Fm’ (Maximum fluorescence in darkness or Maximum fluorescence under actinic light)
+F’ (or Fs; Steady state fluorescence at any point)
+Fv = Fm-F0 (Variable fluorescence in darkness)
+Fv’ = Fm’-F0’ (Variable fluorescence under actinic light)
+Fq′ = (Fm′ - F′) (Difference between Fm′ and F′)
+
+Fv/Fm = (Fm-F0)/Fm (The maximum PSII quantum yield/Maximum photochemical efficiency)
+Fv’/Fm’ = (Fm’- F0’)/Fm’ (Maximum PSII efficiency under actinic light)
+
+ΦPSII = (Fm’- F’)/Fm’ = Fq′/Fm′ (Photochemical efficiency under actinic light)
+
+qP = (Fm’- F’)/(Fm’-F0’) = (Fm′ - F′)/Fv′ = Fq′/Fv′ (PSII efficiency factor under actinic light; photochemical quenching coefficient) 
+
+NPQ =(Fm-Fm’)/Fm’ (Non-photochemical quenching coefficien)
+
+
+ETR = PPFD * aPSII * PSII photochemical efficiency (ΦPSII)
+
+ETR^RCII = PPFD * σPSII * Fq′/Fm′ (or ΦPSII) * 21.683
+
+ETR^chl = PPFD * σPSII * n PSII * Fq′/Fm′ (or ΦPSII) * 21.683
+
+
+FRR fluorescence provides a direct measure of light absorption per unit PSII reaction centres (σPSII).
+
+ETR, called the relative electron transport rate, is the product of the effective photochemical yield of
+PSII (ΦPSII) and photosynthetic photon flux density
+
+ETR^RCII(chl) - RCII (Chlorophyll a)-normalised rate of electron transfer by PSII -> mol e- g chla-1 h-1
+
+ETR^chl is the chlorophylla-specific rate of electron transfer (mol e- mol chla-1 h-1 ).
+
+PPFD (=E) - Photosynthetically active photon flux density -> μmol m-2 s-1
+
+a^chlPSII - a^chl only used for PSII photochemistry -> m2 mg chla-1
+
+(factor 21.683 converts seconds to hours, μmol e- to mol e- and A2 quanta-1 to m2 mol RCII-1)
+
+nPSII - photosynthetic unit size of PSII
+
+JVPSII - PSII flux per unit volume -> electrons m–3 s–1
+
+[RCII] - concentration of functional PS II reaction centers -> m-3
+
+aLHII - LHII (light harvesting complex II) absorption coefficient -> m-1
+
+
