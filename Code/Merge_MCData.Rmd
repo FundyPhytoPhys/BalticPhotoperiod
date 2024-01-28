@@ -42,8 +42,6 @@ Merge_MCData.Rmd reads in all individually processed MultiCulti runs from the "/
 
 # Load Libraries and set project variables
 ```{r load libraries, message= TRUE}
-# libraries; Note check actual dependencies
-
 # library(lubridate)
 library(broom)
 library(knitr)
@@ -348,7 +346,15 @@ remove(LogFitsData)
 
 # Save Long DF for GAM and Nested for further analysis 
 ```{r save files}
-
 saveRDS(object = MCGrowthFits, file = file.path(DataOut, paste(Project, "Cleaned_MCData.Rds",  sep = "_")), ascii = FALSE, version = NULL, compress = "xz", refhook = NULL)
-
 ```
+
+# Variable names used in Data Dictionary
+
+```{r}
+colnames(MCGrowthFits)
+```
+
+
+
+

@@ -14,8 +14,8 @@ editor_options:
     wrap: 72
 ---
 
-
 ## Set Chunk Options
+
 ```{r setup, include = FALSE}
 knitr::opts_chunk$set(echo = TRUE, message = FALSE)
 knitr::opts_chunk$set(fig.path='Figs/')
@@ -30,6 +30,8 @@ Process_MCData.Rmd processes and combines all .Rds from Data/ImportedData/Import
 20220107_PICO_MC257_RUN44_ProcessDataNestGrowth.Rds, 
 20220113_PICO_MC247_RUN45_ProcessDataNestGrowth.Rds, 
 20220122_PICO_MC257_RUN46_ProcessDataNestGrowth.Rds, 
+20220206_PICO_MC257_RUN50_ProcessDataNestGrowth.Rds, 
+20220405_PICO_MC247_RUN60_ProcessDataNestGrowth.Rds, 
 20220405_PICO_MC247_RUN60_ProcessDataNestGrowth.Rds, 
 20220410_PICO_MC257_RUN62_ProcessDataNestGrowth.Rds, 
 20220420_PICO_MC257_RUN65_ProcessDataNestGrowth.Rds, 
@@ -43,10 +45,7 @@ This .Rmd implements logistic growth curve fits to MultiCulti growth trajectorie
 # Load Libraries and set project variables
 Run only first time in session
 
-
 ```{r load libraries}
-# libraries; Note check actual dependencies
-
 library(lubridate)
 library(broom)
 library(knitr)
@@ -54,10 +53,9 @@ library(zoo)
 library(minpack.lm)
 library(photobiologyWavebands)
 library(tidyverse)
-
 ```
 
-Run only first time in session
+# Run only first time in session
 
 ```{r set project variables}
 #"..", takes up a level in the directory path
@@ -107,7 +105,6 @@ Run only first time in session
 
 ```{r previously processed files}
 list.files(path = DataOut, pattern = Project, full.names = TRUE)
-
 ```
 
 # List available tidied, organized .Rds files of MultiCulti data.
@@ -116,7 +113,6 @@ Exported from runs of MultiDataImport.Rmd Run only first time in session
 
 ```{r list tidied data files}
 list.files(path = DataIn, pattern = Project, full.names = TRUE)
-
 ```
 
 # Select and Read ProcessFile
@@ -134,29 +130,25 @@ ProcessFileName
 ProcessData <- readRDS(ProcessFile)  %>%
   ungroup()
 
-colnames(ProcessData)
+# colnames(ProcessData)
 ```
 
 SS120 show anomalous jump in OD720 within first 24 h after inoculation.
 Therefore we add a filter to remove the first InitialTime  from all SS120 runs.
-```{r filter initial data  ProcessData}
 
+```{r filter initial data  ProcessData}
 # ProcessData <- ProcessData %>%
 #   filter(Strain == "SS120" & time >= InitialTime |
 #          Strain == "MIT9313" |
 #          Strain =="MED4"  )
-
 ```
 
 ```{r remove problem tube}
-
 # ProcessData <- ProcessData %>%
 #   filter(Tube !=4)
-
 ```
 
 ```{r filter time tube specific}
-
 # ProcessData <- ProcessData %>%
 #   filter(Tube == 1 |
 #          Tube == 2 |
@@ -166,15 +158,12 @@ Therefore we add a filter to remove the first InitialTime  from all SS120 runs.
 #          Tube == 6 |
 #          Tube == 7 |
 #          Tube == 8 )
-
-
 ```
 
 
 Add deltaOD columns; filter for failed ln; add lognorm columns; add lagseed for each tube
+
 ```{r add columns for fitting}
-
-
 ProcessData <- ProcessData %>%
   mutate(deltaOD = OD680 - OD720) %>%
   filter(!is.infinite(log(OD720))) %>%
@@ -199,13 +188,9 @@ ProcessData <- ProcessData %>%
          LagSeeddeltaOD = time[which.min(rollmeandeltaOD)]
          ) %>%
   ungroup()
-
-
 ```
 
-
 ```{r add min and max meanOD}
-
 ProcessData <- ProcessData %>%
   group_by(Tube) %>%
    mutate(minRollMeanOD720 = min(rollmeanOD720, na.rm = TRUE),
@@ -213,35 +198,28 @@ ProcessData <- ProcessData %>%
           maxRollMeanOD720 = max(rollmeanOD720, na.rm = TRUE),
           maxRollMeandeltaOD = max(rollmeandeltaOD, na.rm = TRUE)) %>% 
   ungroup()
-
-glimpse(ProcessData)
-
+# glimpse(ProcessData)
 ```
 
 # Generate a plot of the data in the selected tidied MultiCulti file.
 # Remember data has been filtered to remove first InitialTime h after start of Multiculti program, which is actually InitialTime + ~18 h after inoculation.
 
 ```{r prelim ProcessPlot}
-
 ProcessData %>%
   ggplot() +
   geom_point(aes(x = time, y = OD720), size = 0.1) +
-  #geom_point(aes(x = time, y = Actinic_par/1000, colour = as.factor(WL)), size = 0.05) +
-   geom_vline(aes(xintercept = 1 * 24), linetype = "dashed") + 
+  geom_vline(aes(xintercept = 1 * 24), linetype = "dashed") + 
   scale_colour_manual(values = MCMIXColours) +
   facet_grid(rows = vars(O2), cols = vars(as.factor(Tube), Strain, Par_ue)) +
   theme_bw()
 
 ProcessData %>%
- # filter(Tube == 1) %>%
   ggplot() +
   geom_point(aes(x = time, y = deltaOD), size = 0.1) +
-   geom_vline(aes(xintercept = 1 * 24), linetype = "dashed") + 
-  #geom_point(aes(x = time, y = Actinic_par/100, colour = as.factor(WL)), size = 0.05) +
+  geom_vline(aes(xintercept = 1 * 24), linetype = "dashed") + 
   scale_colour_manual(values = MCMIXColours) +
   facet_grid(rows = vars(O2), cols = vars(as.factor(Tube), Strain, Par_ue)) +
   theme_bw()
-
 ```
 
 # For split files only; select the interval that covers before the change in actinic light
@@ -270,8 +248,7 @@ ProcessData <- ProcessData %>%
             "DeclineFlagOD720")) %>%
   ungroup()
 
-glimpse(ProcessData)
-
+# glimpse(ProcessData)
 ```
 
 
@@ -422,16 +399,14 @@ remove(ProcessDataNestGrowth2)
 ```
 
 ```{r}
-glimpse(ProcessDataNestGrowth)
+#glimpse(ProcessDataNestGrowth)
 ```
 
 # Save .Rds of ProcessDataNestGrowth containing logistic fits of growth data from time resolved and whole interval fits.
 This .Rds is the substrate for the 'MultiDataGrowthAssessPico.Rmd to compare information across multiple runs.
+
 ```{r save rds}
-
  saveRDS(object = ProcessDataNestGrowth, file = file.path(DataOut, paste(ProcessFileName,  "ProcessDataNestGrowth.Rds",  sep = "_")), ascii = FALSE, version = NULL, compress = "xz", refhook = NULL)
-
-
 ```
 
 # Variable names used in Data Dictionary
@@ -439,143 +414,5 @@ This .Rds is the substrate for the 'MultiDataGrowthAssessPico.Rmd to compare inf
 ```{r}
 colnames(ProcessDataNestGrowth)
 ```
-
-
-
-
-
-
-
-
-
-
-```{r plot logistics predictions}
-#improve with automated annotate placement based upon data traces; difficulty is that data is nested until expansion for ggplot b/c we need to conserve memory so data traces are not easily accessible
-# segmentYstart <- as.numeric(IntervalDataTube1[IntervalDataTube1$time == 52, "lnOD680"])
-# segmentYend <- as.numeric(IntervalDataTube1[IntervalDataTube1$time == 54, "lnOD680"])
-
-OD_x = 7
-OD_y = 0.15
-
-Par_x = 15
-Par_y = 0.04
-
-Resid_x = 3
-Resid_y = -0.03
-
-Predict_x = 4
-Predict_y = 0.06
-
-# #predictions of condition specific fits
-ProcessDataNestGrowth %>%
-#drop_na(OD720_logistic) %>%
-  mutate(OD720_logistic_predict = map(OD720_logistic, possibly(augment, otherwise = NULL))) %>%
-  unnest(cols = c(tubedata, OD720_logistic_predict),names_sep = "_", keep_empty = TRUE) %>%
-  ggplot() +
-  geom_point(aes(x = tubedata_time, y = tubedata_OD720), colour = "darkgreen", size = 0.1) +
-  scale_colour_manual(values = MCMIXColours) +
-  geom_point(aes(x = tubedata_time, y = OD720_logistic_predict_.fitted), colour = "black", size = 0.1) +
-  geom_point(aes(x = tubedata_time, y = OD720_logistic_predict_.resid), colour = "gold", size = 0.05) +
-  geom_point(aes(x = tubedata_time, y = tubedata_Actinic_par/10000, colour = as.factor(WL)), size = 0.05, alpha = 0.1) +
-  #coord_cartesian(xlim = c(-5, 675)) +
-#scale_x_continuous(breaks=seq(0, 25, by = 5)) +
-  facet_grid(rows = vars(O2), cols = vars(Tube, WL, Par_ue, Strain, Photoperiod)) +
-  labs(subtitle = "OD720 Logistic:  Tube; Growth Light (nm; µE); Strain; Photoperiod", caption = ProcessFileName, y = "Optical Density (OD720)", x = "Elapsed Time (h)") +
-  theme_bw() +
-  labs(colour = "Actinic PAR (nm)")+
-  guides(colour = guide_legend(override.aes = list(size = 3,  alpha = 1)))
-
-
-ProcessDataNestGrowth %>%
-  mutate(deltaOD_logistic_predict = map(deltaOD_logistic, possibly(augment, otherwise = NULL))) %>%
-  unnest(cols = c(tubedata, deltaOD_logistic_predict),names_sep = "_", keep_empty = TRUE) %>%
-  ggplot() +
-  geom_point(aes(x = tubedata_time, y = tubedata_deltaOD), colour = "darkgreen", size = 0.1) +
-  scale_colour_manual(values = MCMIXColours) +
-  geom_point(aes(x = tubedata_time, y = deltaOD_logistic_predict_.fitted), colour = "black", size = 0.1) +
-  geom_point(aes(x = tubedata_time, y = deltaOD_logistic_predict_.resid), colour = "gold", size = 0.05) +
-  geom_point(aes(x = tubedata_time, y = tubedata_Actinic_par/10000, colour = as.factor(WL)), size = 0.05, alpha = 0.1) +
-  #coord_cartesian(xlim = c(-5, 675)) +
-  #scale_x_continuous(breaks=seq(0, 675, by = 125)) +
-  facet_grid(rows = vars(O2), cols = vars(Tube, WL, Par_ue, Strain, Photoperiod)) +
-  labs(subtitle = "DeltaOD Logistic:   Tube; Growth Light (nm; µE); Strain; Photoperiod", caption = ProcessFileName, y = "Delta Optical Density (deltaOD)", x = "Elapsed Time (h)") +
-  theme_bw() +
-  labs(colour = "Actinic PAR (nm)")+
-  guides(colour = guide_legend(override.aes = list(size = 3,  alpha = 1)))
-
-
-# ProcessDataNestGrowth %>%
-#   filter(Tube == 5) %>%
-#   mutate(OD720_logistic_predict = map(OD720_logistic, possibly(augment, otherwise = NULL))) %>%
-#   unnest(cols = c(tubedata, OD720_logistic_predict),names_sep = "_") %>%
-#   ggplot() +
-#   geom_point(aes(x = tubedata_time, y = tubedata_OD720), colour = "darkgreen", size = 0.1) +
-#   scale_colour_manual(values = MCMIXColours) +
-#   geom_point(aes(x = tubedata_time, y = OD720_logistic_predict_.fitted), colour = "black", size = 0.1) +
-#   geom_point(aes(x = tubedata_time, y = OD720_logistic_predict_.resid), colour = "gold", size = 0.05, alpha = 0.5) +
-#   geom_point(aes(x = tubedata_time, y = tubedata_Actinic_par/10000, colour = as.factor(WL)), size = 0.01, alpha = 0.1) +
-#   #coord_cartesian(xlim = c(0, 675)) +
-#   #scale_x_continuous(breaks=seq(0, 675, by = 125)) +
-#   facet_grid(rows = vars(O2), cols = vars(Tube, WL, Par_ue, Strain, Photoperiod)) +
-#   annotate(geom = "text", x = OD_x, y = OD_y, label = "OD720", size = 5, colour = "darkgreen") +
-#   annotate(geom = "text", x = Par_x, y = Par_y, label = "Light level", size = 5, colour = "darkblue") +
-#   annotate(geom = "text", x = Resid_x, y = Resid_y, label = "Model residuals", size = 5, colour = "red") +
-#   annotate(geom = "text", x = Predict_x, y = Predict_y, label = "Logistic Regression", size = 5, colour = "black") +
-#   labs(subtitle = "Tube; Growth Light (nm; µE); Strain; Photoperiod", caption = ProcessFileName , y = "Optical Density (OD720)", x = "Elapsed Time (h)") +
-#   theme_bw() +
-#   labs(colour = "Actinic PAR (nm)") +
-#   guides(colour = guide_legend(override.aes = list(size = 3,  alpha = 1)))
-
-
-```
-
-
-```{r exclude poor fits}
-# TestProcessDataNestGrowth %>%
-#   filter(Tube != 4)
-```
-
-
-Plot all Fit Terms vs. conditions- no filters
-```{r plot all}
-ProcessDataNestGrowth %>%
- unnest(cols = c(OD720_logistic_tidied),names_sep = "_") %>%
-  select(c(Filename, Tube, Strain, Par_ue, Photoperiod, Temp_c, O2, WL, LightShape, OD720_logistic_tidied_term, OD720_logistic_tidied_estimate, OD720_logistic_tidied_std.error)) %>%
-  pivot_wider(names_from =  OD720_logistic_tidied_term, values_from = c(OD720_logistic_tidied_estimate, OD720_logistic_tidied_std.error), names_sep = "_") %>%
-  rename(OD720_Lmax = OD720_logistic_tidied_estimate_Lmax,
-         OD720_Lmax_se = OD720_logistic_tidied_std.error_Lmax,
-         OD720_Lmu = OD720_logistic_tidied_estimate_Lmu,
-         OD720_Lmu_se = OD720_logistic_tidied_std.error_Lmu,
-         OD720_Lintercept = OD720_logistic_tidied_estimate_Lintercept,
-         OD720_Lintercept_se = OD720_logistic_tidied_std.error_Lintercept) %>%
-  ggplot() +
-  geom_point(aes(x = Par_ue, y = OD720_Lmu, colour = as.factor(WL))) +
-  geom_errorbar(aes(x = Par_ue, ymin = OD720_Lmu - OD720_Lmu_se, ymax = OD720_Lmu + OD720_Lmu_se, colour = as.factor(WL))) +
-  scale_colour_manual(values = MCMIXColours) +
-  facet_grid (cols = vars(Strain), rows = vars(O2)) +
-  theme_bw() +
-  labs(title = "Logistic cell Specific Growth Rate - All data")
-
-ProcessDataNestGrowth %>%
- unnest(cols = c(deltaOD_logistic_tidied),names_sep = "_") %>%
-  select(c(Filename, Tube, Strain, Par_ue, Photoperiod, Temp_c, O2, WL, LightShape, deltaOD_logistic_tidied_term, deltaOD_logistic_tidied_estimate, deltaOD_logistic_tidied_std.error)) %>%
-  pivot_wider(names_from =  deltaOD_logistic_tidied_term, values_from = c(deltaOD_logistic_tidied_estimate, deltaOD_logistic_tidied_std.error), names_sep = "_") %>%
-  rename(deltaOD_Lmax = deltaOD_logistic_tidied_estimate_Lmax,
-         deltaOD_Lmax_se = deltaOD_logistic_tidied_std.error_Lmax,
-         deltaOD_Lmu = deltaOD_logistic_tidied_estimate_Lmu,
-         deltaOD_Lmu_se = deltaOD_logistic_tidied_std.error_Lmu,
-         deltaOD_Lintercept = deltaOD_logistic_tidied_estimate_Lintercept,
-         deltaOD_Lintercept_se = deltaOD_logistic_tidied_std.error_Lintercept) %>%
-  ggplot() +
-  geom_point(aes(x = Par_ue, y = deltaOD_Lmu, colour = as.factor(WL))) +
-  geom_errorbar(aes(x = Par_ue, ymin = deltaOD_Lmu - deltaOD_Lmu_se, ymax = deltaOD_Lmu + deltaOD_Lmu_se, colour = as.factor(WL))) +
-  scale_colour_manual(values = MCMIXColours) +
-  facet_grid (cols = vars(Strain), rows = vars(O2)) +
-  theme_bw() +
-  labs(title = "Logistic chlorophyll specific - All data")
-
-```
-
-
 
 
