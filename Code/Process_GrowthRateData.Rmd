@@ -28,7 +28,7 @@ knitr::opts_chunk$set(fig.path='Figs/')
 
 # Introduction
 
-Process_GrowthRateData.Rmd processes and combines PICO_NestedFitsData.Rds from Data/CleanData/CleanedMCData folder and BalticPhotoperiod_Processed_OlisSpectraTidy.Rds from Data/ProcessedData/ProcessedOlisJazData. This .Rmd generates BalticPhotoperiod_Processed_GrowthRate.Rds (stored in Data/ProcessedData/ProcessesGrowthRateData folder) and GrowthRate_Plot.png (stored in Output/Plots folder).
+Process_GrowthRateData.Rmd processes and combines PICO_Cleaned_MCData.Rds from Data/CleanedData/CleanedMCData folder and both BalticPhotoperiod_Processed_PigmentsAll.Rds and BalticPhotoperiod_Processed_PigmentsExp.Rds from Data/ProcessedData/ProcessedPigmentsData. This .Rmd generates BalticPhotoperiod_Processed_GrowthRateAll.Rds (stored in Data/ProcessedData/ProcessesGrowthRateData folder) and 2 plots (stored in Output/Figures folder).
 
 # Load Libraries and set Project Variables
 
@@ -202,88 +202,6 @@ MCGrowthRateAll$facetsStrain <- 'Strain'
 MCGrowthRateAll$facetsPARPhotonDose_day <- "PAR~photon~dose~(10^{5}~µmol~photons~m^{-2}~d^{-1})"
 
 rm(PigmentAll, PigmentExp, MCGrowthRate)
-```
-
-# Load tmaxAG catalog 
-
-```{r}
-# gs4_deauth()
-# tmaxAG<- read_sheet("https://docs.google.com/spreadsheets/d/1ksY7xlg9wOsICOBRmZkHPKdd9KOislNwPDzyuJ3UIUI/edit#gid=0")
-# as.data.frame(tmaxAG)
-# tmaxAG <- tmaxAG
-# 
-# tmaxAG<-tmaxAG %>% 
-#   mutate(Par_ue = as.numeric(Par_ue)) %>%
-#   mutate(Photoperiod = as.numeric(Photoperiod)) %>%
-#   mutate(tMaxAG = as.numeric(tMaxAG)) %>%
-#   mutate(dayRound_tmaxAG=tMaxAG/24) %>% 
-#   mutate(dayRound_tmaxAG = round(dayRound_tmaxAG, digits = 0)) %>% 
-#   mutate(Strain=case_when(Strain=="BA127R"~"PE-rich_127",
-#          Strain=="BA48R"~"PE-rich_048",
-#         Strain=="BA56G"~"PC-rich_056",
-#          Strain=="BA77G"~"PC-rich_077"))
-# 
-# tmaxAG$facetsPar_ue = factor(tmaxAG$O2, labels = c("PAR~(µmol~photons~m^{-2}~s^{-1})"))
-# tmaxAG$facetsPhotoperiod = factor(tmaxAG$WL, labels = c("Photoperiod~(h)"))
-# tmaxAG$facetsStrain = factor(tmaxAG$O2, labels = c("Strain"))
-# tmaxAG$facetsPARPhotonDose_day = factor(tmaxAG$WL, labels = c("PAR~photon~dose~(10^{5}~µmol~photons~m^{-2}~d^{-1})"))
-```
-
-```{r select revelant columns}
-# tMaxAGLines_056<-tmaxAG %>% 
-#   filter(Strain == "PC-rich_056") %>% 
-#   dplyr::select(c(Par_ue, Photoperiod, tMaxAG)) %>% 
-#   unique()
-# tMaxAGLines_077<-tmaxAG %>% 
-#   filter(Strain == "PC-rich_077") %>% 
-#   dplyr::select(c(Par_ue, Photoperiod, tMaxAG)) %>% 
-#   unique()
-# tMaxAGLines_048<-tmaxAG %>% 
-#   filter(Strain == "PE-rich_048") %>% 
-#   dplyr::select(c(Par_ue, Photoperiod, tMaxAG)) %>% 
-#   unique()
-# tMaxAGLines_127<-tmaxAG %>% 
-#   filter(Strain == "PE-rich_127") %>% 
-#   dplyr::select(c(Par_ue, Photoperiod, tMaxAG)) %>% 
-#   unique()
-```
-
-# Create preliminary plots
-
-```{r preliminary plot}
-# lab1=c(expression("PC-rich_056"), expression("PC-rich_077"), expression("PE-rich_048"), expression("PE-rich_127"))
-# 
-# MCGrowthRateAll %>%
-#   ggplot() +
-#   geom_point(aes(x = Time_h, y = PURPARRatio, colour = as.factor(Strain)), alpha = 0.9, size = 3, show.legend = T) +
-#   geom_vline(data = tMaxAGLines_056, aes(xintercept = tMaxAG), linetype="dotdash", colour = "brown4") +
-#   geom_vline(data = tMaxAGLines_077, aes(xintercept = tMaxAG), linetype="dotdash", colour = "brown1") +
-#   geom_vline(data = tMaxAGLines_048, aes(xintercept = tMaxAG), linetype="dotdash", colour = "seagreen4") +
-#   geom_vline(data = tMaxAGLines_127, aes(xintercept = tMaxAG), linetype="dotdash", colour = "palegreen3") +
-#   scale_colour_discrete(type=c("seagreen4", "palegreen3", "brown1", "brown4"), name="", labels = lab1) +
-#   scale_y_continuous(breaks=seq(0, 1.2, by = 0.4)) +
-#   coord_cartesian(ylim = c(0, 1.7)) +
-#   ggh4x::facet_nested(cols = vars(Photoperiod), rows = vars(Par_ue), labeller = label_parsed) +
-#   theme_bw() 
-# 
-# MCGrowthRateExp %>%
-#   ggplot() +
-#   geom_point(aes(x = Time_hExp, y = PURPARRatioExp, colour = as.factor(Strain)), alpha = 0.9, size = 3, show.legend = T) +
-#   geom_vline(data = tMaxAGLines_056, aes(xintercept = tMaxAG), linetype="dotdash", colour = "brown4") +
-#   geom_vline(data = tMaxAGLines_077, aes(xintercept = tMaxAG), linetype="dotdash", colour = "brown1") +
-#   geom_vline(data = tMaxAGLines_048, aes(xintercept = tMaxAG), linetype="dotdash", colour = "seagreen4") +
-#   geom_vline(data = tMaxAGLines_127, aes(xintercept = tMaxAG), linetype="dotdash", colour = "palegreen3") +
-#   scale_colour_discrete(type=c("seagreen4", "palegreen3", "brown1", "brown4"), name="", labels = lab1) +
-#   scale_y_continuous(breaks=seq(0, 1.2, by = 0.4)) +
-#   coord_cartesian(ylim = c(0, 1.7)) +
-#   ggh4x::facet_nested(cols = vars(Photoperiod), rows = vars(Par_ue), labeller = label_parsed) +
-#   theme_bw() 
-```
-
-# Cleaning the environment
-
-```{r}
-#rm(tMaxAGLines_056, tMaxAGLines_077, tMaxAGLines_048, tMaxAGLines_127, tmaxAG, PigmentExp)
 ```
 
 # Create preliminary plot PAR photodose and PUR photondose
@@ -1104,19 +1022,23 @@ rm(MCGrowthSPAllModel, MCGrowthSP30Model, MCGrowthSP90Model, MCGrowthSP180Model,
 ```{r save rds}
 saveRDS(MCGrowthRateAll, file.path(DataOut, paste(Project, "Processed_GrowthRateAll.Rds", sep = "_"), fsep = .Platform$file.sep), ascii = FALSE, version = NULL, compress = "xz", refhook = NULL)
 
-saveRDS(MCGrowthRateExp, file.path(DataOut, paste(Project, "Processed_GrowthRateExp.Rds", sep = "_"), fsep = .Platform$file.sep), ascii = FALSE, version = NULL, compress = "xz", refhook = NULL)
+# saveRDS(MCGrowthRateExp, file.path(DataOut, paste(Project, "Processed_GrowthRateExp.Rds", sep = "_"), fsep = .Platform$file.sep), ascii = FALSE, version = NULL, compress = "xz", refhook = NULL)
 ```
 
 # Variable names used in Data Dictionary
 
 ```{r}
 colnames(MCGrowthRateAll)
+SampleID, Run, Strain, ExpDate, Par_ue, Photoperiod, MC, Tube, O2, WL, LightShape, ExpEndDate, PARPhotonDose_day, FilenameMC, OD720_Lmu_corr, OD720_Lmu_se, deltaOD_Lmu_corr, deltaOD_Lmu_se, E_days, ToD, Time_h, meanActinic_par_h, meanOD680_h, meanOD720_h,  meanDeltaOD_h, cellmL_OD680, facetsPar_ue, facetsPhotoperiod, ObsDateOlis, PUR, PURPhotonDose_day, ChlaugmL, CarugmL, PEugmL, PCugmL, APCugmL, PhycougmL, CarChlaRatio, PhycoChlaRatio, PEPCRatio, Chlapgcell, Carpgcell, PEpgcell, PCpgcell, APCpgcell, Phycopgcell, cellL_OD680, PURPARRatio, tMaxAG, AchivePreStationary, MaxDG, MaxAG, dayRound_tmaxAG,  facetsStrain, facetsPARPhotonDose_day, Phase
+
+
+
 ```
 
 # Variable names used in Data Dictionary
 
 ```{r}
-colnames(MCGrowthRateExp)
+# colnames(MCGrowthRateExp)
 ```
 
 

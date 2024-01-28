@@ -478,8 +478,7 @@ MCPigmenttMaxAG <- MCPigment %>%
 MCPigmenttMaxAG <- MCPigmenttMaxAG %>%
   mutate(Phase = O2) %>%
   mutate(Phase=case_when(E_days<=dayRound_tmaxAG~"Exponential",
-         E_days>dayRound_tmaxAG~"Pre-stationary")) %>% 
-  mutate(PURPARRatio = PUR/Par_ue)
+         E_days>dayRound_tmaxAG~"Pre-stationary")) 
 ```
 
 
@@ -560,6 +559,12 @@ MCPigmentPlot %>%
 
 ```{r save plot}
 ggsave(file = file.path(FigPath, paste("SFig_Pigment",".png",sep = "")), height=10, width= 8,  dpi = 300, limitsize = TRUE)
+```
+
+# Save Fig Rds
+
+```{r}
+# saveRDS(MCPigmentPlot, file.path(FigRdsPath, paste(Project, "Fig_Pigment_1.Rds", sep = "_"), fsep = .Platform$file.sep), ascii = FALSE, version = NULL, compress = "xz", refhook = NULL)
 ```
 
 # Cleaning df before saving as Rds and removed unnecessary files from the environment
