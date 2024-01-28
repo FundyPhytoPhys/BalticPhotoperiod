@@ -75,24 +75,15 @@ COMMENT: /as supplemental data show the plots of deltaOD vs elapsed time with th
 
 ![<span id="fig:AccLen"></span>Figure 3: Hours of photoperiod to reach maximum hourly growth increment (AccLen), for two PhycoCyanin(PC)-rich cultures (056, 077) and two PhycoErythrin(PE)-rich cultures (048, 127) (Culture Collection of Baltic Algae) of *Synechococcus* sp. grown at 30, 90, 180, 300, or 900 peak PAR µmol photons m^−2^s^−1^; and photoperiods of 8, 12, or 16 h. The diagonal dashed lines indicate the time (h) to reach the maximum light during the day. Figure represents all data (small symbols) and means (big symbols) for n = 0-5 days from exponential phase, or from pre-stationary growth phase.](../Output/Figures/SFig_AccLen.png)
 
-## Changes of TDG {.unnumbered}
+
 
 ![<span id="fig:TDG"></span>Figure 4: Changes of TDG (tracked as daily change in OD~680~ increment) of two PhycoCyanin(PC)-rich cultures (056, 077) and two PhycoErythrin(PE)-rich cultures (048, 127) (Culture Collection of Baltic Algae) of *Synechococcus* sp. grown at 30, 90, 180, 300, or 900 peak PAR µmol photons m^−2^s^−1^; and photoperiods of 8, 12, or 16 h. The vertical lines represent the time when the strains reached their maximum absolute hourly growth (tMaxAG).](../Output/Figures/SFig_TDG.png)
 
-![<span id="fig:Pigments"></span>Figure 5: Changes of cell-specific pigment content of two PhycoCyanin(PC)-rich cultures (056, 077) and two PhycoErythrin(PE)-rich cultures (048, 127) (Culture Collection of Baltic Algae) of *Synechococcus* sp. at selected cumulative diel µmol photons m^−2^d^−1^ over time (h). The vertical lines represent the time when the strains reached their maximum absolute hourly growth (tMaxAG).](../Output/Figures/SFig_Pigments.png)
+
+![<span id="fig:PhycoChlaRatio"></span>Figure 5: Changes of total Phyco/Chl *a* ratio of two PhycoCyanin(PC)-rich cultures (056, 077) and two PhycoErythrin(PE)-rich cultures (048, 127) (Culture Collection of Baltic Algae) of *Synechococcus* sp. grown at 30, 90, 180, 300, 600, or 900 peak PAR µmol photons m^−2^s^−1^; and photoperiods of 8, 12, 16, or 24 h. Figure represents all data (small symbols) and means (big symbols) from exponential phase, or from pre-stationary growth phase. Blue solid line shows single phase exponential decay fit of pooled data; fit parameters are presented. Different lowercase letters indicate significant differences between the fit models for strains for a given phase of growth (ANOVA; *p* < 0.05).](../Output/Figures/SFig_PhycoChlaRatio.png)
+
 
 ![<span id="fig:Sigma445"></span>Figure 6: Effective absorption cross section of PSII (σ~PSII~'; nm^2^ quanta^-1^) measured under diel peak PAR growth light under Ex445 nm (blue) excitation in two PhycoCyanin(PC)-rich cultures (056, 077) and two PhycoErythrin(PE)-rich cultures (048, 127) (Culture Collection of Baltic Algae) of *Synechococcus* sp. grown at 30, 90, 180, 300, 600, or 900 peak PAR µmol photons m^−2^s^−1^; and photoperiods of 8, 12, 16, or 24 h. Figure represents all data (small symbols) and means (big symbols) from exponential phase, or from pre-stationary growth phase. Blue solid line shows linear model fit.](../Output/Figures/SFig_Sigma445.png)
-
-
-Other plot?
-
-
-## Changes in total Phyco/Chl *a* ratio and PUR/PAR ratio {.unnumbered}
-
-![<span id="fig:PigRatioPUR"></span>Figure 7: Changes of total Phyco/Chl *a* ratio (A) and PUR/PAR ratio (B) of two PhycoCyanin(PC)-rich cultures (056, 077) and two PhycoErythrin(PE)-rich cultures (048, 127) (Culture Collection of Baltic Algae) of *Synechococcus* sp. at selected cumulative diel µmol photons m^−2^d^−1^ over time (h). The vertical lines represent the time when the strains reached their maximum absolute hourly growth (tMaxAG).](../Output/Figures/SFig_PigRatioPUR.png)
-
-
-
 
 
 

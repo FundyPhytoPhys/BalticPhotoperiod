@@ -1557,7 +1557,7 @@ ggplot(PhycoChlaRatioChoosen, aes(x = PARPhotonDose_day, y = PhycoChlaRatio)) +
 # Save plot 
 
 ```{r save plot}
-ggsave(file = file.path(FigPath, paste("SFig_PhycoChlaRatio2",".png",sep = "")), height=10, width= 8,  dpi = 300, limitsize = TRUE)
+ggsave(file = file.path(FigPath, paste("SFig_PhycoChlaRatio",".png",sep = "")), height=10, width= 8,  dpi = 300, limitsize = TRUE)
 ```
 
 
@@ -1700,7 +1700,7 @@ fittedmodelPhase<-fittedmodelPig
 # Preliminary plot PUR/PAR ratio 
 
 ```{r}
-SS %>%
+MCPigmentAllExpStChoosen %>%
   ggplot() +
   geom_point(aes(x = PARPhotonDose_day, y = PURPARRatio, colour = as.factor(Par_ue), shape = as.factor(Photoperiod)),  alpha = 0.8, size = 3, show.legend = T) +
   #scale_colour_discrete(type=c("seagreen4", "palegreen3", "brown1", "brown4"), name="", labels = lab1) +
@@ -1722,25 +1722,33 @@ S1<-MCPigmentAllExpStChoosen %>%
 S2<-MCPigmentAllExpStChoosen %>%
   filter(Phase == "Pre-stationary") %>% 
   filter(Strain == "PE-rich_048") %>% 
-  filter(PARPhotonDose_day<40000000)
-
+  filter(PARPhotonDose_day<10000000) %>% 
+  filter(PURPARRatio<0.52)
+S22<-MCPigmentAllExpStChoosen %>%
+  filter(Phase == "Pre-stationary") %>% 
+  filter(Strain == "PE-rich_048") %>% 
+  filter(PARPhotonDose_day>10000000) %>% 
+  filter(PURPARRatio<0.46)
 S3<-MCPigmentAllExpStChoosen %>%
-  filter(Phase == "Pre-stationary") %>% 
-  filter(Strain == "PC-rich_077") %>% 
-  filter(PARPhotonDose_day<20000000) %>% 
+  filter(Phase == "Pre-stationary") %>%
+  filter(Strain == "PC-rich_077") %>%
+  filter(PARPhotonDose_day<20000000) %>%
   filter(PURPARRatio>0.35)
-
 S4<-MCPigmentAllExpStChoosen %>%
-  filter(Phase == "Pre-stationary") %>% 
-  filter(Strain == "PC-rich_077") %>% 
-  filter(PARPhotonDose_day>20000000) %>% 
+  filter(Phase == "Pre-stationary") %>%
+  filter(Strain == "PC-rich_077") %>%
+  filter(PARPhotonDose_day>20000000) %>%
   filter(PURPARRatio<0.3)
 S5<-MCPigmentAllExpStChoosen %>%
   filter(Phase == "Pre-stationary") %>% 
   filter(Strain == "PE-rich_127") %>% 
   filter(PARPhotonDose_day<70000000) %>% 
   filter(PURPARRatio<0.56) %>% 
-  filter(PURPARRatio>0.44)
+  filter(PURPARRatio>0.475)
+S55<-MCPigmentAllExpStChoosen %>%
+  filter(Phase == "Pre-stationary") %>% 
+  filter(Strain == "PE-rich_127") %>% 
+  filter(PARPhotonDose_day>70000000) 
 S6<-MCPigmentAllExpStChoosen %>%
   filter(Phase == "Exponential") %>% 
   filter(Strain == "PE-rich_048" | Strain == "PE-rich_127") %>% 
@@ -1772,7 +1780,7 @@ S11<-MCPigmentAllExpStChoosen %>%
   filter(PARPhotonDose_day<10000000) %>% 
   filter(PURPARRatio>0.41)
   
-PhycoChlaRatioChoosenPUR<-rbind(S1, S2, S3, S4, S5, S6, S7, S8, S9, S10, S11)
+PhycoChlaRatioChoosenPUR<-rbind(S1, S2, S22, S3, S4, S5, S55, S6, S7, S8, S9, S10, S11)
 
 rm(S1, S2, S3, S4, S5, S6, S7, S8, S9, S10, S11)
 ```
@@ -1783,8 +1791,6 @@ rm(S1, S2, S3, S4, S5, S6, S7, S8, S9, S10, S11)
 ```{r fit the data to exponential decays, echo=FALSE, warning = FALSE}
 SolFitsExpFit590CleanPUR <-PhycoChlaRatioChoosenPUR %>% 
   drop_na(PURPARRatio) %>%
-  #filter(Phase == "Pre-stationary") %>% 
-  #filter(Strain == "PC-rich_077") %>% 
   select(c(PURPARRatio, PARPhotonDose_day, Strain, Phase, O2, WL)) 
 
 # Fit the data
@@ -1803,8 +1809,6 @@ pivot_wider(., names_from = c(term), values_from = c(estimate)) %>%
   mutate(alpha = exp(log_alpha))
 ```
 
-
-
 ```{r unnest, preparing df to preparing final plot, echo=FALSE, warning = FALSE}
 augmented590PUR<-fitted590PUR  %>%
   unnest(augmented590) %>%
@@ -1814,15 +1818,15 @@ augmented590PUR<-fitted590PUR  %>%
 # Create PUR/PAR ratio plot 
 
 ```{r create Sigma plot, fig.height = 8, fig.width = 8, warning = FALSE}
-data_text_y0Exp<- data.frame(WL = c("WW", "WW"), Phase = c("Exponential"), O2=c(21, 21, 21, 21), Strain  = c("PC-rich_056", "PC-rich_077", "PE-rich_048", "PE-rich_127"),  label = c('y0 = 2.2', 'y0 = 3.1', 'y0 = 4.1', 'y0 = 3.9'))
-data_text_yfExp<- data.frame(WL = c("WW", "WW"), Phase = c("Exponential"), O2=c(21, 21, 21, 21), Strain  = c("PC-rich_056", "PC-rich_077", "PE-rich_048", "PE-rich_127"),  label = c('yf = 0.2', 'yf = -0.3', 'yf = -0.3', 'yf = 0.2'))
-data_text_lambdaExp<- data.frame(WL = c("WW", "WW"), Phase = c("Exponential"), O2=c(21, 21, 21, 21), Strain  = c("PC-rich_056", "PC-rich_077", "PE-rich_048", "PE-rich_127"),  label = c('    \u03BB = 5.9e-08', '    \u03BB = 2.8e-08', '    \u03BB = 2.6e-08', '    \u03BB = 4.2e-08'))
+data_text_y0Exp<- data.frame(WL = c("WW", "WW"), Phase = c("Exponential"), O2=c(21, 21, 21, 21), Strain  = c("PC-rich_056", "PC-rich_077", "PE-rich_048", "PE-rich_127"),  label = c('y0 = 0.5', 'y0 = 0.5', 'y0 = 1.0', 'y0 = 0.9'))
+data_text_yfExp<- data.frame(WL = c("WW", "WW"), Phase = c("Exponential"), O2=c(21, 21, 21, 21), Strain  = c("PC-rich_056", "PC-rich_077", "PE-rich_048", "PE-rich_127"),  label = c('yf = 0.3', 'yf = 0.4', 'yf = 0.5', 'yf = 0.5'))
+data_text_lambdaExp<- data.frame(WL = c("WW", "WW"), Phase = c("Exponential"), O2=c(21, 21, 21, 21), Strain  = c("PC-rich_056", "PC-rich_077", "PE-rich_048", "PE-rich_127"),  label = c('    \u03BB = 3.4e-08', '    \u03BB = 2.4e-07', '    \u03BB = 5.4e-07', '    \u03BB = 4.7e-07'))
 
-data_text_y0St<- data.frame(WL = c("WW", "WW"), Phase = c("Pre-stationary"), O2=c(21, 21, 21, 21), Strain  = c("PC-rich_056", "PC-rich_077", "PE-rich_048", "PE-rich_127"),  label = c('y0 = 7.2', ' y0 = 10.8', 'y0 = 3.0', 'y0 = 2.9'))
-data_text_yfSt<- data.frame(WL = c("WW", "WW"), Phase = c("Pre-stationary"), O2=c(21, 21, 21, 21), Strain  = c("PC-rich_056", "PC-rich_077", "PE-rich_048", "PE-rich_127"),  label = c('yf = 0.6', 'yf = 0.8', 'yf = -0.4', 'yf = -0.2'))
-data_text_lambdaSt<- data.frame(WL = c("WW", "WW"), Phase = c("Pre-stationary"), O2=c(21, 21, 21, 21), Strain  = c("PC-rich_056", "PC-rich_077", "PE-rich_048", "PE-rich_127"),  label = c('    \u03BB = 9.3e-07', '    \u03BB = 7.0e-07', '    \u03BB = 2.9e-08', '    \u03BB = 2.4e-08'))
+data_text_y0St<- data.frame(WL = c("WW", "WW"), Phase = c("Pre-stationary"), O2=c(21, 21, 21, 21), Strain  = c("PC-rich_056", "PC-rich_077", "PE-rich_048", "PE-rich_127"),  label = c('y0 = 0.4', 'y0 = 2.6', 'y0 = 0.5', 'y0 = 5.1'))
+data_text_yfSt<- data.frame(WL = c("WW", "WW"), Phase = c("Pre-stationary"), O2=c(21, 21, 21, 21), Strain  = c("PC-rich_056", "PC-rich_077", "PE-rich_048", "PE-rich_127"),  label = c('yf = 0.4', 'yf = 0.4', 'yf = -0.9', 'yf = 0.5'))
+data_text_lambdaSt<- data.frame(WL = c("WW", "WW"), Phase = c("Pre-stationary"), O2=c(21, 21, 21, 21), Strain  = c("PC-rich_056", "PC-rich_077", "PE-rich_048", "PE-rich_127"),  label = c('    \u03BB = 3.5e-08', '    \u03BB = 1.7e-06', '    \u03BB = 1.7e-09', '    \u03BB = 2.1e-06'))
 
-data_text_AnovaExp<- data.frame(WL = c("WW", "WW"), Phase = c("Exponential"), O2=c(21, 21, 21, 21), Strain  = c("PC-rich_056", "PC-rich_077", "PE-rich_048", "PE-rich_127"),  label = c('ANOVA, p < 0.05, a', 'ANOVA, p < 0.05, b', 'ANOVA, p < 0.05, b', 'ANOVA, p < 0.05, c'))
+data_text_AnovaExp<- data.frame(WL = c("WW", "WW"), Phase = c("Exponential"), O2=c(21, 21, 21, 21), Strain  = c("PC-rich_056", "PC-rich_077", "PE-rich_048", "PE-rich_127"),  label = c('ANOVA, p < 0.05, a', 'ANOVA, p < 0.05, b', 'ANOVA, p < 0.05, c', 'ANOVA, p < 0.05, c'))
 data_text_AnovaSt<- data.frame(WL = c("WW", "WW"), Phase = c("Pre-stationary"), O2=c(21, 21, 21, 21), Strain  = c("PC-rich_056", "PC-rich_077", "PE-rich_048", "PE-rich_127"),  label = c('ANOVA, p < 0.05, a', 'ANOVA, p < 0.05, a', 'ANOVA, p < 0.05, a', 'ANOVA, p < 0.05, a'))
 
 WL.labs <- c("Phase of growth")
@@ -1840,16 +1844,16 @@ ggplot(PhycoChlaRatioChoosenPUR, aes(x = PARPhotonDose_day, y = PURPARRatio)) +
   geom_point(aes(x = PARPhotonDose_day, y = PURPARRatio, colour = as.factor(Par_ue), shape = as.factor(Photoperiod)), size = 1, show.legend = F) +
   geom_errorbar(aes(x = PARPhotonDose_day, ymin = AllmeanPURPARRatio - AllsdPURPARRatio, ymax = AllmeanPURPARRatio + AllsdPURPARRatio, colour=as.factor(Par_ue)), width=0, size=0.3, show.legend = F) +
   geom_line(aes(PARPhotonDose_day, .fitted), colour = "blue", linetype = "solid", size = 0.3, show.legend = F, augmented590PUR) +
-  # geom_text(data=data_text_y0Exp, aes(x=70000000, y=4, label=label), size=3.5) +
-  # geom_text(data=data_text_yfExp, aes(x=70000000, y=2.5, label=label), size=3.5) +
-  # geom_text(data=data_text_lambdaExp, aes(x=70000000, y=1, label=label), size=3.5) +
-  # 
-  # geom_text(data=data_text_y0St, aes(x=7500000, y=4, label=label), size=3.5) +
-  # geom_text(data=data_text_yfSt, aes(x=7500000, y=2.5, label=label), size=3.5) +
-  # geom_text(data=data_text_lambdaSt, aes(x=7500000, y=1, label=label), size=3.5) +
-  
-  # geom_text(data=data_text_AnovaExp, aes(x=15000000, y=0, label=label), colour = "blue", size=3.5) +
-  # geom_text(data=data_text_AnovaSt, aes(x=15000000, y=0, label=label), colour = "blue", size=3.5) +
+  geom_text(data=data_text_y0Exp, aes(x=70000000, y=1.1, label=label), size=3.5) +
+  geom_text(data=data_text_yfExp, aes(x=70000000, y=0.9, label=label), size=3.5) +
+  geom_text(data=data_text_lambdaExp, aes(x=70000000, y=0.7, label=label), size=3.5) +
+
+  geom_text(data=data_text_y0St, aes(x=7500000, y=1.1, label=label), size=3.5) +
+  geom_text(data=data_text_yfSt, aes(x=7500000, y=0.9, label=label), size=3.5) +
+  geom_text(data=data_text_lambdaSt, aes(x=7500000, y=0.7, label=label), size=3.5) +
+
+  geom_text(data=data_text_AnovaExp, aes(x=15000000, y=0.05, label=label), colour = "blue", size=3.5) +
+  geom_text(data=data_text_AnovaSt, aes(x=15000000, y=0.05, label=label), colour = "blue", size=3.5) +
   
   scale_shape_manual(values = c(15, 16, 17,18), name="", labels = lab1) +
   scale_colour_manual(values = c("darkslategray", "lightblue4", "hotpink4", "indianred3",  "goldenrod2", "khaki2"), name="", labels = lab2) +
@@ -1877,6 +1881,134 @@ ggplot(PhycoChlaRatioChoosenPUR, aes(x = PARPhotonDose_day, y = PURPARRatio)) +
         legend.text = element_text(size=9))
 ```
 
+# Save plot 
+
+```{r save plot}
+ggsave(file = file.path(FigPath, paste("Fig_PURPARRatio",".png",sep = "")), height=10, width= 8,  dpi = 300, limitsize = TRUE)
+```
+
+
+# Calculated Anova and Tukey test from data points
+
+```{r calculated statistics}
+StatsPUR <-PhycoChlaRatioChoosenPUR 
+
+StatsPUR$Par_ue <- factor(StatsPUR$Par_ue)
+StatsPUR$Photoperiod <- factor(StatsPUR$Photoperiod)
+StatsPUR$Strain <- factor(StatsPUR$Strain)
+StatsPUR$Phase <- factor(StatsPUR$Phase)
+StatsPUR$PARPhotonDose_day <- factor(StatsPUR$PARPhotonDose_day)
+
+# Three way Anova with interactions
+model<-aov(PURPARRatio~PARPhotonDose_day*Phase*Strain, data=StatsPUR)
+AnovaTest_PURPARRatio<-data.frame(unclass(summary(model)), check.names = FALSE, stringsAsFactors = FALSE)
+TukeyHSDTest_PURPARRatio<-TukeyHSD(model, which = c("PARPhotonDose_day", "Phase", "Strain"))
+
+rm(model, StatsPUR)
+```
+
+# Calculated Anova and Tukey test from exponential decay parameters
+
+```{r calculated statistics}
+StatsPURParam<-fitted_Param590PUR
+StatsPURParam<-rbind(StatsPURParam, StatsPURParam)
+StatsPURParam$Strain <- factor(StatsPURParam$Strain)
+StatsPURParam$Phase <- factor(StatsPURParam$Phase)
+
+# Two-way Anova
+model<-aov(y0~Strain*Phase, data=StatsPURParam)
+AnovaTest_PURPARRatio_y0<-data.frame(unclass(summary(model)), check.names = FALSE, stringsAsFactors = FALSE)
+AnovaTest_PURPARRatio_y0$Parameter <- 'y0'
+
+model<-aov(yf~Strain*Phase, data=StatsPURParam)
+AnovaTest_PURPARRatio_yf<-data.frame(unclass(summary(model)), check.names = FALSE, stringsAsFactors = FALSE)
+AnovaTest_PURPARRatio_yf$Parameter <- 'yf'
+
+model<-aov(alpha~Strain*Phase, data=StatsPURParam)
+AnovaTest_PURPARRatio_alpha<-data.frame(unclass(summary(model)), check.names = FALSE, stringsAsFactors = FALSE)
+AnovaTest_PURPARRatio_alpha$Parameter <- 'alpha'
+
+AnovaTest_PURPARRatio_Param<-rbind(AnovaTest_PURPARRatio_y0, AnovaTest_PURPARRatio_yf, AnovaTest_PURPARRatio_alpha)
+
+rm(AnovaTest_PURPARRatio_y0, AnovaTest_PURPARRatio_yf, AnovaTest_PURPARRatio_alpha, model, StatsPURParam)
+```
+
+# Exstracting models for each fit
+
+```{r}
+fittedmodelPUR<-fitted590PUR  %>%
+  select(c(Strain, Phase, fit))
+```
+
+# Anova from the model 
+
+```{r}
+#1->056 St
+#2->048 St
+#3->077 St
+#4->127 St
+#5->048 Exp
+#6->127 Exp
+#7->056 Exp
+#8->077 Exp
+
+
+#Comparing model for strains from Exp phase
+fittedmodelStrainExp<-fittedmodelPUR
+  anova056077Exp<-anova(fittedmodelStrainExp[[3]][[7]], fittedmodelStrainExp[[3]][[8]])
+  anova056077Exp$FitComparison <- '056_077'
+  anova048127Exp<-anova(fittedmodelStrainExp[[3]][[5]], fittedmodelStrainExp[[3]][[6]])
+  anova048127Exp$FitComparison <- '048_127'
+  anova056048Exp<-anova(fittedmodelStrainExp[[3]][[7]], fittedmodelStrainExp[[3]][[5]])
+  anova056048Exp$FitComparison <- '056_048'
+  anova077048Exp<-anova(fittedmodelStrainExp[[3]][[8]], fittedmodelStrainExp[[3]][[5]])
+  anova077048Exp$FitComparison <- '077_048'
+  anova056127Exp<-anova(fittedmodelStrainExp[[3]][[7]], fittedmodelStrainExp[[3]][[6]])
+  anova056127Exp$FitComparison <- '056_127'
+  anova077127Exp<-anova(fittedmodelStrainExp[[3]][[8]], fittedmodelStrainExp[[3]][[6]])
+  anova077127Exp$FitComparison <- '077_127'
+  anova_PURPARRatioModelStrainExp<-rbind(anova056077Exp, anova048127Exp, anova056048Exp, anova077048Exp, anova056127Exp, anova077127Exp)
+  anova_PURPARRatioModelStrainExp <-anova_PURPARRatioModelStrainExp %>% 
+  drop_na(Df) 
+  rm(anova056077Exp, anova048127Exp, anova056048Exp, anova077048Exp, anova056127Exp, anova077127Exp)
+
+#Comparing model for strains from St phase
+fittedmodelStrainSt<-fittedmodelPUR 
+  anova056077St<-anova(fittedmodelStrainSt[[3]][[1]], fittedmodelStrainSt[[3]][[3]])
+  anova056077St$FitComparison <- '056_077'
+  anova048127St<-anova(fittedmodelStrainSt[[3]][[2]], fittedmodelStrainSt[[3]][[4]])
+  anova048127St$FitComparison <- '048_127'
+  anova056048St<-anova(fittedmodelStrainSt[[3]][[1]], fittedmodelStrainSt[[3]][[2]])
+  anova056048St$FitComparison <- '056_048'
+  anova077048St<-anova(fittedmodelStrainSt[[3]][[3]], fittedmodelStrainSt[[3]][[2]])
+  anova077048St$FitComparison <- '077_048'
+  anova056127St<-anova(fittedmodelStrainSt[[3]][[1]], fittedmodelStrainSt[[3]][[4]])
+  anova056127St$FitComparison <- '056_127'
+  anova077127St<-anova(fittedmodelStrainSt[[3]][[3]], fittedmodelStrainSt[[3]][[4]])
+  anova077127St$FitComparison <- '077_127'
+  anova_PURPARRatioModelStrainSt<-rbind(anova056077St, anova048127St, anova056048St, anova077048St, anova056127St, anova077127St)
+  anova_PURPARRatioModelStrainSt <-anova_PURPARRatioModelStrainSt %>% 
+  drop_na(Df) 
+  
+  rm(anova056077St, anova048127St, anova056048St, anova077048St, anova056127St, anova077127St)
+  
+  
+#Comparing model for each strains from different phase (Exp vs St)
+fittedmodelPhase<-fittedmodelPUR 
+  anova056ExpSt<-anova(fittedmodelPhase[[3]][[7]], fittedmodelPhase[[3]][[1]])
+  anova056ExpSt$FitComparison <- '056_Exp_St'
+  anova077ExpSt<-anova(fittedmodelPhase[[3]][[8]], fittedmodelPhase[[3]][[3]])
+  anova077ExpSt$FitComparison <- '077_Exp_St'
+  anova048ExpSt<-anova(fittedmodelPhase[[3]][[5]], fittedmodelPhase[[3]][[2]])
+  anova048ExpSt$FitComparison <- '048_Exp_St'
+  anova127ExpSt<-anova(fittedmodelPhase[[3]][[6]], fittedmodelPhase[[3]][[4]])
+  anova127ExpSt$FitComparison <- '127_Exp_St'
+  anova_PURPARRatioModelPhase<-rbind(anova056ExpSt, anova077ExpSt, anova048ExpSt, anova127ExpSt)
+  anova_PURPARRatioModelPhase <-anova_PURPARRatioModelPhase %>% 
+  drop_na(Df) 
+  
+  rm(anova056ExpSt, anova077ExpSt, anova048ExpSt, anova127ExpSt)
+```
 
 
 

@@ -92,11 +92,11 @@ Cultures grew at 22℃, with photoperiods of 8, 12, 16, or 24 h, with peak Photo
  
 The cultures of picocyanobacteria were acclimatized for one day to the new conditions corresponding to the incubation conditions of the proper culture. Tubes contained Glass Aeration Tubes and were closed with a silicone inert stopper perforated by an aeration input tube extending to the bottom of the culture tube, and a pressure outlet tube. Aeration with a total air flow rate of around 1,100 mL min^−1^ distributed across 8 tubes for ~ 140 mL min^−1^ tube^−1^ ensures mixing and provides sufficient air/CO~2~ supply to cultures across the entire culture volume. Cultivation and monitoring functions (light, temperature, optical density, and aeration gas) of the Multi-Cultivator system was controlled via the Photobioreactor Control Software (Photon Systems Instruments, Drásov, Czech Republic). 
 
-## The growth curve and logistic growth rate analysis {.unnumbered}
+## The growth curve and chlorophyll specific exponential growth rate analysis {.unnumbered}
 
 Picocyanobacterial growth was monitored every 5 minutes by automatically recording OD~680~, OD~720~, and ΔOD (ΔOD = OD~680~-OD~720~) for 14 days, independently for each culture tube. The exceptions were experiments conducted with a photoperiod of 24 h and light of 900 µmol photons m^−2^s^−1^, which lasted 7 days.
 
-Based on the obtained measurements of growth we determined exponential chlorophyll specific exponential growth rates (µ) by fitting logistic growth curves to plots of the chlorophyll *a* proxy of ΔOD vs. time for each combination of strain, photoperiod, and peak PAR. We used a modified Levenberg-Marquardt fitting algorithm [@minpack.lm].
+Based on the obtained measurements of growth we determined exponential chlorophyll specific exponential growth rate (µ) by fitting logistic growth curves to plots of the chlorophyll *a* proxy of ΔOD vs. time for each combination of strain, photoperiod, and peak PAR. We used a modified Levenberg-Marquardt fitting algorithm [@minpack.lm].
 
 ## The AccLen and growth symmetry analysis {.unnumbered}
 
@@ -124,24 +124,24 @@ $$\begin{equation}
 
 ## Pigment content analysis {.unnumbered}
 
-The pigment content: chlorophyll *a* (Chl *a*), carotenoids (Car), phycoerythrin (PE), phycocyanin (PC), and allophycocyanin (APC) in *Synechococcus* sp. cultures over time was estimated with previously determined linear correlations between pigment content obtained by extraction technique and absorbance values of individual pigment peaks (nm) obtained from the whole-cell absorbance spectra (Tab. S2 in the Supplementary materials). Total amount of phycobilin pigments (Phyco) for individual strains was obtained by adding the content of PE, PC, and APC.
+The pigment content: chlorophyll *a* (Chl *a*), carotenoids (Car), phycoerythrin (PE), phycocyanin (PC), and allophycocyanin (APC) in *Synechococcus* sp. cultures over time was estimated with previously determined linear correlations between pigment content obtained by extraction technique and absorbance values of individual pigment peaks (nm) obtained from the whole-cell absorbance spectra (Tab. S2 in the Supplementary materials). Total amount of phycobilin pigments (Total Phyco) for individual strains was obtained by adding the content of PE, PC, and APC.
 
 Pigments extraction were performed using formula from [@stricklandPracticalHandBook1972] for Ch *a* and Car concentrations. PE, PC, and APC were calculated based on [@bennettCOMPLEMENTARYCHROMATICADAPTATION1973]. The extracts contained photosynthetic pigments were measured using a CLARIOstar Plus Plate Reader (BMG, Labtech, Ortenberg, Germany), at wavelengths of 480, 665, and 750 nm for Chl *a* and Car calculation and at 565, 620, 650, and 750 nm for PE, PC, and APC. The values of individual pigment peaks (nm) from the whole-cell absorbance spectra were obtained by Olis-modernized Cary 14 UV/Vis/NIR with Integrating Sphere upgrade spectrophotometer (On-Line Instrument Systems, Inc., Bogart, GA, USA). For the linear model, the following wavelengths were analyzed: 480 (Car), 565 (PE), 620 (PC), 650 (APC), and 665 (Chl *a*) nm.
 
 ## Estimating cumulative diel PAR {.unnumbered}
 
-Based on the length and shape of the photoperiod (sine wave for photoperiod of 8-16 h; square for photoperiod of 24 h) and the given light level, we estimated the value of the cumulative diel photon dose. For a photoperiod arranged in the shape of a sine wave we used Eq. (2). For a continuous 24 h photoperiod we used Eq. (3).
+Based on the length and shape of the photoperiod (sine wave for photoperiod of 8-16 h; square for photoperiod of 24 h) and the given light level, we estimated the value of the cumulative diel PAR. For a photoperiod arranged in the shape of a sine wave we used Eq. (2). For a continuous 24 h photoperiod we used Eq. (3).
 
 $$\begin{equation}
 \begin{split}
-  Photon~dose~(µmol~photons~m^{−2}~d^{−1})= \\ \frac{light~level~(µmol~photons~m^{−2}~s^{−1})*60~(s~min^{−1})*60~(min~h^{−1})*photoperiod~(h~d^{−1})}{2}
+  Cumulative~diel~PAR~(µmol~photons~m^{−2}~d^{−1})= \\ \frac{PAR~(µmol~photons~m^{−2}~s^{−1})*60~(s~min^{−1})*60~(min~h^{−1})*photoperiod~(h~d^{−1})}{2}
   \qquad(2)
 \end{split}
 \end{equation}$$
 
 $$\begin{equation}
 \begin{split}
-  Photon~dose~(µmol~photons~m^{−2}~d^{−1})= \\ light~level~(µmol~photons~m^{−2}~s^{−1})*60~(s~min^{−1})*60~(min~h^{−1})*photoperiod~(h~d^{−1})
+  Cumulative~diel~PAR~(µmol~photons~m^{−2}~d^{−1})= \\ PAR~(µmol~photons~m^{−2}~s^{−1})*60~(s~min^{−1})*60~(min~h^{−1})*photoperiod~(h~d^{−1})
   \qquad(3)
 \end{split}
 \end{equation}$$
@@ -169,9 +169,9 @@ All analysis of obtained results was conducted using R version 4.3.0 [@rcoreteam
 
 # Results {.unnumbered}
 
-## Changes in logistic growth rates {.unnumbered}
+## Changes in chlorophyll specific exponential growth rate {.unnumbered}
 
-![<span id="fig:GrowthRate"></span>Figure 2: Chlorophyll specific exponential growth rates, estimated from logistic fits of chlorophyll proxy OD~680~-OD~720~ vs. elapsed time, for two PhycoCyanin(PC)-rich cultures (056, 077) and two PhycoErythrin(PE)-rich cultures (048, 127) (Culture Collection of Baltic Algae) of *Synechococcus* sp. grown at 30, 90, 180, 300, 600, or 900 peak PAR µmol photons m^−2^s^−1^; and photoperiods of 8, 12, 16, or 24 h. Growth rates (+/- SE from logistic model; SE falls within symbol sizes) are plotted vs. cumulative diel µmol photons m^−2^d^−1^. Solid blue line shows fit of the pooled data with a three parameter model (Harrison and Platt, 1986). We also fit separate lines for growth under 8 (dotted line), 12 (longdash line), 16 (dashed line), or 24 (twodash line) h photoperiod, since they were significantly different (ANOVA, *p* < 0.05) from the pooled fit.](../Output/Figures/Fig_GrowthRate.png)
+![<span id="fig:GrowthRate"></span>Figure 2: Chlorophyll specific exponential growth rate, estimated from logistic fits of chlorophyll proxy OD~680~-OD~720~ vs. elapsed time, for two PhycoCyanin(PC)-rich cultures (056, 077) and two PhycoErythrin(PE)-rich cultures (048, 127) (Culture Collection of Baltic Algae) of *Synechococcus* sp. grown at 30, 90, 180, 300, 600, or 900 peak PAR µmol photons m^−2^s^−1^; and photoperiods of 8, 12, 16, or 24 h. Growth rates (+/- SE from logistic model; SE falls within symbol sizes) are plotted vs. cumulative diel µmol photons m^−2^d^−1^. Solid blue line shows fit of the pooled data with a three parameter model (Harrison and Platt, 1986). We also fit separate lines for growth under 8 (dotted line), 12 (longdash line), 16 (dashed line), or 24 (twodash line) h photoperiod, since they were significantly different (ANOVA, *p* < 0.05) from the pooled fit.](../Output/Figures/Fig_GrowthRate.png)
 
 ## Changes of diel growth symmetry {.unnumbered}
 
@@ -180,12 +180,15 @@ All analysis of obtained results was conducted using R version 4.3.0 [@rcoreteam
 
 ![<span id="fig:GS"></span>Figure 4: Index of diel growth symmetry (AccLen/DecLen), for two PhycoCyanin(PC)-rich cultures (056, 077) and two PhycoErythrin(PE)-rich cultures (048, 127) (Culture Collection of Baltic Algae) of *Synechococcus* sp. grown at 30, 90, 180, 300, or 900 peak PAR µmol photons m^−2^s^−1^; and photoperiods of 8, 12, or 16 h. Figure represents all data (small symbols) and means (big symbols) for n = 0-5 days from exponential phase, or from pre-stationary growth phase. Blue solid line shows single phase exponential decay fit of pooled data; fit parameters are presented. Different lowercase letters indicate significant differences between the fit models for strains for a given phase of growth (ANOVA; *p* < 0.05).](../Output/Figures/Fig_GS.png)
 
+## Changes of PUR/PAR ratio {.unnumbered}
+
+![<span id="fig:PURPARRatio"></span>Figure 5: Changes of PUR/PAR ratio of two PhycoCyanin(PC)-rich cultures (056, 077) and two PhycoErythrin(PE)-rich cultures (048, 127) (Culture Collection of Baltic Algae) of *Synechococcus* sp. grown at 30, 90, 180, 300, 600, or 900 peak PAR µmol photons m^−2^s^−1^; and photoperiods of 8, 12, 16, or 24 h. Figure represents all data (small symbols) and means (big symbols) from exponential phase, or from pre-stationary growth phase. Blue solid line shows single phase exponential decay fit of pooled data; fit parameters are presented. Different lowercase letters indicate significant differences between the fit models for strains for a given phase of growth (ANOVA; *p* < 0.05).](../Output/Figures/Fig_PURPARRatio.png)
 
 ## Changes effective absorption cross section of PSII {.unnumbered}
 
-![<span id="fig:Sigma590"></span>Figure 5: Effective absorption cross section of PSII (σ~PSII~'; nm^2^ quanta^-1^) measured under diel peak PAR growth light under Ex590 nm (orange) excitation in two PhycoCyanin(PC)-rich cultures (056, 077) and two PhycoErythrin(PE)-rich cultures (048, 127) (Culture Collection of Baltic Algae) of *Synechococcus* sp. grown at 30, 90, 180, 300, 600, or 900 peak PAR µmol photons m^−2^s^−1^; and photoperiods of 8, 12, 16, or 24 h. Figure represents all data (small symbols) and means (big symbols) from exponential phase, or from pre-stationary growth phase. Blue solid line shows single phase exponential decay fit of pooled data; fit parameters are presented. Different lowercase letters indicate significant differences between the fit models for strains for a given phase of growth (ANOVA; *p* < 0.05).](../Output/Figures/Fig_Sigma590.png)
+![<span id="fig:Sigma590"></span>Figure 6: Effective absorption cross section of PSII (σ~PSII~'; nm^2^ quanta^-1^) measured under diel peak PAR growth light under Ex590 nm (orange) excitation in two PhycoCyanin(PC)-rich cultures (056, 077) and two PhycoErythrin(PE)-rich cultures (048, 127) (Culture Collection of Baltic Algae) of *Synechococcus* sp. grown at 30, 90, 180, 300, 600, or 900 peak PAR µmol photons m^−2^s^−1^; and photoperiods of 8, 12, 16, or 24 h. Figure represents all data (small symbols) and means (big symbols) from exponential phase, or from pre-stationary growth phase. Blue solid line shows single phase exponential decay fit of pooled data; fit parameters are presented. Different lowercase letters indicate significant differences between the fit models for strains for a given phase of growth (ANOVA; *p* < 0.05).](../Output/Figures/Fig_Sigma590.png)
 
-![<span id="fig:SigmaPig590"></span>Figure 6: Changes of effective absorption cross section of PSII (σ~PSII~'; nm^2^ quanta^-1^) measured under diel peak PAR growth light under Ex590 nm (orange) excitation in relation to the total Phyco/Chl *a* ratio of two PhycoCyanin(PC)-rich cultures (Culture Collection of Baltic Algae; 056, 077) and two PhycoErythrin(PE)-rich cultures (Culture Collection of Baltic Algae; 048, 127) of *Synechococcus* sp. grown at 30, 90, 180, 300, 600, or 900 peak PAR µmol photons m^−2^s^−1^; and photoperiods of 8, 12, 16, or 24 h. Figure represents all data (small symbols) and means (big symbols) from exponential phase, or from pre-stationary growth phase. Blue solid line shows linear model fit.](../Output/Figures/Fig_SigmaPig590.png)
+![<span id="fig:SigmaPig590"></span>Figure 7: Changes of effective absorption cross section of PSII (σ~PSII~'; nm^2^ quanta^-1^) measured under diel peak PAR growth light under Ex590 nm (orange) excitation in relation to the total Phyco/Chl *a* ratio of two PhycoCyanin(PC)-rich cultures (Culture Collection of Baltic Algae; 056, 077) and two PhycoErythrin(PE)-rich cultures (Culture Collection of Baltic Algae; 048, 127) of *Synechococcus* sp. grown at 30, 90, 180, 300, 600, or 900 peak PAR µmol photons m^−2^s^−1^; and photoperiods of 8, 12, 16, or 24 h. Figure represents all data (small symbols) and means (big symbols) from exponential phase, or from pre-stationary growth phase. Blue solid line shows linear model fit.](../Output/Figures/Fig_SigmaPig590.png)
 
 # Discussion {.unnumbered}
 
