@@ -170,12 +170,15 @@ group_by(SampleID, E_days, Par_ue, Photoperiod) %>%
   mutate(SumAbNorm = sum(AbsNorm440)) %>% 
 ungroup()
 ```
-# Cleaning df before saving as rds and removed unnecessary files from the environment
+
+# Cleaning df before saving as Rds
 
 ```{r cleaning and ordering OLISSpectraMeta440 before creating rds}
 OLISSpectraMeta440<-OLISSpectraMeta440 %>% 
   select(-c(CDateTime, Range)) 
 ```
+
+# Removed unnecessary files from the environment
 
 ```{r removed unnecessary df from the environment}
 rm(Absorbance440, CultureCatalog, TargetSpectra, OLISSpectraMeta, TargetSpectraLong)

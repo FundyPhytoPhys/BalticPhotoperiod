@@ -83,7 +83,7 @@ OLISSpectraFileName <- str_split(string = OLISSpectraFile, "/")[[1]][3] %>%
 OLISSpectra <- readRDS(OLISSpectraFile)  %>%
   ungroup()
 
-JazFile <- "../Data/ImportedData/ImportedJazEmData/BalticPhotoperiod_Imported_JazEmDataMS.Rds"
+JazFile <- "../Data/ImportedData/ImportedJazEmData/BalticPhotoperiod_Imported_JazEmData.Rds"
 JazFileName <- str_split(string = JazFile, "/")[[1]][3] %>%
   str_remove(pattern = ".Rds")
 JazData <- readRDS(JazFile)  %>%
@@ -453,7 +453,7 @@ OLISSpectraMetaPURShort %>%
         legend.text = element_text(size=10))
 ```
 
-# Cleaning df before saving as rds and removed unnecessary files from the environment
+# Cleaning df before saving as Rds and removed unnecessary files from the environment
 
 ```{r delete unused df from the environment}
 rm(data_textpigment1,data_textpigment2,data_textpigment3,data_textpigment4,data_textpigment5,data_textpigment6, data_textpigment7, data_textpigment8, data_textpigment9, data_textpigment10, data_textpigment11, data_textpigment12, arrowdf1,arrowdf2,arrowdf3,arrowdf4,arrowdf5,arrowdf6, arrowdf7, arrowdf8, arrowdf9, arrowdf10, arrowdf11, arrowdf12, data_textPUR0, data_textPUR00, data_textPUR1,data_textPUR2, JazData, JazDataRoundMeta, OLISSpectraMetaPURShortBA127R, OLISSpectraMetaPURShortBA77G, OLISSpectraMeta, OLISSpectra)
@@ -567,7 +567,7 @@ tMaxAGLines_127Select<-tmaxAGSelect %>%
 ```{r Create final PUR/PAR ratio plot}
 lab1=c(expression("PC-rich_056"), expression("PC-rich_077"), expression("PE-rich_048"), expression("PE-rich_127"))
 lab2=c(expression("8 h"), expression("12 h"), expression("16 h"), expression("24 h"))
-lab3=c(expression("30 µE"), expression("90 µE"), expression("180 µE"), expression("300 µE"), expression("900 µE"))
+lab3=c(expression("30 µE"), expression("90 µE"), expression("180 µE"), expression("300 µE"), expression("600 µE"), expression("900 µE"))
 
 OLISAllPURTidy %>%
   filter(PARPhotonDoseTidy == 4.32000|
@@ -587,6 +587,85 @@ OLISAllPURTidy %>%
   scale_y_continuous(breaks=seq(0, 1.2, by = 0.4)) +
   coord_cartesian(ylim = c(0, 1.5)) +
   ggh4x::facet_nested(cols = vars(facetsPARPhotonDose_day, PARPhotonDoseTidy), labeller = label_parsed) +
+  theme_bw() +
+  theme(panel.grid.minor = element_blank(),
+        panel.grid.major = element_blank(),
+        axis.text = element_text(size=12),
+        axis.title = element_text(size=16),
+        strip.background = element_rect(fill="white"),
+        strip.text = element_text(size=12),
+        axis.title.y = element_text(margin=margin(r=10)),
+        axis.title.x = element_text(margin=margin(t=10)),
+        legend.background = element_rect(fill="white"),
+        legend.position = c(0.08,0.87),
+        legend.key.height= unit(0.005, 'cm'),
+        legend.spacing.y = unit(-0.005, "cm"),
+        legend.spacing.x = unit(-0.005, "cm"),
+        legend.title = element_blank(),
+        legend.text = element_text(size=10))
+```
+
+# Create preliminary plot
+
+```{r preliminary plot, fig.height = 8, fig.width = 8}
+lab1=c(expression("PC-rich_056"), expression("PC-rich_077"), expression("PE-rich_048"), expression("PE-rich_127"))
+lab2=c(expression("8 h"), expression("12 h"), expression("16 h"), expression("24 h"))
+lab3=c(expression("30 µE"), expression("90 µE"), expression("180 µE"), expression("300 µE"), expression("600 µE"), expression("900 µE"))
+
+OLISSpectraMetaPUR %>%
+  filter(E_days != 0) %>% 
+  ggplot() +
+  geom_area(aes(x = nm, y = EmNormJaz439), fill = "gray84", alpha = 0.6, show.legend = F) +
+  geom_line(aes(x = nm, y = AbsNorm440, colour = as.factor(Strain)), show.legend = F, linewidth = 0.7,  alpha = 0.5) +
+  stat_wl_strip(aes(x = nm), ymin = -Inf, ymax = -0.025, alpha = 0.5) +
+  scale_fill_identity() +
+  scale_colour_discrete(type=c("seagreen4", "palegreen3", "brown1", "brown4")) +
+  scale_y_continuous(breaks=seq(0, 3, by = 1)) +
+  coord_cartesian(ylim = c(0, 3)) +
+  labs(y = "Normalized absorbance", x = "Wavelength (nm)") +
+  ggh4x::facet_nested(cols = vars(Photoperiod), rows = vars(Strain), labeller = label_parsed) +
+  theme_bw() +
+  theme(panel.grid.minor = element_blank(),
+        panel.grid.major = element_blank(),
+        panel.spacing.x = unit(0.4, 'cm'),
+        axis.text = element_text(size=12),
+        axis.title = element_text(size=16),
+        strip.background = element_rect(fill="white"),
+        strip.text = element_text(size=12),
+        axis.title.y = element_text(margin=margin(r=10)),
+        axis.title.x = element_text(margin=margin(t=10)),
+        legend.background = element_rect(fill="white"),
+        legend.position = c(0.08,0.87),
+        legend.key.height= unit(0.005, 'cm'),
+        legend.spacing.y = unit(-0.005, "cm"),
+        legend.spacing.x = unit(-0.005, "cm"),
+        legend.title = element_blank(),
+        legend.text = element_text(size=10))
+```
+# Save plot 
+
+```{r save plot}
+ggsave(file = file.path(FigPath, paste("SFig_OlisSpectra_Photoperiod",".png",sep = "")), height=10, width= 8,  dpi = 300, limitsize = TRUE)
+```
+
+# Create preliminary plot
+
+```{r preliminary plot}
+lab1=c(expression("PC-rich_056"), expression("PC-rich_077"), expression("PE-rich_048"), expression("PE-rich_127"))
+lab2=c(expression("8 h"), expression("12 h"), expression("16 h"), expression("24 h"))
+lab3=c(expression("30 µE"), expression("90 µE"), expression("180 µE"), expression("300 µE"), expression("600 µE"), expression("900 µE"))
+
+OLISSpectraMetaPUR %>%
+  ggplot() +
+  geom_area(aes(x = nm, y = EmNormJaz439), fill = "gray84", alpha = 0.6, show.legend = F) +
+  geom_line(aes(x = nm, y = AbsNorm440, colour = as.factor(Strain)), show.legend = F, linewidth = 0.7) +
+  scale_colour_discrete(type=c("seagreen4", "palegreen3", "brown1", "brown4")) +
+  stat_wl_strip(aes(x = nm), ymin = -Inf, ymax = -0.025, alpha = 0.5) +
+  scale_fill_identity() +
+  scale_y_continuous(breaks=seq(0, 3, by = 1)) +
+  coord_cartesian(ylim = c(0, 3)) +
+  labs(y = "Normalized absorbance", x = "Wavelength (nm)") +
+  ggh4x::facet_nested(cols = vars(Par_ue), rows = vars(Strain), labeller = label_parsed) +
   theme_bw() +
   theme(panel.grid.minor = element_blank(),
         panel.grid.major = element_blank(),
