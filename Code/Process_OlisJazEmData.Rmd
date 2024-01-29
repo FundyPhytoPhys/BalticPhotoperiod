@@ -28,7 +28,7 @@ knitr::opts_chunk$set(fig.path='Figs/')
 
 # Introduction
 
-Process_OlisJazEmData.Rmd processes and combines BalticPhotoperiod_Imported_JazEmData.Rds from Data/ImportedData/ImportedJazEmData folder and BalticPhotoperiod_Imported_OlisData.Rds from Data/ImportedData/ImportedOlisData folder. This .Rmd generates BalticPhotoperiod_Processed_OlisSpectraAll.Rds and BalticPhotoperiod_Processed_OlisSpectraTidy.Rds (both stored in Data/ProcessedData/ProcessedOlisJazData folder) and OlisSpectra_Plot.png (stored in Output/Plots folder).
+Process_OlisJazEmData.Rmd processes and combines BalticPhotoperiod_Imported_JazEmData.Rds from Data/ImportedData/ImportedJazEmData folder and BalticPhotoperiod_Imported_OlisData.Rds from Data/ImportedData/ImportedOlisData folder. This .Rmd generates BalticPhotoperiod_Processed_OlisSpectraAll.Rds and BalticPhotoperiod_Processed_OlisSpectraTidy.Rds (both stored in Data/ProcessedData/ProcessedOlisJazData folder) and 1 plot (stored in Output/Figures folder).
 
 # Load Libraries and set Project Variables
 
@@ -83,7 +83,7 @@ OLISSpectraFileName <- str_split(string = OLISSpectraFile, "/")[[1]][3] %>%
 OLISSpectra <- readRDS(OLISSpectraFile)  %>%
   ungroup()
 
-JazFile <- "../Data/ImportedData/ImportedJazEmData/BalticPhotoperiod_Imported_JazEmData.Rds"
+JazFile <- "../Data/ImportedData/ImportedJazEmData/BalticPhotoperiod_Imported_JazEmDataMS.Rds"
 JazFileName <- str_split(string = JazFile, "/")[[1]][3] %>%
   str_remove(pattern = ".Rds")
 JazData <- readRDS(JazFile)  %>%
@@ -92,44 +92,41 @@ JazData <- readRDS(JazFile)  %>%
 
 # Preparing df for further analysis
 
-```{r round nm}
-JazData <- JazData %>%
-   mutate(WavelengthRound = round(Wavelength))
-colnames(JazData)
-
-JazDataRound <- JazData %>%
-group_by(FilenameJaz, WavelengthRound) %>%
-  summarize(Counts, FilenameJaz, ObsDate, Strain, Par_ue, WL, WavelengthRound, CountsMean = mean(Counts)) %>%
-ungroup()
-
-JazDataRound <- JazDataRound %>%
-  summarize(FilenameJaz, Strain, Par_ue, WL, WavelengthRound, CountsMean) %>%
-  unique()
-
-JazDataRound <- JazDataRound %>%
-  filter(WavelengthRound >= 400 & WavelengthRound <= 700)
+```{r}
+JazData<-JazData %>% 
+  filter(WL == "WW") %>% 
+  filter(MC == "MC257") %>% 
+  select(-c(MCMeasuredPar_uE, MCSetPar_uE))
 ```
 
 # Normalize Jaz emission to 439 nm
 
 ```{r Normalization Jaz emission at 439}
-EmissionJazWW <- JazDataRound %>%
-  group_by(WL, Strain, Par_ue) %>%
-  filter(WavelengthRound == 439) %>%
-  mutate(EmJaz439 = CountsMean) %>%
-  select(Strain, EmJaz439, Par_ue) %>%
-  ungroup()
+EmissionJazWW <- JazData %>%
+  #group_by(WL) %>%
+  filter(MCEm_nm == 439) %>%
+  mutate(EmJaz439 = Emission) %>%
+  select(EmJaz439) 
+  # ungroup()
+JazDataRoundMeta <- JazData %>%
+  cross_join(., EmissionJazWW) %>%
+  mutate(EmNormJaz439 = Emission / EmJaz439)
 
-JazDataRoundMeta <- JazDataRound %>%
-  left_join(., EmissionJazWW) %>%
-  mutate(EmNormJaz439 = CountsMean / EmJaz439)
+rm(EmissionJazWW)
+```
+
+# Remove unrevelant columns 
+
+```{r}
+JazDataRoundMeta<-JazDataRoundMeta %>% 
+  select(-c(MC, WL, ObsDateJaz))
 ```
 
 # Merge Olis and Jaz data
 
 ```{r combine Olis spectra and Jaz data}
 OLISSpectraMeta <- OLISSpectra %>%
-  left_join(., JazDataRoundMeta, by = c("Par_ue" = "Par_ue", "nm" = "WavelengthRound", "Strain" = "Strain", "WL" = "WL")) %>%
+  left_join(., JazDataRoundMeta, by = c("nm" = "MCEm_nm")) %>%
   unique()
 ```
 
@@ -145,7 +142,7 @@ OLISSpectraMetaPUR <- OLISSpectraMeta %>%
   ungroup() 
 ```
 
-# Calculate daily PUR photon dose
+# Calculate daily PUR photon dose and PUR/PAR ratio
 
 ```{r calculate PUR Photon dose}
 OLISSpectraMetaPUR1 <- OLISSpectraMetaPUR %>%
@@ -156,8 +153,11 @@ OLISSpectraMetaPUR2 <- OLISSpectraMetaPUR %>%
   filter(Photoperiod == "24") %>% 
   mutate(PURPhotonDose_day = PUR*Photoperiod*3600)
   
-  OLISSpectraMetaPUR <-rbind(OLISSpectraMetaPUR1, OLISSpectraMetaPUR2)
+OLISSpectraMetaPUR <-rbind(OLISSpectraMetaPUR1, OLISSpectraMetaPUR2)
   rm(OLISSpectraMetaPUR1,OLISSpectraMetaPUR2)
+
+OLISSpectraMetaPUR <-OLISSpectraMetaPUR %>% 
+  mutate(PURPARRatio = PUR/Par_ue)  
 ```
 
 # Filter unrevelant data
@@ -190,7 +190,7 @@ OLISSpectraMetaPURShortBA77G<- OLISSpectraMetaPUR %>%
   select(-c(PURNorm, FilenameJaz, FilenameOlis))
 
 OLISSpectraMetaPURShort <- OLISSpectraMetaPURShortBA127R %>%
-  full_join(., OLISSpectraMetaPURShortBA77G, by = c("SampleID" = "SampleID", "Run" = "Run", "Strain" = "Strain", "ExpDate" = "ExpDate", "Par_ue" = "Par_ue", "Photoperiod" = "Photoperiod", "MC"="MC", "Tube" = "Tube", "O2" = "O2", "WL" = "WL", "LightShape" = "LightShape", "ExpEndDate"="ExpEndDate", "nm" = "nm", "ObsDate" = "ObsDate", "Absorbance" = "Absorbance", "SumAb" = "SumAb", "Abs440" = "Abs440", "AbsNorm440" = "AbsNorm440", "SumAbNorm" = "SumAbNorm", "E_days" = "E_days", "CountsMean" = "CountsMean", "EmJaz439" = "EmJaz439", "EmNormJaz439" = "EmNormJaz439", "PURNormSum" = "PURNormSum", "SumEmNormJaz439" = "SumEmNormJaz439", "PUR" = "PUR", "PURPhotonDose_day" = "PURPhotonDose_day", "PARPhotonDose_day" = "PARPhotonDose_day")) 
+  full_join(., OLISSpectraMetaPURShortBA77G, by = c("SampleID" = "SampleID", "Run" = "Run", "Strain" = "Strain", "ExpDate" = "ExpDate", "Par_ue" = "Par_ue", "Photoperiod" = "Photoperiod", "MC"="MC", "Tube" = "Tube", "O2" = "O2", "WL" = "WL", "LightShape" = "LightShape", "ExpEndDate"="ExpEndDate", "nm" = "nm", "ObsDate" = "ObsDate", "Absorbance" = "Absorbance", "SumAb" = "SumAb", "Abs440" = "Abs440", "AbsNorm440" = "AbsNorm440", "SumAbNorm" = "SumAbNorm", "E_days" = "E_days", "Emission" = "Emission", "EmJaz439" = "EmJaz439", "EmNormJaz439" = "EmNormJaz439", "PURNormSum" = "PURNormSum", "SumEmNormJaz439" = "SumEmNormJaz439", "PUR" = "PUR", "PURPhotonDose_day" = "PURPhotonDose_day", "PARPhotonDose_day" = "PARPhotonDose_day")) 
 ```
 
 ```{r Changes strain names}
@@ -263,7 +263,7 @@ OLISSpectraMetaPURShort %>%
   geom_area(aes(x = nm, y = EmNormJaz439, fill = "gray84"), alpha = 0.6, show.legend = F) +
   geom_area(aes(x = nm, y = PURNormBA127R, fill = "brown4"), alpha = 0.5, show.legend = F) +
   geom_area(aes(x = nm, y = PURNormBA77G, fill = "palegreen3"), alpha = 0.5, show.legend = F) +
-  geom_line(aes(x = nm, y = AbsNorm440, colour = as.factor(Strain), linetype = as.factor(Strain)), show.legend = F, size = 0.4) +
+  geom_line(aes(x = nm, y = AbsNorm440, colour = as.factor(Strain), linetype = as.factor(Strain)), show.legend = F, linewidth = 0.4) +
 
   geom_text(data=data_textPUR0, aes(x=446, y=1.26, label=label), size=3.7) +
   geom_text(data=data_textPUR00, aes(x=446, y=1.26, label=label), size=3.7) +
@@ -393,7 +393,7 @@ OLISSpectraMetaPURShort %>%
   geom_area(aes(x = nm, y = EmNormJaz439, fill = "gray84"), alpha = 0.6, show.legend = F) +
   geom_area(aes(x = nm, y = PURNormBA127R, fill = "brown4"), alpha = 0.5, show.legend = F) +
   geom_area(aes(x = nm, y = PURNormBA77G, fill = "palegreen3"), alpha = 0.5, show.legend = F) +
-  geom_line(aes(x = nm, y = AbsNorm440, colour = as.factor(Strain), linetype = as.factor(Strain)), show.legend = F, size = 0.7) +
+  geom_line(aes(x = nm, y = AbsNorm440, colour = as.factor(Strain), linetype = as.factor(Strain)), show.legend = F, linewidth = 0.7) +
 
   geom_text(data=data_textPUR0, aes(x=435, y=1.26, label=label), size=3.5) +
   geom_text(data=data_textPUR1, aes(x=462, y=1.21, label=label), size=3.5) +
@@ -456,14 +456,14 @@ OLISSpectraMetaPURShort %>%
 # Cleaning df before saving as rds and removed unnecessary files from the environment
 
 ```{r delete unused df from the environment}
-rm(data_textpigment1,data_textpigment2,data_textpigment3,data_textpigment4,data_textpigment5,data_textpigment6, data_textpigment7, data_textpigment8, data_textpigment9, data_textpigment10, data_textpigment11, data_textpigment12, arrowdf1,arrowdf2,arrowdf3,arrowdf4,arrowdf5,arrowdf6, arrowdf7, arrowdf8, arrowdf9, arrowdf10, arrowdf11, arrowdf12, data_textPUR0, data_textPUR00, data_textPUR1,data_textPUR2, EmissionJazWW, JazData, JazDataRound, JazDataRoundMeta, OLISSpectraMetaPURShortBA127R, OLISSpectraMetaPURShortBA77G, OLISSpectraMeta, OLISSpectra)
+rm(data_textpigment1,data_textpigment2,data_textpigment3,data_textpigment4,data_textpigment5,data_textpigment6, data_textpigment7, data_textpigment8, data_textpigment9, data_textpigment10, data_textpigment11, data_textpigment12, arrowdf1,arrowdf2,arrowdf3,arrowdf4,arrowdf5,arrowdf6, arrowdf7, arrowdf8, arrowdf9, arrowdf10, arrowdf11, arrowdf12, data_textPUR0, data_textPUR00, data_textPUR1,data_textPUR2, JazData, JazDataRoundMeta, OLISSpectraMetaPURShortBA127R, OLISSpectraMetaPURShortBA77G, OLISSpectraMeta, OLISSpectra)
 ```
 
 # Create tidy df without all nm
 
 ```{r clean df, create smaller df - without absorbance and all nm}
 OLISAllPURTidy<-OLISSpectraMetaPUR %>% 
-  select(-c(Absorbance, nm, Abs440, AbsNorm440, EmJaz439, EmNormJaz439, PURNorm, CountsMean, SumAbNorm, PURNormSum, SumEmNormJaz439)) %>% 
+  select(-c(Absorbance, nm, Abs440, AbsNorm440, EmJaz439, EmNormJaz439, PURNorm, Emission, SumAbNorm, PURNormSum, SumEmNormJaz439, SumAb, FilenameJaz, EmMax_nm)) %>% 
   unique()
 
 OLISAllPURTidy<-OLISAllPURTidy %>% 
@@ -492,23 +492,6 @@ OLISAllPURTidy$facetsPhotoperiod = factor(OLISAllPURTidy$WL, labels = c("Photope
 OLISAllPURTidy$facetsStrain = factor(OLISAllPURTidy$WL, labels = c("Strain"))
 OLISAllPURTidy$facetsPhase = factor(OLISAllPURTidy$WL, labels = c("Phase~of~growth"))
 OLISAllPURTidy$facetsPARPhotonDose_day = factor(OLISAllPURTidy$WL, labels = c("PAR~photon~dose~(10^{5}~µmol~photons~m^{-2}~d^{-1})"))
-```
-
-# Create preliminary PUR/PAR ratio plot
-
-```{r preliminary plot}
-# lab1=c(expression("PC-rich_056"), expression("PC-rich_077"), expression("PE-rich_048"), expression("PE-rich_127"))
-# lab2=c(expression("8 h"), expression("12 h"), expression("16 h"), expression("24 h"))
-# lab3=c(expression("30 µE"), expression("90 µE"), expression("180 µE"), expression("300 µE"), expression("900 µE"))
-# 
-# OLISAllPURTidy %>%
-#   ggplot() +
-#   geom_point(aes(x = E_hours, y = PURPARRatio, colour = as.factor(Strain)), alpha = 0.9, size = 3, show.legend = T) +
-#   scale_colour_discrete(type=c("seagreen4", "palegreen3", "brown1", "brown4"), name="", labels = lab1) +
-#   scale_y_continuous(breaks=seq(0, 1.2, by = 0.4)) +
-#   coord_cartesian(ylim = c(0, 1.7)) +
-#   ggh4x::facet_nested(cols = vars(facetsPhotoperiod, Photoperiod), rows = vars(facetsPar_ue, Par_ue), labeller = label_parsed) +
-#   theme_bw()
 ```
 
 # Load tmaxAG catalog 
@@ -579,9 +562,9 @@ tMaxAGLines_127Select<-tmaxAGSelect %>%
   unique()
 ```
 
-# Create plot
+# Create preliminary plot
 
-```{r Create final PUR/PAR ratio plot, fig.height = 5, fig.width = 8}
+```{r Create final PUR/PAR ratio plot}
 lab1=c(expression("PC-rich_056"), expression("PC-rich_077"), expression("PE-rich_048"), expression("PE-rich_127"))
 lab2=c(expression("8 h"), expression("12 h"), expression("16 h"), expression("24 h"))
 lab3=c(expression("30 µE"), expression("90 µE"), expression("180 µE"), expression("300 µE"), expression("900 µE"))
@@ -631,8 +614,15 @@ rm(tMaxAGLines_056Select, tMaxAGLines_077Select, tMaxAGLines_048Select, tMaxAGLi
 # Save Fig Rds
 
 ```{r}
-saveRDS(OLISSpectraMetaPURShort, file.path(FigRdsPath, paste(Project, "Fig_OlisSpectra_1.Rds", sep = "_"), fsep = .Platform$file.sep), ascii = FALSE, version = NULL, compress = "xz", refhook = NULL)
+# saveRDS(OLISSpectraMetaPURShort, file.path(FigRdsPath, paste(Project, "Fig_OlisSpectra_1.Rds", sep = "_"), fsep = .Platform$file.sep), ascii = FALSE, version = NULL, compress = "xz", refhook = NULL)
 ```
+
+# Remove Fig Rds
+
+```{r}
+# rm(OLISSpectraMetaPURShort)
+```
+
 
 # Save Rds for further analysis
 
