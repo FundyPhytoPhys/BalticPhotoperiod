@@ -1,6 +1,7 @@
 ---
 title: "Import_JazEmData"
 author:
+- Mireille Savoie
 - Sylwia Sliwinska-Wilczewska
 - Douglas A. Campbell
 date: "`r format(Sys.Date())`"
@@ -28,16 +29,28 @@ knitr::opts_chunk$set(fig.path='Figs/')
 
 # Introduction
 
-Import_JazEmData.Rmd imports Jaz radiospectrometer files from Data/RawData/JazEmData.zip folder and stored in Data/ImportedData/ImportedJazEmData folder as: 
-BalticPhotoperiod_Imported_JazEmData.Rds
+Import_JazEmData.Rmd imports Jaz radiospectrometer files from Data/RawData/JazEmData.zip folder and stored in Data/ImportedData/ImportedJazEmData folder as: BalticPhotoperiod_Imported_JazEmData.Rds
 
-# Load Libraries and set Project Variables
+# Load Libraries
 
 ```{r load libraries, warning = FALSE, echo=FALSE}
 library(tidyverse)
-library(lubridate)
-library(googledrive)
+# library(googledrive)
+library(photobiologyWavebands)
 ```
+
+# Set Photobiology colors
+
+```{r set colours}
+Wavelengths_nm = c(405, 445, 470, 530, 620, 660, 730, "WW")
+MCMIXColours = c(c(w_length2rgb(405), w_length2rgb(445), w_length2rgb(470), w_length2rgb(530), 
+                   w_length2rgb(620), w_length2rgb(660), w_length2rgb(730), "black"))
+
+names(MCMIXColours) <- Wavelengths_nm
+MCMIXColours
+```
+
+# Set Project Variables
 
 ```{r set project variables, read zipped files, list available files, warning = FALSE, echo=FALSE}
 Project <- "BalticPhotoperiod"
@@ -133,8 +146,6 @@ JazSpecTrim <- JazSpecTrim %>%
 ```{r cleaning JazSpecTrim for final rds}
 JazSpecTrim<-JazSpecTrim %>% 
   select(-c(CDateTime))
-
-colnames(JazSpecTrim)
 ```
 # Removed unnecessary files from the environment
 
@@ -142,7 +153,7 @@ colnames(JazSpecTrim)
 rm(JazSpec)
 ```
 
-# Save rds for further analysis
+# Save Rds for further analysis
 
 ```{r save rds}
 saveRDS(JazSpecTrim, file.path(DataOut, paste(Project, "Imported_JazEmData.Rds", sep = "_"), fsep = .Platform$file.sep), ascii = FALSE, version = NULL, compress = "xz", refhook = NULL)

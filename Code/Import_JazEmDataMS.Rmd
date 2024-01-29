@@ -29,16 +29,17 @@ knitr::opts_chunk$set(fig.path='Figs/')
 
 # Introduction
 
-Import_JazEmData.Rmd imports and tidies Jaz radiospectrometer files from Data/RawData/JazEmData.zip The tidied data is saved as a .Rds in Data/ImportedData/ImportedJazEmData folder as: 
-PICO_Imported_JazEmData.Rds
+Import_JazEmData.Rmd imports Jaz radiospectrometer files from Data/RawData/JazEmData.zip folder and stored in Data/ImportedData/ImportedJazEmData folder as: BalticPhotoperiod_Imported_JazEmData.Rds
 
 # Load Libraries 
+
 ```{r load libraries, warning = FALSE, echo=FALSE}
 library(tidyverse)
 library(photobiologyWavebands)
 ```
 
-#set Photobiology colors
+# Set Photobiology colors
+
 ```{r set colours}
 Wavelengths_nm = c(405, 445, 470, 530, 620, 660, 730, "WW")
 MCMIXColours = c(c(w_length2rgb(405), w_length2rgb(445), w_length2rgb(470), w_length2rgb(530), 
@@ -49,12 +50,13 @@ MCMIXColours
 ```
 
 # Set Project Variables
+
 ```{r set project variables, read zipped files, list available files, warning = FALSE, echo=FALSE}
-Project <- "PICO"
+Project <- "BalticPhotoperiod"
 DataOut <- file.path("..", "Data", "ImportedData", "ImportedJazEmData", fsep = .Platform$file.sep)
 
 # Set the path to the zip folder
-DataIn <- file.path("..", "Data", "RawData", "JazEmData.zip")
+DataIn <- file.path("..", "Data", "RawData", "JazEmDataMS.zip")
 
 RollWindow <- 10
 
@@ -63,9 +65,10 @@ Jazfile <- unzip(DataIn, list = TRUE)
 Jazfile <- Jazfile[grepl(".txt$", Jazfile$Name), "Name"]
 print(Jazfile)
 ```
-# Import MultiCulti actinic par data
-```{r read multiculti PAR data}
 
+# Import MultiCulti actinic par data
+
+```{r read multiculti PAR data}
 TargetFile <- "MultiCulti_PAR.csv"
 
 MultiCultiPAR <- read_csv(unz(DataIn, TargetFile)) %>% 
@@ -73,11 +76,11 @@ MultiCultiPAR <- read_csv(unz(DataIn, TargetFile)) %>%
 ```
 
 # Set up fread_plus function
+
 ```{r set up fread_plus, warning = FALSE, echo=FALSE}
 SkipCS <- 14
 FileEncodeCS <- "UTF-8"
 DelimCS <- "\t"
-
 
 # Define function to read and process each file
 fread_plus <- function(Flnm, Skip, FileEncode, Delim) {
@@ -106,6 +109,7 @@ colnames(JazSpec)[2] <- "Counts"
 ```
 
 # Import and tidy emission data columns
+
 ```{r filename separation, warning = FALSE, echo=FALSE}
 JazSpec <- JazSpec %>% 
   mutate(Filename = str_remove(Filename, pattern = " "))  %>% 
@@ -120,12 +124,14 @@ mutate(ObsDate = ymd(ObsDate),
 ```
 
 # Select wavelength range from 350 to 750 nm
+
 ```{r select range of nm}
 JazSpecTrim <- JazSpec %>% 
   subset(JazSpec$Wavelength >= 350 & JazSpec$Wavelength <= 750)
 ```
 
 # Remove all NA columns & empty rows, fix column types
+
 ```{r remove empty rows and fix column types}
 not_all_na <- function(x) {!all(is.na(x))}
 
@@ -134,18 +140,19 @@ JazSpecTrim <- JazSpecTrim %>%
 ```
 
 # Find nm at max count
+
 ```{r find nm at max count}
 JazSpecTrim <- JazSpecTrim %>% 
   group_by(WL, MultiCulti) %>%
-   mutate(EmMax_nm = round(Wavelength[which.max(Counts)])) %>% 
+  mutate(EmMax_nm = round(Wavelength[which.max(Counts)])) %>% 
   ungroup()
 ```
 
+# Get 1 mean emission count for each wavelength after rounding for a resolution of 1 nm 
 
-# Get 1 mean emission count for each wavelength after rounding for a resolution of 1 nm   
 ```{r tidy to get one count for each wavelength}
 JazSpecTrim <- JazSpecTrim %>% 
-   group_by(MultiCulti, Par_ue, WL, Wavelength) %>%
+  group_by(MultiCulti, Par_ue, WL, Wavelength) %>%
   mutate(MCEm_nm = round(Wavelength)) %>%
   ungroup() %>%
   group_by(FilenameJaz, MultiCulti, Par_ue, WL, MCEm_nm, EmMax_nm, ObsDate) %>%
@@ -156,46 +163,46 @@ JazSpecTrim <- JazSpecTrim %>%
          SetPar_uE = Par_ue,
          MC_SpectralID = paste(MC,WL, sep = "_")) %>% 
   select(-c(MeanEmission))
-
 ```
 
 # Join MulitiCulti par data with emission data
+
 ```{r join par with spectral data}
 MC_SpectraPAR <- left_join(JazSpecTrim, MultiCultiPAR, by = c("WL" = "Actinic_nm", "SetPar_uE", "MC" = "MultiCulti")) %>%
   rename(MCSetPar_uE = 'SetPar_uE',
          MCMeasuredPar_uE = 'MeasuredPar_uE') %>% 
   select(-c(Par_ue, MultiCulti, Date))
-  
 ```
 
+# Nest data for each MC emission wavelenth if needed
 
-
-# Nest data for each MC emission wavelenth
 ```{r nest the spectral data}
-
-JazSpecNest <- MC_SpectraPAR %>%
-  nest(EmSpectra = c(MCEm_nm, Emission))
-
-colnames(JazSpecNest)
+JazSpecNest <- MC_SpectraPAR 
+  #nest(EmSpectra = c(MCEm_nm, Emission))
 ```
 
+# Cleaning df before saving as Rds
+
+```{r cleaning JazSpecTrim for final rds}
+JazSpecNest<-JazSpecNest %>% 
+  select(-c(MC_SpectralID))
+```
+
+# Removed unnecessary files from the environment
 
 ```{r remove redundant DF}
-remove(JazSpecTrim)
-remove(JazSpec)
-remove(MC_SpectraPAR)
-remove(MultiCultiPAR)
+rm(JazSpecTrim, JazSpec, MC_SpectraPAR, MultiCultiPAR)
 ```
 
-# Plot to confirm data tidy
-```{r Prelim plot}
+# Create preliminary plot to confirm data tidy
 
+```{r Preliminary plot}
 # Adding the maximum (peak) value in ggplot for geom_smoth
 # https://stackoverflow.com/questions/71162252/adding-the-maximum-peak-value-in-ggplot-for-geom-smooth
 
 JazSpecNest %>%
-  unnest(EmSpectra) %>%
-    ggplot() +
+  #unnest(EmSpectra) %>%
+  ggplot() +
   geom_point(aes(x = MCEm_nm, y = Emission, colour = as.factor(WL))) +
   geom_text(aes(x = EmMax_nm, y= max(Emission), label= EmMax_nm), alpha = 0.5 ,hjust = 0.5, vjust=-0.5) +
   scale_color_manual(values = MCMIXColours) +
@@ -204,14 +211,12 @@ JazSpecNest %>%
   scale_y_continuous(limits = c(0,100000)) +
   ggh4x::facet_nested(rows = vars(MC, WL), labeller = labeller(WL = label_both, Par = label_both, MultiCulti = label_both)) +
   theme_bw() 
-
 ```
 
-
-# Save rds for further analysis
+# Save Rds for further analysis
 
 ```{r save rds}
-saveRDS(JazSpecNest, file.path(DataOut, paste(Project, "Imported_JazEmData.Rds", sep = "_"), fsep = .Platform$file.sep), ascii = FALSE, version = NULL, compress = "xz", refhook = NULL)
+saveRDS(JazSpecNest, file.path(DataOut, paste(Project, "Imported_JazEmDataMS.Rds", sep = "_"), fsep = .Platform$file.sep), ascii = FALSE, version = NULL, compress = "xz", refhook = NULL)
 ```
 
 # Variable names used in Data Dictionary
@@ -219,3 +224,6 @@ saveRDS(JazSpecNest, file.path(DataOut, paste(Project, "Imported_JazEmData.Rds",
 ```{r}
 colnames(JazSpecNest)
 ```
+
+
+
