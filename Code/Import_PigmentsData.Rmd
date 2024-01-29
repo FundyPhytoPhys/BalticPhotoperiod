@@ -791,10 +791,20 @@ OLISSpectraMeta<-OLISSpectraMeta650
 
 ```{r}
 OLISSpectraMeta <- OLISSpectraMeta %>%
-  select(-c(SumAb, SumAbNorm, AbsNorm440, nm, Absorbance, CountsMean, EmNormJaz439, EmJaz439, Abs440, PURNorm, PURNormSum)) %>% 
+  select(-c(SumAb, SumAbNorm, AbsNorm440, nm, Absorbance, Emission, EmNormJaz439, EmJaz439, Abs440, PURNorm, PURNormSum, EmMax_nm, SumEmNormJaz439)) %>% 
   unique()
 
 rm(Absorbance650, Absorbance620, Absorbance565, Absorbance480, Absorbance665, OLISSpectraMeta650, OLISSpectraMeta620, OLISSpectraMeta565, OLISSpectraMeta480, OLISSpectraMeta665)
+```
+
+# Change Strain name for consistency
+
+```{r}
+PigmentsClario<-PigmentsClario %>% 
+      mutate(Strain=case_when(Strain=="BA127R"~"PE-rich_127",
+         Strain=="BA48R"~"PE-rich_048",
+        Strain=="BA56G"~"PC-rich_056",
+         Strain=="BA77G"~"PC-rich_077"))
 ```
 
 # Preparing Pigments Clario (filters) for correlation
@@ -804,6 +814,7 @@ PigmentsClarioClean <- PigmentsClario %>%
   summarise(SampleID, Run, Strain, ExpDate, Par_ue, Photoperiod, Tube, O2, WL, LightShape, Chla_ugmL, Car_ugmL, PC_ugmL, APC_ugmL, PE_ugmL, E_days) %>% 
 unique()
 ```
+
 # Merge Pigments Clario (filters) and Olis - contained pigments value from filters and selected Ab from Olis
 
 ```{r}
@@ -819,7 +830,7 @@ https://www.datacamp.com/tutorial/linear-regression-R
 
 ```{r}
 ClarioPigmentChla <- PigmentsClarioOlisCorr %>% 
-    filter(Strain != "BA127R") 
+    filter(Strain != "PE-rich_127") 
 my_dataChla <- ClarioPigmentChla
 ggscatter(my_dataChla, x = "Abs665", y = "Chla_ugmL", 
           add = "reg.line", conf.int = TRUE, 
@@ -833,7 +844,7 @@ summary(lmChla)
 
 
 ClarioPigmentCar <- PigmentsClarioOlisCorr %>% 
-    filter(Strain != "BA127R") 
+    filter(Strain != "PE-rich_127") 
 my_dataCar <- ClarioPigmentCar
 ggscatter(my_dataCar, x = "Abs480", y = "Car_ugmL", 
           add = "reg.line", conf.int = TRUE, 
@@ -848,7 +859,7 @@ summary(lmCar)
 
 ClarioPigmentPE <- PigmentsClarioOlisCorr %>% 
     filter(PE_ugmL < 10) %>% 
-    filter(Strain != "BA56G")
+    filter(Strain != "PC-rich_056")
 my_dataPE <- ClarioPigmentPE
 ggscatter(my_dataPE, x = "Abs565", y = "PE_ugmL", 
           add = "reg.line", conf.int = TRUE, 
@@ -862,7 +873,7 @@ summary(lmPE)
 
 
 ClarioPigmentPC <- PigmentsClarioOlisCorr %>% 
-    filter(Strain != "BA56G")
+    filter(Strain != "PC-rich_056")
 my_dataPC <- ClarioPigmentPC
 ggscatter(my_dataPC, x = "Abs620", y = "PC_ugmL", 
           # color = "Strain",
@@ -903,7 +914,7 @@ PigmentsCorrelation<-rbind(data_textPaersonChla, data_textPaersonCar, data_textP
 
 
 ClarioPigmentChla %>% 
-  filter(Strain != "BA127R") %>% 
+  filter(Strain != "PE-rich_127") %>% 
   ggplot(aes(x = Abs665, y = Chla_ugmL)) +
   geom_point(aes(x = Abs665, y = Chla_ugmL), show.legend = "none", colour = "midnightblue", size = 3, alpha = 0.4) +
   geom_text(data=data_textPaersonChla, aes(x=0.06, y=8, label=Equation), size=4) +
@@ -913,7 +924,7 @@ ClarioPigmentChla %>%
   theme_bw()
 
 ClarioPigmentCar %>% 
-  filter(Strain != "BA127R") %>% 
+  filter(Strain != "PE-rich_127") %>% 
   ggplot(aes(x = Abs480, y = Car_ugmL)) +
   geom_point(aes(x = Abs480, y = Car_ugmL), show.legend = "none", colour = "midnightblue", size = 3, alpha = 0.4) +
   geom_text(data=data_textPaersonCar, aes(x=0.06, y=8, label=Equation), size=4) +
@@ -924,7 +935,7 @@ ClarioPigmentCar %>%
 
 ClarioPigmentPE %>% 
   filter(PE_ugmL < 10) %>% 
-  filter(Strain != "BA56G") %>% 
+  filter(Strain != "PC-rich_056") %>% 
   ggplot(aes(x = Abs565, y = PE_ugmL)) +
   geom_point(aes(x = Abs565, y = PE_ugmL), show.legend = "none", colour = "midnightblue", size = 3, alpha = 0.4) +
   geom_text(data=data_textPaersonPE, aes(x=0.06, y=8, label=Equation), size=4) +
@@ -934,7 +945,7 @@ ClarioPigmentPE %>%
   theme_bw()
 
 ClarioPigmentPC %>% 
-  filter(Strain != "BA56G") %>% 
+  filter(Strain != "PC-rich_056") %>% 
   ggplot(aes(x = Abs620, y = PC_ugmL)) +
   geom_point(aes(x = Abs620, y = PC_ugmL), show.legend = "none", colour = "midnightblue", size = 3, alpha = 0.4) +
   geom_text(data=data_textPaersonPC, aes(x=0.06, y=8, label=Equation), size=4) +
@@ -970,21 +981,11 @@ PigmentsClarioOlisCorr <- PigmentsClarioOlisCorr %>%
   mutate(PEPCRatio = PEugmL/PCugmL)
 ```
 
-# Change Strain name for consistency
-
-```{r}
-PigmentsClarioOlisCorr<-PigmentsClarioOlisCorr %>% 
-      mutate(Strain=case_when(Strain=="BA127R"~"PE-rich_127",
-         Strain=="BA48R"~"PE-rich_048",
-        Strain=="BA56G"~"PC-rich_056",
-         Strain=="BA77G"~"PC-rich_077"))
-```
-
 # Removed pigmnents data from filters - keeping only pigments based on correlation (OLIS)
 
 ```{r}
 PigmentsClarioOlisCorr<-PigmentsClarioOlisCorr %>% 
-  select(-c(Chla_ugmL, Car_ugmL, PE_ugmL, PC_ugmL, APC_ugmL, FilenameJaz, FilenameOlis, SumEmNormJaz439)) %>% 
+  select(-c(Chla_ugmL, Car_ugmL, PE_ugmL, PC_ugmL, APC_ugmL, FilenameJaz, FilenameOlis)) %>% 
   rename(ObsDateOlis = ObsDate)
 ```
 
@@ -1059,7 +1060,7 @@ MC_cellmL <- rbind(MCBA127R, MCBA48R, MCBA56G, MCBA77G)
 
 ```{r, warning = FALSE, echo = FALSE}
 MC_cellmLPigment <- MC_cellmL %>%
-  left_join(., PigmentsClarioOlisCorr, by = c("SampleID"="SampleID", "Run" = "Run", "Strain" = "Strain", "ExpDate" = "ExpDate", "Par_ue" = "Par_ue", "Photoperiod" = "Photoperiod", "Tube" = "Tube", "O2" = "O2", "WL" = "WL", "LightShape" = "LightShape", "ExpEndDate"="ExpEndDate","E_days" = "E_days")) 
+  left_join(., PigmentsClarioOlisCorr, by = c("SampleID"="SampleID", "Run" = "Run", "Strain" = "Strain", "ExpDate" = "ExpDate", "Par_ue" = "Par_ue", "Photoperiod" = "Photoperiod", "Tube" = "Tube", "O2" = "O2", "WL" = "WL", "LightShape" = "LightShape", "ExpEndDate"="ExpEndDate","E_days" = "E_days", "facetsPhotoperiod" = "facetsPhotoperiod", "facetsPar_ue" = "facetsPar_ue")) 
 ```
 
 # Estimated Pigments content per cell (fg/cell) - based on correlations
@@ -1109,6 +1110,7 @@ saveRDS(MC_cellmLPigment, file.path(DataOut, paste(Project, "Imported_PigmentsDa
 ```{r}
 colnames(MC_cellmLPigment)
 ```
+
 # Correlations from Polish flowcytometer (BD Accuri) and Polish Spec if needed
 
 ```{r}
