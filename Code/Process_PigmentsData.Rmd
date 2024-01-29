@@ -91,9 +91,6 @@ MCPigment<-MCPigment %>%
 ```{r Replace negative values, warning=FALSE}
 MCPigment <- MCPigment
 MCPigment[MCPigment < 0] <- 0
-
-# MCPigment<-MCPigment %>% 
-#   filter(PhycoChlaRatio<10)
 ```
 
 # Calculate number of cells per L and PUR/PAR ratio
@@ -237,7 +234,7 @@ tMaxAGLines_127Select<-tmaxAGSelect %>%
 
 # Create pigments per cell plot
 
-```{r Final pigments per cell plot, fig.height = 8, fig.width = 8}
+```{r Final pigments per cell plot}
 scientific_10 <- function(x) {   parse(text=gsub("e\\+*", " %*% 10^", scales::scientific_format()(x))) }
 lab1=c(expression("PC-rich_056"), expression("PC-rich_077"), expression("PE-rich_048"), expression("PE-rich_127"))
 lab2=c(expression("8 h"), expression("12 h"), expression("16 h"), expression("24 h"))
@@ -332,7 +329,7 @@ MCPigmentRatioPlot <- MCPigmentRatioPlot %>%
 MCPigmentRatioPlot$facetsPARPhotonDose_day = factor(MCPigmentRatioPlot$WL, labels = c("PAR~photon~dose~(10^{5}~µmol~photons~m^{-2}~d^{-1})"))
 ```
 
-```{r Final pigments per cell plot, fig.height = 5, fig.width = 8}
+```{r Final pigments per cell plot}
 data_textA <- data.frame(
   facetsPARPhotonDose_day=c("PAR~photon~dose~(10^{5}~µmol~photons~m^{-2}~d^{-1})"),
   PARPhotonDoseTidy = c(86.40000),
@@ -387,7 +384,7 @@ Plot1
 
 # Create PUR/PAR ratio plot
 
-```{r create PUR/PAR ratio plot, fig.height = 5, fig.width = 8}
+```{r create PUR/PAR ratio plot}
 data_textB <- data.frame(
   facetsPARPhotonDose_day=c("PAR~photon~dose~(10^{5}~µmol~photons~m^{-2}~d^{-1})"),
   PARPhotonDoseTidy = c(86.40000),
@@ -437,7 +434,7 @@ Plot2
 
 # Merge two plots into one with panel A and B
 
-```{r Final Plot arrange, fig.height = 10, fig.width = 8, warning = FALSE}
+```{r Final Plot arrange, warning = FALSE}
 ggarrange(Plot1,Plot2,
           ncol = 1, nrow = 2)
 ```
@@ -468,17 +465,17 @@ rm(data_textA, data_textB, Plot1, Plot2, tMaxAGLines_056Select, tMaxAGLines_077S
 # Merge Pigment data and tMaxAG to divide pigments from exponential and pre-stationary phase
 
 ```{r Combine pigment and tMaxAG df}
-MCPigmenttMaxAG <- MCPigment %>%
-  left_join(., tmaxAG, by = c("Strain"="Strain","Par_ue"="Par_ue","Photoperiod"="Photoperiod", "WL"="WL", "O2"="O2", "PARPhotonDose_day"="PARPhotonDose_day", "facetsPar_ue"="facetsPar_ue", "facetsPhotoperiod"="facetsPhotoperiod"))
+MCPigmenttMaxAG <- MCPigment 
+#   left_join(., tmaxAG, by = c("Strain"="Strain","Par_ue"="Par_ue","Photoperiod"="Photoperiod", "WL"="WL", "O2"="O2", "PARPhotonDose_day"="PARPhotonDose_day", "facetsPar_ue"="facetsPar_ue", "facetsPhotoperiod"="facetsPhotoperiod"))
 ```
 
 # Divided pigments data to Exponential and Pre-stationary phase according to tmaxAG
 
 ```{r divided pigments data to Exponential and Pre-stationary}
-MCPigmenttMaxAG <- MCPigmenttMaxAG %>%
-  mutate(Phase = O2) %>%
-  mutate(Phase=case_when(E_days<=dayRound_tmaxAG~"Exponential",
-         E_days>dayRound_tmaxAG~"Pre-stationary")) 
+# MCPigmenttMaxAG <- MCPigmenttMaxAG %>%
+#   mutate(Phase = O2) %>%
+#   mutate(Phase=case_when(E_days<=dayRound_tmaxAG~"Exponential",
+#          E_days>dayRound_tmaxAG~"Pre-stationary")) 
 ```
 
 
