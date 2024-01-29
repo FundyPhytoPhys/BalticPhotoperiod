@@ -459,39 +459,18 @@ OLISSpectraMetaPURShort %>%
 rm(data_textpigment1,data_textpigment2,data_textpigment3,data_textpigment4,data_textpigment5,data_textpigment6, data_textpigment7, data_textpigment8, data_textpigment9, data_textpigment10, data_textpigment11, data_textpigment12, arrowdf1,arrowdf2,arrowdf3,arrowdf4,arrowdf5,arrowdf6, arrowdf7, arrowdf8, arrowdf9, arrowdf10, arrowdf11, arrowdf12, data_textPUR0, data_textPUR00, data_textPUR1,data_textPUR2, JazData, JazDataRoundMeta, OLISSpectraMetaPURShortBA127R, OLISSpectraMetaPURShortBA77G, OLISSpectraMeta, OLISSpectra)
 ```
 
-# Create tidy df without all nm
-
-```{r clean df, create smaller df - without absorbance and all nm}
-OLISAllPURTidy<-OLISSpectraMetaPUR %>% 
-  select(-c(Absorbance, nm, Abs440, AbsNorm440, EmJaz439, EmNormJaz439, PURNorm, Emission, SumAbNorm, PURNormSum, SumEmNormJaz439, SumAb, FilenameJaz, EmMax_nm)) %>% 
-  unique()
-
-OLISAllPURTidy<-OLISAllPURTidy %>% 
-  group_by(Strain, Par_ue, Photoperiod, E_days, MC, Run) %>%
-  mutate(PURPARRatio = PUR/Par_ue) %>% 
-ungroup()
-
-OLISAllPURTidy <- OLISAllPURTidy %>% 
-  mutate(E_hours = E_days*24) %>% 
-  filter(PURPARRatio<=1) %>% 
-  filter(PURPARRatio>0)
-```
-
-# Preparing df for creating plot
+# Preparing df for creating plot - added proper strain names and facet labels
 
 ```{r create tidy PAR photon dose and facets for plot}
-OLISAllPURTidy <- OLISAllPURTidy %>%
-    mutate(PARPhotonDoseTidy=PARPhotonDose_day/100000) %>% 
+OLISSpectraMetaPUR <- OLISSpectraMetaPUR %>%
     mutate(Strain=case_when(Strain=="BA127R"~"PE-rich_127",
          Strain=="BA48R"~"PE-rich_048",
         Strain=="BA56G"~"PC-rich_056",
          Strain=="BA77G"~"PC-rich_077"))
-
-OLISAllPURTidy$facetsPar_ue = factor(OLISAllPURTidy$O2, labels = c("PAR~(µmol~photons~m^{-2}~s^{-1})"))
-OLISAllPURTidy$facetsPhotoperiod = factor(OLISAllPURTidy$WL, labels = c("Photoperiod~(h)"))
-OLISAllPURTidy$facetsStrain = factor(OLISAllPURTidy$WL, labels = c("Strain"))
-OLISAllPURTidy$facetsPhase = factor(OLISAllPURTidy$WL, labels = c("Phase~of~growth"))
-OLISAllPURTidy$facetsPARPhotonDose_day = factor(OLISAllPURTidy$WL, labels = c("PAR~photon~dose~(10^{5}~µmol~photons~m^{-2}~d^{-1})"))
+OLISSpectraMetaPUR$facetsPar_ue = factor(OLISSpectraMetaPUR$O2, labels = c("PAR~(µmol~photons~m^{-2}~s^{-1})"))
+OLISSpectraMetaPUR$facetsPhotoperiod = factor(OLISSpectraMetaPUR$WL, labels = c("Photoperiod~(h)"))
+OLISSpectraMetaPUR$facetsStrain = factor(OLISSpectraMetaPUR$WL, labels = c("Strain"))
+OLISSpectraMetaPUR$facetsPhase = factor(OLISSpectraMetaPUR$WL, labels = c("Phase~of~growth"))
 ```
 
 # Load tmaxAG catalog 
@@ -526,6 +505,167 @@ tmaxAG24<-tmaxAG %>%
   mutate(PARPhotonDose_day = Par_ue*Photoperiod*3600) 
 tmaxAG <-rbind(tmaxAGno24, tmaxAG24)
   rm(tmaxAGno24, tmaxAG24)
+```
+
+# Merge OlisJaz data and tMaxAG to divide spectra from exponential and pre-stationary phase
+
+```{r Combine pigment and tMaxAG df}
+OLISSpectraMetaPURMaxAG <- OLISSpectraMetaPUR %>%
+  left_join(., tmaxAG, by = c("Strain"="Strain","Par_ue"="Par_ue","Photoperiod"="Photoperiod", "WL"="WL", "O2"="O2", "PARPhotonDose_day"="PARPhotonDose_day", "facetsPar_ue"="facetsPar_ue", "facetsPhotoperiod"="facetsPhotoperiod", "facetsStrain" = "facetsStrain"))
+```
+
+# Divided pigments data to Exponential and Pre-stationary phase according to tmaxAG
+
+```{r divided pigments data to Exponential and Pre-stationary}
+OLISSpectraMetaPURMaxAG <- OLISSpectraMetaPURMaxAG %>%
+  mutate(Phase = O2) %>%
+  mutate(Phase=case_when(E_days<=dayRound_tmaxAG~"Exponential",
+         E_days>dayRound_tmaxAG~"Pre-stationary")) 
+```
+
+# Choose selected spectra - for plot only
+
+```{r}
+OLISSelect <-OLISSpectraMetaPURMaxAG %>%
+  filter(Run == 50) %>% 
+  filter(E_days == 1) %>% 
+  select(-c(Phase))
+OLISSelect$Phase <- 'Exponential'
+
+OLISSelectBA56Exp <-OLISSpectraMetaPURMaxAG %>%
+  filter(Strain == "PC-rich_056") %>% 
+  filter(E_days == 3 & Par_ue == 30 & Photoperiod == 12) 
+OLISSelectBA77Exp <-OLISSpectraMetaPURMaxAG %>%
+  filter(Strain == "PC-rich_077") %>% 
+  filter(E_days == 4 & Par_ue == 30 & Photoperiod == 16) 
+OLISSelectBA48Exp <-OLISSpectraMetaPURMaxAG %>%
+  filter(Strain == "PE-rich_048") %>% 
+  filter(E_days == 2 & Par_ue == 30 & Photoperiod == 8) 
+OLISSelectBA127Exp <-OLISSpectraMetaPURMaxAG %>%
+  filter(Strain == "PE-rich_127") %>% 
+  filter(E_days == 2 & Par_ue == 300 & Photoperiod == 12) 
+
+OLISSelectBA56St <-OLISSpectraMetaPURMaxAG %>%
+  filter(Strain == "PC-rich_056") %>% 
+  filter(E_days == 7 & Par_ue == 900 & Photoperiod == 8) 
+OLISSelectBA77St <-OLISSpectraMetaPURMaxAG %>%
+  filter(Strain == "PC-rich_077") %>% 
+  filter(E_days == 7 & Par_ue == 900 & Photoperiod == 8) 
+OLISSelectBA48St <-OLISSpectraMetaPURMaxAG %>%
+  filter(Strain == "PE-rich_048") %>% 
+  filter(E_days == 14 & Par_ue == 30 & Photoperiod == 12) 
+OLISSelectBA127St <-OLISSpectraMetaPURMaxAG %>%
+  filter(Strain == "PE-rich_127") %>% 
+  filter(E_days == 14 & Par_ue == 30 & Photoperiod == 12) 
+
+OLISSelectStrains<-rbind(OLISSelectBA56Exp, OLISSelectBA77Exp, OLISSelectBA48Exp, OLISSelectBA127Exp, OLISSelectBA56St, OLISSelectBA77St, OLISSelectBA48St, OLISSelectBA127St)
+
+rm(OLISSelectBA56Exp, OLISSelectBA77Exp, OLISSelectBA48Exp, OLISSelectBA127Exp, OLISSelectBA56St, OLISSelectBA77St, OLISSelectBA48St, OLISSelectBA127St)
+```
+
+# Testing max peak condition
+
+```{r}
+# Test<-OLISSpectraMetaPURMaxAG %>% 
+#   filter(Strain == "PE-rich_127") %>% 
+#   filter(Phase == "Pre-stationary")
+```
+
+# Create preliminary plot
+
+```{r preliminary plot, fig.height = 8, fig.width = 8}
+# data_text_Exp<- data.frame(WL = c("WW", "WW"), facetsPhase = c("Phase~of~growth"), Phase = c("Exponential"), facetsStrain = c("Strain"), Strain  = c("PC-rich_056", "PC-rich_077", "PE-rich_048", "PE-rich_127"),  label = c('Max peak - day 3, 30 µE, 12 h', 'Max peak - day 4, 30 µE, 16 h', 'Max peak - day 2, 30 µE, 8 h', 'Max peak - day 2, 300 µE, 12 h'))
+# 
+# data_text_St<- data.frame(WL = c("WW", "WW"), facetsPhase = c("Phase~of~growth"), Phase = c("Pre-stationary"), facetsStrain = c("Strain"), Strain  = c("PC-rich_056", "PC-rich_077", "PE-rich_048", "PE-rich_127"),  label = c('Max peak - day 7, 900 µE, 8 h', 'Max peak - day 7, 900 µE, 8 h', 'Max peak - day 14, 30 µE, 12 h', 'Max peak - day 14, 30 µE, 12 h'))
+
+data_text_Exp<- data.frame(WL = c("WW", "WW"), facetsPhase = c("Phase~of~growth"), Phase = c("Exponential"), facetsStrain = c("Strain"), Strain  = c("PC-rich_056", "PC-rich_077", "PE-rich_048", "PE-rich_127"),  label = c('Max peak: day 3', 'Max peak: day 4', 'Max peak: day 2', 'Max peak: day 2'))
+data_text_St<- data.frame(WL = c("WW", "WW"), facetsPhase = c("Phase~of~growth"), Phase = c("Pre-stationary"), facetsStrain = c("Strain"), Strain  = c("PC-rich_056", "PC-rich_077", "PE-rich_048", "PE-rich_127"),  label = c('Max peak: day 7', 'Max peak: day 7', 'Max peak: day 14', 'Max peak: day 14'))
+
+data_text_Exp1<- data.frame(WL = c("WW", "WW"), facetsPhase = c("Phase~of~growth"), Phase = c("Exponential"), facetsStrain = c("Strain"), Strain  = c("PC-rich_056", "PC-rich_077", "PE-rich_048", "PE-rich_127"),  label = c('30 µE, 12 h', '30 µE, 16 h', '30 µE, 8 h', ' 300 µE, 12 h'))
+data_text_St1<- data.frame(WL = c("WW", "WW"), facetsPhase = c("Phase~of~growth"), Phase = c("Pre-stationary"), facetsStrain = c("Strain"), Strain  = c("PC-rich_056", "PC-rich_077", "PE-rich_048", "PE-rich_127"),  label = c('900 µE, 8 h', '900 µE, 8 h', '30 µE, 12 h', '30 µE, 12 h'))
+
+lab1=c(expression("PC-rich_056"), expression("PC-rich_077"), expression("PE-rich_048"), expression("PE-rich_127"))
+lab2=c(expression("8 h"), expression("12 h"), expression("16 h"), expression("24 h"))
+lab3=c(expression("30 µE"), expression("90 µE"), expression("180 µE"), expression("300 µE"), expression("600 µE"), expression("900 µE"))
+
+OLISSpectraMetaPURMaxAG %>%
+  filter(Phase == "Exponential" | Phase == "Pre-stationary") %>% 
+  filter(E_days != 1) %>% 
+  ggplot() +
+  geom_area(aes(x = nm, y = EmNormJaz439), fill = "gray84", alpha = 0.6, show.legend = F) +
+  geom_line(aes(x = nm, y = AbsNorm440, colour = as.factor(Strain)), show.legend = F, linewidth = 0.7,  alpha = 0.5) +
+  
+  geom_line(aes(x = nm, y = AbsNorm440), show.legend = F, linewidth = 0.5,  colour = "gray20", alpha = 0.7, OLISSelect) +
+  geom_line(aes(x = nm, y = AbsNorm440), show.legend = F, linewidth = 0.5,  colour = "blue", alpha = 0.7, OLISSelectStrains) +
+  
+  geom_text(data=data_text_Exp, aes(x=450, y=2.8, label=label), colour = "blue", size=3.5) +
+  geom_text(data=data_text_St, aes(x=450, y=2.8, label=label), colour = "blue", size=3.5) +
+  geom_text(data=data_text_Exp1, aes(x=435, y=2.4, label=label), colour = "blue", size=3.5) +
+  geom_text(data=data_text_St1, aes(x=435, y=2.4, label=label), colour = "blue", size=3.5) +
+  
+  stat_wl_strip(aes(x = nm), ymin = -Inf, ymax = -0.025, alpha = 0.5) +
+  scale_fill_identity() +
+  scale_colour_discrete(type=c("seagreen4", "palegreen3", "brown1", "brown4")) +
+  scale_y_continuous(breaks=seq(0, 3, by = 1)) +
+  coord_cartesian(ylim = c(0, 3)) +
+  labs(y = "Normalized absorbance", x = "Wavelength (nm)") +
+  ggh4x::facet_nested(cols = vars(facetsPhase, Phase), rows = vars(facetsStrain, Strain), labeller = label_parsed) +
+  theme_bw() +
+  theme(panel.grid.minor = element_blank(),
+        panel.grid.major = element_blank(),
+        panel.spacing.x = unit(0.4, 'cm'),
+        axis.text = element_text(size=12),
+        axis.title = element_text(size=16),
+        strip.background = element_rect(fill="white"),
+        strip.text = element_text(size=12),
+        axis.title.y = element_text(margin=margin(r=10)),
+        axis.title.x = element_text(margin=margin(t=10)),
+        legend.background = element_rect(fill="white"),
+        legend.position = c(0.08,0.87),
+        legend.key.height= unit(0.005, 'cm'),
+        legend.spacing.y = unit(-0.005, "cm"),
+        legend.spacing.x = unit(-0.005, "cm"),
+        legend.title = element_blank(),
+        legend.text = element_text(size=10))
+```
+
+# Save plot 
+
+```{r save plot}
+ggsave(file = file.path(FigPath, paste("Fig_OlisSpectra_Phase",".png",sep = "")), height=10, width= 8,  dpi = 300, limitsize = TRUE)
+```
+
+# Removed unnecessary files from the environment
+
+```{r}
+rm(data_text_Exp, data_text_St, data_text_Exp1, data_text_St1, OLISSelectStrains, OLISSelect)
+```
+
+# Create tidy df without all nm
+
+```{r clean df, create smaller df - without absorbance and all nm}
+OLISAllPURTidy<-OLISSpectraMetaPUR %>% 
+  select(-c(Absorbance, nm, Abs440, AbsNorm440, EmJaz439, EmNormJaz439, PURNorm, Emission, SumAbNorm, PURNormSum, SumEmNormJaz439, SumAb, FilenameJaz, EmMax_nm)) %>% 
+  unique()
+
+OLISAllPURTidy<-OLISAllPURTidy %>% 
+  group_by(Strain, Par_ue, Photoperiod, E_days, MC, Run) %>%
+  mutate(PURPARRatio = PUR/Par_ue) %>% 
+ungroup()
+
+OLISAllPURTidy <- OLISAllPURTidy %>% 
+  mutate(E_hours = E_days*24) %>% 
+  filter(PURPARRatio<=1) %>% 
+  filter(PURPARRatio>0)
+```
+
+# Preparing df for creating plot
+
+```{r create tidy PAR photon dose and facets for plot}
+OLISAllPURTidy <- OLISAllPURTidy %>%
+    mutate(PARPhotonDoseTidy=PARPhotonDose_day/100000) 
+
+OLISAllPURTidy$facetsPARPhotonDose_day = factor(OLISAllPURTidy$WL, labels = c("PAR~photon~dose~(10^{5}~µmol~photons~m^{-2}~d^{-1})"))
 ```
 
 # Select variable for choosen PARPhotonDose to create a plot
@@ -587,126 +727,33 @@ OLISAllPURTidy %>%
   scale_y_continuous(breaks=seq(0, 1.2, by = 0.4)) +
   coord_cartesian(ylim = c(0, 1.5)) +
   ggh4x::facet_nested(cols = vars(facetsPARPhotonDose_day, PARPhotonDoseTidy), labeller = label_parsed) +
-  theme_bw() +
-  theme(panel.grid.minor = element_blank(),
-        panel.grid.major = element_blank(),
-        axis.text = element_text(size=12),
-        axis.title = element_text(size=16),
-        strip.background = element_rect(fill="white"),
-        strip.text = element_text(size=12),
-        axis.title.y = element_text(margin=margin(r=10)),
-        axis.title.x = element_text(margin=margin(t=10)),
-        legend.background = element_rect(fill="white"),
-        legend.position = c(0.08,0.87),
-        legend.key.height= unit(0.005, 'cm'),
-        legend.spacing.y = unit(-0.005, "cm"),
-        legend.spacing.x = unit(-0.005, "cm"),
-        legend.title = element_blank(),
-        legend.text = element_text(size=10))
+  theme_bw()
 ```
 
-# Create preliminary plot
-
-```{r preliminary plot, fig.height = 8, fig.width = 8}
-lab1=c(expression("PC-rich_056"), expression("PC-rich_077"), expression("PE-rich_048"), expression("PE-rich_127"))
-lab2=c(expression("8 h"), expression("12 h"), expression("16 h"), expression("24 h"))
-lab3=c(expression("30 µE"), expression("90 µE"), expression("180 µE"), expression("300 µE"), expression("600 µE"), expression("900 µE"))
-
-OLISSpectraMetaPUR %>%
-  filter(E_days != 0) %>% 
-  ggplot() +
-  geom_area(aes(x = nm, y = EmNormJaz439), fill = "gray84", alpha = 0.6, show.legend = F) +
-  geom_line(aes(x = nm, y = AbsNorm440, colour = as.factor(Strain)), show.legend = F, linewidth = 0.7,  alpha = 0.5) +
-  stat_wl_strip(aes(x = nm), ymin = -Inf, ymax = -0.025, alpha = 0.5) +
-  scale_fill_identity() +
-  scale_colour_discrete(type=c("seagreen4", "palegreen3", "brown1", "brown4")) +
-  scale_y_continuous(breaks=seq(0, 3, by = 1)) +
-  coord_cartesian(ylim = c(0, 3)) +
-  labs(y = "Normalized absorbance", x = "Wavelength (nm)") +
-  ggh4x::facet_nested(cols = vars(Photoperiod), rows = vars(Strain), labeller = label_parsed) +
-  theme_bw() +
-  theme(panel.grid.minor = element_blank(),
-        panel.grid.major = element_blank(),
-        panel.spacing.x = unit(0.4, 'cm'),
-        axis.text = element_text(size=12),
-        axis.title = element_text(size=16),
-        strip.background = element_rect(fill="white"),
-        strip.text = element_text(size=12),
-        axis.title.y = element_text(margin=margin(r=10)),
-        axis.title.x = element_text(margin=margin(t=10)),
-        legend.background = element_rect(fill="white"),
-        legend.position = c(0.08,0.87),
-        legend.key.height= unit(0.005, 'cm'),
-        legend.spacing.y = unit(-0.005, "cm"),
-        legend.spacing.x = unit(-0.005, "cm"),
-        legend.title = element_blank(),
-        legend.text = element_text(size=10))
-```
-# Save plot 
-
-```{r save plot}
-ggsave(file = file.path(FigPath, paste("SFig_OlisSpectra_Photoperiod",".png",sep = "")), height=10, width= 8,  dpi = 300, limitsize = TRUE)
-```
-
-# Create preliminary plot
-
-```{r preliminary plot}
-lab1=c(expression("PC-rich_056"), expression("PC-rich_077"), expression("PE-rich_048"), expression("PE-rich_127"))
-lab2=c(expression("8 h"), expression("12 h"), expression("16 h"), expression("24 h"))
-lab3=c(expression("30 µE"), expression("90 µE"), expression("180 µE"), expression("300 µE"), expression("600 µE"), expression("900 µE"))
-
-OLISSpectraMetaPUR %>%
-  ggplot() +
-  geom_area(aes(x = nm, y = EmNormJaz439), fill = "gray84", alpha = 0.6, show.legend = F) +
-  geom_line(aes(x = nm, y = AbsNorm440, colour = as.factor(Strain)), show.legend = F, linewidth = 0.7) +
-  scale_colour_discrete(type=c("seagreen4", "palegreen3", "brown1", "brown4")) +
-  stat_wl_strip(aes(x = nm), ymin = -Inf, ymax = -0.025, alpha = 0.5) +
-  scale_fill_identity() +
-  scale_y_continuous(breaks=seq(0, 3, by = 1)) +
-  coord_cartesian(ylim = c(0, 3)) +
-  labs(y = "Normalized absorbance", x = "Wavelength (nm)") +
-  ggh4x::facet_nested(cols = vars(Par_ue), rows = vars(Strain), labeller = label_parsed) +
-  theme_bw() +
-  theme(panel.grid.minor = element_blank(),
-        panel.grid.major = element_blank(),
-        axis.text = element_text(size=12),
-        axis.title = element_text(size=16),
-        strip.background = element_rect(fill="white"),
-        strip.text = element_text(size=12),
-        axis.title.y = element_text(margin=margin(r=10)),
-        axis.title.x = element_text(margin=margin(t=10)),
-        legend.background = element_rect(fill="white"),
-        legend.position = c(0.08,0.87),
-        legend.key.height= unit(0.005, 'cm'),
-        legend.spacing.y = unit(-0.005, "cm"),
-        legend.spacing.x = unit(-0.005, "cm"),
-        legend.title = element_blank(),
-        legend.text = element_text(size=10))
-```
-
-# Cleaning df before saving as rds and removed unnecessary files from the environment
+# Removed unnecessary files from the environment
 
 ```{r}
-rm(tMaxAGLines_056Select, tMaxAGLines_077Select, tMaxAGLines_048Select, tMaxAGLines_127Select, tmaxAG, tmaxAGSelect)
+rm(tMaxAGLines_056Select, tMaxAGLines_077Select, tMaxAGLines_048Select, tMaxAGLines_127Select, tmaxAG, tmaxAGSelect, OLISSpectraMetaPUR)
 ```
 
 # Save Fig Rds
 
 ```{r}
 # saveRDS(OLISSpectraMetaPURShort, file.path(FigRdsPath, paste(Project, "Fig_OlisSpectra_1.Rds", sep = "_"), fsep = .Platform$file.sep), ascii = FALSE, version = NULL, compress = "xz", refhook = NULL)
+
+# saveRDS(OLISSpectraMetaPURMaxAG, file.path(FigRdsPath, paste(Project, "Fig_OlisSpectra_2.Rds", sep = "_"), fsep = .Platform$file.sep), ascii = FALSE, version = NULL, compress = "xz", refhook = NULL)
 ```
 
 # Remove Fig Rds
 
 ```{r}
-# rm(OLISSpectraMetaPURShort)
+rm(OLISSpectraMetaPURShort)
 ```
-
 
 # Save Rds for further analysis
 
 ```{r save Rds}
-saveRDS(OLISSpectraMetaPUR, file.path(DataOut, paste(Project, "Processed_OlisSpectraAll.Rds", sep = "_"), fsep = .Platform$file.sep), ascii = FALSE, version = NULL, compress = "xz", refhook = NULL)
+saveRDS(OLISSpectraMetaPURMaxAG, file.path(DataOut, paste(Project, "Processed_OlisSpectraAll.Rds", sep = "_"), fsep = .Platform$file.sep), ascii = FALSE, version = NULL, compress = "xz", refhook = NULL)
 
 saveRDS(OLISAllPURTidy, file.path(DataOut, paste(Project, "Processed_OlisSpectraTidy.Rds", sep = "_"), fsep = .Platform$file.sep), ascii = FALSE, version = NULL, compress = "xz", refhook = NULL)
 ```
@@ -714,7 +761,7 @@ saveRDS(OLISAllPURTidy, file.path(DataOut, paste(Project, "Processed_OlisSpectra
 # Variable names used in Data Dictionary
 
 ```{r}
-colnames(OLISSpectraMetaPUR)
+colnames(OLISSpectraMetaPURMaxAG)
 ```
 
 # Variable names used in Data Dictionary
