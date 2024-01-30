@@ -28,7 +28,7 @@ knitr::opts_chunk$set(fig.path='Figs/')
 
 # Introduction
 
-Process_PigmentsData.Rmd processes and combines BalticPhotoperiod_Imported_PigmentsData.Rds from Data/ImportedData/ImportedPigmentsData and tmaxAG Catalog from google sheet. This .Rmd generates BalticPhotoperiod_Processed_PigmentAll.Rds and BalticPhotoperiod_Processed_PigmentsExp.Rds (both stored in Data/ProcessedData/ProcessedPigmentsData folder) and two plots (stored in Output/Figures folder).
+Process_PigmentsData.Rmd processes BalticPhotoperiod_Imported_PigmentsData.Rds from Data/ImportedData/ImportedPigmentsData. This .Rmd generates BalticPhotoperiod_Processed_PigmentAll.Rds and BalticPhotoperiod_Processed_PigmentsExp.Rds (both stored in Data/ProcessedData/ProcessedPigmentsData folder) and one plots (stored in Output/Figures folder).
 
 # Load Libraries and set Project Variables
 
