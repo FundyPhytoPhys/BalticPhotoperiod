@@ -51,7 +51,7 @@ library(minpack.lm) #Standard 'nls' framework that uses 'nls.lm' for fitting
 
 ```{r set project variables}
 Project <- "BalticPhotoperiod"
-DataOut <- file.path("..", "Data", "ProcessedData", "ProcessedGrowthRateData")
+DataOut <- file.path("..", "Data", "ProcessedData", "ProcessedGrowthRateSolisenseData")
 DataInGrowthRate <- file.path("..", "Data", "ProcessedData", "ProcessedGrowthRateData", fsep = .Platform$file.sep)
 
 DataInSolisense <- file.path("..", "Data", "ProcessedData", "ProcessedSolisenseData", fsep = .Platform$file.sep)
@@ -73,23 +73,42 @@ list.files(path = DataInSolisense, pattern = Project, full.names = TRUE)
 ```
 
 ```{r read ProcessFile}
-GrowthRateFile <- "../Data/ProcessedData/ProcessedGrowthRateData/BalticPhotoperiod_Processed_GrowthRate.Rds"
+GrowthRateFile <- "../Data/ProcessedData/ProcessedGrowthRateData/BalticPhotoperiod_Processed_GrowthRateAll.Rds"
 GrowthRateFileName <- str_split(string = GrowthRateFile, "/")[[1]][3] %>%
   str_remove(pattern = ".Rds")
 
 GrowthRate <- readRDS(GrowthRateFile)  %>%
   ungroup()
 
+# GrowthRate<-GrowthRate %>% 
+#   rename(E_daysExpPUR=E_daysExp) %>% 
+#   rename(E_hoursExpPUR=E_hoursExp) %>% 
+#   rename(ObsDatePUR=ObsDate) %>% 
+#   rename(E_daysPUR=E_days) %>% 
+#   rename(E_hoursPUR=E_hours)  
+
 GrowthRate<-GrowthRate %>% 
-  rename(E_daysExpPUR=E_daysExp) %>% 
-  rename(E_hoursExpPUR=E_hoursExp) %>% 
-  rename(ObsDatePUR=ObsDate) %>% 
-  rename(E_daysPUR=E_days) %>% 
-  rename(E_hoursPUR=E_hours)  
+  select(c(SampleID, Run, Strain, Tube, MC, ExpDate, Par_ue, Photoperiod, O2, WL, LightShape, PARPhotonDose_day, FilenameMC, ExpEndDate, OD720_Lmu_se, OD720_Lmu_corr, deltaOD_Lmu_se, deltaOD_Lmu_corr)) %>% 
+  unique()
+
+#E_days, ToD, Time_h, - problem
 ```
 
+# Create preliminary plot
+
+```{r preliminary plot, warning = FALSE}
+GrowthRate %>%
+  ggplot() +
+  geom_point(aes(x = Par_ue, y = deltaOD_Lmu_corr,colour=as.factor(Strain)), size = 3.5, alpha = 0.9, show.legend = T) +
+  geom_errorbar(aes(x = Par_ue, ymin = deltaOD_Lmu_corr - deltaOD_Lmu_se, ymax = deltaOD_Lmu_corr + deltaOD_Lmu_se), alpha = 0.5) +
+  scale_colour_discrete(type=c("seagreen4", "palegreen3", "brown1", "brown4")) +
+  ggh4x::facet_nested(rows = vars(Strain), cols = vars(Photoperiod)) +
+  theme_bw()
+```
+
+
 ```{r read ProcessFile}
-SolisenseFile <- "../Data/ProcessedData/ProcessedSolisenseData/BalticPhotoperiod_Processed_SolisensePigmentsExp.Rds"
+SolisenseFile <- "../Data/ProcessedData/ProcessedSolisenseData/BalticPhotoperiod_Processed_SolisensePigmentsAll.Rds"
 SolisenseFileName <- str_split(string = SolisenseFile, "/")[[1]][3] %>%
   str_remove(pattern = ".Rds")
 
@@ -97,18 +116,30 @@ Solisense <- readRDS(SolisenseFile)  %>%
   ungroup()
 ```
 
+
+# Create preliminary plot
+
+```{r preliminary plot, warning = FALSE}
+lab1=c(expression("8 h"), expression("12 h"), expression("16 h"), expression("24 h"))
+lab2=c(expression("30 µE"), expression("90 µE"), expression("180 µE"), expression("300 µE"), expression("600 µE"), expression("900 µE"))
+
+Solisense %>% 
+  ggplot() +
+  geom_point(aes(x = TurChl_ugL, y = JVPSII_ETRqpOxbo_aLHII_Sig, colour = as.factor(Par_ue), shape = as.factor(Photoperiod)), size = 3.5, show.legend = T) +
+  scale_shape_manual(values = c(15, 16, 17,18), name="", labels = lab1) +
+  scale_colour_manual(values = c("darkslategray", "lightblue4", "hotpink4", "indianred3","goldenrod2", "khaki2"), name="", labels = lab2) +
+  ggh4x::facet_nested(cols = vars(Ex_WL), rows = vars(Strain), labeller = label_parsed) +
+  theme_bw()
+```
+
 # Merge Growth rate and Solisense
 
 ```{r Joining growth rate and Solisense exp data}
 GrowthRateSoliExp <- GrowthRate %>% 
-  left_join(., Solisense, by = c("SampleID"="SampleID", "Run"="Run",  "Strain"="Strain", "ExpDate"="ExpDate", "Par_ue"="Par_ue","Photoperiod"="Photoperiod", "O2"="O2", "WL"="WL", "PARPhotonDose_day"="PARPhotonDose_day", "facetsStrain" = "facetsStrain")) 
-```
-# Filter unrevelant data
+  left_join(., Solisense, by = c("SampleID"="SampleID", "Run"="Run",  "Strain"="Strain", "Tube" = "Tube", "MC"="MC",  "ExpDate"="ExpDate", "Par_ue"="Par_ue","Photoperiod"="Photoperiod", "O2"="O2", "WL"="WL", "PARPhotonDose_day"="PARPhotonDose_day", "LightShape" = "LightShape", "FilenameMC" = "FilenameMC", "ExpEndDate"= "ExpEndDate")) 
 
-```{r}
-GrowthRateSoliExp <- GrowthRateSoliExp %>% 
-  filter(PhycoChlaRatioExp>0)
 ```
+
 
 # Create preliminary plot
 
@@ -120,12 +151,20 @@ GrowthRateSoliExp %>%
   scale_colour_discrete(type=c("seagreen4", "palegreen3", "brown1", "brown4")) +
   ggh4x::facet_nested(rows = vars(Strain), cols = vars(Photoperiod)) +
   theme_bw()
+
+Solisense %>% 
+  ggplot() +
+  geom_point(aes(x = TurChl_ugL, y = JVPSII_ETRqpOxbo_aLHII_Sig, colour = as.factor(Par_ue), shape = as.factor(Photoperiod)), size = 3.5, show.legend = T) +
+  scale_shape_manual(values = c(15, 16, 17,18), name="", labels = lab1) +
+  scale_colour_manual(values = c("darkslategray", "lightblue4", "hotpink4", "indianred3","goldenrod2", "khaki2"), name="", labels = lab2) +
+  ggh4x::facet_nested(cols = vars(Ex_WL), rows = vars(Strain), labeller = label_parsed) +
+  theme_bw()
 ```
 
 
 
 #sig per phyco/chla ratio
-Issue - not always pigment based on Olis correspond to Solisense data-> I combine these two df with only selected exp data
+Issue - not always pigment based on Olis correspond to Solisense data-> I combine these two df with selected pigment data that correspond with the time, when sig was measured (5 measurements for pigment - Allmean)
 
 Later - come back to OD680data from Multiculti and choose cell/ml (based on pamas corr) corresponding with the same day of sigma and JVPSII!!! Before calculations! Fix this Sylwia!!!!!
 
@@ -137,15 +176,15 @@ lab2=c(expression("30 µE"), expression("90 µE"), expression("180 µE"), expres
 
 GrowthRateSoliExp %>% 
   ggplot() +
-  geom_point(aes(x = PhycoChlaRatioExp, y = Sig_nm2psii, colour = as.factor(Par_ue), shape = as.factor(Photoperiod)), size = 3.5, show.legend = T) +
+  geom_point(aes(x = AllmeanPhycoChlaRatio, y = AllmeanSig_nm2psii, colour = as.factor(Par_ue), shape = as.factor(Photoperiod)), size = 3.5, show.legend = T) +
   scale_shape_manual(values = c(15, 16, 17,18), name="", labels = lab1) +
   scale_colour_manual(values = c("darkslategray", "lightblue4", "hotpink4", "indianred3","goldenrod2", "khaki2"), name="", labels = lab2) +
-  ggh4x::facet_nested(cols = vars(Ex_WL), rows = vars(Strain), labeller = label_parsed) +
+  ggh4x::facet_nested(cols = vars(Phase, Ex_WL), rows = vars(Strain), labeller = label_parsed) +
   theme_bw()
 
 GrowthRateSoliExp %>% 
   ggplot() +
-  geom_point(aes(y = PhycoChlaRatioExp, x = JVPSII_ETRqpOxbo_aLHII_Sig, colour = as.factor(Strain)), size = 3.5, show.legend = T) +
+  geom_point(aes(y = AllmeanPhycoChlaRatio, x = JVPSII_ETRqpOxbo_aLHII_Sig, colour = as.factor(Strain)), size = 3.5, show.legend = T) +
   scale_colour_discrete(type=c("seagreen4", "palegreen3", "brown1", "brown4")) +
   ggh4x::facet_nested(cols = vars(Photoperiod), rows = vars(Par_ue), labeller = label_parsed) +
   theme_bw()
@@ -161,7 +200,7 @@ JVPSII vs Chl Turner (ug/L) and JVPSII vs photonDose
 
 GrowthRateSoliExp %>% 
   ggplot() +
-  geom_point(aes(x = ChlaugLExp, y = JVPSII_ETRqpOxbo_aLHII_Sig, colour = as.factor(Par_ue), shape = as.factor(Photoperiod)), size = 3.5, show.legend = T) +
+  geom_point(aes(x = ChlaugmL, y = JVPSII_ETRqpOxbo_aLHII_Sig, colour = as.factor(Par_ue), shape = as.factor(Photoperiod)), size = 3.5, show.legend = T) +
   # geom_errorbar(aes(x = ChlapgcellExp, ymin = AllmeanSig_nm2psii - AllsdSig_nm2psii, ymax = AllmeanSig_nm2psii + AllsdSig_nm2psii, colour=as.factor(Par_ue))) +
   scale_shape_manual(values = c(15, 16, 17,18), name="", labels = lab1) +
   scale_colour_manual(values = c("darkslategray", "lightblue4", "hotpink4", "indianred3", "goldenrod2", "khaki2"), name="", labels = lab2) +
@@ -169,13 +208,13 @@ GrowthRateSoliExp %>%
   theme_bw()
 
 
-GrowthRateSoliExp %>% 
+GrowthRateSoliExp %>%
   ggplot() +
-  geom_point(aes(x = cellLExp, y = JVPSII_ETRqpOxbo_aLHII_Sig, colour = as.factor(Par_ue), shape = as.factor(Photoperiod)), size = 3.5, show.legend = T) +
+  geom_point(aes(x = TurChl_ugL, y = JVPSII_ETRqpOxbo_aLHII_Sig, colour = as.factor(Par_ue), shape = as.factor(Photoperiod)), size = 3.5, show.legend = T) +
   scale_shape_manual(values = c(15, 16, 17,18), name="", labels = lab1) +
   scale_colour_manual(values = c("darkslategray", "lightblue4", "hotpink4", "indianred3", "goldenrod2", "khaki2"), name="", labels = lab2) +
   ggh4x::facet_nested(cols = vars(Ex_WL), rows = vars(Strain), labeller = label_parsed) +
-  theme_bw() 
+  theme_bw()
 
 
 GrowthRateSoliExp %>% 
@@ -191,7 +230,6 @@ GrowthRateSoliExp %>%
 Growth rate vs JVPSII
 
 
-#meandeltaOD_Lmu_corr ->mean for real replica from MultiCulti
 ```{r warning = FALSE}
 # JVPSII_aLHIIOxbomax
 # JVPSII_ETRtauav_FoSig
@@ -218,7 +256,7 @@ ggplot() +
 
 
 
-JVPSII per Turner Chl ug/L and per cell/L
+JVPSII per Turner Chl ug/L and per cell/L (cellL_OD680; meanTurChl_ugL)
 ```{r}
 #colnames(SolFitsAllPigment)
 
@@ -230,19 +268,19 @@ JVPSII per Turner Chl ug/L and per cell/L
 
 GrowthRateSoliExp<-GrowthRateSoliExp %>% 
   #Turner
-  mutate(JVPSII_aLHIIOxbomax_Chl = JVPSII_aLHIIOxbomax/meanChl_ugL) %>% 
-  mutate(JVPSII_ETRtauav_FoSig_Chl = JVPSII_ETRtauav_FoSig/meanChl_ugL) %>% 
-  mutate(JVPSII_ETRqpOxbo_FoSig_Chl = JVPSII_ETRqpOxbo_FoSig/meanChl_ugL) %>% 
-  mutate(JVPSII_ETRtauav_aLHII_Sig_Chl = JVPSII_ETRtauav_aLHII_Sig/meanChl_ugL) %>% 
-  mutate(JVPSII_ETRqpOxbo_aLHII_Sig_Chl = JVPSII_ETRqpOxbo_aLHII_Sig/meanChl_ugL) %>% 
+  mutate(JVPSII_aLHIIOxbomax_Chl = JVPSII_aLHIIOxbomax/meanTurChl_ugL) %>% 
+  mutate(JVPSII_ETRtauav_FoSig_Chl = JVPSII_ETRtauav_FoSig/meanTurChl_ugL) %>% 
+  mutate(JVPSII_ETRqpOxbo_FoSig_Chl = JVPSII_ETRqpOxbo_FoSig/meanTurChl_ugL) %>% 
+  mutate(JVPSII_ETRtauav_aLHII_Sig_Chl = JVPSII_ETRtauav_aLHII_Sig/meanTurChl_ugL) %>% 
+  mutate(JVPSII_ETRqpOxbo_aLHII_Sig_Chl = JVPSII_ETRqpOxbo_aLHII_Sig/meanTurChl_ugL) %>% 
   #mutate(meanJVPSII_ETRqpOxbo_aLHII_Sig_Chl = meanJVPSII_ETRqpOxbo_aLHII_Sig/AllmeanTurnerChl_ugL) %>% 
   
   #cell per L based on pamas corr
-  mutate(JVPSII_aLHIIOxbomax_Corrcell = JVPSII_aLHIIOxbomax/cellLExp) %>% 
-  mutate(JVPSII_ETRtauav_FoSig_Corrcell = JVPSII_ETRtauav_FoSig/cellLExp) %>% 
-  mutate(JVPSII_ETRqpOxbo_FoSig_Corrcell = JVPSII_ETRqpOxbo_FoSig/cellLExp) %>% 
-  mutate(JVPSII_ETRtauav_aLHII_Sig_Corrcell = JVPSII_ETRtauav_aLHII_Sig/cellLExp) %>% 
-  mutate(JVPSII_ETRqpOxbo_aLHII_Sig_Corrcell = JVPSII_ETRqpOxbo_aLHII_Sig/cellLExp) 
+  mutate(JVPSII_aLHIIOxbomax_Corrcell = JVPSII_aLHIIOxbomax/cellL_OD680) %>% 
+  mutate(JVPSII_ETRtauav_FoSig_Corrcell = JVPSII_ETRtauav_FoSig/cellL_OD680) %>% 
+  mutate(JVPSII_ETRqpOxbo_FoSig_Corrcell = JVPSII_ETRqpOxbo_FoSig/cellL_OD680) %>% 
+  mutate(JVPSII_ETRtauav_aLHII_Sig_Corrcell = JVPSII_ETRtauav_aLHII_Sig/cellL_OD680) %>% 
+  mutate(JVPSII_ETRqpOxbo_aLHII_Sig_Corrcell = JVPSII_ETRqpOxbo_aLHII_Sig/cellL_OD680) 
   #mutate(meanJVPSII_ETRqpOxbo_aLHII_Sig_Corrcell = meanJVPSII_ETRqpOxbo_aLHII_Sig/cellLExp) %>%   
  
   # #Turner - one value
@@ -644,7 +682,7 @@ colnames(SolFitsAllPigmentTurnerDaySmall)
 # Save assembled spectra data set
 ```{r save Olis}
 
-# saveRDS(SolFitsAllPigmentTurnerDay, file.path(DataOut, paste(Project, "SolFitsAllPigmentTurnerNew.Rds", sep = "_"), fsep = .Platform$file.sep))
+saveRDS(SolFitsAllPigmentTurnerDay, file.path(DataOut, paste(Project, "Processed_GrowthRateSolisense.Rds", sep = "_"), fsep = .Platform$file.sep))
 
 ```
 
