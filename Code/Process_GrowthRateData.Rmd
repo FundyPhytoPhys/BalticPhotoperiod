@@ -1017,7 +1017,14 @@ saveRDS(MCParamAll_Photoperiod, file.path(TableRdsPath, paste(Project, "Tab_Grow
 rm(MCGrowthSPAllModel, MCGrowthSP30Model, MCGrowthSP90Model, MCGrowthSP180Model, MCGrowthSP300Model, MCGrowthSP900Model, MCGrowthSP8Model, MCGrowthSP12Model, MCGrowthSP16Model, MCGrowthSP24Model, GRCplatt_PredictGrowthAll, GRCplatt_PredictGrowth30, GRCplatt_PredictGrowth90, GRCplatt_PredictGrowth180, GRCplatt_PredictGrowth300, GRCplatt_PredictGrowth900, GRCplatt_PredictGrowth8, GRCplatt_PredictGrowth12, GRCplatt_PredictGrowth16, GRCplatt_PredictGrowth24, GRCplatt_PredictGrowth900_BA127, GRCplatt_PredictGrowth900_BA48, GRCplatt_PredictGrowth900_BA56, GRCplatt_PredictGrowth900_BA77, MCGrowthSP, GrowthRateAllParam)
 ```
 
-# Save rds for further analysis
+# Change variable order
+
+```{r}
+MCGrowthRateAll<-MCGrowthRateAll %>% 
+select(c(SampleID, Run, Strain, ExpDate, Par_ue, Photoperiod, MC, Tube, O2, WL, LightShape, ExpEndDate, PARPhotonDose_day, FilenameMC, OD720_Lmu_corr, OD720_Lmu_se, deltaOD_Lmu_corr, deltaOD_Lmu_se, E_days, ToD, Time_h, meanActinic_par_h, meanOD680_h, meanOD720_h,  meanDeltaOD_h, cellmL_OD680, facetsPar_ue, facetsPhotoperiod, ObsDateOlis, PUR, PURPhotonDose_day, ChlaugmL, CarugmL, PEugmL, PCugmL, APCugmL, PhycougmL, CarChlaRatio, PhycoChlaRatio, PEPCRatio, Chlapgcell, Carpgcell, PEpgcell, PCpgcell, APCpgcell, Phycopgcell, cellL_OD680, PURPARRatio, tMaxAG, AchivePreStationary, MaxDG, MaxAG, dayRound_tmaxAG,  facetsStrain, facetsPARPhotonDose_day, Phase))
+```
+
+# Save Rds for further analysis
 
 ```{r save rds}
 saveRDS(MCGrowthRateAll, file.path(DataOut, paste(Project, "Processed_GrowthRateAll.Rds", sep = "_"), fsep = .Platform$file.sep), ascii = FALSE, version = NULL, compress = "xz", refhook = NULL)
@@ -1029,10 +1036,6 @@ saveRDS(MCGrowthRateAll, file.path(DataOut, paste(Project, "Processed_GrowthRate
 
 ```{r}
 colnames(MCGrowthRateAll)
-SampleID, Run, Strain, ExpDate, Par_ue, Photoperiod, MC, Tube, O2, WL, LightShape, ExpEndDate, PARPhotonDose_day, FilenameMC, OD720_Lmu_corr, OD720_Lmu_se, deltaOD_Lmu_corr, deltaOD_Lmu_se, E_days, ToD, Time_h, meanActinic_par_h, meanOD680_h, meanOD720_h,  meanDeltaOD_h, cellmL_OD680, facetsPar_ue, facetsPhotoperiod, ObsDateOlis, PUR, PURPhotonDose_day, ChlaugmL, CarugmL, PEugmL, PCugmL, APCugmL, PhycougmL, CarChlaRatio, PhycoChlaRatio, PEPCRatio, Chlapgcell, Carpgcell, PEpgcell, PCpgcell, APCpgcell, Phycopgcell, cellL_OD680, PURPARRatio, tMaxAG, AchivePreStationary, MaxDG, MaxAG, dayRound_tmaxAG,  facetsStrain, facetsPARPhotonDose_day, Phase
-
-
-
 ```
 
 # Variable names used in Data Dictionary
