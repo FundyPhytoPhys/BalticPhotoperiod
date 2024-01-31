@@ -67,6 +67,7 @@ library(knitr)
 library(readxl)
 library(stringr)
 library(rmarkdown)
+library(gdtools)
 #library(trackdown)
 options(knitr.table.format = "word_document2", knitr.kable.NA = '') 
 ```
@@ -129,79 +130,90 @@ SigmaPig445_cap<- glue("Changes of effective absorption cross section of PSII (\
 knitr::include_graphics(file.path(FiguresFP,"SFig_SigmaPig445.png"))
 ```
 
-https://ardata-fr.github.io/flextable-book/
 
-```{r echo = FALSE}
-ft <- flextable(airquality[ sample.int(10),])
-ft <- add_header_row(ft,
-  colwidths = c(4, 2),
-  values = c("Air quality", "Time")
-)
-ft <- theme_vanilla(ft)
-ft <- add_footer_lines(ft, "Daily air quality measurements in New York, May to September 1973.")
-ft <- color(ft, part = "footer", color = "#666666")
-ft <- set_caption(ft, caption = "New York Air Quality Measurements")
-ft
-```
-
-
-```{r}
-myft <- flextable(head(mtcars), 
-  col_keys = c("am", "carb", "gear", "mpg", "drat" ))
-myft
-#SSS<-as_flextable(SolFits)
-# flextable(SolFits)
-
-```
-
-
-# Read MetaData
-
-```{r read locally stored metadata from rds}
+```{r read locally stored metadata from rds, echo = FALSE}
 # BalticPhotoperiod_Anova_GrowthRate.Rds
-# BalticPhotoperiod_Anova_GS.Rds
+        # BalticPhotoperiod_Anova_GS.Rds
 # BalticPhotoperiod_AnovaModel_GrowthRate_Light.Rds
 # BalticPhotoperiod_AnovaModel_GrowthRate_Photoperiod.Rds
-# BalticPhotoperiod_HSD_GrowthRate.Rds
+        # BalticPhotoperiod_HSD_GrowthRate.Rds
 # BalticPhotoperiod_Tab_GrowthCorrelation.Rds
-# BalticPhotoperiod_Tab_GrowthRate_FitParam_Light.Rds
-# BalticPhotoperiod_Tab_GrowthRate_FitParam_Photoperiod.Rds
+        # BalticPhotoperiod_Tab_GrowthRate_FitParam_Light.Rds
+        # BalticPhotoperiod_Tab_GrowthRate_FitParam_Photoperiod.Rds
 # BalticPhotoperiod_Tab_PigmentsCorrelation.Rds
-# 
-# GrowthCorrelation <- readRDS(file = file.path("..", "Output", "TablesRds", "BalticPhotoperiod_Tab_GrowthCorrelation.Rds"))
-# GrowthCorrelation<-GrowthCorrelation 
-# 
-# PigmentsCorrelation <- readRDS(file = file.path("..", "Output", "TablesRds", "BalticPhotoperiod_Tab_PigmentsCorrelation.Rds"))
-# PigmentsCorrelation<-PigmentsCorrelation 
 
 ```
 
-```{r GrowthCorrelation, echo = TRUE}
-# GrowthCorrelation_cap <- glue("Pearson Correlation for two PhycoCyanin(PC)-rich cultures (056, 077) and two PhycoErythrin(PE)-rich cultures (048, 127) (Culture Collection of Baltic Algae) of *Synechococcus* sp.")
-# 
-# readRDS(file.path("..", "Output", "TablesRds", "BalticPhotoperiod_Tab_GrowthCorrelation.Rds")) %>%
-#   as.data.frame()
-#   # kable(caption = GrowthCorrelation_cap) %>%
-#   # kableExtra::kable_classic()
-# 
-# DataIn <- file.path("..", "Output", "TablesRds", fsep = .Platform$file.sep)
-# SolisenseFile <- "../Output/TablesRds/BalticPhotoperiod_Tab_GrowthCorrelation.Rds"
-# 
-# SolisenseFileName <- str_split(string = SolisenseFile, "/")[[1]][3] %>%
-#   str_remove(pattern = ".Rds")
-# 
-# SolFits <- readRDS(SolisenseFile)  %>%
-#   ungroup()
+```{r echo = FALSE}
+Anova_GrowthRate <- readRDS(file = file.path("..", "Output", "TablesRds", "BalticPhotoperiod_Anova_GrowthRate.Rds"))
+Anova_GrowthRate<-Anova_GrowthRate
+
+AnovaModel_GrowthRate_Light <- readRDS(file = file.path("..", "Output", "TablesRds", "BalticPhotoperiod_AnovaModel_GrowthRate_Light.Rds"))
+AnovaModel_GrowthRate_Light<-AnovaModel_GrowthRate_Light
+
+AnovaModel_GrowthRate_Photoperiod <- readRDS(file = file.path("..", "Output", "TablesRds", "BalticPhotoperiod_AnovaModel_GrowthRate_Photoperiod.Rds"))
+AnovaModel_GrowthRate_Photoperiod<-AnovaModel_GrowthRate_Photoperiod
+
+GrowthCorrelation <- readRDS(file = file.path("..", "Output", "TablesRds", "BalticPhotoperiod_Tab_GrowthCorrelation.Rds"))
+GrowthCorrelation<-GrowthCorrelation
+
+PigmentsCorrelation <- readRDS(file = file.path("..", "Output", "TablesRds", "BalticPhotoperiod_Tab_PigmentsCorrelation.Rds"))
+PigmentsCorrelation<-PigmentsCorrelation
+```
+
+```{r echo = FALSE}
+#myft <- flextable(head(GrowthCorrelation)) ->bad idea!
+myft <- flextable(GrowthCorrelation)
+#myft <- width(myft, width = 1.0)
+myft <- autofit(myft)
+myft <- set_caption(myft, caption = "Linear regression, coefficient of determination (R square), correlation coefficients (R), and p-value used to calculate the number of studied picocyanobacteria cells (N/mL) in cultures based on optical density (OD) measurements.")
+myft <- fontsize(myft, size = 12, part = "header")
+myft <- fontsize(myft, size = 10, part = "body")
+myft
 
 ```
 
-```{r PigmentsCorrelation, echo = TRUE}
-# PigmentsCorrelation_cap <- glue("Pearson Correlation for two PhycoCyanin(PC)-rich cultures (056, 077) and two PhycoErythrin(PE)-rich cultures (048, 127) (Culture Collection of Baltic Algae) of *Synechococcus* sp.")
-#                           
-# readRDS(file.path("..", "Output", "TablesRds", "BalticPhotoperiod_Tab_PigmentsCorrelation.Rds")) %>% 
-#   as.data.frame() %>% 
-#   kable(caption = PigmentsCorrelation_cap) %>% 
-#   kableExtra::kable_classic()
+```{r echo = FALSE}
+myft <- flextable(PigmentsCorrelation)
+myft <- autofit(myft)
+myft <- set_caption(myft, caption = "Linear regression, coefficient of determination (R square), correlation coefficients (R), and p-value used to calculate the pigment content (µg/mL) of studied picocyanobacteria based on absorbance values (Abs) of individual pigment peaks obtained from the whole-cell absorbance spectra.")
+myft <- fontsize(myft, size = 12, part = "header")
+myft <- fontsize(myft, size = 10, part = "body")
+myft
 ```
+
+
+```{r echo = FALSE}
+myft <- flextable(Anova_GrowthRate)
+myft <- autofit(myft)
+myft <- set_caption(myft, caption = "Linear regression, coefficient of determination (R square), correlation coefficients (R), and p-value used to calculate the pigment content (µg/mL) of studied picocyanobacteria based on absorbance values (Abs) of individual pigment peaks obtained from the whole-cell absorbance spectra.")
+myft <- fontsize(myft, size = 12, part = "header")
+myft <- fontsize(myft, size = 10, part = "body")
+myft
+```
+
+
+```{r echo = FALSE}
+myft <- flextable(AnovaModel_GrowthRate_Light)
+myft <- autofit(myft)
+myft <- set_caption(myft, caption = "Linear regression, coefficient of determination (R square), correlation coefficients (R), and p-value used to calculate the pigment content (µg/mL) of studied picocyanobacteria based on absorbance values (Abs) of individual pigment peaks obtained from the whole-cell absorbance spectra.")
+myft <- fontsize(myft, size = 12, part = "header")
+myft <- fontsize(myft, size = 10, part = "body")
+myft
+```
+
+
+```{r echo = FALSE}
+myft <- flextable(AnovaModel_GrowthRate_Photoperiod)
+myft <- autofit(myft)
+myft <- set_caption(myft, caption = "Linear regression, coefficient of determination (R square), correlation coefficients (R), and p-value used to calculate the pigment content (µg/mL) of studied picocyanobacteria based on absorbance values (Abs) of individual pigment peaks obtained from the whole-cell absorbance spectra.")
+myft <- fontsize(myft, size = 12, part = "header")
+myft <- fontsize(myft, size = 10, part = "body")
+myft
+```
+
+
+
+
 
 
