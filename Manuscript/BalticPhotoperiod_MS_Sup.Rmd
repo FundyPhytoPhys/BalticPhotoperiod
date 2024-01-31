@@ -155,6 +155,27 @@ myft
 ```
 
 
+# Read MetaData
+
+```{r read locally stored metadata from rds}
+# BalticPhotoperiod_Anova_GrowthRate.Rds
+# BalticPhotoperiod_Anova_GS.Rds
+# BalticPhotoperiod_AnovaModel_GrowthRate_Light.Rds
+# BalticPhotoperiod_AnovaModel_GrowthRate_Photoperiod.Rds
+# BalticPhotoperiod_HSD_GrowthRate.Rds
+# BalticPhotoperiod_Tab_GrowthCorrelation.Rds
+# BalticPhotoperiod_Tab_GrowthRate_FitParam_Light.Rds
+# BalticPhotoperiod_Tab_GrowthRate_FitParam_Photoperiod.Rds
+# BalticPhotoperiod_Tab_PigmentsCorrelation.Rds
+# 
+# GrowthCorrelation <- readRDS(file = file.path("..", "Output", "TablesRds", "BalticPhotoperiod_Tab_GrowthCorrelation.Rds"))
+# GrowthCorrelation<-GrowthCorrelation 
+# 
+# PigmentsCorrelation <- readRDS(file = file.path("..", "Output", "TablesRds", "BalticPhotoperiod_Tab_PigmentsCorrelation.Rds"))
+# PigmentsCorrelation<-PigmentsCorrelation 
+
+```
+
 ```{r GrowthCorrelation, echo = TRUE}
 # GrowthCorrelation_cap <- glue("Pearson Correlation for two PhycoCyanin(PC)-rich cultures (056, 077) and two PhycoErythrin(PE)-rich cultures (048, 127) (Culture Collection of Baltic Algae) of *Synechococcus* sp.")
 # 
