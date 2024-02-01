@@ -135,7 +135,11 @@ knitr::include_graphics(file.path(FiguresFP,"SFig_SigmaPig445.png"))
 # https://davidgohel.github.io/flextable/reference/index.html
 
 # BalticPhotoperiod_Anova_GrowthRate.Rds
-# BalticPhotoperiod_Anova_GS.Rds -. parameters!!
+        # BalticPhotoperiod_Anova_GS.Rds
+        # BalticPhotoperiod_Anova_GS_Model.Rds
+        # BalticPhotoperiod_Anova_GS_Param.Rds
+
+
 # BalticPhotoperiod_AnovaModel_GrowthRate_Light.Rds
 # BalticPhotoperiod_AnovaModel_GrowthRate_Photoperiod.Rds
 # BalticPhotoperiod_Tab_GrowthCorrelation.Rds
@@ -244,13 +248,34 @@ myft
 rm(AnovaModel_GrowthRate_Light)
 ```
 
-
 ```{r echo = FALSE}
 Anova_GS <- readRDS(file = file.path("..", "Output", "TablesRds", "BalticPhotoperiod_Anova_GS.Rds"))
 Anova_GS<-Anova_GS
-df <- data.frame(Source_of_variation = c("Strain", "Phase", "Strain:Phase", "Residuals", "Strain", "Phase", "Strain:Phase", "Residuals", "Strain", "Phase", "Strain:Phase", "Residuals"))
+df <- data.frame(Source_of_variation = c("PhotonDose_day", "Phase", "Strain", "PhotonDose_day:Phase", "PhotonDose_day:Strain", "PhotonDose_day:Phase:Strain", "Residuals"))
 Anova_GS<-cbind(df, Anova_GS) 
 Anova_GS<-Anova_GS %>% 
+  rename(p_value = "Pr(>F)") %>% 
+  rename(F_value = "F value") 
+
+
+myft <- flextable(Anova_GS)
+myft <- set_caption(myft, caption = "Three-way factorial ANOVA of index of diel growth symmetry (AccLen/DecLen), for two PhycoCyanin(PC)-rich cultures (056, 077) and two PhycoErythrin(PE)-rich cultures (048, 127) (Culture Collection of Baltic Algae) of Synechococcus sp. grown at 30, 90, 180, 300, 600, or 900 peak PAR µmol photons m^−2^s^−1^; and photoperiods of 8, 12, 16, or 24 h.): Df – degrees of freedom; Sum Sq – sum of squares; Mean Sq – mean sum of squares; F – Fisher's F-test statistic. Levels of significance (p_value) were: * p < 0.05; ** p < 0.01; *** p < 0.001.")
+myft <- colformat_double(x = myft, big.mark = ",", digits = 3, na_str = "N/A")
+myft <- set_formatter(myft, F_value = function(x) {formatC(x, format = "e", digits = 3)})
+myft <- fontsize(myft, size = 12, part = "header")
+myft <- fontsize(myft, size = 10, part = "body")
+myft <- autofit(myft)
+myft
+
+rm(Anova_GS, df)
+```
+
+```{r echo = FALSE}
+Anova_GS_Param <- readRDS(file = file.path("..", "Output", "TablesRds", "BalticPhotoperiod_Anova_GS_Param.Rds"))
+Anova_GS_Param<-Anova_GS_Param
+df <- data.frame(Source_of_variation = c("Strain", "Phase", "Strain:Phase", "Residuals", "Strain", "Phase", "Strain:Phase", "Residuals", "Strain", "Phase", "Strain:Phase", "Residuals"))
+Anova_GS_Param<-cbind(df, Anova_GS_Param) 
+Anova_GS_Param<-Anova_GS_Param %>% 
   rename(p_value = "Pr(>F)") %>% 
   rename(F_value = "F value") %>% 
   relocate(Parameter, .before = Df) 

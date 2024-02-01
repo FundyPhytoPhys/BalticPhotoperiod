@@ -130,11 +130,6 @@ MCGrowthRateStats$Strain <- factor(MCGrowthRateStats$Strain)
 model<-aov(deltaOD_Lmu_corr~Par_ue*Photoperiod*Strain, data=MCGrowthRateStats)
 AnovaTest_GrowthRate<-data.frame(unclass(summary(model)), check.names = FALSE, stringsAsFactors = FALSE)
 TukeyHSDTest_GrowthRate<-TukeyHSD(model, which = c("Par_ue", "Photoperiod", "Strain"))
-
-AnovaTest_GrowthRate<-AnovaTest_GrowthRate %>%
-  mutate(across(where(is.numeric), ~ round(., 3)))
-  #sprintf("%.3f")
-  # mutate_if(is.numeric, round, digits=4)
 ```
 
 # Save RDS that create stats and tables

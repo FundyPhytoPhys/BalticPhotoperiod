@@ -310,6 +310,13 @@ AnovaTest_GS<-data.frame(unclass(summary(model)), check.names = FALSE, stringsAs
 TukeyHSDTest_GS<-TukeyHSD(model, which = c("PARPhotonDose_day", "Phase", "Strain"))
 ```
 
+# Save Rds that create stats and tables
+
+```{r}
+saveRDS(AnovaTest_GS, file.path(TableRdsPath, paste(Project, "Anova_GS.Rds", sep = "_"), fsep = .Platform$file.sep), ascii = FALSE, version = NULL, compress = "xz", refhook = NULL)
+
+# saveRDS(TukeyHSDTest_y0_alpha, file.path(RDSTablePath, paste(Project, "GSTukey_y0.Rds", sep = "_"), fsep = .Platform$file.sep), ascii = FALSE, version = NULL, compress = "xz", refhook = NULL)
+```
 
 # Calculated Anova and Tukey test from exponential decay parameters
 
@@ -341,6 +348,12 @@ AnovaTest_GS_Param<-rbind(AnovaTest_GS_y0, AnovaTest_GS_yf, AnovaTest_GS_alpha)
   rm(AnovaTest_GS_y0, AnovaTest_GS_yf, AnovaTest_GS_alpha, GSStats, GSStats2, model)
 ```
 
+# Save Rds that create stats and tables
+
+```{r}
+# saveRDS(AnovaTest_GS_Param, file.path(TableRdsPath, paste(Project, "Anova_GS_Param.Rds", sep = "_"), fsep = .Platform$file.sep), ascii = FALSE, version = NULL, compress = "xz", refhook = NULL)
+```
+
 # Exstracting models for each fit
 
 ```{r}
@@ -363,17 +376,17 @@ fittedmodel<-fitted  %>%
 #Comparing model for strains from Exp phase
 fittedmodelStrainExp<-fittedmodel 
   anova056077Exp<-anova(fittedmodelStrainExp[[3]][[7]], fittedmodelStrainExp[[3]][[8]])
-  anova056077Exp$FitComparison <- '056_077'
+  anova056077Exp$FitComparison <- '056_077_Exp'
   anova048127Exp<-anova(fittedmodelStrainExp[[3]][[6]], fittedmodelStrainExp[[3]][[5]])
-  anova048127Exp$FitComparison <- '048_127'
+  anova048127Exp$FitComparison <- '048_127_Exp'
   anova056048Exp<-anova(fittedmodelStrainExp[[3]][[7]], fittedmodelStrainExp[[3]][[6]])
-  anova056048Exp$FitComparison <- '056_048'
+  anova056048Exp$FitComparison <- '056_048_Exp'
   anova077048Exp<-anova(fittedmodelStrainExp[[3]][[8]], fittedmodelStrainExp[[3]][[6]])
-  anova077048Exp$FitComparison <- '077_048'
+  anova077048Exp$FitComparison <- '077_048_Exp'
   anova056127Exp<-anova(fittedmodelStrainExp[[3]][[7]], fittedmodelStrainExp[[3]][[5]])
-  anova056127Exp$FitComparison <- '056_127'
+  anova056127Exp$FitComparison <- '056_127_Exp'
   anova077127Exp<-anova(fittedmodelStrainExp[[3]][[8]], fittedmodelStrainExp[[3]][[5]])
-  anova077127Exp$FitComparison <- '077_127'
+  anova077127Exp$FitComparison <- '077_127_Exp'
   anovaStrainExp<-rbind(anova056077Exp, anova048127Exp, anova056048Exp, anova077048Exp, anova056127Exp, anova077127Exp)
   anovaStrainExp <-anovaStrainExp %>% 
   drop_na(Df) 
@@ -382,17 +395,17 @@ fittedmodelStrainExp<-fittedmodel
 #Comparing model for strains from St phase
 fittedmodelStrainSt<-fittedmodel 
   anova056077St<-anova(fittedmodelStrainSt[[3]][[2]], fittedmodelStrainSt[[3]][[3]])
-  anova056077St$FitComparison <- '056_077'
+  anova056077St$FitComparison <- '056_077_St'
   anova048127St<-anova(fittedmodelStrainSt[[3]][[1]], fittedmodelStrainSt[[3]][[4]])
-  anova048127St$FitComparison <- '048_127'
+  anova048127St$FitComparison <- '048_127_St'
   anova056048St<-anova(fittedmodelStrainSt[[3]][[1]], fittedmodelStrainSt[[3]][[2]])
-  anova056048St$FitComparison <- '056_048'
+  anova056048St$FitComparison <- '056_048_St'
   anova077048St<-anova(fittedmodelStrainSt[[3]][[3]], fittedmodelStrainSt[[3]][[1]])
-  anova077048St$FitComparison <- '077_048'
+  anova077048St$FitComparison <- '077_048_St'
   anova056127St<-anova(fittedmodelStrainSt[[3]][[2]], fittedmodelStrainSt[[3]][[4]])
-  anova056127St$FitComparison <- '056_127'
+  anova056127St$FitComparison <- '056_127_St'
   anova077127St<-anova(fittedmodelStrainSt[[3]][[3]], fittedmodelStrainSt[[3]][[4]])
-  anova077127St$FitComparison <- '077_127'
+  anova077127St$FitComparison <- '077_127_St'
   anovaStrainSt<-rbind(anova056077St, anova048127St, anova056048St, anova077048St, anova056127St, anova077127St)
   anovaStrainSt <-anovaStrainSt %>% 
   drop_na(Df) 
@@ -414,18 +427,18 @@ fittedmodelPhase<-fittedmodel
   drop_na(Df) 
   rm(anova056ExpSt, anova077ExpSt, anova048ExpSt, anova127ExpSt)
 
+  
+  Anova_GS_Model<-rbind(anovaStrainExp, anovaStrainSt, anovaPhase)
   # anovaStrainAll<-anova(fittedmodelStrain[[3]][[7]], fittedmodelStrain[[3]][[8]], fittedmodelStrain[[3]][[6]], fittedmodelStrain[[3]][[5]])
   
 ```
 
-
 # Save Rds that create stats and tables
 
 ```{r}
-saveRDS(AnovaTest_GS_Param, file.path(TableRdsPath, paste(Project, "Anova_GS.Rds", sep = "_"), fsep = .Platform$file.sep), ascii = FALSE, version = NULL, compress = "xz", refhook = NULL)
-
-# saveRDS(TukeyHSDTest_y0_alpha, file.path(RDSTablePath, paste(Project, "GSTukey_y0.Rds", sep = "_"), fsep = .Platform$file.sep), ascii = FALSE, version = NULL, compress = "xz", refhook = NULL)
+saveRDS(Anova_GS_Model, file.path(TableRdsPath, paste(Project, "Anova_GS_Model.Rds", sep = "_"), fsep = .Platform$file.sep), ascii = FALSE, version = NULL, compress = "xz", refhook = NULL)
 ```
+
 
 ```{r AccLen Plot, fig.height = 8, fig.width = 8, warning = FALSE}
 data_text_8<- data.frame(facetsPhase = c("Phase~of~growth", "Phase~of~growth"), Phase = c("Exponential"), facetsStrain=c("Strain", "Strain", "Strain", "Strain"), Strain  = c("PC-rich_056", "PC-rich_077", "PE-rich_048", "PE-rich_127"),  label = c('Max light at   8h', 'Max light at   8h', 'Max light at   8h', 'Max light at   8h'))
