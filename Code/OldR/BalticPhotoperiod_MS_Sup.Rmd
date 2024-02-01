@@ -179,7 +179,31 @@ readRDS(file.path("..", "..", "Output", "TablesRds", "BalticPhotoperiod_Tab_Pigm
 ```
 
 
-
+```{r echo = FALSE}
+# Anova_GS_Param <- readRDS(file = file.path("..", "Output", "TablesRds", "BalticPhotoperiod_Anova_GS_Param.Rds"))
+# Anova_GS_Param<-Anova_GS_Param
+# df <- data.frame(Source_of_variation = c("Strain", "Phase", "Strain:Phase", "Residuals", "Strain", "Phase", "Strain:Phase", "Residuals", "Strain", "Phase", "Strain:Phase", "Residuals"))
+# Anova_GS_Param<-cbind(df, Anova_GS_Param) 
+# Anova_GS_Param<-Anova_GS_Param %>% 
+#   rename(p_value = "Pr(>F)") %>% 
+#   rename(F_value = "F value") %>% 
+#   relocate(Parameter, .before = Df) 
+# 
+# 
+# myft <- flextable(Anova_GS_Param)
+# myft <- set_caption(myft, caption = "Three-way factorial ANOVA of single phase exponential decay fit of pooled data parameters of diel growth symmetry (AccLen/DecLen) index, for two PhycoCyanin(PC)-rich cultures (056, 077) and two PhycoErythrin(PE)-rich cultures (048, 127) (Culture Collection of Baltic Algae) of Synechococcus sp. grown at 30, 90, 180, 300, 600, or 900 peak PAR µmol photons m^−2^s^−1^; and photoperiods of 8, 12, 16, or 24 h.): Df – degrees of freedom; Sum Sq – sum of squares; Mean Sq – mean sum of squares; F – Fisher's F-test statistic. Levels of significance (p_value) were: * p < 0.05; ** p < 0.01; *** p < 0.001.")
+# #myft <- theme_booktabs(myft)
+# myft <- colformat_double(x = myft, big.mark = ",", digits = 3, na_str = "N/A")
+# myft <- set_formatter(myft, F_value = function(x) {formatC(x, format = "e", digits = 3)})
+# myft <- fontsize(myft, size = 12, part = "header")
+# myft <- fontsize(myft, size = 10, part = "body")
+# myft <- autofit(myft)
+# # myft <- height(myft, height = 0.5)
+# # myft <- hrule(myft, rule = "exact")
+# myft
+# 
+# rm(Anova_GS_Param, df)
+```
 
 
 
