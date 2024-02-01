@@ -131,7 +131,7 @@ knitr::include_graphics(file.path(FiguresFP,"SFig_SigmaPig445.png"))
 ```
 
 
-```{r read locally stored metadata from rds, echo = FALSE}
+```{r locally stored metadata from rds, echo = FALSE}
 # https://davidgohel.github.io/flextable/reference/index.html
 
         # BalticPhotoperiod_Anova_GrowthRate.Rds
@@ -146,9 +146,11 @@ knitr::include_graphics(file.path(FiguresFP,"SFig_SigmaPig445.png"))
 
 ```
 
-```{r echo = FALSE}
-# Anova_GrowthRate <- readRDS(file = file.path("..", "Output", "TablesRds", "BalticPhotoperiod_Anova_GrowthRate.Rds"))
-# Anova_GrowthRate<-Anova_GrowthRate
+```{r read locally stored metadata from rds, echo = FALSE}
+Anova_GrowthRate <- readRDS(file = file.path("..", "Output", "TablesRds", "BalticPhotoperiod_Anova_GrowthRate.Rds"))
+Anova_GrowthRate<-Anova_GrowthRate
+df <- data.frame(Source_of_variation = c("Par_ue", "Photoperiod", "Strain", "Par_ue:Photoperiod", "Par_ue:Strain", "Photoperiod:Strain", "Par_ue:Photoperiod:Strain", "Residuals"))
+Anova_GrowthRate<-cbind(df, Anova_GrowthRate)
 
 AnovaModel_GrowthRate_Light <- readRDS(file = file.path("..", "Output", "TablesRds", "BalticPhotoperiod_AnovaModel_GrowthRate_Light.Rds"))
 AnovaModel_GrowthRate_Light<-AnovaModel_GrowthRate_Light
@@ -164,21 +166,16 @@ PigmentsCorrelation<-PigmentsCorrelation
 ```
 
 ```{r echo = FALSE}
-#myft <- flextable(head(GrowthCorrelation)) ->bad idea!
 myft <- flextable(GrowthCorrelation)
-#myft <- width(myft, width = 1.0)
 myft <- autofit(myft)
 myft <- set_caption(myft, caption = "Linear regression, coefficient of determination (R square), correlation coefficients (R), and p-value used to calculate the number of studied picocyanobacteria cells (N/mL) in cultures based on optical density (OD) measurements.")
 myft <- fontsize(myft, size = 12, part = "header")
 myft <- fontsize(myft, size = 10, part = "body")
 myft
-
 ```
 
 ```{r echo = FALSE}
-
-myft <- flextable(PigmentsCorrelation, col_keys = names(PigmentsCorrelation))
-#myft <- add_body_row()
+myft <- flextable(PigmentsCorrelation)
 myft <- autofit(myft)
 myft <- set_caption(myft, caption = "Linear regression, coefficient of determination (R square), correlation coefficients (R), and p-value used to calculate the pigment content (µg/mL) of studied picocyanobacteria based on absorbance values (Abs) of individual pigment peaks obtained from the whole-cell absorbance spectra.")
 myft <- fontsize(myft, size = 12, part = "header")
@@ -187,13 +184,10 @@ myft
 ```
 
 
-Two-way factorial ANOVA of cells concentration measured in Synechococcus sp. Type 1, Type 2, and Type 3a growing at different temperatures (°C) and irradiance (μmol photons m–2s–1): df – degrees of freedom; F – Fisher's F-test statistic; Mss – mean sum of squares; Ss – sum of squares. Levels of significance were: * p < 0.05; ** p < 0.01; *** p < 0.001
-
 ```{r echo = FALSE}
-myft <- flextable(AnovaModel_GrowthRate_Light)
-myft <- colformat_double(x = myft, big.mark = ",", digits = 3, na_str = "N/A")
+myft <- flextable(Anova_GrowthRate)
 myft <- autofit(myft)
-myft <- set_caption(myft, caption = "Linear regression, coefficient of determination (R square), correlation coefficients (R), and p-value used to calculate the pigment content (µg/mL) of studied picocyanobacteria based on absorbance values (Abs) of individual pigment peaks obtained from the whole-cell absorbance spectra.")
+myft <- set_caption(myft, caption = "Three-way factorial ANOVA of chlorophyll specific exponential growth rate, estimated from logistic fits of chlorophyll proxy OD~680~-OD~720~ vs. elapsed time, for two PhycoCyanin(PC)-rich cultures (056, 077) and two PhycoErythrin(PE)-rich cultures (048, 127) (Culture Collection of Baltic Algae) of *Synechococcus* sp. grown at 30, 90, 180, 300, 600, or 900 peak PAR µmol photons m^−2^s^−1^; and photoperiods of 8, 12, 16, or 24 h.): Df – degrees of freedom; Sum Sq – sum of squares; Mean Sq – mean sum of squares; F – Fisher's F-test statistic. Levels of significance(p_value) were: * *p* < 0.05; ** *p* < 0.01; *** *p* < 0.001.")
 myft <- fontsize(myft, size = 12, part = "header")
 myft <- fontsize(myft, size = 10, part = "body")
 myft
@@ -204,23 +198,22 @@ myft
 myft <- flextable(AnovaModel_GrowthRate_Photoperiod)
 myft <- colformat_double(x = myft, big.mark = ",", digits = 3, na_str = "N/A")
 myft <- autofit(myft)
-myft <- set_caption(myft, caption = "One-way ANOVA of pooled and separe fit data (FitComparison) with a three parameter model (Harrison and Platt, 1986) for growth under 8, 12, 16, or 24 h photoperiod: Df – degrees of freedom; Sum Sq – sum of squares; F value – Fisher's F-test statistic; . Levels of significance were: * p < 0.05; ** p < 0.01; *** p < 0.001
-                    
-                    ")
+myft <- set_caption(myft, caption = "One-way ANOVA of pooled and separe fit data (FitComparison) for two PhycoCyanin(PC)-rich cultures (056, 077) and two PhycoErythrin(PE)-rich cultures (048, 127) (Culture Collection of Baltic Algae) of *Synechococcus* sp. with a three parameter model (Harrison and Platt, 1986) for growth at 8, 12, 16, or 24 h photoperiod: Df – degrees of freedom; Sum Sq – sum of squares; F value – Fisher's F-test statistic. Levels of significance (p_value) were: * *p* < 0.05; ** *p* < 0.01; *** *p* < 0.00.")
 myft <- fontsize(myft, size = 12, part = "header")
 myft <- fontsize(myft, size = 10, part = "body")
 myft
 ```
-
-
 
 ```{r echo = FALSE}
-myft <- flextable(Anova_GrowthRate, col_keys = names(Anova_GrowthRate))
+myft <- flextable(AnovaModel_GrowthRate_Light)
+myft <- colformat_double(x = myft, big.mark = ",", digits = 3, na_str = "N/A")
 myft <- autofit(myft)
-myft <- set_caption(myft, caption = "Three-way factorial ANOVA of chlorophyll specific growth rate measured in Synechococcus sp. growing at different temperatures (°C) and irradiance (μmol photons m–2s–1): df – degrees of freedom; F – Fisher's F-test statistic; Mss – mean sum of squares; Ss – sum of squares. Levels of significance were: * p < 0.05; ** p < 0.01; *** p < 0.001.")
+myft <- set_caption(myft, caption = "One-way ANOVA of pooled and separe fit data (FitComparison) for two PhycoCyanin(PC)-rich cultures (056, 077) and two PhycoErythrin(PE)-rich cultures (048, 127) (Culture Collection of Baltic Algae) of *Synechococcus* sp. with a three parameter model (Harrison and Platt, 1986) for growth at 30, 90, 180, 300, 600, or 900 peak PAR µmol photons m^−2^s^−1^: Df – degrees of freedom; Sum Sq – sum of squares; F value – Fisher's F-test statistic. Levels of significance (p_value) were: * *p* < 0.05; ** *p* < 0.01; *** *p* < 0.001.")
 myft <- fontsize(myft, size = 12, part = "header")
 myft <- fontsize(myft, size = 10, part = "body")
 myft
 ```
+
+
 
 
