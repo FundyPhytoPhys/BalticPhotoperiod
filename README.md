@@ -248,8 +248,8 @@ https://docs.google.com/spreadsheets/d/1byJ7NV2LrHfzkcw9GQgZdQijKw1UbdzvtvZ1d1KL
 ### Manuscript
 
 - URL for main Manucript:
-https://docs.google.com/document/d/17_gItWGUMA_ASr4ICtBdS9dwYsfHBvl7/edit#heading=h.qqkbcrm6n36m
+https://docs.google.com/document/d/1rpUJyodvmd8ISzSk8PKRrZo73a6tK26yKlcucbD-EHI/edit
 
 - URL for Supplementary materials:
-https://docs.google.com/document/d/1bvCu3sV73xn-o4TGLZ7sgvcb3RtNSg4E/edit#heading=h.pfv5hkliwuke
+https://docs.google.com/document/d/1mx0k0i898YFBWFq6-NiF_deLP90VUFrvjNK-PYeWEpI/edit#heading=h.pfv5hkliwuke
 
