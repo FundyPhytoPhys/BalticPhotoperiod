@@ -664,6 +664,7 @@ SolFitsExpSt %>%
   ggh4x::facet_nested(cols = vars(Phase), rows = vars(Strain), labeller = label_parsed) +
   theme_bw() 
 
+
 SolFitsExpFitAll %>% 
   filter(Ex_WL == 590) %>% 
   ggplot() +
