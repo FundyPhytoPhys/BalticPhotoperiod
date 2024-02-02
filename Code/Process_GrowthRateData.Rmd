@@ -913,7 +913,6 @@ ggplot(MCGrowthSP, aes(PARPhotonDose_day, deltaOD_Lmu_corr)) +
   theme(panel.grid.minor = element_blank(),
         panel.grid.major = element_blank(),
         axis.text = element_text(size=12),
-        axis.text.x = element_text(size=11),
         axis.title = element_text(size=16),
         strip.background = element_rect(fill="white"),
         strip.text = element_text(size=12),
@@ -925,13 +924,13 @@ ggplot(MCGrowthSP, aes(PARPhotonDose_day, deltaOD_Lmu_corr)) +
         legend.spacing.y = unit(-0.1, "cm"),
         legend.spacing.x = unit(-0.1, 'cm'),
         legend.title = element_blank(),
-        legend.text = element_text(size=9))
+        legend.text = element_text(size=10))
 ```
 
 # Save plot 
 
 ```{r save plot}
-ggsave(file = file.path(FigPath, paste("SFig_GrowthRate",".png",sep = "")), height=10, width= 8,  dpi = 300, limitsize = TRUE)
+ggsave(file = file.path(FigPath, paste("SFig_GrowthRate_Light",".png",sep = "")), height=10, width= 8,  dpi = 300, limitsize = TRUE)
 ```
 
 # Create plot - Photoperiod
@@ -959,7 +958,6 @@ ggplot(MCGrowthSP, aes(PARPhotonDose_day, deltaOD_Lmu_corr)) +
   theme(panel.grid.minor = element_blank(),
         panel.grid.major = element_blank(),
         axis.text = element_text(size=12),
-        axis.text.x = element_text(size=11),
         axis.title = element_text(size=16),
         strip.background = element_rect(fill="white"),
         strip.text = element_text(size=12),
@@ -971,13 +969,13 @@ ggplot(MCGrowthSP, aes(PARPhotonDose_day, deltaOD_Lmu_corr)) +
         legend.spacing.y = unit(-0.1, "cm"),
         legend.spacing.x = unit(-0.1, 'cm'),
         legend.title = element_blank(),
-        legend.text = element_text(size=9))
+        legend.text = element_text(size=10))
 ```
 
 # Save plot 
 
 ```{r save plot}
-ggsave(file = file.path(FigPath, paste("Fig_GrowthRate",".png",sep = "")), height=10, width= 8,  dpi = 300, limitsize = TRUE)
+ggsave(file = file.path(FigPath, paste("Fig_GrowthRate_Photoperiod",".png",sep = "")), height=10, width= 8,  dpi = 300, limitsize = TRUE)
 ```
 
 # Save RDS that create plot
