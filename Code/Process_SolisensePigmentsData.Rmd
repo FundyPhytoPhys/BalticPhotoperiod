@@ -1889,7 +1889,6 @@ ggplot(PhycoChlaRatioChoosenPUR, aes(x = PARPhotonDose_day, y = PURPARRatio)) +
   theme(panel.grid.minor = element_blank(),
         panel.grid.major = element_blank(),
         axis.text = element_text(size=12),
-        axis.text.x = element_text(size=11),
         axis.title = element_text(size=16),
         strip.background = element_rect(fill="white"),
         strip.text = element_text(size=12),
@@ -1901,7 +1900,7 @@ ggplot(PhycoChlaRatioChoosenPUR, aes(x = PARPhotonDose_day, y = PURPARRatio)) +
         legend.spacing.y = unit(-0.1, "cm"),
         legend.spacing.x = unit(-0.1, 'cm'),
         legend.title = element_blank(),
-        legend.text = element_text(size=9))
+        legend.text = element_text(size=10))
 ```
 
 # Save plot 

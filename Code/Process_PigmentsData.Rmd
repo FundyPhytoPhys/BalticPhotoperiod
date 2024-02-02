@@ -530,14 +530,13 @@ MCPigmentPlot %>%
   scale_x_continuous(breaks=seq(0, 60000000, by = 30000000), label=scientific_10) +
   scale_y_continuous(breaks=seq(0, 30, by = 10)) +
   coord_cartesian(xlim = c(0, 80000000), ylim = c(0, 30)) +
-  labs(y = "Pigments content ( pg  " ~ cell^-1~")", x = "PAR photon dose ( µmol photons "~m^-2~""~d^-1~")") +
+  labs(y = "Pigments content ( pg " ~ cell^-1~")", x = "PAR photon dose ( µmol photons "~m^-2~""~d^-1~")") +
   ggh4x::facet_nested(cols = vars(Phase), rows = vars(facetsStrain, Strain), labeller = label_parsed) +
   # ggh4x::facet_nested(cols = vars(Phase), rows = vars(factor(PigmentsName, levels=c('Chlorophyll~a', 'Total~phycobilins', 'Carotenoids'))), labeller = label_parsed) +
   theme_bw() +
   theme(panel.grid.minor = element_blank(),
         panel.grid.major = element_blank(),
         axis.text = element_text(size=12),
-        axis.text.x = element_text(size=11),
         axis.title = element_text(size=16),
         strip.background = element_rect(fill="white"),
         strip.text = element_text(size=12),
@@ -549,7 +548,7 @@ MCPigmentPlot %>%
         legend.spacing.y = unit(-0.1, "cm"),
         legend.spacing.x = unit(-0.1, 'cm'),
         legend.title = element_blank(),
-        legend.text = element_text(size=9))
+        legend.text = element_text(size=10))
 ```
 
 # Save plot 
