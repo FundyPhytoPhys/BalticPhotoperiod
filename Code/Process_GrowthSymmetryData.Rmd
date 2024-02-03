@@ -243,6 +243,7 @@ lab2=c(expression("30 µE"), expression("90 µE"), expression("180 µE"), expres
   geom_point(aes(x = PARPhotonDose_day, y = meanGS, colour = as.factor(Par_ue), shape = as.factor(Photoperiod)), size = 3.5, alpha = 0.8, show.legend = T, GScatalogMetaFit) +
   geom_errorbar(aes(x = PARPhotonDose_day, ymin = meanGS - sdGS, ymax = meanGS + sdGS, colour = as.factor(Par_ue)), show.legend = F, width=0, size=0.3, GScatalogMetaFit) +
   geom_point(aes(x = PARPhotonDose_day, y = GS, colour = as.factor(Par_ue), shape = as.factor(Photoperiod)), size = 1, alpha = 0.8, show.legend = F, GScatalogMetaFit) +
+    
   geom_line(aes(PARPhotonDose_day, .fitted), colour = "blue", size = 0.3, linetype = "solid", show.legend = F, augmented) +
   geom_hline(yintercept = 1, linetype="dashed", size=0.4, colour = "cornsilk4") +
 
@@ -257,10 +258,11 @@ lab2=c(expression("30 µE"), expression("90 µE"), expression("180 µE"), expres
   geom_text(data=data_text_AnovaExp, aes(x=5000000, y=0, label=label), colour = "blue", size=3.5) +
   geom_text(data=data_text_AnovaSt, aes(x=5000000, y=0, label=label), colour = "blue", size=3.5) +
       
-  labs(y = "Diel growth symmetry (AccLen/DecLen ratio)", x = "Photon dose ( µmol photons "~m^-2~""~d^-1~")") +
   scale_shape_manual(values = c(15, 16, 17), name="", labels = lab1) +
   scale_colour_manual(values = c("darkslategray", "lightblue4", "hotpink4", "indianred3", "khaki2"), name="", labels = lab2) +
   scale_x_continuous(label=scientific_10) +
+  guides(color = guide_legend(order = 1), shape  = guide_legend(order = 0)) +
+  labs(y = "Diel growth symmetry (AccLen/DecLen ratio)", x = "Photon dose ( µmol photons "~m^-2~""~d^-1~")") +
   ggh4x::facet_nested(rows = vars(O2, Strain), cols = vars(WL, Phase), labeller = labeller(WL = WL.labs, O2 = O2.labs)) +
   theme_bw() +
   theme(panel.grid.minor = element_blank(),
@@ -279,11 +281,6 @@ lab2=c(expression("30 µE"), expression("90 µE"), expression("180 µE"), expres
         legend.text = element_text(size=10))
 ```
 
-# Cleaning the environment
-
-```{r}
-rm(data_text_y0Exp, data_text_yfExp, data_text_lambdaExp, data_text_y0St, data_text_yfSt, data_text_lambdaSt)
-```
 
 # Save plot 
 
@@ -291,6 +288,11 @@ rm(data_text_y0Exp, data_text_yfExp, data_text_lambdaExp, data_text_y0St, data_t
 ggsave(file = file.path(FigPath, paste("Fig_GS",".png",sep = "")), height=10, width= 8,  dpi = 300, limitsize = TRUE)
 ```
 
+# Cleaning the environment
+
+```{r}
+rm(data_text_y0Exp, data_text_yfExp, data_text_lambdaExp, data_text_y0St, data_text_yfSt, data_text_lambdaSt)
+```
 
 # Calculated Anova and Tukey test from data points
 
@@ -466,13 +468,14 @@ GScatalogMeta %>%
   geom_hline(data = data_hlineGS8, aes(yintercept = value), linetype="dashed", size=0.4, colour = "cornsilk4") +
   geom_hline(data = data_hlineGS12, aes(yintercept = value), linetype="dashed", size=0.4, colour = "cornsilk4") +
   geom_hline(data = data_hlineGS16, aes(yintercept = value), linetype="dashed", size=0.4, colour = "cornsilk4") +
-  labs(y = "AccLen (h)", x = "Photon dose ( µmol photons "~m^-2~""~d^-1~")") +
   scale_shape_manual(values = c(15, 16, 17), name="", labels = lab1) +
   scale_colour_manual(values = c("darkslategray", "lightblue4", "hotpink4", "indianred3", "khaki2"), name="", labels = lab2) +
   scale_linetype_manual(values = c("solid", "solid", "solid"), name="", labels = lab1) +
   scale_x_continuous(breaks=seq(0, 30000000, by = 10000000), label=scientific_10) +
   scale_y_continuous(breaks=seq(0, 10, by = 2)) +
   coord_cartesian(ylim = c(0, 12), xlim = c(0, 36000000)) +
+  guides(color = guide_legend(order = 1), shape  = guide_legend(order = 0)) +
+  labs(y = "AccLen (h)", x = "Photon dose ( µmol photons "~m^-2~""~d^-1~")") +
   ggh4x::facet_nested(cols = vars(facetsPhase, Phase), rows = vars(facetsStrain, Strain), labeller = label_parsed) +
   theme_bw() +
   theme(panel.grid.minor = element_blank(),
@@ -522,12 +525,13 @@ GScatalogMeta %>%
   geom_hline(data = data_hlineGS8, aes(yintercept = value), linetype="dashed", size=0.4, colour = "cornsilk4") +
   geom_hline(data = data_hlineGS12, aes(yintercept = value), linetype="dashed", size=0.4, colour = "cornsilk4") +
   geom_hline(data = data_hlineGS16, aes(yintercept = value), linetype="dashed", size=0.4, colour = "cornsilk4") +
-  labs(y = "AccLen (h)", x = "Photon dose ( µmol photons "~m^-2~""~d^-1~")") +
   scale_shape_manual(values = c(15, 16, 17), name="", labels = lab1) +
   scale_colour_manual(values = c("darkslategray", "lightblue4", "hotpink4", "indianred3", "khaki2"), name="", labels = lab2) +
   scale_x_continuous(breaks=seq(0, 30000000, by = 10000000), label=scientific_10) +
   scale_y_continuous(breaks=seq(0, 10, by = 2)) +
   coord_cartesian(ylim = c(0, 12), xlim = c(0, 36000000)) +
+  guides(color = guide_legend(order = 1), shape  = guide_legend(order = 0)) +
+  labs(y = "AccLen (h)", x = "Photon dose ( µmol photons "~m^-2~""~d^-1~")") +
   ggh4x::facet_nested(cols = vars(facetsPhase, Phase), rows = vars(facetsStrain, Strain), labeller = label_parsed) +
   theme_bw() +
   theme(panel.grid.minor = element_blank(),
@@ -564,11 +568,12 @@ GScatalogMeta %>%
   geom_point(aes(x = Photoperiod, y = AccLen, colour = as.factor(Par_ue), shape = as.factor(Photoperiod)), size = 1, alpha = 0.8, show.legend = F) +
   geom_errorbar(aes(x = Photoperiod, ymin = meanAccLen - sdAccLen, ymax = meanAccLen + sdAccLen, colour = as.factor(Par_ue)), show.legend = F, width=0) +
   geom_point(aes(x = Photoperiod, y = meanAccLen, colour = as.factor(Par_ue), shape = as.factor(Photoperiod)), size = 3.5, alpha = 0.8, show.legend = T) +
-labs(y = "AccLen (h)", x = "Photoperiod (h)") +
   scale_colour_manual(values = c("darkslategray", "lightblue4", "hotpink4", "indianred3", "khaki2"), name="", labels = lab2) +
   geom_abline(slope = 0.5, intercept = 0, linetype = "dashed", size=0.4, colour = "cornsilk4") +
   scale_y_continuous(breaks=seq(0, 10, by = 2)) +
   coord_cartesian(ylim = c(0, 14)) +
+  guides(color = guide_legend(order = 1), shape  = guide_legend(order = 0)) +
+  labs(y = "AccLen (h)", x = "Photoperiod (h)") +
   ggh4x::facet_nested(cols = vars(facetsPhase, Phase), rows = vars(facetsStrain, Strain), labeller = label_parsed) +
   theme_bw() +
   theme(panel.grid.minor = element_blank(),
