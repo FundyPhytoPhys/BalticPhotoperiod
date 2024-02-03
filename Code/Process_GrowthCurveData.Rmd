@@ -504,6 +504,7 @@ tMaxAGLines_127<-tmaxAG %>%
   unique()
 ```
 
+
 # Create GrowthCurve plot
 
 ```{r create GrowthCurve plot, fig.height = 8, fig.width = 8, warning = FALSE}
@@ -623,6 +624,123 @@ MultiCultiDataAll %>%
 ```{r save plot}
 ggsave(file = file.path(FigPath, paste("SFig_GrowthCurve_DeltaOD",".png",sep = "")), height=10, width= 8,  dpi = 300, limitsize = TRUE)
 ```
+
+Create GrowthCurve plot
+
+```{r create GrowthCurve plot, fig.height = 8, fig.width = 8, warning = FALSE}
+lab2=c(expression("30 µE"), expression("90 µE"), expression("180 µE"), expression("300 µE"), expression("600 µE"), expression("900 µE"))
+MultiCultiDataAll %>%
+  #filter(Par_ue != 600) %>% 
+  filter(Run != 77) %>% 
+  ggplot() +
+  #geom_area(aes(x = Time_h, y = meanActinic_par_h), size = 0.1, fill = "tan1", alpha = 0.6) +
+  geom_line(aes(x = Time_h, y = meanOD680_h, colour = as.factor(Par_ue)), size = 0.5, show.legend = T) +
+  scale_colour_manual(values = c("darkslategray", "lightblue4", "hotpink4", "indianred3",  "goldenrod2", "khaki2"), name="", labels = lab2) +
+  #scale_colour_discrete(type=c("seagreen4", "palegreen3", "brown1", "brown4"), name="") +
+  scale_y_continuous(breaks=seq(0, 1, by = 0.25)) +
+  coord_cartesian(ylim = c(0, 1.0)) +
+  labs(y = "Optical density ("~OD[680]~")", x = "Elapsed time (h)") +
+  ggh4x::facet_nested(cols = vars(facetsPhotoperiod, Photoperiod), rows = vars(Strain), labeller = label_parsed) +
+  theme_bw() +
+  theme(panel.grid.minor = element_blank(),
+        panel.grid.major = element_blank(),
+        axis.text = element_text(size=12),
+        axis.title = element_text(size=16),
+        strip.background = element_rect(fill="white"),
+        strip.text = element_text(size=12),
+        axis.title.y = element_text(margin=margin(r=10)),
+        axis.title.x = element_text(margin=margin(t=10)),
+        legend.background = element_rect(fill="transparent"),
+        legend.position = c(0.07,0.95),
+        legend.key.height= unit(0.005, 'cm'),
+        legend.spacing.x = unit(0.01, 'cm'),
+        legend.text = element_text(size=10))
+```
+
+# Save plot 
+
+```{r save plot}
+ggsave(file = file.path(FigPath, paste("SFig_GrowthCurve_OD680_Photoperiod",".png",sep = "")), height=10, width= 8,  dpi = 300, limitsize = TRUE)
+```
+
+
+Create GrowthCurve plot
+
+```{r create GrowthCurve plot, fig.height = 8, fig.width = 8, warning = FALSE}
+lab2=c(expression("30 µE"), expression("90 µE"), expression("180 µE"), expression("300 µE"), expression("600 µE"), expression("900 µE"))
+MultiCultiDataAll %>%
+  #filter(Par_ue != 600) %>% 
+  filter(Run != 77) %>% 
+  ggplot() +
+  #geom_area(aes(x = Time_h, y = meanActinic_par_h), size = 0.1, fill = "tan1", alpha = 0.6) +
+  geom_line(aes(x = Time_h, y = meanOD720_h, colour = as.factor(Par_ue)), size = 0.5, show.legend = T) +
+  scale_colour_manual(values = c("darkslategray", "lightblue4", "hotpink4", "indianred3",  "goldenrod2", "khaki2"), name="", labels = lab2) +
+  #scale_colour_discrete(type=c("seagreen4", "palegreen3", "brown1", "brown4"), name="") +
+  scale_y_continuous(breaks=seq(0, 1, by = 0.25)) +
+  coord_cartesian(ylim = c(0, 1.0)) +
+  labs(y = "Optical density ("~OD[720]~")", x = "Elapsed time (h)") +
+  ggh4x::facet_nested(cols = vars(facetsPhotoperiod, Photoperiod), rows = vars(Strain), labeller = label_parsed) +
+  theme_bw() +
+  theme(panel.grid.minor = element_blank(),
+        panel.grid.major = element_blank(),
+        axis.text = element_text(size=12),
+        axis.title = element_text(size=16),
+        strip.background = element_rect(fill="white"),
+        strip.text = element_text(size=12),
+        axis.title.y = element_text(margin=margin(r=10)),
+        axis.title.x = element_text(margin=margin(t=10)),
+        legend.background = element_rect(fill="transparent"),
+        legend.position = c(0.07,0.95),
+        legend.key.height= unit(0.005, 'cm'),
+        legend.spacing.x = unit(0.01, 'cm'),
+        legend.text = element_text(size=10))
+```
+
+# Save plot 
+
+```{r save plot}
+ggsave(file = file.path(FigPath, paste("SFig_GrowthCurve_OD720_Photoperiod",".png",sep = "")), height=10, width= 8,  dpi = 300, limitsize = TRUE)
+```
+
+
+Create GrowthCurve plot
+
+```{r create GrowthCurve plot, fig.height = 8, fig.width = 8, warning = FALSE}
+lab2=c(expression("30 µE"), expression("90 µE"), expression("180 µE"), expression("300 µE"), expression("600 µE"), expression("900 µE"))
+MultiCultiDataAll %>%
+  #filter(Par_ue != 600) %>% 
+  filter(Run != 77) %>% 
+  ggplot() +
+  #geom_area(aes(x = Time_h, y = meanActinic_par_h), size = 0.1, fill = "tan1", alpha = 0.6) +
+  geom_line(aes(x = Time_h, y = meanDeltaOD_h, colour = as.factor(Par_ue)), size = 0.5, show.legend = T) +
+  scale_colour_manual(values = c("darkslategray", "lightblue4", "hotpink4", "indianred3",  "goldenrod2", "khaki2"), name="", labels = lab2) +
+  #scale_colour_discrete(type=c("seagreen4", "palegreen3", "brown1", "brown4"), name="") +
+  scale_y_continuous(breaks=seq(0, 1, by = 0.25)) +
+  coord_cartesian(ylim = c(0, 1.0)) +
+  labs(y = "Optical density (Delta OD)", x = "Elapsed time (h)") +
+  ggh4x::facet_nested(cols = vars(facetsPhotoperiod, Photoperiod), rows = vars(Strain), labeller = label_parsed) +
+  theme_bw() +
+  theme(panel.grid.minor = element_blank(),
+        panel.grid.major = element_blank(),
+        axis.text = element_text(size=12),
+        axis.title = element_text(size=16),
+        strip.background = element_rect(fill="white"),
+        strip.text = element_text(size=12),
+        axis.title.y = element_text(margin=margin(r=10)),
+        axis.title.x = element_text(margin=margin(t=10)),
+        legend.background = element_rect(fill="transparent"),
+        legend.position = c(0.07,0.95),
+        legend.key.height= unit(0.005, 'cm'),
+        legend.spacing.x = unit(0.01, 'cm'),
+        legend.text = element_text(size=10))
+```
+
+# Save plot 
+
+```{r save plot}
+ggsave(file = file.path(FigPath, paste("SFig_GrowthCurve_DeltaOD_Photoperiod",".png",sep = "")), height=10, width= 8,  dpi = 300, limitsize = TRUE)
+```
+
 
 # Create preliminary plot - loop
 
