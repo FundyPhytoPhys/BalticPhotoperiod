@@ -568,6 +568,7 @@ GScatalogMeta %>%
   geom_point(aes(x = Photoperiod, y = AccLen, colour = as.factor(Par_ue), shape = as.factor(Photoperiod)), size = 1, alpha = 0.8, show.legend = F) +
   geom_errorbar(aes(x = Photoperiod, ymin = meanAccLen - sdAccLen, ymax = meanAccLen + sdAccLen, colour = as.factor(Par_ue)), show.legend = F, width=0) +
   geom_point(aes(x = Photoperiod, y = meanAccLen, colour = as.factor(Par_ue), shape = as.factor(Photoperiod)), size = 3.5, alpha = 0.8, show.legend = T) +
+  scale_shape_manual(values = c(15, 16, 17), name="", labels = lab1) +
   scale_colour_manual(values = c("darkslategray", "lightblue4", "hotpink4", "indianred3", "khaki2"), name="", labels = lab2) +
   geom_abline(slope = 0.5, intercept = 0, linetype = "dashed", size=0.4, colour = "cornsilk4") +
   scale_y_continuous(breaks=seq(0, 10, by = 2)) +
