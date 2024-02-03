@@ -196,9 +196,9 @@ All analysis of obtained results was conducted using R version 4.3.0 [@rcoreteam
 
 ## Changes in chlorophyll specific exponential growth rate {.unnumbered}
 
-```{r GrowthRate, fig.cap = GrowthRate_cap, fig.height = 6, fig.width = 8, echo = FALSE}
-GrowthRate_cap<- glue("Chlorophyll specific exponential growth rate, estimated from logistic fits of chlorophyll proxy OD~680~-OD~720~ vs. elapsed time, for two PhycoCyanin(PC)-rich cultures (056, 077) and two PhycoErythrin(PE)-rich cultures (048, 127) (Culture Collection of Baltic Algae) of *Synechococcus* sp. grown at 30, 90, 180, 300, 600, or 900 peak PAR µmol photons m^−2^s^−1^; and photoperiods of 8, 12, 16, or 24 h. Growth rates (+/- SE from logistic model; SE falls within symbol sizes) are plotted vs. cumulative diel µmol photons m^−2^d^−1^. Solid blue line shows fit of the pooled data with a three parameter model (Harrison and Platt, 1986). We also fit separate lines for growth under 8 (dotted line), 12 (longdash line), 16 (dashed line), or 24 (twodash line) h photoperiod, since they were significantly different (ANOVA, *p* < 0.05) from the pooled fit.", .sep = " ")
-knitr::include_graphics(file.path(FiguresFP,"Fig_GrowthRate.png"))
+```{r GrowthRatePhotoperiod, fig.cap = GrowthRatePhotoperiod_cap, fig.height = 6, fig.width = 8, echo = FALSE}
+GrowthRatePhotoperiod_cap<- glue("Chlorophyll specific exponential growth rate, estimated from logistic fits of chlorophyll proxy OD~680~-OD~720~ vs. elapsed time, for two PhycoCyanin(PC)-rich cultures (056, 077) and two PhycoErythrin(PE)-rich cultures (048, 127) (Culture Collection of Baltic Algae) of *Synechococcus* sp. grown at 30 (dark gray), 90 (light gray), 180 (purple), 300 (red), 600 (orange), or 900 (yellow) peak PAR µmol photons m^−2^s^−1^; and photoperiods of 8 (square), 12 (circle), 16 (triangle), or 24 (diamond) h. Growth rates (+/- SE from logistic model; SE falls within symbol sizes) are plotted vs. cumulative diel µmol photons m^−2^d^−1^. Solid blue line shows fit of the pooled data with a three parameter model (Harrison and Platt, 1986). We also fit the same model for chlorophyll specific exponential growth rate across 8 (dotted line), 12 (long dash line), 16 (dashed line), or 24 (two dash line) h photoperiod, since they were significantly different (ANOVA, *p* < 0.05) from the fit of pooled data.", .sep = " ")
+knitr::include_graphics(file.path(FiguresFP,"Fig_GrowthRate_Photoperiod.png"))
 ```
 
 ## Changes of diel growth symmetry {.unnumbered}
