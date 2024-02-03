@@ -110,7 +110,7 @@ knitr::include_graphics(file.path(FiguresFP,"SFig_GrowthRate_Light.png"))
 
 
 ```{r AccLen, fig.cap = AccLen_cap, fig.height = 8, fig.width = 6, echo = FALSE}
-AccLen_cap<- glue("Hours of photoperiod to reach maximum hourly growth increment (AccLen), for two PhycoCyanin(PC)-rich cultures (056, 077) and two PhycoErythrin(PE)-rich cultures (048, 127) (Culture Collection of Baltic Algae) of *Synechococcus* sp. grown at 30, 90, 180, 300, or 900 peak PAR µmol photons m^−2^s^−1^; and photoperiods of 8, 12, or 16 h. The diagonal dashed lines indicate the time (h) to reach the maximum light during the day. Figure represents all data (small symbols) and means (big symbols) for n = 0-5 days from exponential phase, or from pre-stationary growth phase.", .sep = " ")
+AccLen_cap<- glue("Hours of photoperiod to reach maximum hourly growth increment (AccLen), for two PhycoCyanin(PC)-rich cultures (056, 077) and two PhycoErythrin(PE)-rich cultures (048, 127) (Culture Collection of Baltic Algae) of *Synechococcus* sp. grown at 30 (dark gray), 90 (light gray), 180 (purple), 300 (red), or 900 (yellow) peak PAR µmol photons m^−2^s^−1^; and photoperiods of 8 (square), 12 (circle), or 16 (triangle) h. The diagonal dashed lines indicate the time (h) to reach the maximum light during the day. Figure represents all data (small symbols) and means (big symbols) for n = 0-5 days from exponential phase, or from pre-stationary growth phase.", .sep = " ")
 knitr::include_graphics(file.path(FiguresFP,"SFig_AccLen.png"))
 ```
 
@@ -123,19 +123,19 @@ knitr::include_graphics(file.path(FiguresFP,"SFig_TDG.png"))
 
 
 ```{r PhycoChlaRatio, fig.cap = PhycoChlaRatio_cap, fig.height = 6, fig.width = 8, echo = FALSE}
-PhycoChlaRatio_cap<- glue("Changes of total Phyco/Chl *a* ratio of two PhycoCyanin(PC)-rich cultures (056, 077) and two PhycoErythrin(PE)-rich cultures (048, 127) (Culture Collection of Baltic Algae) of *Synechococcus* sp. grown at 30, 90, 180, 300, 600, or 900 peak PAR µmol photons m^−2^s^−1^; and photoperiods of 8, 12, 16, or 24 h. Figure represents all data (small symbols) and means (big symbols) from exponential phase, or from pre-stationary growth phase. Blue solid line shows single phase exponential decay fit of pooled data; fit parameters are presented. Different lowercase letters indicate significant differences between the fit models for strains for a given phase of growth (ANOVA; *p* < 0.05).", .sep = " ")
+PhycoChlaRatio_cap<- glue("Changes of total Phyco/Chl *a* ratio of two PhycoCyanin(PC)-rich cultures (056, 077) and two PhycoErythrin(PE)-rich cultures (048, 127) (Culture Collection of Baltic Algae) of *Synechococcus* sp. grown at 30 (dark gray), 90 (light gray), 180 (purple), 300 (red), 600 (orange), or 900 (yellow) peak PAR µmol photons m^−2^s^−1^; and photoperiods of 8 (square), 12 (circle), 16 (triangle), or 24 (diamond) h. Figure represents all data (small symbols) and means (big symbols) from exponential phase, or from pre-stationary growth phase. Blue solid line shows single phase exponential decay fit of pooled data; fit parameters are presented. Different lowercase letters indicate significant differences between the fit models for strains for a given phase of growth (ANOVA; *p* < 0.05).", .sep = " ")
 knitr::include_graphics(file.path(FiguresFP,"SFig_PhycoChlaRatio.png"))
 ```
 
 
 ```{r Sigma445, fig.cap = Sigma445_cap, fig.height = 8, fig.width = 6, echo = FALSE}
-Sigma445_cap<- glue("Effective absorption cross section of PSII (\u03C3~PSII~'; nm^2^ quanta^-1^) measured under diel peak PAR growth light under Ex445 nm (blue) excitation in two PhycoCyanin(PC)-rich cultures (056, 077) and two PhycoErythrin(PE)-rich cultures (048, 127) (Culture Collection of Baltic Algae) of *Synechococcus* sp. grown at 30, 90, 180, 300, 600, or 900 peak PAR µmol photons m^−2^s^−1^; and photoperiods of 8, 12, 16, or 24 h. Figure represents all data (small symbols) and means (big symbols) from exponential phase, or from pre-stationary growth phase. Blue solid line shows linear model fit.", .sep = " ")
+Sigma445_cap<- glue("Effective absorption cross section of PSII (\u03C3~PSII~'; nm^2^ quanta^-1^) measured under diel peak PAR growth light under Ex445 nm (blue) excitation in two PhycoCyanin(PC)-rich cultures (056, 077) and two PhycoErythrin(PE)-rich cultures (048, 127) (Culture Collection of Baltic Algae) of *Synechococcus* sp. grown at 30 (dark gray), 90 (light gray), 180 (purple), 300 (red), 600 (orange), or 900 (yellow) peak PAR µmol photons m^−2^s^−1^; and photoperiods of 8 (square), 12 (circle), 16 (triangle), or 24 (diamond) h. Figure represents all data (small symbols) and means (big symbols) from exponential phase, or from pre-stationary growth phase. Blue solid line shows linear model fit.", .sep = " ")
 knitr::include_graphics(file.path(FiguresFP,"SFig_Sigma445.png"))
 ```
 
 
 ```{r SigmaPig445, fig.cap = SigmaPig445_cap, fig.height = 8, fig.width = 6, echo = FALSE}
-SigmaPig445_cap<- glue("Changes of effective absorption cross section of PSII (\u03C3~PSII~'; nm^2^ quanta^-1^) measured under diel peak PAR growth light under Ex445 nm (blue) excitation in relation to the total Phyco/Chl *a* ratio of two PhycoCyanin(PC)-rich cultures (Culture Collection of Baltic Algae; 056, 077) and two PhycoErythrin(PE)-rich cultures (Culture Collection of Baltic Algae; 048, 127) of *Synechococcus* sp. grown at 30, 90, 180, 300, 600, or 900 peak PAR µmol photons m^−2^s^−1^; and photoperiods of 8, 12, 16, or 24 h. Figure represents all data (small symbols) and means (big symbols) from exponential phase, or from pre-stationary growth phase. Blue solid line shows linear model fit.", .sep = " ")
+SigmaPig445_cap<- glue("Changes of effective absorption cross section of PSII (\u03C3~PSII~'; nm^2^ quanta^-1^) measured under diel peak PAR growth light under Ex445 nm (blue) excitation in relation to the total Phyco/Chl *a* ratio of two PhycoCyanin(PC)-rich cultures (Culture Collection of Baltic Algae; 056, 077) and two PhycoErythrin(PE)-rich cultures (Culture Collection of Baltic Algae; 048, 127) of *Synechococcus* sp. grown at 30 (dark gray), 90 (light gray), 180 (purple), 300 (red), 600 (orange), or 900 (yellow) peak PAR µmol photons m^−2^s^−1^; and photoperiods of 8 (square), 12 (circle), 16 (triangle), or 24 (diamond) h. Figure represents all data (small symbols) and means (big symbols) from exponential phase, or from pre-stationary growth phase. Blue solid line shows linear model fit.", .sep = " ")
 knitr::include_graphics(file.path(FiguresFP,"SFig_SigmaPig445.png"))
 ```
 
@@ -197,7 +197,7 @@ Anova_GrowthRate<-Anova_GrowthRate %>%
   rename(F_value = "F value")
 
 
-myft <- flextable(Anova_GrowthRate)
+myft <- flextable(Anova_GrowthRate) 
 myft <- set_caption(myft, caption = "Three-way factorial ANOVA of chlorophyll specific exponential growth rate, estimated from logistic fits of chlorophyll proxy OD680-OD720 vs. elapsed time, for two PhycoCyanin(PC)-rich cultures (056, 077) and two PhycoErythrin(PE)-rich cultures (048, 127) (Culture Collection of Baltic Algae) of Synechococcus sp., grown at 30, 90, 180, 300, 600, or 900 peak PAR µmol photons m−2s−1; and photoperiods of 8, 12, 16, or 24 h. Df – degrees of freedom; Sum Sq – sum of squares; Mean Sq – mean sum of squares; F_value – Fisher's F-test statistic; p_value - level of significance.")
 myft <- colformat_double(x = myft, big.mark = ",", digits = 3, na_str = "N/A")
 myft <- set_formatter(myft, F_value = function(x) {formatC(x, format = "e", digits = 3)})
@@ -297,6 +297,17 @@ myft
 rm(Anova_GS_Model)
 ```
 
+```{r echo = FALSE}
+# myft <- flextable(Anova_GrowthRate) %>% 
+# set_caption(caption = as_paragraph(
+#       as_chunk("Three-way factorial ANOVA of chlorophyll specific exponential growth rate, estimated from logistic fits of chlorophyll proxy OD680-OD720 vs. elapsed time, for two PhycoCyanin(PC)-rich cultures (056, 077) and two PhycoErythrin(PE)-rich cultures (048, 127) (Culture Collection of Baltic Algae) of", 
+#                props = fp_text_default(font.family = "Courier", italic = FALSE)),
+#       as_chunk(" Synechococcus", 
+#                props = fp_text_default(font.family = "Courier", italic = TRUE)),
+#       as_chunk(" sp., grown at 30, 90, 180, 300, 600, or 900 peak PAR µmol photons m−2s−1; and photoperiods of 8, 12, 16, or 24 h. Df – degrees of freedom; Sum Sq – sum of squares; Mean Sq – mean sum of squares; F_value – Fisher's F-test statistic; p_value - level of significance.", 
+#                props = fp_text_default(font.family = "Courier", italic = FALSE))))
+# myft
+```
 
 
 
