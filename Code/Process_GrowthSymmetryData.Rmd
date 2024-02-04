@@ -225,10 +225,21 @@ data_text_lambdaExp<- data.frame(WL = c("WW", "WW"), Phase = c("Exponential"), O
 
 data_text_y0St<- data.frame(WL = c("WW", "WW"), Phase = c("Pre-stationary"), O2=c(21, 21, 21, 21), Strain  = c("PC-rich_056", "PC-rich_077", "PE-rich_048", "PE-rich_127"),  label = c('y0 = NA', '  y0 = 3.8', 'y0 = 0.6', 'y0 = 0.6'))
 data_text_yfSt<- data.frame(WL = c("WW", "WW"), Phase = c("Pre-stationary"), O2=c(21, 21, 21, 21), Strain  = c("PC-rich_056", "PC-rich_077", "PE-rich_048", "PE-rich_127"),  label = c('yf = 0.7', 'yf = 0.4', 'yf = 0.3', 'yf = 0.2'))
-data_text_lambdaSt<- data.frame(WL = c("WW", "WW"), Phase = c("Pre-stationary"), O2=c(21, 21, 21, 21), Strain  = c("PC-rich_056", "PC-rich_077", "PE-rich_048", "PE-rich_127"),  label = c('\u03BB = NA', '     \u03BB = 1.8e-06', '    \u03BB = 7.8e-08', '    \u03BB = 6.3e-08'))
+data_text_lambdaSt<- data.frame(WL = c("WW", "WW"), Phase = c("Pre-stationary"), O2=c(21, 21, 21, 21), Strain  = c("PC-rich_056", "PC-rich_077", "PE-rich_048", "PE-rich_127"),  label = c('\u03BB = NA', '     \u03BB = 1.8e-06', '     \u03BB = 7.8e-08', '     \u03BB = 6.3e-08'))
 
-data_text_AnovaExp<- data.frame(WL = c("WW", "WW"), Phase = c("Exponential"), O2=c(21, 21, 21, 21), Strain  = c("PC-rich_056", "PC-rich_077", "PE-rich_048", "PE-rich_127"),  label = c('ANOVA, \u03B1 = 0.05, a', 'ANOVA, \u03B1 = 0.05, a', 'ANOVA, \u03B1 = 0.05, b', ' ANOVA, \u03B1 = 0.05, ab'))
-data_text_AnovaSt<- data.frame(WL = c("WW", "WW"), Phase = c("Pre-stationary"), O2=c(21, 21, 21, 21), Strain  = c("PC-rich_056", "PC-rich_077", "PE-rich_048", "PE-rich_127"),  label = c('ANOVA, \u03B1 = 0.05, a', ' ANOVA, \u03B1 = 0.05, ab', ' ANOVA, \u03B1 = 0.05, ab', 'ANOVA, \u03B1 = 0.05, b'))
+# data_text_AnovaExp<- data.frame(WL = c("WW", "WW"), Phase = c("Exponential"), O2=c(21, 21, 21, 21), Strain  = c("PC-rich_056", "PC-rich_077", "PE-rich_048", "PE-rich_127"),  label = c('ANOVA, \u03B1 = 0.05, a', 'ANOVA, \u03B1 = 0.05, a', 'ANOVA, \u03B1 = 0.05, b', ' ANOVA, \u03B1 = 0.05, ab'))
+
+data_text_AnovaExp56<- data.frame(WL = c("WW"), Phase = c("Exponential"), O2=c(21), Strain  = c("PC-rich_056"),  label = c('a'))
+data_text_AnovaExp77<- data.frame(WL = c("WW"), Phase = c("Exponential"), O2=c(21), Strain  = c("PC-rich_077"),  label = c("a"))
+data_text_AnovaExp48<- data.frame(WL = c("WW"), Phase = c("Exponential"), O2=c(21), Strain  = c("PE-rich_048"),  label = c("b"))
+data_text_AnovaExp127<- data.frame(WL = c("WW"), Phase = c("Exponential"), O2=c(21), Strain  = c("PE-rich_127"),  label = c("ab"))
+
+data_text_AnovaSt56<- data.frame(WL = c("WW"), Phase = c("Pre-stationary"), O2=c(21), Strain  = c("PC-rich_056"),  label = c('a'))
+data_text_AnovaSt77<- data.frame(WL = c("WW"), Phase = c("Pre-stationary"), O2=c(21), Strain  = c("PC-rich_077"),  label = c("ab"))
+data_text_AnovaSt48<- data.frame(WL = c("WW"), Phase = c("Pre-stationary"), O2=c(21), Strain  = c("PE-rich_048"),  label = c("ab"))
+data_text_AnovaSt127<- data.frame(WL = c("WW"), Phase = c("Pre-stationary"), O2=c(21), Strain  = c("PE-rich_127"),  label = c("b"))
+
+data_text_AnovaPhase<- data.frame(WL = c("WW", "WW"), Phase = c("Exponential"), O2=c(21, 21, 21, 21), Strain  = c("PC-rich_056", "PC-rich_077", "PE-rich_048", "PE-rich_127"),  label = c('ANOVA, p < 0.05', 'ANOVA, p < 0.05', 'ANOVA, p < 0.05', 'ANOVA, p < 0.05'))
 
 WL.labs <- c("Phase of growth")
 names(WL.labs) <- c("WW")
@@ -255,12 +266,27 @@ lab2=c(expression("30 µE"), expression("90 µE"), expression("180 µE"), expres
   geom_text(data=data_text_yfSt, aes(x=2400000, y=2.5, label=label), size=3.5) +
   geom_text(data=data_text_lambdaSt, aes(x=2400000, y=2.0, label=label), size=3.5) +
     
-  geom_text(data=data_text_AnovaExp, aes(x=5000000, y=0, label=label), colour = "blue", size=3.5) +
-  geom_text(data=data_text_AnovaSt, aes(x=5000000, y=0, label=label), colour = "blue", size=3.5) +
-      
+  # geom_text(data=data_text_AnovaExp, aes(x=5000000, y=0, label=label), colour = "blue", size=3.5) +
+  # geom_text(data=data_text_AnovaSt, aes(x=5000000, y=0, label=label), colour = "blue", size=3.5) +
+    
+  geom_text(data=data_text_AnovaExp56, aes(x=25000000, y=1.3, label=label), colour = "blue", size=4) +
+  geom_text(data=data_text_AnovaExp77, aes(x=25000000, y=1.0, label=label), colour = "blue", size=4) +
+  geom_text(data=data_text_AnovaExp48, aes(x=25000000, y=0.9, label=label), colour = "blue", size=4) +
+  geom_text(data=data_text_AnovaExp127, aes(x=25000000, y=1.0, label=label), colour = "blue", size=4) +
+    
+  geom_text(data=data_text_AnovaSt56, aes(x=8000000, y=1.1, label=label), colour = "blue", size=4) +
+  geom_text(data=data_text_AnovaSt77, aes(x=8000000, y=1.0, label=label), colour = "blue", size=4) +
+  geom_text(data=data_text_AnovaSt48, aes(x=25000000, y=0.8, label=label), colour = "blue", size=4) +
+  geom_text(data=data_text_AnovaSt127, aes(x=25000000, y=0.7, label=label), colour = "blue", size=4) +
+    
+  geom_text(data=data_text_AnovaPhase, aes(x=6000000, y=-0.1, label=label), colour = "blue", size=4) +
+    
   scale_shape_manual(values = c(15, 16, 17), name="", labels = lab1) +
   scale_colour_manual(values = c("darkslategray", "lightblue4", "hotpink4", "indianred3", "khaki2"), name="", labels = lab2) +
-  scale_x_continuous(label=scientific_10) +
+  #scale_x_continuous(label=scientific_10) +
+  scale_x_continuous(breaks=seq(0, 27000000, by = 10000000), label=scientific_10) +
+  coord_cartesian(xlim = c(0, 27000000), ylim = c(-0.5, 3.5)) +
+    
   guides(color = guide_legend(order = 1), shape  = guide_legend(order = 0)) +
   labs(y = "Diel growth symmetry (AccLen/DecLen ratio)", x = "Photon dose ( µmol photons "~m^-2~""~d^-1~")") +
   ggh4x::facet_nested(rows = vars(O2, Strain), cols = vars(WL, Phase), labeller = labeller(WL = WL.labs, O2 = O2.labs)) +
@@ -274,18 +300,18 @@ lab2=c(expression("30 µE"), expression("90 µE"), expression("180 µE"), expres
         axis.title.y = element_text(margin=margin(r=10)),
         axis.title.x = element_text(margin=margin(t=10)),
         legend.background = element_rect(fill="white"),
-        legend.position = c(0.92,0.91),
+        legend.position = c(0.90,0.90),
         legend.key.height= unit(0.005, 'cm'),
         legend.spacing.y = unit(-0.1, "cm"),
         legend.title = element_blank(),
-        legend.text = element_text(size=10))
+        legend.text = element_text(size=11))
 ```
 
 
 # Save plot 
 
 ```{r save plot}
-ggsave(file = file.path(FigPath, paste("Fig_GS",".png",sep = "")), height=10, width= 8,  dpi = 300, limitsize = TRUE)
+ggsave(file = file.path(FigPath, paste("Fig_GS",".png",sep = "")), height=9, width= 7,  dpi = 300, limitsize = TRUE)
 ```
 
 # Cleaning the environment
@@ -316,8 +342,6 @@ TukeyHSDTest_GS<-TukeyHSD(model, which = c("PARPhotonDose_day", "Phase", "Strain
 
 ```{r}
 saveRDS(AnovaTest_GS, file.path(TableRdsPath, paste(Project, "Anova_GS.Rds", sep = "_"), fsep = .Platform$file.sep), ascii = FALSE, version = NULL, compress = "xz", refhook = NULL)
-
-# saveRDS(TukeyHSDTest_y0_alpha, file.path(RDSTablePath, paste(Project, "GSTukey_y0.Rds", sep = "_"), fsep = .Platform$file.sep), ascii = FALSE, version = NULL, compress = "xz", refhook = NULL)
 ```
 
 # Calculated Anova and Tukey test from exponential decay parameters
@@ -429,10 +453,7 @@ fittedmodelPhase<-fittedmodel
   drop_na(Df) 
   rm(anova056ExpSt, anova077ExpSt, anova048ExpSt, anova127ExpSt)
 
-  
   Anova_GS_Model<-rbind(anovaStrainExp, anovaStrainSt, anovaPhase)
-  # anovaStrainAll<-anova(fittedmodelStrain[[3]][[7]], fittedmodelStrain[[3]][[8]], fittedmodelStrain[[3]][[6]], fittedmodelStrain[[3]][[5]])
-  
 ```
 
 # Save Rds that create stats and tables
@@ -487,11 +508,11 @@ GScatalogMeta %>%
         axis.title.y = element_text(margin=margin(r=10)),
         axis.title.x = element_text(margin=margin(t=10)),
         legend.background = element_rect(fill="white"),
-        legend.position = c(0.912,0.9),
+        legend.position = c(0.90,0.9),
         legend.key.height= unit(0.005, 'cm'),
         legend.spacing.y = unit(-0.1, "cm"),
         legend.title = element_blank(),
-        legend.text = element_text(size=10))
+        legend.text = element_text(size=11))
 ```
 
 # Save plot 
@@ -529,7 +550,8 @@ GScatalogMeta %>%
   scale_colour_manual(values = c("darkslategray", "lightblue4", "hotpink4", "indianred3", "khaki2"), name="", labels = lab2) +
   scale_x_continuous(breaks=seq(0, 30000000, by = 10000000), label=scientific_10) +
   scale_y_continuous(breaks=seq(0, 10, by = 2)) +
-  coord_cartesian(ylim = c(0, 12), xlim = c(0, 36000000)) +
+  coord_cartesian(ylim = c(0, 12), xlim = c(0, 37000000)) +
+  
   guides(color = guide_legend(order = 1), shape  = guide_legend(order = 0)) +
   labs(y = "AccLen (h)", x = "Photon dose ( µmol photons "~m^-2~""~d^-1~")") +
   ggh4x::facet_nested(cols = vars(facetsPhase, Phase), rows = vars(facetsStrain, Strain), labeller = label_parsed) +
@@ -543,17 +565,17 @@ GScatalogMeta %>%
         axis.title.y = element_text(margin=margin(r=10)),
         axis.title.x = element_text(margin=margin(t=10)),
         legend.background = element_rect(fill="white"),
-        legend.position = c(0.912,0.9),
+        legend.position = c(0.9,0.9),
         legend.key.height= unit(0.005, 'cm'),
         legend.spacing.y = unit(-0.1, "cm"),
         legend.title = element_blank(),
-        legend.text = element_text(size=10))
+        legend.text = element_text(size=11))
 ```
 
 # Save plot 
 
 ```{r save plot}
-ggsave(file = file.path(FigPath, paste("Fig_AccLen",".png",sep = "")), height=10, width= 8,  dpi = 300, limitsize = TRUE)
+ggsave(file = file.path(FigPath, paste("Fig_AccLen",".png",sep = "")), height=9, width= 7,  dpi = 300, limitsize = TRUE)
 ```
 
 ```{r AccLen Plot, fig.height = 8, fig.width = 8, warning = FALSE}
@@ -587,18 +609,18 @@ GScatalogMeta %>%
         axis.title.y = element_text(margin=margin(r=10)),
         axis.title.x = element_text(margin=margin(t=10)),
         legend.background = element_rect(fill="transparent"),
-        legend.position = c(0.575,0.92),
+        legend.position = c(0.6,0.91),
         #legend.margin = margin(0,-0.5,0,0, unit="cm"),
         legend.key.height= unit(0.0005, 'cm'),
         legend.spacing.y = unit(-0.2, "cm"),
         legend.title = element_blank(),
-        legend.text = element_text(size=10))
+        legend.text = element_text(size=11))
 ```
 
 # Save plot 
 
 ```{r save plot}
-ggsave(file = file.path(FigPath, paste("SFig_AccLen",".png",sep = "")), height=10, width= 8,  dpi = 300, limitsize = TRUE)
+ggsave(file = file.path(FigPath, paste("SFig_AccLen",".png",sep = "")), height=9, width= 7,  dpi = 300, limitsize = TRUE)
 ```
 
 # Calculated Anova and Tukey test from AccLen data points

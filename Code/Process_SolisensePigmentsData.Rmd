@@ -49,6 +49,7 @@ library(Cairo) #for greek symbols
 library(googledrive)
 library(googlesheets4)
 library(readxl)
+library(multcompView)
 ```
 
 ```{r set project variables}
@@ -836,6 +837,7 @@ fittedmodel<-fitted590  %>%
 ```
 
 # Anova from the model 
+(When I made Anova from all models I got a result, but it is not possible to tell, what is sig different. Tukey doesn't work here. That is why I compare each pair of data - models separately)
 
 ```{r}
 #1->048 Exp
@@ -883,7 +885,6 @@ fittedmodelStrainSt<-fittedmodel
   anova_SigModelStrainSt<-rbind(anova056077St, anova048127St, anova056048St, anova077048St, anova056127St, anova077127St)
   anova_SigModelStrainSt <-anova_SigModelStrainSt %>% 
   drop_na(Df) 
-  
   rm(anova056077St, anova048127St, anova056048St, anova077048St, anova056127St, anova077127St)
   
   
@@ -940,6 +941,9 @@ augmented445<-fitted445 %>%
 # Create Sigma plot at 445
 
 ```{r create Sigma plot, fig.height = 8, fig.width = 8, warning = FALSE}
+data_text_AnovaExp<- data.frame(WL = c("WW", "WW"), Phase = c("Exponential"), O2=c(21, 21, 21, 21), Strain  = c("PC-rich_056", "PC-rich_077", "PE-rich_048", "PE-rich_127"),  label = c('ANOVA, \u03B1 = 0.05, a', 'ANOVA, \u03B1 = 0.05, a', 'ANOVA, \u03B1 = 0.05, a', 'ANOVA, \u03B1 = 0.05, a'))
+data_text_AnovaSt<- data.frame(WL = c("WW", "WW"), Phase = c("Pre-stationary"), O2=c(21, 21, 21, 21), Strain  = c("PC-rich_056", "PC-rich_077", "PE-rich_048", "PE-rich_127"),  label = c('ANOVA, \u03B1 = 0.05, a', 'ANOVA, \u03B1 = 0.05, a', 'ANOVA, \u03B1 = 0.05, b', 'ANOVA, \u03B1 = 0.05, a'))
+data_text_AnovaPhase<- data.frame(WL = c("WW", "WW"), Phase = c("Pre-stationary"), O2=c(21, 21, 21, 21), Strain  = c("PC-rich_056", "PC-rich_077", "PE-rich_048", "PE-rich_127"),  label = c("Phase, p > 0.05", 'Phase, p < 0.05', 'Phase, p < 0.05', 'Phase, p < 0.05'))
 
 WL.labs <- c("Phase of growth")
 names(WL.labs) <- c("WW")
@@ -958,12 +962,17 @@ ggplot(SolFitsExpFitAll445, aes(x = PARPhotonDose_day, y = Sig_nm2psii)) +
   geom_point(aes(x = PARPhotonDose_day, y = Sig_nm2psii, colour = as.factor(Par_ue), shape = as.factor(Photoperiod)), size = 1, show.legend = F) +
   geom_errorbar(aes(x = PARPhotonDose_day, ymin = AllmeanSig_nm2psii - AllsdSig_nm2psii, ymax = AllmeanSig_nm2psii + AllsdSig_nm2psii, colour=as.factor(Par_ue)), width=0, size=0.3, show.legend = F) +
   geom_line(aes(PARPhotonDose_day, .fitted), colour = "blue", linetype = "solid", size = 0.3, show.legend = F, augmented445) +
+  
+  geom_text(data=data_text_AnovaExp, aes(x=15000000, y=-0.4, label=label), colour = "blue", size=3.5) +
+  geom_text(data=data_text_AnovaSt, aes(x=15000000, y=-0.4, label=label), colour = "blue", size=3.5) +
+  geom_text(data=data_text_AnovaPhase, aes(x=65000000, y=-0.4, label=label), colour = "blue", size=3.5) +
+  
   scale_shape_manual(values = c(15, 16, 17,18), name="", labels = lab1) +
   scale_colour_manual(values = c("darkslategray", "lightblue4", "hotpink4", "indianred3",  "goldenrod2", "khaki2"), name="", labels = lab2) +
   labs(y=expression(paste(sigma,""["PSII"]*"' (nm"^"2"*" quanta"^"-1"*")")), x = "Photon dose ( µmol photons "~m^-2~""~d^-1~")") +
   scale_x_continuous(breaks=seq(0, 60000000, by = 30000000), label=scientific_10) +
   scale_y_continuous(breaks=seq(0, 10, by = 2)) +
-  coord_cartesian(xlim = c(0, 80000000), ylim = c(0, 10)) +
+  coord_cartesian(xlim = c(0, 80000000), ylim = c(-1, 10)) +
   ggh4x::facet_nested(rows = vars(O2, Strain), cols = vars(WL, Phase), labeller = labeller(WL = WL.labs, O2 = O2.labs)) +
   theme_bw() +
   theme(panel.grid.minor = element_blank(),
@@ -1014,122 +1023,228 @@ saveRDS(Anova_Sig445, file.path(TableRdsPath, paste(Project, "Anova_Sig445.Rds",
 ```
 
 # Anova from the linear model 
+https://stackoverflow.com/questions/24527116/write-regression-summary-to-the-csv-file-in-r
 
-dziala!!!!! t-test
+t-test from the linear model Exp
 ```{r}
 # Exp
 Stats56_77Exp<-SolFitsExpFitAll %>%
   filter(Phase == "Exponential") %>%
   filter(Ex_WL == 445) %>%
-  filter(Strain == "PC-rich_056" | Strain == "PC-rich_077") %>% 
-  select(c(Strain, Sig_nm2psii, PARPhotonDose_day))
-model_56_77Exp<-summary(lm(Sig_nm2psii ~ PARPhotonDose_day + Strain + PARPhotonDose_day:Strain,data=Stats56_77Exp))
+  filter(Strain == "PC-rich_056" | Strain == "PC-rich_077") 
+  fit <- lm(Sig_nm2psii ~ PARPhotonDose_day + Strain + PARPhotonDose_day:Strain,data=Stats56_77Exp)
+x <- cbind(t(as.numeric(coefficients(fit))), t(as.numeric(summary(fit)$coefficients[4, 4])), t(as.numeric(summary(fit)$coefficients[4, 3])), t(as.numeric(summary(fit)$coefficients[4, 2])))
+model_56_77Exp<-data.frame(unclass(x), check.names = FALSE, stringsAsFactors = FALSE) %>% 
+  rename("Estimate" = "4", "Std.Error" = "7", "t_value" = "6", "p_value" = "5") %>% 
+  select(c("Estimate", "Std.Error", "t_value", "p_value"))
+  model_56_77Exp$FitComparison <- '056_077_Exp'
 
 SolFits56_48Exp<-SolFitsExpFitAll %>%
   filter(Phase == "Exponential") %>%
   filter(Ex_WL == 445) %>%
-  filter(Strain == "PC-rich_056" | Strain == "PE-rich_048") %>% 
-  select(c(Strain, Sig_nm2psii, PARPhotonDose_day))
-model_56_48Exp<-summary(lm(Sig_nm2psii ~ PARPhotonDose_day + Strain + PARPhotonDose_day:Strain,data=SolFits56_48Exp))
+  filter(Strain == "PC-rich_056" | Strain == "PE-rich_048") 
+  fit <- lm(Sig_nm2psii ~ PARPhotonDose_day + Strain + PARPhotonDose_day:Strain,data=SolFits56_48Exp)
+x <- cbind(t(as.numeric(coefficients(fit))), t(as.numeric(summary(fit)$coefficients[4, 4])), t(as.numeric(summary(fit)$coefficients[4, 3])), t(as.numeric(summary(fit)$coefficients[4, 2])))
+model_56_48Exp<-data.frame(unclass(x), check.names = FALSE, stringsAsFactors = FALSE) %>% 
+  rename("Estimate" = "4", "Std.Error" = "7", "t_value" = "6", "p_value" = "5") %>% 
+  select(c("Estimate", "Std.Error", "t_value", "p_value"))
+  model_56_48Exp$FitComparison <- '056_048_Exp'
 
 SolFits56_127Exp<-SolFitsExpFitAll %>%
   filter(Phase == "Exponential") %>%
   filter(Ex_WL == 445) %>%
-  filter(Strain == "PC-rich_056" | Strain == "PE-rich_127") %>% 
-  select(c(Strain, Sig_nm2psii, PARPhotonDose_day))
-model_56_127Exp<-summary(lm(Sig_nm2psii ~ PARPhotonDose_day + Strain + PARPhotonDose_day:Strain,data=SolFits56_127Exp))
+  filter(Strain == "PC-rich_056" | Strain == "PE-rich_127")  
+  fit <- lm(Sig_nm2psii ~ PARPhotonDose_day + Strain + PARPhotonDose_day:Strain,data=SolFits56_127Exp)
+x <- cbind(t(as.numeric(coefficients(fit))), t(as.numeric(summary(fit)$coefficients[4, 4])), t(as.numeric(summary(fit)$coefficients[4, 3])), t(as.numeric(summary(fit)$coefficients[4, 2])))
+model_56_127Exp<-data.frame(unclass(x), check.names = FALSE, stringsAsFactors = FALSE) %>% 
+  rename("Estimate" = "4", "Std.Error" = "7", "t_value" = "6", "p_value" = "5") %>% 
+  select(c("Estimate", "Std.Error", "t_value", "p_value"))
+  model_56_127Exp$FitComparison <- '056_127_Exp'
 
 SolFits48_127Exp<-SolFitsExpFitAll %>%
   filter(Phase == "Exponential") %>%
   filter(Ex_WL == 445) %>%
-  filter(Strain == "PE-rich_048" | Strain == "PE-rich_127") %>% 
-  select(c(Strain, Sig_nm2psii, PARPhotonDose_day))
-model_48_127Exp<-summary(lm(Sig_nm2psii ~ PARPhotonDose_day + Strain + PARPhotonDose_day:Strain,data=SolFits48_127Exp))
+  filter(Strain == "PE-rich_048" | Strain == "PE-rich_127")  
+  fit <- lm(Sig_nm2psii ~ PARPhotonDose_day + Strain + PARPhotonDose_day:Strain,data=SolFits48_127Exp)
+x <- cbind(t(as.numeric(coefficients(fit))), t(as.numeric(summary(fit)$coefficients[4, 4])), t(as.numeric(summary(fit)$coefficients[4, 3])), t(as.numeric(summary(fit)$coefficients[4, 2])))
+model_48_127Exp<-data.frame(unclass(x), check.names = FALSE, stringsAsFactors = FALSE) %>% 
+  rename("Estimate" = "4", "Std.Error" = "7", "t_value" = "6", "p_value" = "5") %>% 
+  select(c("Estimate", "Std.Error", "t_value", "p_value"))
+  model_48_127Exp$FitComparison <- '048_127_Exp'
 
 SolFits77_48Exp<-SolFitsExpFitAll %>%
   filter(Phase == "Exponential") %>%
   filter(Ex_WL == 445) %>%
-  filter(Strain == "PC-rich_077" | Strain == "PE-rich_048") %>% 
-  select(c(Strain, Sig_nm2psii, PARPhotonDose_day))
-model_77_48Exp<-summary(lm(Sig_nm2psii ~ PARPhotonDose_day + Strain + PARPhotonDose_day:Strain,data=SolFits77_48Exp))
+  filter(Strain == "PC-rich_077" | Strain == "PE-rich_048") 
+  fit <- lm(Sig_nm2psii ~ PARPhotonDose_day + Strain + PARPhotonDose_day:Strain,data=SolFits77_48Exp)
+x <- cbind(t(as.numeric(coefficients(fit))), t(as.numeric(summary(fit)$coefficients[4, 4])), t(as.numeric(summary(fit)$coefficients[4, 3])), t(as.numeric(summary(fit)$coefficients[4, 2])))
+model_77_48Exp<-data.frame(unclass(x), check.names = FALSE, stringsAsFactors = FALSE) %>% 
+  rename("Estimate" = "4", "Std.Error" = "7", "t_value" = "6", "p_value" = "5") %>% 
+  select(c("Estimate", "Std.Error", "t_value", "p_value"))
+  model_77_48Exp$FitComparison <- '077_048_Exp'
 
 SolFits77_127Exp<-SolFitsExpFitAll %>%
   filter(Phase == "Exponential") %>%
   filter(Ex_WL == 445) %>%
-  filter(Strain == "PC-rich_077" | Strain == "PE-rich_127") %>% 
-  select(c(Strain, Sig_nm2psii, PARPhotonDose_day))
-model_77_127Exp<-summary(lm(Sig_nm2psii ~ PARPhotonDose_day + Strain + PARPhotonDose_day:Strain,data=SolFits77_127Exp))
+  filter(Strain == "PC-rich_077" | Strain == "PE-rich_127") 
+  fit <- lm(Sig_nm2psii ~ PARPhotonDose_day + Strain + PARPhotonDose_day:Strain,data=SolFits77_127Exp)
+x <- cbind(t(as.numeric(coefficients(fit))), t(as.numeric(summary(fit)$coefficients[4, 4])), t(as.numeric(summary(fit)$coefficients[4, 3])), t(as.numeric(summary(fit)$coefficients[4, 2])))
+model_77_127Exp<-data.frame(unclass(x), check.names = FALSE, stringsAsFactors = FALSE) %>% 
+  rename("Estimate" = "4", "Std.Error" = "7", "t_value" = "6", "p_value" = "5") %>% 
+  select(c("Estimate", "Std.Error", "t_value", "p_value"))
+  model_77_127Exp$FitComparison <- '077_127_Exp'
 
+modelExp<-rbind(model_56_77Exp, model_56_48Exp, model_56_127Exp, model_48_127Exp, model_77_48Exp, model_77_127Exp)
+  rm(model_56_77Exp, model_56_48Exp, model_56_127Exp, model_48_127Exp, model_77_48Exp, model_77_127Exp)
+```
 
-# St
+t-test from the linear model St
+```{r}
+# Exp
 Stats56_77St<-SolFitsExpFitAll %>%
   filter(Phase == "Pre-stationary") %>%
   filter(Ex_WL == 445) %>%
-  filter(Strain == "PC-rich_056" | Strain == "PC-rich_077") %>% 
-  select(c(Strain, Sig_nm2psii, PARPhotonDose_day))
-model_56_77St<-summary(lm(Sig_nm2psii ~ PARPhotonDose_day + Strain + PARPhotonDose_day:Strain,data=Stats56_77St))
+  filter(Strain == "PC-rich_056" | Strain == "PC-rich_077") 
+  fit <- lm(Sig_nm2psii ~ PARPhotonDose_day + Strain + PARPhotonDose_day:Strain,data=Stats56_77St)
+x <- cbind(t(as.numeric(coefficients(fit))), t(as.numeric(summary(fit)$coefficients[4, 4])), t(as.numeric(summary(fit)$coefficients[4, 3])), t(as.numeric(summary(fit)$coefficients[4, 2])))
+model_56_77St<-data.frame(unclass(x), check.names = FALSE, stringsAsFactors = FALSE) %>% 
+  rename("Estimate" = "4", "Std.Error" = "7", "t_value" = "6", "p_value" = "5") %>% 
+  select(c("Estimate", "Std.Error", "t_value", "p_value"))
+  model_56_77St$FitComparison <- '056_077_St'
 
 SolFits56_48St<-SolFitsExpFitAll %>%
   filter(Phase == "Pre-stationary") %>%
   filter(Ex_WL == 445) %>%
-  filter(Strain == "PC-rich_056" | Strain == "PE-rich_048") %>% 
-  select(c(Strain, Sig_nm2psii, PARPhotonDose_day))
-model_56_48St<-summary(lm(Sig_nm2psii ~ PARPhotonDose_day + Strain + PARPhotonDose_day:Strain,data=SolFits56_48St))
+  filter(Strain == "PC-rich_056" | Strain == "PE-rich_048") 
+  fit <- lm(Sig_nm2psii ~ PARPhotonDose_day + Strain + PARPhotonDose_day:Strain,data=SolFits56_48St)
+x <- cbind(t(as.numeric(coefficients(fit))), t(as.numeric(summary(fit)$coefficients[4, 4])), t(as.numeric(summary(fit)$coefficients[4, 3])), t(as.numeric(summary(fit)$coefficients[4, 2])))
+model_56_48St<-data.frame(unclass(x), check.names = FALSE, stringsAsFactors = FALSE) %>% 
+  rename("Estimate" = "4", "Std.Error" = "7", "t_value" = "6", "p_value" = "5") %>% 
+  select(c("Estimate", "Std.Error", "t_value", "p_value"))
+  model_56_48St$FitComparison <- '056_048_St'
 
 SolFits56_127St<-SolFitsExpFitAll %>%
   filter(Phase == "Pre-stationary") %>%
   filter(Ex_WL == 445) %>%
-  filter(Strain == "PC-rich_056" | Strain == "PE-rich_127") %>% 
-  select(c(Strain, Sig_nm2psii, PARPhotonDose_day))
-model_56_127St<-summary(lm(Sig_nm2psii ~ PARPhotonDose_day + Strain + PARPhotonDose_day:Strain,data=SolFits56_127St))
+  filter(Strain == "PC-rich_056" | Strain == "PE-rich_127")  
+  fit <- lm(Sig_nm2psii ~ PARPhotonDose_day + Strain + PARPhotonDose_day:Strain,data=SolFits56_127St)
+x <- cbind(t(as.numeric(coefficients(fit))), t(as.numeric(summary(fit)$coefficients[4, 4])), t(as.numeric(summary(fit)$coefficients[4, 3])), t(as.numeric(summary(fit)$coefficients[4, 2])))
+model_56_127St<-data.frame(unclass(x), check.names = FALSE, stringsAsFactors = FALSE) %>% 
+  rename("Estimate" = "4", "Std.Error" = "7", "t_value" = "6", "p_value" = "5") %>% 
+  select(c("Estimate", "Std.Error", "t_value", "p_value"))
+  model_56_127St$FitComparison <- '056_127_St'
 
 SolFits48_127St<-SolFitsExpFitAll %>%
   filter(Phase == "Pre-stationary") %>%
   filter(Ex_WL == 445) %>%
-  filter(Strain == "PE-rich_048" | Strain == "PE-rich_127") %>% 
-  select(c(Strain, Sig_nm2psii, PARPhotonDose_day))
-model_48_127St<-summary(lm(Sig_nm2psii ~ PARPhotonDose_day + Strain + PARPhotonDose_day:Strain,data=SolFits48_127St))
+  filter(Strain == "PE-rich_048" | Strain == "PE-rich_127")  
+  fit <- lm(Sig_nm2psii ~ PARPhotonDose_day + Strain + PARPhotonDose_day:Strain,data=SolFits48_127St)
+x <- cbind(t(as.numeric(coefficients(fit))), t(as.numeric(summary(fit)$coefficients[4, 4])), t(as.numeric(summary(fit)$coefficients[4, 3])), t(as.numeric(summary(fit)$coefficients[4, 2])))
+model_48_127St<-data.frame(unclass(x), check.names = FALSE, stringsAsFactors = FALSE) %>% 
+  rename("Estimate" = "4", "Std.Error" = "7", "t_value" = "6", "p_value" = "5") %>% 
+  select(c("Estimate", "Std.Error", "t_value", "p_value"))
+  model_48_127St$FitComparison <- '048_127_St'
 
 SolFits77_48St<-SolFitsExpFitAll %>%
   filter(Phase == "Pre-stationary") %>%
   filter(Ex_WL == 445) %>%
-  filter(Strain == "PC-rich_077" | Strain == "PE-rich_048") %>% 
-  select(c(Strain, Sig_nm2psii, PARPhotonDose_day))
-model_77_48St<-summary(lm(Sig_nm2psii ~ PARPhotonDose_day + Strain + PARPhotonDose_day:Strain,data=SolFits77_48St))
+  filter(Strain == "PC-rich_077" | Strain == "PE-rich_048") 
+  fit <- lm(Sig_nm2psii ~ PARPhotonDose_day + Strain + PARPhotonDose_day:Strain,data=SolFits77_48St)
+x <- cbind(t(as.numeric(coefficients(fit))), t(as.numeric(summary(fit)$coefficients[4, 4])), t(as.numeric(summary(fit)$coefficients[4, 3])), t(as.numeric(summary(fit)$coefficients[4, 2])))
+model_77_48St<-data.frame(unclass(x), check.names = FALSE, stringsAsFactors = FALSE) %>% 
+  rename("Estimate" = "4", "Std.Error" = "7", "t_value" = "6", "p_value" = "5") %>% 
+  select(c("Estimate", "Std.Error", "t_value", "p_value"))
+  model_77_48St$FitComparison <- '077_048_St'
 
 SolFits77_127St<-SolFitsExpFitAll %>%
   filter(Phase == "Pre-stationary") %>%
   filter(Ex_WL == 445) %>%
-  filter(Strain == "PC-rich_077" | Strain == "PE-rich_127") %>% 
-  select(c(Strain, Sig_nm2psii, PARPhotonDose_day))
-model_77_127St<-summary(lm(Sig_nm2psii ~ PARPhotonDose_day + Strain + PARPhotonDose_day:Strain,data=SolFits77_127St))
+  filter(Strain == "PC-rich_077" | Strain == "PE-rich_127") 
+  fit <- lm(Sig_nm2psii ~ PARPhotonDose_day + Strain + PARPhotonDose_day:Strain,data=SolFits77_127St)
+x <- cbind(t(as.numeric(coefficients(fit))), t(as.numeric(summary(fit)$coefficients[4, 4])), t(as.numeric(summary(fit)$coefficients[4, 3])), t(as.numeric(summary(fit)$coefficients[4, 2])))
+model_77_127St<-data.frame(unclass(x), check.names = FALSE, stringsAsFactors = FALSE) %>% 
+  rename("Estimate" = "4", "Std.Error" = "7", "t_value" = "6", "p_value" = "5") %>% 
+  select(c("Estimate", "Std.Error", "t_value", "p_value"))
+  model_77_127St$FitComparison <- '077_127_St'
 
-# https://stackoverflow.com/questions/24527116/write-regression-summary-to-the-csv-file-in-r
-# fit <- lm(Sig_nm2psii ~ PARPhotonDose_day + Strain + PARPhotonDose_day:Strain,data=SolFits77_127St)
-# x <- cbind(SolFits77_127St, t(as.numeric(coefficients(fit))), t(as.numeric(summary(fit)$coefficients[, 4])), summary(fit)$r.squared)
-# names(x)[(length(x) - 6):length(x)] <- c(paste("coeff", names(coefficients(fit))), paste("P-value", names(summary(fit)$coefficients[, 4])), "R-squared")
-# 
-# 
-# 
-# 
-# fit <- lm(Net.Price ~ Quantity + Net.ASP, data = abc)
-# x <- cbind(abc, t(as.numeric(coefficients(fit))), t(as.numeric(summary(fit)$coefficients[, 4])), summary(fit)$r.squared)
-# names(x)[(length(x) - 6):length(x)] <- c(paste("coeff", names(coefficients(fit))), paste("P-value", names(summary(fit)$coefficients[, 4])), "R-squared")
- 
+modelSt<-rbind(model_56_77St, model_56_48St, model_56_127St, model_48_127St, model_77_48St, model_77_127St)
+  rm(model_56_77St, model_56_48St, model_56_127St, model_48_127St, model_77_48St, model_77_127St)
 ```
 
+t-test from the linear model St
+```{r}
+# Exp
+Stats56_ExpSt<-SolFitsExpFitAll %>%
+  filter(Phase == "Exponential" | Phase == "Pre-stationary") %>%
+  filter(Ex_WL == 445) %>%
+  filter(Strain == "PC-rich_056") 
+  fit <- lm(Sig_nm2psii ~ PARPhotonDose_day + Phase + PARPhotonDose_day:Phase,data=Stats56_ExpSt)
+x <- cbind(t(as.numeric(coefficients(fit))), t(as.numeric(summary(fit)$coefficients[4, 4])), t(as.numeric(summary(fit)$coefficients[4, 3])), t(as.numeric(summary(fit)$coefficients[4, 2])))
+model_56ExpSt<-data.frame(unclass(x), check.names = FALSE, stringsAsFactors = FALSE) %>% 
+  rename("Estimate" = "4", "Std.Error" = "7", "t_value" = "6", "p_value" = "5") %>% 
+  select(c("Estimate", "Std.Error", "t_value", "p_value"))
+  model_56ExpSt$FitComparison <- '056_Exp_St'
+
+Stats77_ExpSt<-SolFitsExpFitAll %>%
+  filter(Phase == "Exponential" | Phase == "Pre-stationary") %>%
+  filter(Ex_WL == 445) %>%
+  filter(Strain == "PC-rich_077") 
+  fit <- lm(Sig_nm2psii ~ PARPhotonDose_day + Phase + PARPhotonDose_day:Phase,data=Stats77_ExpSt)
+x <- cbind(t(as.numeric(coefficients(fit))), t(as.numeric(summary(fit)$coefficients[4, 4])), t(as.numeric(summary(fit)$coefficients[4, 3])), t(as.numeric(summary(fit)$coefficients[4, 2])))
+model_77ExpSt<-data.frame(unclass(x), check.names = FALSE, stringsAsFactors = FALSE) %>% 
+  rename("Estimate" = "4", "Std.Error" = "7", "t_value" = "6", "p_value" = "5") %>% 
+  select(c("Estimate", "Std.Error", "t_value", "p_value"))
+  model_77ExpSt$FitComparison <- '077_Exp_St'
+
+Stats48_ExpSt<-SolFitsExpFitAll %>%
+  filter(Phase == "Exponential" | Phase == "Pre-stationary") %>%
+  filter(Ex_WL == 445) %>%
+  filter(Strain == "PE-rich_048") 
+  fit <- lm(Sig_nm2psii ~ PARPhotonDose_day + Phase + PARPhotonDose_day:Phase,data=Stats48_ExpSt)
+x <- cbind(t(as.numeric(coefficients(fit))), t(as.numeric(summary(fit)$coefficients[4, 4])), t(as.numeric(summary(fit)$coefficients[4, 3])), t(as.numeric(summary(fit)$coefficients[4, 2])))
+model_48ExpSt<-data.frame(unclass(x), check.names = FALSE, stringsAsFactors = FALSE) %>% 
+  rename("Estimate" = "4", "Std.Error" = "7", "t_value" = "6", "p_value" = "5") %>% 
+  select(c("Estimate", "Std.Error", "t_value", "p_value"))
+  model_48ExpSt$FitComparison <- '048_Exp_St'
+
+Stats127_ExpSt<-SolFitsExpFitAll %>%
+  filter(Phase == "Exponential" | Phase == "Pre-stationary") %>%
+  filter(Ex_WL == 445) %>%
+  filter(Strain == "PE-rich_127") 
+  fit <- lm(Sig_nm2psii ~ PARPhotonDose_day + Phase + PARPhotonDose_day:Phase,data=Stats127_ExpSt)
+x <- cbind(t(as.numeric(coefficients(fit))), t(as.numeric(summary(fit)$coefficients[4, 4])), t(as.numeric(summary(fit)$coefficients[4, 3])), t(as.numeric(summary(fit)$coefficients[4, 2])))
+model_127ExpSt<-data.frame(unclass(x), check.names = FALSE, stringsAsFactors = FALSE) %>% 
+  rename("Estimate" = "4", "Std.Error" = "7", "t_value" = "6", "p_value" = "5") %>% 
+  select(c("Estimate", "Std.Error", "t_value", "p_value"))
+  model_127ExpSt$FitComparison <- '127_Exp_St'
+
+
+modelExpSt<-rbind(model_56ExpSt, model_77ExpSt, model_48ExpSt, model_127ExpSt)
+  rm(model_56ExpSt, model_77ExpSt, model_48ExpSt, model_127ExpSt)
+```
+
+# Merge statistic
+```{r}
+Anova_Sig445_Model<-rbind(modelExp, modelSt, modelExpSt)
+rm(modelExp, modelSt, modelExpSt)
+```
+
+```{r}
+# SolFits77_127St<-SolFitsExpFitAll %>%
+#   filter(Phase == "Pre-stationary") %>%
+#   filter(Ex_WL == 445) %>%
+#   filter(Strain == "PC-rich_077" | Strain == "PE-rich_127") %>% 
+#   select(c(Strain, Sig_nm2psii, PARPhotonDose_day))
+# model_77_127St<-summary(lm(Sig_nm2psii ~ PARPhotonDose_day + Strain + PARPhotonDose_day:Strain,data=SolFits77_127St))
+# 
+# Anova_Sig445_Model<-data.frame(unclass(summary(model_77_127St[["coefficients"]])), check.names = FALSE, stringsAsFactors = FALSE)
+```
 
 # Save RDS that create stats and tables
 
 ```{r}
-# saveRDS(Anova_Sig445_Model, file.path(TableRdsPath, paste(Project, "Anova_Sig445_Model.Rds", sep = "_"), fsep = .Platform$file.sep), ascii = FALSE, version = NULL, compress = "xz", refhook = NULL)
+saveRDS(Anova_Sig445_Model, file.path(TableRdsPath, paste(Project, "Anova_Sig445_Model.Rds", sep = "_"), fsep = .Platform$file.sep), ascii = FALSE, version = NULL, compress = "xz", refhook = NULL)
 ```
-
-
-
-
-
-
 
 
 # Removed unneccessary df from the environment
@@ -2934,6 +3049,28 @@ saveRDS(SolFitsAllPigmentPCPETurner, file.path(DataOut, paste(Project, "Processe
 colnames(SolFitsAllPigmentPCPETurner)
 ```
 
+# compact letter display
+```{r}
+# # analysis of variance
+# anova <- aov(weight ~ feed, data = chickwts)
+# 
+# # Tukey's test
+# tukey <- TukeyHSD(anova)
+# 
+# # compact letter display
+# cld <- multcompLetters4(anova, tukey)
+# 
+# # table with factors and 3rd quantile
+# dt <- group_by(chickwts, feed) %>%
+#   summarise(w=mean(weight), sd = sd(weight)) %>%
+#   arrange(desc(w))
+# 
+# # extracting the compact letter display and adding to the Tk table
+# cld <- as.data.frame.list(cld$feed)
+# dt$cld <- cld$Letters
+# 
+# print(dt)
+```
 
 
 

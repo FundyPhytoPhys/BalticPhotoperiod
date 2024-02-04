@@ -220,11 +220,8 @@ O2.labs <- c("Strain")
 names(O2.labs) <- c(21)
 
 data_textPUR0 <- data.frame(Par_ue = c(300, 300), E_days = c(3, 7), Strain  = c("PE-rich_127", "PE-rich_127"), Photoperiod = c(12), O2 = c(21), label = c('PAR = 300 µE', 'PAR = 300 µE'))
-
 data_textPUR00 <- data.frame(Par_ue = c(300, 300), E_days = c(3, 7), Strain  = c("PC-rich_077", "PC-rich_077"), Photoperiod = c(12), O2 = c(21), label = c('PAR = 300 µE', 'PAR = 300 µE'))
-
 data_textPUR1 <- data.frame(Par_ue = c(300, 300), E_days = c(3, 7), Strain  = c("PE-rich_127", "PE-rich_127"), Photoperiod = c(12), O2 = c(21), label = c('PUR = 176 µE', 'PUR = 129 µE'))
-
 data_textPUR2 <- data.frame(Par_ue = c(300, 300), E_days = c(3, 7), Strain  = c("PC-rich_077", "PC-rich_077"), Photoperiod = c(12), O2 = c(21), label = c('PUR = 139 µE', 'PUR = 128 µE'))
 
 data_textpigment1 <- data.frame(Par_ue = c(300), E_days = c(3), Strain  = c("PC-rich_077"), Photoperiod = c(12), O2 = c(21), label = c('Chl a 440 nm'))
@@ -265,10 +262,10 @@ OLISSpectraMetaPURShort %>%
   geom_area(aes(x = nm, y = PURNormBA77G, fill = "palegreen3"), alpha = 0.5, show.legend = F) +
   geom_line(aes(x = nm, y = AbsNorm440, colour = as.factor(Strain), linetype = as.factor(Strain)), show.legend = F, linewidth = 0.4) +
 
-  geom_text(data=data_textPUR0, aes(x=446, y=1.26, label=label), size=3.7) +
-  geom_text(data=data_textPUR00, aes(x=446, y=1.26, label=label), size=3.7) +
-  geom_text(data=data_textPUR1, aes(x=446, y=1.21, label=label), size=3.7) +
-  geom_text(data=data_textPUR2, aes(x=446, y=1.21, label=label), size=3.7) +
+  geom_text(data=data_textPUR0, aes(x=450, y=1.26, label=label), size=3.7) +
+  geom_text(data=data_textPUR00, aes(x=450, y=1.26, label=label), size=3.7) +
+  geom_text(data=data_textPUR1, aes(x=450, y=1.21, label=label), size=3.7) +
+  geom_text(data=data_textPUR2, aes(x=450, y=1.21, label=label), size=3.7) +
 
   geom_text(data=data_textpigment1, aes(x=500, y=1.1, label=label), size=4, colour = "darkgreen") + #chla440
   geom_text(data=data_textpigment5, aes(x=500, y=0.8, label=label), size=4, colour = "orange") + #Car
@@ -277,19 +274,19 @@ OLISSpectraMetaPURShort %>%
   geom_text(data=data_textpigment6, aes(x=485, y=0.25, label=label), size=4, colour = "sienna4") + #PUB
   geom_segment(data = arrowdf1,
                aes(x = 480, xend = 445, y = 1.05, yend = 1),
-               colour = "darkgreen", size = 1, alpha=0.9, arrow = arrow(length=unit(0.2, 'cm'))) + #chla440
+               colour = "darkgreen", size = 0.5, alpha=0.9, arrow = arrow(length=unit(0.2, 'cm'))) + #chla440
   geom_segment(data = arrowdf5,
                aes(x = 480, xend = 475, y = 0.75, yend = 0.54),
-               colour = "orange", size = 1, alpha=0.9, arrow = arrow(length=unit(0.2, 'cm'))) + #Car
+               colour = "orange", size = 0.5, alpha=0.9, arrow = arrow(length=unit(0.2, 'cm'))) + #Car
   geom_segment(data = arrowdf3,
                aes(x = 660, xend = 680, y = 1.14, yend = 0.95),
-               colour = "darkgreen", size = 1, alpha=0.9, arrow = arrow(length=unit(0.2, 'cm'))) + #chla680
+               colour = "darkgreen", size = 0.5, alpha=0.9, arrow = arrow(length=unit(0.2, 'cm'))) + #chla680
   geom_segment(data = arrowdf4,
                aes(x = 610, xend = 630, y = 0.90, yend = 0.82),
-               colour = "deepskyblue4", size = 1, alpha=0.9, arrow = arrow(length=unit(0.2, 'cm'))) + #PC
+               colour = "deepskyblue4", size = 0.5, alpha=0.9, arrow = arrow(length=unit(0.2, 'cm'))) + #PC
   geom_segment(data = arrowdf4,
                aes(x = 480, xend = 494, y = 0.30, yend = 0.41),
-               colour = "sienna4", size = 1, alpha=0.9, arrow = arrow(length=unit(0.2, 'cm'))) + #PUB
+               colour = "sienna4", size = 0.5, alpha=0.9, arrow = arrow(length=unit(0.2, 'cm'))) + #PUB
   geom_text(data=data_textpigment7, aes(x=500, y=1.1, label=label), size=4, colour = "darkgreen") + #chla440
   geom_text(data=data_textpigment8, aes(x=500, y=0.8, label=label), size=4, colour = "orange") + #Car
   geom_text(data=data_textpigment9, aes(x=580, y=1.0, label=label), size=4, colour = "darkmagenta") + #PE
@@ -298,22 +295,22 @@ OLISSpectraMetaPURShort %>%
   geom_text(data=data_textpigment12, aes(x=495, y=0.30, label=label), size=4, colour = "sienna4") + #PUB
   geom_segment(data = arrowdf7,
                aes(x = 480, xend = 445, y = 1.05, yend = 1),
-               colour = "darkgreen", size = 1, alpha=0.9, arrow = arrow(length=unit(0.2, 'cm'))) + #chla440
+               colour = "darkgreen", size = 0.5, alpha=0.9, arrow = arrow(length=unit(0.2, 'cm'))) + #chla440
   geom_segment(data = arrowdf8,
                aes(x = 480, xend = 475, y = 0.75, yend = 0.55),
-               colour = "orange", size = 1, alpha=0.9, arrow = arrow(length=unit(0.2, 'cm'))) + #Car
+               colour = "orange", size = 0.5, alpha=0.9, arrow = arrow(length=unit(0.2, 'cm'))) + #Car
   geom_segment(data = arrowdf9,
                aes(x = 590, xend = 575, y = 0.95, yend = 0.85),
-               colour = "darkmagenta", size = 1, alpha=0.9, arrow = arrow(length=unit(0.2, 'cm'))) + #PE
+               colour = "darkmagenta", size = 0.5, alpha=0.9, arrow = arrow(length=unit(0.2, 'cm'))) + #PE
   geom_segment(data = arrowdf10,
                aes(x = 660, xend = 680, y = 1.14, yend = 0.85),
-               colour = "darkgreen", size = 1, alpha=0.9, arrow = arrow(length=unit(0.2, 'cm'))) + #chla680
+               colour = "darkgreen", size = 0.5, alpha=0.9, arrow = arrow(length=unit(0.2, 'cm'))) + #chla680
   geom_segment(data = arrowdf11,
                aes(x = 610, xend = 630, y = 0.2, yend = 0.3),
-               colour = "deepskyblue4", size = 1, alpha=0.9, arrow = arrow(length=unit(0.2, 'cm'))) + #PC
+               colour = "deepskyblue4", size = 0.5, alpha=0.9, arrow = arrow(length=unit(0.2, 'cm'))) + #PC
   geom_segment(data = arrowdf12,
                aes(x = 490, xend = 500, y = 0.35, yend = 0.52),
-               colour = "sienna4", size = 1, alpha=0.9, arrow = arrow(length=unit(0.2, 'cm'))) + #PUB
+               colour = "sienna4", size = 0.5, alpha=0.9, arrow = arrow(length=unit(0.2, 'cm'))) + #PUB
   scale_color_manual(values = c("PC-rich_077" ="palegreen3", "PE-rich_127" ="brown4")) +
   scale_linetype_manual(values = c("PC-rich_077" ="solid", "PE-rich_127" ="longdash")) +
   stat_wl_strip(aes(x = nm), ymin = -Inf, ymax = -0.025, alpha = 0.5) +
@@ -346,7 +343,7 @@ OLISSpectraMetaPURShort %>%
 # Save plot 
 
 ```{r save plot}
-ggsave(file = file.path(FigPath, paste("Fig_OlisSpectra",".png",sep = "")), height=10, width= 8,  dpi = 300, limitsize = TRUE)
+ggsave(file = file.path(FigPath, paste("Fig_OlisSpectra",".png",sep = "")), height=9, width= 7,  dpi = 300, limitsize = TRUE)
 ```
 
 ```{r Create plot, fig.height = 6, fig.width = 8}
@@ -632,7 +629,54 @@ OLISSpectraMetaPURMaxAG %>%
 # Save plot 
 
 ```{r save plot}
-ggsave(file = file.path(FigPath, paste("Fig_OlisSpectra_Phase",".png",sep = "")), height=10, width= 8,  dpi = 300, limitsize = TRUE)
+# ggsave(file = file.path(FigPath, paste("Fig_OlisSpectra_Phase",".png",sep = "")), height=9, width= 7,  dpi = 300, limitsize = TRUE)
+```
+
+# Create preliminary plot
+
+```{r preliminary plot, fig.height = 8, fig.width = 8}
+
+lab1=c(expression("PC-rich_056"), expression("PC-rich_077"), expression("PE-rich_048"), expression("PE-rich_127"))
+lab2=c(expression("8 h"), expression("12 h"), expression("16 h"), expression("24 h"))
+lab3=c(expression("30 µE"), expression("90 µE"), expression("180 µE"), expression("300 µE"), expression("600 µE"), expression("900 µE"))
+
+OLISSpectraMetaPURMaxAG %>%
+  filter(Phase == "Exponential" | Phase == "Pre-stationary") %>% 
+  filter(E_days != 1) %>% 
+  ggplot() +
+  geom_area(aes(x = nm, y = EmNormJaz439), fill = "gray84", alpha = 0.6, show.legend = F) +
+  geom_line(aes(x = nm, y = AbsNorm440, colour = as.factor(Strain)), show.legend = F, linewidth = 0.7,  alpha = 0.5) +
+  # geom_line(aes(x = nm, y = AbsNorm440), show.legend = F, linewidth = 0.5,  colour = "gray20", alpha = 0.7, OLISSelect) +
+  stat_wl_strip(aes(x = nm), ymin = -Inf, ymax = -0.025, alpha = 0.5) +
+  scale_fill_identity() +
+  scale_colour_discrete(type=c("seagreen4", "palegreen3", "brown1", "brown4")) +
+  scale_y_continuous(breaks=seq(0, 3, by = 1)) +
+  coord_cartesian(ylim = c(0, 3)) +
+  labs(y = "Normalized absorbance", x = "Wavelength (nm)") +
+  ggh4x::facet_nested(cols = vars(facetsPhotoperiod, Photoperiod), rows = vars(facetsStrain, Strain), labeller = label_parsed) +
+  theme_bw() +
+  theme(panel.grid.minor = element_blank(),
+        panel.grid.major = element_blank(),
+        panel.spacing.x = unit(0.4, 'cm'),
+        axis.text = element_text(size=12),
+        axis.title = element_text(size=16),
+        strip.background = element_rect(fill="white"),
+        strip.text = element_text(size=12),
+        axis.title.y = element_text(margin=margin(r=10)),
+        axis.title.x = element_text(margin=margin(t=10)),
+        legend.background = element_rect(fill="white"),
+        legend.position = c(0.08,0.87),
+        legend.key.height= unit(0.005, 'cm'),
+        legend.spacing.y = unit(-0.005, "cm"),
+        legend.spacing.x = unit(-0.005, "cm"),
+        legend.title = element_blank(),
+        legend.text = element_text(size=10))
+```
+
+# Save plot 
+
+```{r save plot}
+ggsave(file = file.path(FigPath, paste("SFig_OlisSpectra_Photoperiod",".png",sep = "")), height=9, width= 7,  dpi = 300, limitsize = TRUE)
 ```
 
 # Removed unnecessary files from the environment
