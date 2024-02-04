@@ -822,6 +822,12 @@ AnovaTest_Sig590_Param<-rbind(AnovaTest_Sig590_y0, AnovaTest_Sig590_yf, AnovaTes
 rm(AnovaTest_Sig590_y0, AnovaTest_Sig590_yf, AnovaTest_Sig590_alpha, Sig590Stats, Sig590Stats2, model)
 ```
 
+# Save RDS that create stats and tables
+
+```{r}
+saveRDS(AnovaTest_Sig, file.path(TableRdsPath, paste(Project, "Anova_Sig590.Rds", sep = "_"), fsep = .Platform$file.sep), ascii = FALSE, version = NULL, compress = "xz", refhook = NULL)
+```
+
 # Exstracting models for each fit
 
 ```{r}
@@ -844,17 +850,17 @@ fittedmodel<-fitted590  %>%
 #Comparing model for strains from Exp phase
 fittedmodelStrainExp<-fittedmodel
   anova056077Exp<-anova(fittedmodelStrainExp[[3]][[2]], fittedmodelStrainExp[[3]][[3]])
-  anova056077Exp$FitComparison <- '056_077'
+  anova056077Exp$FitComparison <- '056_077_Exp'
   anova048127Exp<-anova(fittedmodelStrainExp[[3]][[1]], fittedmodelStrainExp[[3]][[4]])
-  anova048127Exp$FitComparison <- '048_127'
+  anova048127Exp$FitComparison <- '048_127_Exp'
   anova056048Exp<-anova(fittedmodelStrainExp[[3]][[1]], fittedmodelStrainExp[[3]][[3]])
-  anova056048Exp$FitComparison <- '056_048'
+  anova056048Exp$FitComparison <- '056_048_Exp'
   anova077048Exp<-anova(fittedmodelStrainExp[[3]][[1]], fittedmodelStrainExp[[3]][[2]])
-  anova077048Exp$FitComparison <- '077_048'
+  anova077048Exp$FitComparison <- '077_048_Exp'
   anova056127Exp<-anova(fittedmodelStrainExp[[3]][[3]], fittedmodelStrainExp[[3]][[4]])
-  anova056127Exp$FitComparison <- '056_127'
+  anova056127Exp$FitComparison <- '056_127_Exp'
   anova077127Exp<-anova(fittedmodelStrainExp[[3]][[2]], fittedmodelStrainExp[[3]][[4]])
-  anova077127Exp$FitComparison <- '077_127'
+  anova077127Exp$FitComparison <- '077_127_Exp'
   anova_SigModelStrainExp<-rbind(anova056077Exp, anova048127Exp, anova056048Exp, anova077048Exp, anova056127Exp, anova077127Exp)
   anova_SigModelStrainExp <-anova_SigModelStrainExp %>% 
   drop_na(Df) 
@@ -863,17 +869,17 @@ fittedmodelStrainExp<-fittedmodel
 #Comparing model for strains from St phase
 fittedmodelStrainSt<-fittedmodel 
   anova056077St<-anova(fittedmodelStrainSt[[3]][[5]], fittedmodelStrainSt[[3]][[6]])
-  anova056077St$FitComparison <- '056_077'
+  anova056077St$FitComparison <- '056_077_St'
   anova048127St<-anova(fittedmodelStrainSt[[3]][[7]], fittedmodelStrainSt[[3]][[8]])
-  anova048127St$FitComparison <- '048_127'
+  anova048127St$FitComparison <- '048_127_St'
   anova056048St<-anova(fittedmodelStrainSt[[3]][[5]], fittedmodelStrainSt[[3]][[7]])
-  anova056048St$FitComparison <- '056_048'
+  anova056048St$FitComparison <- '056_048_St'
   anova077048St<-anova(fittedmodelStrainSt[[3]][[6]], fittedmodelStrainSt[[3]][[7]])
-  anova077048St$FitComparison <- '077_048'
+  anova077048St$FitComparison <- '077_048_St'
   anova056127St<-anova(fittedmodelStrainSt[[3]][[5]], fittedmodelStrainSt[[3]][[8]])
-  anova056127St$FitComparison <- '056_127'
+  anova056127St$FitComparison <- '056_127_St'
   anova077127St<-anova(fittedmodelStrainSt[[3]][[6]], fittedmodelStrainSt[[3]][[8]])
-  anova077127St$FitComparison <- '077_127'
+  anova077127St$FitComparison <- '077_127_St'
   anova_SigModelStrainSt<-rbind(anova056077St, anova048127St, anova056048St, anova077048St, anova056127St, anova077127St)
   anova_SigModelStrainSt <-anova_SigModelStrainSt %>% 
   drop_na(Df) 
@@ -895,15 +901,15 @@ fittedmodelPhase<-fittedmodel
   anova_SigModelPhase <-anova_SigModelPhase %>% 
   drop_na(Df) 
   
-  rm(anova056ExpSt, anova077ExpSt, anova048ExpSt, anova127ExpSt)
+  Anova_Sig590_Model<-rbind(anova_SigModelStrainExp, anova_SigModelStrainSt, anova_SigModelPhase)
+  
+  rm(anova056ExpSt, anova077ExpSt, anova048ExpSt, anova127ExpSt, anova_SigModelStrainExp, anova_SigModelStrainSt, anova_SigModelPhase)
 ```
 
 # Save RDS that create stats and tables
 
 ```{r}
-# saveRDS(AnovaTest_Sig590_Param, file.path(RDSTablePath, paste(Project, "Sig590_Anova.Rds", sep = "_"), fsep = .Platform$file.sep), ascii = FALSE, version = NULL, compress = "xz", refhook = NULL)
-
-# saveRDS(TukeyHSDTest_y0_alpha, file.path(RDSTablePath, paste(Project, "GSTukey_y0.Rds", sep = "_"), fsep = .Platform$file.sep), ascii = FALSE, version = NULL, compress = "xz", refhook = NULL)
+saveRDS(Anova_Sig590_Model, file.path(TableRdsPath, paste(Project, "Anova_Sig590_Model.Rds", sep = "_"), fsep = .Platform$file.sep), ascii = FALSE, version = NULL, compress = "xz", refhook = NULL)
 ```
 
 # Removed unneccessary df from the environment
@@ -1604,6 +1610,12 @@ AnovaTest_PhycoChlaRatio_Param<-rbind(AnovaTest_PhycoChlaRatio_y0, AnovaTest_Phy
 rm(AnovaTest_PhycoChlaRatio_y0, AnovaTest_PhycoChlaRatio_yf, AnovaTest_PhycoChlaRatio_alpha, model, StatsPigParam)
 ```
 
+# Save RDS that create stats and tables
+
+```{r}
+saveRDS(AnovaTest_PhycoChlaRatio, file.path(TableRdsPath, paste(Project, "Anova_PhycoChlaRatio.Rds", sep = "_"), fsep = .Platform$file.sep), ascii = FALSE, version = NULL, compress = "xz", refhook = NULL)
+```
+
 # Exstracting models for each fit
 
 ```{r}
@@ -1627,17 +1639,17 @@ fittedmodelPig<-fitted590Pig  %>%
 #Comparing model for strains from Exp phase
 fittedmodelStrainExp<-fittedmodelPig
   anova056077Exp<-anova(fittedmodelStrainExp[[3]][[5]], fittedmodelStrainExp[[3]][[7]])
-  anova056077Exp$FitComparison <- '056_077'
+  anova056077Exp$FitComparison <- '056_077_Exp'
   anova048127Exp<-anova(fittedmodelStrainExp[[3]][[1]], fittedmodelStrainExp[[3]][[3]])
-  anova048127Exp$FitComparison <- '048_127'
+  anova048127Exp$FitComparison <- '048_127_Exp'
   anova056048Exp<-anova(fittedmodelStrainExp[[3]][[5]], fittedmodelStrainExp[[3]][[1]])
-  anova056048Exp$FitComparison <- '056_048'
+  anova056048Exp$FitComparison <- '056_048_Exp'
   anova077048Exp<-anova(fittedmodelStrainExp[[3]][[7]], fittedmodelStrainExp[[3]][[1]])
-  anova077048Exp$FitComparison <- '077_048'
+  anova077048Exp$FitComparison <- '077_048_Exp'
   anova056127Exp<-anova(fittedmodelStrainExp[[3]][[5]], fittedmodelStrainExp[[3]][[3]])
-  anova056127Exp$FitComparison <- '056_127'
+  anova056127Exp$FitComparison <- '056_127_Exp'
   anova077127Exp<-anova(fittedmodelStrainExp[[3]][[7]], fittedmodelStrainExp[[3]][[3]])
-  anova077127Exp$FitComparison <- '077_127'
+  anova077127Exp$FitComparison <- '077_127_Exp'
   anova_PhycoChlaRatioModelStrainExp<-rbind(anova056077Exp, anova048127Exp, anova056048Exp, anova077048Exp, anova056127Exp, anova077127Exp)
   anova_PhycoChlaRatioModelStrainExp <-anova_PhycoChlaRatioModelStrainExp %>% 
   drop_na(Df) 
@@ -1646,17 +1658,17 @@ fittedmodelStrainExp<-fittedmodelPig
 #Comparing model for strains from St phase
 fittedmodelStrainSt<-fittedmodelPig 
   anova056077St<-anova(fittedmodelStrainSt[[3]][[6]], fittedmodelStrainSt[[3]][[8]])
-  anova056077St$FitComparison <- '056_077'
+  anova056077St$FitComparison <- '056_077_St'
   anova048127St<-anova(fittedmodelStrainSt[[3]][[2]], fittedmodelStrainSt[[3]][[4]])
-  anova048127St$FitComparison <- '048_127'
+  anova048127St$FitComparison <- '048_127_St'
   anova056048St<-anova(fittedmodelStrainSt[[3]][[6]], fittedmodelStrainSt[[3]][[2]])
-  anova056048St$FitComparison <- '056_048'
+  anova056048St$FitComparison <- '056_048_St'
   anova077048St<-anova(fittedmodelStrainSt[[3]][[8]], fittedmodelStrainSt[[3]][[2]])
-  anova077048St$FitComparison <- '077_048'
+  anova077048St$FitComparison <- '077_048_St'
   anova056127St<-anova(fittedmodelStrainSt[[3]][[6]], fittedmodelStrainSt[[3]][[4]])
-  anova056127St$FitComparison <- '056_127'
+  anova056127St$FitComparison <- '056_127_St'
   anova077127St<-anova(fittedmodelStrainSt[[3]][[8]], fittedmodelStrainSt[[3]][[4]])
-  anova077127St$FitComparison <- '077_127'
+  anova077127St$FitComparison <- '077_127_St'
   anova_PhycoChlaRatioModelStrainSt<-rbind(anova056077St, anova048127St, anova056048St, anova077048St, anova056127St, anova077127St)
   anova_PhycoChlaRatioModelStrainSt <-anova_PhycoChlaRatioModelStrainSt %>% 
   drop_na(Df) 
@@ -1678,15 +1690,15 @@ fittedmodelPhase<-fittedmodelPig
   anova_PhycoChlaRatioModelPhase <-anova_PhycoChlaRatioModelPhase %>% 
   drop_na(Df) 
   
-  rm(anova056ExpSt, anova077ExpSt, anova048ExpSt, anova127ExpSt)
+  Anova_PhycoChlaRatio_Model<-rbind(anova_PhycoChlaRatioModelStrainExp, anova_PhycoChlaRatioModelStrainSt, anova_PhycoChlaRatioModelPhase)
+  
+  rm(anova056ExpSt, anova077ExpSt, anova048ExpSt, anova127ExpSt, anova_PhycoChlaRatioModelStrainExp, anova_PhycoChlaRatioModelStrainSt, anova_PhycoChlaRatioModelPhase)
 ```
 
 # Save RDS that create stats and tables
 
 ```{r}
-# saveRDS(AnovaTest_Sig590_Param, file.path(RDSTablePath, paste(Project, "Sig590_Anova.Rds", sep = "_"), fsep = .Platform$file.sep), ascii = FALSE, version = NULL, compress = "xz", refhook = NULL)
-
-# saveRDS(TukeyHSDTest_y0_alpha, file.path(RDSTablePath, paste(Project, "GSTukey_y0.Rds", sep = "_"), fsep = .Platform$file.sep), ascii = FALSE, version = NULL, compress = "xz", refhook = NULL)
+saveRDS(Anova_PhycoChlaRatio_Model, file.path(TableRdsPath, paste(Project, "Anova_PhycoChlaRatio_Model.Rds", sep = "_"), fsep = .Platform$file.sep), ascii = FALSE, version = NULL, compress = "xz", refhook = NULL)
 ```
 
 # Removed unneccessary df from the environment
@@ -1952,6 +1964,12 @@ AnovaTest_PURPARRatio_Param<-rbind(AnovaTest_PURPARRatio_y0, AnovaTest_PURPARRat
 rm(AnovaTest_PURPARRatio_y0, AnovaTest_PURPARRatio_yf, AnovaTest_PURPARRatio_alpha, model, StatsPURParam)
 ```
 
+# Save RDS that create stats and tables
+
+```{r}
+saveRDS(AnovaTest_PURPARRatio, file.path(TableRdsPath, paste(Project, "Anova_PURPARRatio.Rds", sep = "_"), fsep = .Platform$file.sep), ascii = FALSE, version = NULL, compress = "xz", refhook = NULL)
+```
+
 # Exstracting models for each fit
 
 ```{r}
@@ -1975,17 +1993,17 @@ fittedmodelPUR<-fitted590PUR  %>%
 #Comparing model for strains from Exp phase
 fittedmodelStrainExp<-fittedmodelPUR
   anova056077Exp<-anova(fittedmodelStrainExp[[3]][[7]], fittedmodelStrainExp[[3]][[8]])
-  anova056077Exp$FitComparison <- '056_077'
+  anova056077Exp$FitComparison <- '056_077_Exp'
   anova048127Exp<-anova(fittedmodelStrainExp[[3]][[5]], fittedmodelStrainExp[[3]][[6]])
-  anova048127Exp$FitComparison <- '048_127'
+  anova048127Exp$FitComparison <- '048_127_Exp'
   anova056048Exp<-anova(fittedmodelStrainExp[[3]][[7]], fittedmodelStrainExp[[3]][[5]])
-  anova056048Exp$FitComparison <- '056_048'
+  anova056048Exp$FitComparison <- '056_048_Exp'
   anova077048Exp<-anova(fittedmodelStrainExp[[3]][[8]], fittedmodelStrainExp[[3]][[5]])
-  anova077048Exp$FitComparison <- '077_048'
+  anova077048Exp$FitComparison <- '077_048_Exp'
   anova056127Exp<-anova(fittedmodelStrainExp[[3]][[7]], fittedmodelStrainExp[[3]][[6]])
-  anova056127Exp$FitComparison <- '056_127'
+  anova056127Exp$FitComparison <- '056_127_Exp'
   anova077127Exp<-anova(fittedmodelStrainExp[[3]][[8]], fittedmodelStrainExp[[3]][[6]])
-  anova077127Exp$FitComparison <- '077_127'
+  anova077127Exp$FitComparison <- '077_127_Exp'
   anova_PURPARRatioModelStrainExp<-rbind(anova056077Exp, anova048127Exp, anova056048Exp, anova077048Exp, anova056127Exp, anova077127Exp)
   anova_PURPARRatioModelStrainExp <-anova_PURPARRatioModelStrainExp %>% 
   drop_na(Df) 
@@ -1994,17 +2012,17 @@ fittedmodelStrainExp<-fittedmodelPUR
 #Comparing model for strains from St phase
 fittedmodelStrainSt<-fittedmodelPUR 
   anova056077St<-anova(fittedmodelStrainSt[[3]][[1]], fittedmodelStrainSt[[3]][[3]])
-  anova056077St$FitComparison <- '056_077'
+  anova056077St$FitComparison <- '056_077_St'
   anova048127St<-anova(fittedmodelStrainSt[[3]][[2]], fittedmodelStrainSt[[3]][[4]])
-  anova048127St$FitComparison <- '048_127'
+  anova048127St$FitComparison <- '048_127_St'
   anova056048St<-anova(fittedmodelStrainSt[[3]][[1]], fittedmodelStrainSt[[3]][[2]])
-  anova056048St$FitComparison <- '056_048'
+  anova056048St$FitComparison <- '056_048_St'
   anova077048St<-anova(fittedmodelStrainSt[[3]][[3]], fittedmodelStrainSt[[3]][[2]])
-  anova077048St$FitComparison <- '077_048'
+  anova077048St$FitComparison <- '077_048_St'
   anova056127St<-anova(fittedmodelStrainSt[[3]][[1]], fittedmodelStrainSt[[3]][[4]])
-  anova056127St$FitComparison <- '056_127'
+  anova056127St$FitComparison <- '056_127_St'
   anova077127St<-anova(fittedmodelStrainSt[[3]][[3]], fittedmodelStrainSt[[3]][[4]])
-  anova077127St$FitComparison <- '077_127'
+  anova077127St$FitComparison <- '077_127_St'
   anova_PURPARRatioModelStrainSt<-rbind(anova056077St, anova048127St, anova056048St, anova077048St, anova056127St, anova077127St)
   anova_PURPARRatioModelStrainSt <-anova_PURPARRatioModelStrainSt %>% 
   drop_na(Df) 
@@ -2026,7 +2044,15 @@ fittedmodelPhase<-fittedmodelPUR
   anova_PURPARRatioModelPhase <-anova_PURPARRatioModelPhase %>% 
   drop_na(Df) 
   
-  rm(anova056ExpSt, anova077ExpSt, anova048ExpSt, anova127ExpSt)
+  Anova_PURPARRatio_Model<-rbind(anova_PURPARRatioModelStrainExp, anova_PURPARRatioModelStrainSt, anova_PURPARRatioModelPhase)
+  
+  rm(anova056ExpSt, anova077ExpSt, anova048ExpSt, anova127ExpSt, anova_PURPARRatioModelStrainExp, anova_PURPARRatioModelStrainSt, anova_PURPARRatioModelPhase)
+```
+
+# Save RDS that create stats and tables
+
+```{r}
+saveRDS(Anova_PURPARRatio_Model, file.path(TableRdsPath, paste(Project, "Anova_PURPARRatio_Model.Rds", sep = "_"), fsep = .Platform$file.sep), ascii = FALSE, version = NULL, compress = "xz", refhook = NULL)
 ```
 
 
