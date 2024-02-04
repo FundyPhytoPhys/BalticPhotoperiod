@@ -792,8 +792,8 @@ SigFit590Stats$PARPhotonDose_day <- factor(SigFit590Stats$PARPhotonDose_day)
 
 # Three way Anova with interactions
 model<-aov(Sig_nm2psii~PARPhotonDose_day*Phase*Strain, data=SigFit590Stats)
-AnovaTest_Sig<-data.frame(unclass(summary(model)), check.names = FALSE, stringsAsFactors = FALSE)
-TukeyHSDTest_Sig<-TukeyHSD(model, which = c("PARPhotonDose_day", "Phase", "Strain"))
+Anova_Sig590<-data.frame(unclass(summary(model)), check.names = FALSE, stringsAsFactors = FALSE)
+TukeyHSDTest_Sig590<-TukeyHSD(model, which = c("PARPhotonDose_day", "Phase", "Strain"))
 ```
 
 # Calculated Anova and Tukey test from exponential decay parameters
@@ -825,7 +825,7 @@ rm(AnovaTest_Sig590_y0, AnovaTest_Sig590_yf, AnovaTest_Sig590_alpha, Sig590Stats
 # Save RDS that create stats and tables
 
 ```{r}
-saveRDS(AnovaTest_Sig, file.path(TableRdsPath, paste(Project, "Anova_Sig590.Rds", sep = "_"), fsep = .Platform$file.sep), ascii = FALSE, version = NULL, compress = "xz", refhook = NULL)
+saveRDS(Anova_Sig590, file.path(TableRdsPath, paste(Project, "Anova_Sig590.Rds", sep = "_"), fsep = .Platform$file.sep), ascii = FALSE, version = NULL, compress = "xz", refhook = NULL)
 ```
 
 # Exstracting models for each fit
@@ -989,47 +989,147 @@ ggplot(SolFitsExpFitAll445, aes(x = PARPhotonDose_day, y = Sig_nm2psii)) +
 ggsave(file = file.path(FigPath, paste("SFig_Sigma445",".png",sep = "")), height=10, width= 8,  dpi = 300, limitsize = TRUE)
 ```
 
-# Exstracting models for each fit
+# Calculated Anova and Tukey test from data points
 
-```{r}
-fittedmodel445<-fitted445  %>%
-  select(c(Strain, Phase, Linear_Model))
+```{r calculated statistics}
+SigFit445Stats <-SolFitsExpFitAll %>% 
+  filter(Ex_WL == 445) 
+
+SigFit445Stats$Par_ue <- factor(SigFit445Stats$Par_ue)
+SigFit445Stats$Photoperiod <- factor(SigFit445Stats$Photoperiod)
+SigFit445Stats$Strain <- factor(SigFit445Stats$Strain)
+SigFit445Stats$Phase <- factor(SigFit445Stats$Phase)
+SigFit445Stats$PARPhotonDose_day <- factor(SigFit445Stats$PARPhotonDose_day)
+
+# Three way Anova with interactions
+model<-aov(Sig_nm2psii~PARPhotonDose_day*Phase*Strain, data=SigFit445Stats)
+Anova_Sig445<-data.frame(unclass(summary(model)), check.names = FALSE, stringsAsFactors = FALSE)
+TukeyHSDTest_Sig<-TukeyHSD(model, which = c("PARPhotonDose_day", "Phase", "Strain"))
 ```
 
-# Anova from the model - doesnt work for linear models "models were not all fitted to the same size of dataset"
+# Save RDS that create stats and tables
 
 ```{r}
-# #1->056 Exp
-# #2->077 Exp
-# #3->048 Exp
-# #4->127 Exp
-# #5->056 St
-# #6->077 ST
-# #7->048 St
-# #8->127 St
-# 
-# #Comparing model for strains from Exp phase
-# fittedmodelStrainExp<-fittedmodel445
-#   anova056077Exp<-anova(fittedmodelStrainExp[[3]][[1]], fittedmodelStrainExp[[3]][[2]])
-#   anova056077Exp$FitComparison <- '056_077'
-#   anova048127Exp<-anova(fittedmodelStrainExp[[3]][[3]], fittedmodelStrainExp[[3]][[4]])
-#   anova048127Exp$FitComparison <- '048_127'
-#   anova056048Exp<-anova(fittedmodelStrainExp[[3]][[1]], fittedmodelStrainExp[[3]][[3]])
-#   anova056048Exp$FitComparison <- '056_048'
-#   anova077048Exp<-anova(fittedmodelStrainExp[[3]][[2]], fittedmodelStrainExp[[3]][[3]])
-#   anova077048Exp$FitComparison <- '077_048'
-#   anova056127Exp<-anova(fittedmodelStrainExp[[3]][[1]], fittedmodelStrainExp[[3]][[4]])
-#   anova056127Exp$FitComparison <- '056_127'
-#   anova077127Exp<-anova(fittedmodelStrainExp[[3]][[2]], fittedmodelStrainExp[[3]][[4]])
-#   anova077127Exp$FitComparison <- '077_127'
-#   anovaStrainExp445<-rbind(anova056077Exp, anova048127Exp, anova056048Exp, anova077048Exp, anova056127Exp, anova077127Exp)
-#   anovaStrainExp445 <-anovaStrainExp445 %>% 
-#   drop_na(Df) 
-#   rm(anova056077Exp, anova048127Exp, anova056048Exp, anova077048Exp, anova056127Exp, anova077127Exp)
-# 
-
-
+saveRDS(Anova_Sig445, file.path(TableRdsPath, paste(Project, "Anova_Sig445.Rds", sep = "_"), fsep = .Platform$file.sep), ascii = FALSE, version = NULL, compress = "xz", refhook = NULL)
 ```
+
+# Anova from the linear model 
+
+dziala!!!!! t-test
+```{r}
+# Exp
+Stats56_77Exp<-SolFitsExpFitAll %>%
+  filter(Phase == "Exponential") %>%
+  filter(Ex_WL == 445) %>%
+  filter(Strain == "PC-rich_056" | Strain == "PC-rich_077") %>% 
+  select(c(Strain, Sig_nm2psii, PARPhotonDose_day))
+model_56_77Exp<-summary(lm(Sig_nm2psii ~ PARPhotonDose_day + Strain + PARPhotonDose_day:Strain,data=Stats56_77Exp))
+
+SolFits56_48Exp<-SolFitsExpFitAll %>%
+  filter(Phase == "Exponential") %>%
+  filter(Ex_WL == 445) %>%
+  filter(Strain == "PC-rich_056" | Strain == "PE-rich_048") %>% 
+  select(c(Strain, Sig_nm2psii, PARPhotonDose_day))
+model_56_48Exp<-summary(lm(Sig_nm2psii ~ PARPhotonDose_day + Strain + PARPhotonDose_day:Strain,data=SolFits56_48Exp))
+
+SolFits56_127Exp<-SolFitsExpFitAll %>%
+  filter(Phase == "Exponential") %>%
+  filter(Ex_WL == 445) %>%
+  filter(Strain == "PC-rich_056" | Strain == "PE-rich_127") %>% 
+  select(c(Strain, Sig_nm2psii, PARPhotonDose_day))
+model_56_127Exp<-summary(lm(Sig_nm2psii ~ PARPhotonDose_day + Strain + PARPhotonDose_day:Strain,data=SolFits56_127Exp))
+
+SolFits48_127Exp<-SolFitsExpFitAll %>%
+  filter(Phase == "Exponential") %>%
+  filter(Ex_WL == 445) %>%
+  filter(Strain == "PE-rich_048" | Strain == "PE-rich_127") %>% 
+  select(c(Strain, Sig_nm2psii, PARPhotonDose_day))
+model_48_127Exp<-summary(lm(Sig_nm2psii ~ PARPhotonDose_day + Strain + PARPhotonDose_day:Strain,data=SolFits48_127Exp))
+
+SolFits77_48Exp<-SolFitsExpFitAll %>%
+  filter(Phase == "Exponential") %>%
+  filter(Ex_WL == 445) %>%
+  filter(Strain == "PC-rich_077" | Strain == "PE-rich_048") %>% 
+  select(c(Strain, Sig_nm2psii, PARPhotonDose_day))
+model_77_48Exp<-summary(lm(Sig_nm2psii ~ PARPhotonDose_day + Strain + PARPhotonDose_day:Strain,data=SolFits77_48Exp))
+
+SolFits77_127Exp<-SolFitsExpFitAll %>%
+  filter(Phase == "Exponential") %>%
+  filter(Ex_WL == 445) %>%
+  filter(Strain == "PC-rich_077" | Strain == "PE-rich_127") %>% 
+  select(c(Strain, Sig_nm2psii, PARPhotonDose_day))
+model_77_127Exp<-summary(lm(Sig_nm2psii ~ PARPhotonDose_day + Strain + PARPhotonDose_day:Strain,data=SolFits77_127Exp))
+
+
+# St
+Stats56_77St<-SolFitsExpFitAll %>%
+  filter(Phase == "Pre-stationary") %>%
+  filter(Ex_WL == 445) %>%
+  filter(Strain == "PC-rich_056" | Strain == "PC-rich_077") %>% 
+  select(c(Strain, Sig_nm2psii, PARPhotonDose_day))
+model_56_77St<-summary(lm(Sig_nm2psii ~ PARPhotonDose_day + Strain + PARPhotonDose_day:Strain,data=Stats56_77St))
+
+SolFits56_48St<-SolFitsExpFitAll %>%
+  filter(Phase == "Pre-stationary") %>%
+  filter(Ex_WL == 445) %>%
+  filter(Strain == "PC-rich_056" | Strain == "PE-rich_048") %>% 
+  select(c(Strain, Sig_nm2psii, PARPhotonDose_day))
+model_56_48St<-summary(lm(Sig_nm2psii ~ PARPhotonDose_day + Strain + PARPhotonDose_day:Strain,data=SolFits56_48St))
+
+SolFits56_127St<-SolFitsExpFitAll %>%
+  filter(Phase == "Pre-stationary") %>%
+  filter(Ex_WL == 445) %>%
+  filter(Strain == "PC-rich_056" | Strain == "PE-rich_127") %>% 
+  select(c(Strain, Sig_nm2psii, PARPhotonDose_day))
+model_56_127St<-summary(lm(Sig_nm2psii ~ PARPhotonDose_day + Strain + PARPhotonDose_day:Strain,data=SolFits56_127St))
+
+SolFits48_127St<-SolFitsExpFitAll %>%
+  filter(Phase == "Pre-stationary") %>%
+  filter(Ex_WL == 445) %>%
+  filter(Strain == "PE-rich_048" | Strain == "PE-rich_127") %>% 
+  select(c(Strain, Sig_nm2psii, PARPhotonDose_day))
+model_48_127St<-summary(lm(Sig_nm2psii ~ PARPhotonDose_day + Strain + PARPhotonDose_day:Strain,data=SolFits48_127St))
+
+SolFits77_48St<-SolFitsExpFitAll %>%
+  filter(Phase == "Pre-stationary") %>%
+  filter(Ex_WL == 445) %>%
+  filter(Strain == "PC-rich_077" | Strain == "PE-rich_048") %>% 
+  select(c(Strain, Sig_nm2psii, PARPhotonDose_day))
+model_77_48St<-summary(lm(Sig_nm2psii ~ PARPhotonDose_day + Strain + PARPhotonDose_day:Strain,data=SolFits77_48St))
+
+SolFits77_127St<-SolFitsExpFitAll %>%
+  filter(Phase == "Pre-stationary") %>%
+  filter(Ex_WL == 445) %>%
+  filter(Strain == "PC-rich_077" | Strain == "PE-rich_127") %>% 
+  select(c(Strain, Sig_nm2psii, PARPhotonDose_day))
+model_77_127St<-summary(lm(Sig_nm2psii ~ PARPhotonDose_day + Strain + PARPhotonDose_day:Strain,data=SolFits77_127St))
+
+# https://stackoverflow.com/questions/24527116/write-regression-summary-to-the-csv-file-in-r
+# fit <- lm(Sig_nm2psii ~ PARPhotonDose_day + Strain + PARPhotonDose_day:Strain,data=SolFits77_127St)
+# x <- cbind(SolFits77_127St, t(as.numeric(coefficients(fit))), t(as.numeric(summary(fit)$coefficients[, 4])), summary(fit)$r.squared)
+# names(x)[(length(x) - 6):length(x)] <- c(paste("coeff", names(coefficients(fit))), paste("P-value", names(summary(fit)$coefficients[, 4])), "R-squared")
+# 
+# 
+# 
+# 
+# fit <- lm(Net.Price ~ Quantity + Net.ASP, data = abc)
+# x <- cbind(abc, t(as.numeric(coefficients(fit))), t(as.numeric(summary(fit)$coefficients[, 4])), summary(fit)$r.squared)
+# names(x)[(length(x) - 6):length(x)] <- c(paste("coeff", names(coefficients(fit))), paste("P-value", names(summary(fit)$coefficients[, 4])), "R-squared")
+ 
+```
+
+
+# Save RDS that create stats and tables
+
+```{r}
+# saveRDS(Anova_Sig445_Model, file.path(TableRdsPath, paste(Project, "Anova_Sig445_Model.Rds", sep = "_"), fsep = .Platform$file.sep), ascii = FALSE, version = NULL, compress = "xz", refhook = NULL)
+```
+
+
+
+
+
+
 
 
 # Removed unneccessary df from the environment
@@ -2314,13 +2414,13 @@ dodawanie modeli zeby sprawdzic, czy sa istotne roznice pomiedzy szczepami i faz
 https://stats.stackexchange.com/questions/435644/is-there-a-method-to-look-for-significant-difference-between-two-linear-regressi
 
 ```{r}
-set.seed(123)
-df = data.frame(Age=sample(1:100))
-df$Height[1:50] = df$Age[1:50] + rpois(50,30)
-df$Height[51:100] = 1.3*df$Age[51:100] + rpois(50,30)
-df$Fladen = rep(c("A","B"),each=50)
-
-summary(lm(Height ~ Age + Fladen + Age:Fladen,data=df))
+# set.seed(123)
+# df = data.frame(Age=sample(1:100))
+# df$Height[1:50] = df$Age[1:50] + rpois(50,30)
+# df$Height[51:100] = 1.3*df$Age[51:100] + rpois(50,30)
+# df$Fladen = rep(c("A","B"),each=50)
+# 
+# summary(lm(Height ~ Age + Fladen + Age:Fladen,data=df))
 
 # So the last term, Age:FladenB shows a coefficient of 0.29, meaning the slope (Height vs Age) in Fladen B is .29 more than that in Fladen A
 
@@ -2425,6 +2525,11 @@ model_77_127St<-summary(lm(Sig_nm2psii ~ AllmeanPhycoChlaRatio + Strain + Allmea
 ```
 
 
+# Save RDS that create stats and tables
+
+```{r}
+# saveRDS(Anova_SigPig590_Model, file.path(TableRdsPath, paste(Project, "Anova_SigPig590_Model.Rds", sep = "_"), fsep = .Platform$file.sep), ascii = FALSE, version = NULL, compress = "xz", refhook = NULL)
+```
 
 
 
