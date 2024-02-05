@@ -690,18 +690,18 @@ labs(y = "TDG ("~OD[680]~")", x = "Elapsed time (h)") +
         axis.title.y = element_text(margin=margin(r=10)),
         axis.title.x = element_text(margin=margin(t=10)),
         #panel.spacing.x=unit(0.9, "lines"),
-        legend.position = c(0.095,0.93),
+        legend.position = c(0.1,0.93),
         legend.key.height= unit(0.005, 'cm'),
         legend.spacing.y = unit(-0.1, "cm"),
         legend.spacing.x = unit(-0.1, 'cm'),
         legend.title = element_blank(),
-        legend.text = element_text(size=10))
+        legend.text = element_text(size=11))
 ```
 
 # Save plot 
 
 ```{r save plot}
-ggsave(file = file.path(FigPath, paste("SFig_TDG",".png",sep = "")), height=10, width= 8,  dpi = 300, limitsize = TRUE)
+ggsave(file = file.path(FigPath, paste("SFig_TDG",".png",sep = "")), height=9, width= 7,  dpi = 300, limitsize = TRUE)
 ```
 
 # Removed unnecessary files from the environment
