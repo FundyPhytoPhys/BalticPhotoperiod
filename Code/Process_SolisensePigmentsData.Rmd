@@ -2749,6 +2749,30 @@ ggsave(file = file.path(FigPath, paste("Fig_SigmaPig590",".png",sep = "")), heig
 ```
 
 
+# Calculated Anova and Tukey test from data points
+
+```{r calculated statistics}
+SigFit590Stats <-SolFitsAllPigmentPCPE %>% 
+  filter(Ex_WL == 590) 
+
+SigFit590Stats$Par_ue <- factor(SigFit590Stats$Par_ue)
+SigFit590Stats$Photoperiod <- factor(SigFit590Stats$Photoperiod)
+SigFit590Stats$Strain <- factor(SigFit590Stats$Strain)
+SigFit590Stats$Phase <- factor(SigFit590Stats$Phase)
+#SigFit590Stats$AllmeanPhycoChlaRatio <- factor(SigFit590Stats$AllmeanPhycoChlaRatio)
+
+# Three way Anova with interactions
+model<-aov(Sig_nm2psii~AllmeanPhycoChlaRatio*Phase*Strain, data=SigFit590Stats)
+Anova_SigPig590<-data.frame(unclass(summary(model)), check.names = FALSE, stringsAsFactors = FALSE)
+#TukeyHSDTest_SigPig<-TukeyHSD(model, which = c("AllmeanPhycoChlaRatio", "Phase", "Strain"))
+```
+
+# Save RDS that create stats and tables
+
+```{r}
+saveRDS(Anova_SigPig590, file.path(TableRdsPath, paste(Project, "Anova_SigPig590.Rds", sep = "_"), fsep = .Platform$file.sep), ascii = FALSE, version = NULL, compress = "xz", refhook = NULL)
+```
+
 # Anova from the linear model 
 https://stackoverflow.com/questions/24527116/write-regression-summary-to-the-csv-file-in-r
 
@@ -3058,6 +3082,29 @@ SolFitsAllPigmentPCPE590 %>%
 ggsave(file = file.path(FigPath, paste("SFig_SigmaPig445",".png",sep = "")), height=9, width= 7,  dpi = 300, limitsize = TRUE)
 ```
 
+# Calculated Anova and Tukey test from data points
+
+```{r calculated statistics}
+SigFit445Stats <-SolFitsAllPigmentPCPE %>% 
+  filter(Ex_WL == 445) 
+
+SigFit445Stats$Par_ue <- factor(SigFit445Stats$Par_ue)
+SigFit445Stats$Photoperiod <- factor(SigFit445Stats$Photoperiod)
+SigFit445Stats$Strain <- factor(SigFit445Stats$Strain)
+SigFit445Stats$Phase <- factor(SigFit445Stats$Phase)
+#SigFit445Stats$AllmeanPhycoChlaRatio <- factor(SigFit445Stats$AllmeanPhycoChlaRatio)
+
+# Three way Anova with interactions
+model<-aov(Sig_nm2psii~AllmeanPhycoChlaRatio*Phase*Strain, data=SigFit445Stats)
+Anova_SigPig445<-data.frame(unclass(summary(model)), check.names = FALSE, stringsAsFactors = FALSE)
+#TukeyHSDTest_SigPig<-TukeyHSD(model, which = c("AllmeanPhycoChlaRatio", "Phase", "Strain"))
+```
+
+# Save RDS that create stats and tables
+
+```{r}
+saveRDS(Anova_SigPig445, file.path(TableRdsPath, paste(Project, "Anova_SigPig445.Rds", sep = "_"), fsep = .Platform$file.sep), ascii = FALSE, version = NULL, compress = "xz", refhook = NULL)
+```
 
 # Anova from the linear model 
 https://stackoverflow.com/questions/24527116/write-regression-summary-to-the-csv-file-in-r
