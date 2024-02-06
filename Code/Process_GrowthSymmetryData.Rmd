@@ -239,7 +239,17 @@ data_text_AnovaSt77<- data.frame(WL = c("WW"), Phase = c("Pre-stationary"), O2=c
 data_text_AnovaSt48<- data.frame(WL = c("WW"), Phase = c("Pre-stationary"), O2=c(21), Strain  = c("PE-rich_048"),  label = c("ab"))
 data_text_AnovaSt127<- data.frame(WL = c("WW"), Phase = c("Pre-stationary"), O2=c(21), Strain  = c("PE-rich_127"),  label = c("b"))
 
-data_text_AnovaPhase<- data.frame(WL = c("WW", "WW"), Phase = c("Exponential"), O2=c(21, 21, 21, 21), Strain  = c("PC-rich_056", "PC-rich_077", "PE-rich_048", "PE-rich_127"),  label = c('ANOVA, p < 0.05', 'ANOVA, p < 0.05', 'ANOVA, p < 0.05', 'ANOVA, p < 0.05'))
+data_text_AnovaExp56P<- data.frame(WL = c("WW"), Phase = c("Exponential"), O2=c(21), Strain  = c("PC-rich_056"),  label = c('A'))
+data_text_AnovaExp77P<- data.frame(WL = c("WW"), Phase = c("Exponential"), O2=c(21), Strain  = c("PC-rich_077"),  label = c("A"))
+data_text_AnovaExp48P<- data.frame(WL = c("WW"), Phase = c("Exponential"), O2=c(21), Strain  = c("PE-rich_048"),  label = c("A"))
+data_text_AnovaExp127P<- data.frame(WL = c("WW"), Phase = c("Exponential"), O2=c(21), Strain  = c("PE-rich_127"),  label = c("A"))
+
+data_text_AnovaSt56P<- data.frame(WL = c("WW"), Phase = c("Pre-stationary"), O2=c(21), Strain  = c("PC-rich_056"),  label = c('B'))
+data_text_AnovaSt77P<- data.frame(WL = c("WW"), Phase = c("Pre-stationary"), O2=c(21), Strain  = c("PC-rich_077"),  label = c("B"))
+data_text_AnovaSt48P<- data.frame(WL = c("WW"), Phase = c("Pre-stationary"), O2=c(21), Strain  = c("PE-rich_048"),  label = c("B"))
+data_text_AnovaSt127P<- data.frame(WL = c("WW"), Phase = c("Pre-stationary"), O2=c(21), Strain  = c("PE-rich_127"),  label = c("B"))
+
+data_text_AnovaPhase<- data.frame(WL = c("WW", "WW"), Phase = c("Exponential"), O2=c(21, 21, 21, 21), Strain  = c("PC-rich_056", "PC-rich_077", "PE-rich_048", "PE-rich_127"),  label = c('ANOVA, \u03B1 = 0.05', 'ANOVA, \u03B1 = 0.05', 'ANOVA, \u03B1 = 0.05', 'ANOVA, \u03B1 = 0.05'))
 
 WL.labs <- c("Phase of growth")
 names(WL.labs) <- c("WW")
@@ -278,6 +288,16 @@ lab2=c(expression("30 µE"), expression("90 µE"), expression("180 µE"), expres
   geom_text(data=data_text_AnovaSt77, aes(x=8000000, y=1.0, label=label), colour = "blue", size=4) +
   geom_text(data=data_text_AnovaSt48, aes(x=25000000, y=0.8, label=label), colour = "blue", size=4) +
   geom_text(data=data_text_AnovaSt127, aes(x=25000000, y=0.7, label=label), colour = "blue", size=4) +
+    
+  geom_text(data=data_text_AnovaExp56P, aes(x=25000000, y=0.6, label=label), colour = "blue", size=4) +
+  geom_text(data=data_text_AnovaExp77P, aes(x=25000000, y=0.2, label=label), colour = "blue", size=4) +
+  geom_text(data=data_text_AnovaExp48P, aes(x=25000000, y=0.1, label=label), colour = "blue", size=4) +
+  geom_text(data=data_text_AnovaExp127P, aes(x=25000000, y=0.2, label=label), colour = "blue", size=4) +
+    
+  geom_text(data=data_text_AnovaSt56P, aes(x=8000000, y=0.4, label=label), colour = "blue", size=4) +
+  geom_text(data=data_text_AnovaSt77P, aes(x=8000000, y=0.2, label=label), colour = "blue", size=4) +
+  geom_text(data=data_text_AnovaSt48P, aes(x=25000000, y=0.1, label=label), colour = "blue", size=4) +
+  geom_text(data=data_text_AnovaSt127P, aes(x=25000000, y=0.0, label=label), colour = "blue", size=4) +
     
   geom_text(data=data_text_AnovaPhase, aes(x=6000000, y=-0.1, label=label), colour = "blue", size=4) +
     
@@ -399,6 +419,9 @@ fittedmodel<-fitted  %>%
 #7->056 Exp
 #8->077 Exp
 
+# fittedmodelStrainExp<-fittedmodel 
+#   GS_2Anova_Strain_Phase<-anova(fittedmodelStrainExp[[3]][[1]], fittedmodelStrainExp[[3]][[2]], fittedmodelStrainExp[[3]][[3]], fittedmodelStrainExp[[3]][[4]], fittedmodelStrainExp[[3]][[5]], fittedmodelStrainExp[[3]][[6]], fittedmodelStrainExp[[3]][[7]], fittedmodelStrainExp[[3]][[8]])
+
 #Comparing model for strains from Exp phase
 fittedmodelStrainExp<-fittedmodel 
   anova056077Exp<-anova(fittedmodelStrainExp[[3]][[7]], fittedmodelStrainExp[[3]][[8]])
@@ -496,7 +519,7 @@ GScatalogMeta %>%
   scale_y_continuous(breaks=seq(0, 10, by = 2)) +
   coord_cartesian(ylim = c(0, 12), xlim = c(0, 36000000)) +
   guides(color = guide_legend(order = 1), shape  = guide_legend(order = 0)) +
-  labs(y = "AccLen (h)", x = "Photon dose ( µmol photons "~m^-2~""~d^-1~")") +
+  labs(y = "Hours of photoperiod to reach maximum daily growth (h)", x = "Photon dose ( µmol photons "~m^-2~""~d^-1~")") +
   ggh4x::facet_nested(cols = vars(facetsPhase, Phase), rows = vars(facetsStrain, Strain), labeller = label_parsed) +
   theme_bw() +
   theme(panel.grid.minor = element_blank(),
@@ -522,11 +545,11 @@ GScatalogMeta %>%
 ```
 
 ```{r AccLen Plot, fig.height = 8, fig.width = 8, warning = FALSE}
-data_text_8<- data.frame(facetsPhase = c("Phase~of~growth", "Phase~of~growth"), Phase = c("Exponential"), facetsStrain=c("Strain", "Strain", "Strain", "Strain"), Strain  = c("PC-rich_056", "PC-rich_077", "PE-rich_048", "PE-rich_127"),  label = c('Max light at   8h', 'Max light at   8h', 'Max light at   8h', 'Max light at   8h'))
+data_text_8<- data.frame(facetsPhase = c("Phase~of~growth"), Phase = c("Pre-stationary"), facetsStrain=c("Strain", "Strain", "Strain", "Strain"), Strain  = c("PC-rich_077"),  label = c('Time to max light for  8h photoperiod'))
 
-data_text_12<- data.frame(facetsPhase = c("Phase~of~growth", "Phase~of~growth"), Phase = c("Exponential"), facetsStrain=c("Strain", "Strain", "Strain", "Strain"), Strain  = c("PC-rich_056", "PC-rich_077", "PE-rich_048", "PE-rich_127"),  label = c('Max light at 12h', 'Max light at 12h', 'Max light at 12h', 'Max light at 12h'))
+data_text_12<- data.frame(facetsPhase = c("Phase~of~growth"), Phase = c("Pre-stationary"), facetsStrain=c("Strain", "Strain", "Strain", "Strain"), Strain  = c("PC-rich_077"),  label = c('Time to max light for 12h photoperiod'))
 
-data_text_16<- data.frame(facetsPhase = c("Phase~of~growth", "Phase~of~growth"), Phase = c("Exponential"), facetsStrain=c("Strain", "Strain", "Strain", "Strain"), Strain  = c("PC-rich_056", "PC-rich_077", "PE-rich_048", "PE-rich_127"),  label = c('Max light at 16h', 'Max light at 16h', 'Max light at 16h', 'Max light at 16h'))
+data_text_16<- data.frame(facetsPhase = c("Phase~of~growth"), Phase = c("Pre-stationary"), facetsStrain=c("Strain", "Strain", "Strain", "Strain"), Strain  = c("PC-rich_077"),  label = c("Time to max light for 16h photoperiod"))
 
 
 scientific_10 <- function(x) {   parse(text=gsub("e\\+*", " %*% 10^", scales::scientific_format()(x))) }
@@ -540,9 +563,9 @@ GScatalogMeta %>%
   geom_line(aes(x = PARPhotonDose_day, y = meanAccLen, colour = as.factor(Par_ue)), size = 0.3, show.legend = F) +
   geom_errorbar(aes(x = PARPhotonDose_day, ymin = meanAccLen - sdAccLen, ymax = meanAccLen + sdAccLen, colour = as.factor(Par_ue)), show.legend = F, width=0, size=0.3) +
   geom_point(aes(x = PARPhotonDose_day, y = AccLen, colour = as.factor(Par_ue), shape = as.factor(Photoperiod)), size = 1, alpha = 0.8, show.legend = F) +
-  geom_text(data=data_text_8, aes(x=32000000, y=3.5, label=label), size=2.8) +
-  geom_text(data=data_text_12, aes(x=32000000, y=5.5, label=label), size=2.8) +
-  geom_text(data=data_text_16, aes(x=32000000, y=7.5, label=label), size=2.8) +
+  geom_text(data=data_text_8, aes(x=24000000, y=3.5, label=label), size=2.8) +
+  geom_text(data=data_text_12, aes(x=24000000, y=5.5, label=label), size=2.8) +
+  geom_text(data=data_text_16, aes(x=24000000, y=7.5, label=label), size=2.8) +
   geom_hline(data = data_hlineGS8, aes(yintercept = value), linetype="dashed", size=0.4, colour = "cornsilk4") +
   geom_hline(data = data_hlineGS12, aes(yintercept = value), linetype="dashed", size=0.4, colour = "cornsilk4") +
   geom_hline(data = data_hlineGS16, aes(yintercept = value), linetype="dashed", size=0.4, colour = "cornsilk4") +
@@ -553,7 +576,7 @@ GScatalogMeta %>%
   coord_cartesian(ylim = c(0, 12), xlim = c(0, 37000000)) +
   
   guides(color = guide_legend(order = 1), shape  = guide_legend(order = 0)) +
-  labs(y = "AccLen (h)", x = "Photon dose ( µmol photons "~m^-2~""~d^-1~")") +
+  labs(y = "Hours of photoperiod to reach maximum daily growth (h)", x = "Photon dose ( µmol photons "~m^-2~""~d^-1~")") +
   ggh4x::facet_nested(cols = vars(facetsPhase, Phase), rows = vars(facetsStrain, Strain), labeller = label_parsed) +
   theme_bw() +
   theme(panel.grid.minor = element_blank(),
@@ -596,7 +619,7 @@ GScatalogMeta %>%
   scale_y_continuous(breaks=seq(0, 10, by = 2)) +
   coord_cartesian(ylim = c(0, 14)) +
   guides(color = guide_legend(order = 1), shape  = guide_legend(order = 0)) +
-  labs(y = "AccLen (h)", x = "Photoperiod (h)") +
+  labs(y = "Hours of photoperiod to reach maximum daily growth (h)", x = "Photoperiod (h)") +
   ggh4x::facet_nested(cols = vars(facetsPhase, Phase), rows = vars(facetsStrain, Strain), labeller = label_parsed) +
   theme_bw() +
   theme(panel.grid.minor = element_blank(),
