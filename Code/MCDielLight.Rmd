@@ -75,6 +75,27 @@ MCData |>
   theme_bw()
 ```
 
+#https://stackoverflow.com/questions/76603287/calculate-linear-regression-slope-with-moving-window
+```{r growth rates}
+
+# slope <- function(x) coef(lm(x[, 2] ~ x[, 1]))[[2]]
+slope <- function(x) cov(x[, 1], x[, 2]) / var(x[, 1])
+
+MCData <- MCData %>%
+  mutate(mu_deltaODwindow = rollapply(cbind(time, log(deltaOD)), 12, slope, by.column=FALSE, fill=NA)) |>
+  mutate(mu_Averh = zoo::rollmean(mu_deltaODwindow, k = 12, fill = NA, align = "right"))
+
+MCData |>
+  filter(time >= 48,
+         time <= 72) |>
+  ggplot() +
+  geom_point(aes(x = time, y = mu_deltaODwindow, colour = WL)) +
+  geom_point(aes(x = time, y = mu_deltaODwindow)) +
+  facet_grid(cols = vars(Tube)) +
+  theme_bw()
+```
+
+
 ```{r hourly photon estimates}
 #temporary
 #use case_when to remove 'dark' periods?
