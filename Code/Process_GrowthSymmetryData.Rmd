@@ -249,7 +249,7 @@ data_text_AnovaSt77P<- data.frame(WL = c("WW"), Phase = c("Pre-stationary"), O2=
 data_text_AnovaSt48P<- data.frame(WL = c("WW"), Phase = c("Pre-stationary"), O2=c(21), Strain  = c("PE-rich_048"),  label = c("B"))
 data_text_AnovaSt127P<- data.frame(WL = c("WW"), Phase = c("Pre-stationary"), O2=c(21), Strain  = c("PE-rich_127"),  label = c("B"))
 
-data_text_AnovaPhase<- data.frame(WL = c("WW", "WW"), Phase = c("Exponential"), O2=c(21, 21, 21, 21), Strain  = c("PC-rich_056", "PC-rich_077", "PE-rich_048", "PE-rich_127"),  label = c('ANOVA, \u03B1 = 0.05', 'ANOVA, \u03B1 = 0.05', 'ANOVA, \u03B1 = 0.05', 'ANOVA, \u03B1 = 0.05'))
+data_text_AnovaPhase<- data.frame(WL = c("WW", "WW"), Phase = c("Exponential"), O2=c(21, 21, 21, 21), Strain  = c("PC-rich_056", "PC-rich_077", "PE-rich_048", "PE-rich_127"),  label = c('Welch’s t-test, \u03B1 = 0.05', 'Welch’s t-test, \u03B1 = 0.05', 'Welch’s t-test, \u03B1 = 0.05', 'Welch’s t-test, \u03B1 = 0.05'))
 
 WL.labs <- c("Phase of growth")
 names(WL.labs) <- c("WW")
@@ -295,11 +295,11 @@ lab2=c(expression("30 µE"), expression("90 µE"), expression("180 µE"), expres
   geom_text(data=data_text_AnovaExp127P, aes(x=25000000, y=0.2, label=label), colour = "blue", size=4) +
     
   geom_text(data=data_text_AnovaSt56P, aes(x=8000000, y=0.4, label=label), colour = "blue", size=4) +
-  geom_text(data=data_text_AnovaSt77P, aes(x=8000000, y=0.2, label=label), colour = "blue", size=4) +
+  geom_text(data=data_text_AnovaSt77P, aes(x=8000000, y=0.1, label=label), colour = "blue", size=4) +
   geom_text(data=data_text_AnovaSt48P, aes(x=25000000, y=0.1, label=label), colour = "blue", size=4) +
   geom_text(data=data_text_AnovaSt127P, aes(x=25000000, y=0.0, label=label), colour = "blue", size=4) +
     
-  geom_text(data=data_text_AnovaPhase, aes(x=6000000, y=-0.1, label=label), colour = "blue", size=4) +
+  geom_text(data=data_text_AnovaPhase, aes(x=9000000, y=-0.2, label=label), colour = "blue", size=4) +
     
   scale_shape_manual(values = c(15, 16, 17), name="", labels = lab1) +
   scale_colour_manual(values = c("darkslategray", "lightblue4", "hotpink4", "indianred3", "khaki2"), name="", labels = lab2) +
@@ -408,7 +408,7 @@ fittedmodel<-fitted  %>%
 ```
 
 # Performed a t-test using the coefficients from a non-linear model in R.
-Welch Two Sample t-test
+Welch Two Sample t-test - Welch's t-test
 
 In statistics, Welch's t-test, or unequal variances t-test, is a two-sample location test which is used to test the (null) hypothesis that two populations have equal means. It is more reliable when the two samples have unequal variances and possibly unequal sample sizes. These tests are often referred to as "unpaired" or "independent samples" t-tests, as they are typically applied when the statistical units underlying the two samples being compared are non-overlapping. Given that Welch's t-test has been less popular than Student's t-test and may be less familiar to readers, a more informative name is "Welch's unequal variances t-test" — or "unequal variances t-test" for brevity.
 ```{r}
