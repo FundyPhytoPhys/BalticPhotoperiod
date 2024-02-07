@@ -168,6 +168,15 @@ MCData |>
   geom_line(aes(x = ToD, y = mu_Averh, colour = Actinic_photonsm2h)) +
   facet_grid(cols = vars(Tube)) +
   theme_bw()
+
+MCData |>
+  filter(time - round(time) == 0) |>
+  filter(Actinic_par > 1) |>
+  ggplot() +
+  geom_point(aes(x = ToD, y = mu_Averh, colour = Actinic_photonsm2h)) +
+  geom_line(aes(x = ToD, y = mu_Averh, colour = Actinic_photonsm2h)) +
+  facet_grid(cols = vars(Tube)) +
+  theme_bw()
 ```
 
 
