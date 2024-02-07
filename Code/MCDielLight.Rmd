@@ -46,6 +46,7 @@ MCFiles <- list.files(path = file.path("..", "Data", "ImportedData", "ImportedMC
 MCFiles
 
 MCData <- readRDS(file = MCFiles[1]) |>
+  ungroup() |>
   mutate(deltaOD = OD680 - OD720)
 
   colnames(MCData)
@@ -73,6 +74,15 @@ MCData |>
   geom_point(aes(x = time, y = deltaOD, colour = WL)) +
   facet_grid(cols = vars(Tube)) +
   theme_bw()
+
+MCData |>
+  filter(time >= 48,
+         time <= 72) |>
+  ggplot() +
+  geom_point(aes(x = time, y = Actinic_par)) +
+  geom_point(aes(x = time, y = 1000 * deltaOD, colour = WL)) +
+  facet_grid(cols = vars(Tube)) +
+  theme_bw()
 ```
 
 #https://stackoverflow.com/questions/76603287/calculate-linear-regression-slope-with-moving-window
@@ -81,62 +91,60 @@ MCData |>
 # slope <- function(x) coef(lm(x[, 2] ~ x[, 1]))[[2]]
 slope <- function(x) cov(x[, 1], x[, 2]) / var(x[, 1])
 
-MCData <- MCData %>%
+MCData <- MCData |>
+  group_by(Filename, Tube, Day) |>
+  filter(deltaOD > 0) |>
+  mutate(Actinic_photonsm2h = zoo::rollsum(Actinic_par * 5, k = 12, fill = NA, align = "right")) |> # will not work b/c will sum across entire df
   mutate(mu_deltaODwindow = rollapply(cbind(time, log(deltaOD)), 12, slope, by.column=FALSE, fill=NA)) |>
-  mutate(mu_Averh = zoo::rollmean(mu_deltaODwindow, k = 12, fill = NA, align = "right"))
+  mutate(mu_Averh = zoo::rollmean(mu_deltaODwindow, k = 12, fill = NA, align = "right")) |>
+  ungroup()
 
 MCData |>
   filter(time >= 48,
          time <= 72) |>
   ggplot() +
   geom_point(aes(x = time, y = mu_deltaODwindow, colour = WL)) +
-  geom_point(aes(x = time, y = mu_deltaODwindow)) +
+  geom_point(aes(x = time, y = mu_Averh)) +
   facet_grid(cols = vars(Tube)) +
   theme_bw()
 ```
 
 
-```{r hourly photon estimates}
+```{r hourly plots}
 #temporary
 #use case_when to remove 'dark' periods?
 #bad to filter and only then estimate growth rates; better to do across 1 h window
-MCData24h <-  MCData |>
-  filter(time >= 48,
-         time <= 72) |>
-  mutate(Actinic_photonsm2h = zoo::rollsum(Actinic_par * 5, k = 12, fill = NA, align = "right")) |>
-  filter(time - round(time) == 0)
 
-MCData24h |>
+MCData |>
+   filter(time >= 48,
+          time <= 72) |>
+  filter(time - round(time) == 0) |>
   ggplot() +
   geom_point(aes(x = time, y = Actinic_photonsm2h, colour = WL)) +
+  geom_point(aes(x = time, y = mu_Averh * 10000)) +
   facet_grid(cols = vars(Tube)) +
   theme_bw()
 
+MCData |>
+   filter(time >= 48,
+          time <= 72) |>
+  filter(time - round(time) == 0) |>
+  ggplot() +
+  geom_point(aes(x = Actinic_photonsm2h, y = mu_Averh, colour = ToD)) +
+  geom_line(aes(x = Actinic_photonsm2h, y = mu_Averh, colour = ToD)) +
+  facet_grid(cols = vars(Tube)) +
+  theme_bw()
+
+MCData |>
+   filter(time >= 48,
+          time <= 72) |>
+  filter(time - round(time) == 0) |>
+  ggplot() +
+  geom_point(aes(x = ToD, y = mu_Averh, colour = Actinic_photonsm2h)) +
+  geom_line(aes(x = ToD, y = mu_Averh, colour = Actinic_photonsm2h)) +
+  facet_grid(cols = vars(Tube)) +
+  theme_bw()
 
 ```
 
-```{r hourly mu deltaOD estimates}
-#works for 1 h spacing of data points
-MCData24h |>
-  ggplot() +
-  geom_point(aes(x = time, y = mu_deltaODh, colour = WL)) +
-  facet_grid(cols = vars(Tube)) +
-  theme_bw()
-
-
-MCData24h <- MCData24h |>
-  mutate(mu_deltaODh = (log(deltaOD) - log(lag(deltaOD)))/1)
-
-MCData24h |>
-  ggplot() +
-  geom_point(aes(x = time, y = mu_deltaODh, colour = WL)) +
-  facet_grid(cols = vars(Tube)) +
-  theme_bw()
-
-MCData24h |>
-  ggplot() +
-  geom_point(aes(x = Actinic_photonsm2h, y = mu_deltaODh, colour = WL)) +
-  facet_grid(cols = vars(Tube)) +
-  theme_bw()
-```
 
