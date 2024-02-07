@@ -407,8 +407,10 @@ fittedmodel<-fitted  %>%
   select(c(Strain, Phase, fit))
 ```
 
-# Anova from the model - compare fit from all light to selected one light
+# Performed a t-test using the coefficients from a non-linear model in R.
+Welch Two Sample t-test
 
+In statistics, Welch's t-test, or unequal variances t-test, is a two-sample location test which is used to test the (null) hypothesis that two populations have equal means. It is more reliable when the two samples have unequal variances and possibly unequal sample sizes. These tests are often referred to as "unpaired" or "independent samples" t-tests, as they are typically applied when the statistical units underlying the two samples being compared are non-overlapping. Given that Welch's t-test has been less popular than Student's t-test and may be less familiar to readers, a more informative name is "Welch's unequal variances t-test" — or "unequal variances t-test" for brevity.
 ```{r}
 #1->048 St
 #2->056 St
@@ -418,9 +420,46 @@ fittedmodel<-fitted  %>%
 #6->048 Exp
 #7->056 Exp
 #8->077 Exp
+fittedmodelStrainExp<-fittedmodel 
 
-# fittedmodelStrainExp<-fittedmodel 
-#   GS_2Anova_Strain_Phase<-anova(fittedmodelStrainExp[[3]][[1]], fittedmodelStrainExp[[3]][[2]], fittedmodelStrainExp[[3]][[3]], fittedmodelStrainExp[[3]][[4]], fittedmodelStrainExp[[3]][[5]], fittedmodelStrainExp[[3]][[6]], fittedmodelStrainExp[[3]][[7]], fittedmodelStrainExp[[3]][[8]])
+model1 <- fittedmodelStrainExp[[3]][[1]]
+model2 <- fittedmodelStrainExp[[3]][[2]]
+model3 <- fittedmodelStrainExp[[3]][[3]]
+model4 <- fittedmodelStrainExp[[3]][[4]]
+model5 <- fittedmodelStrainExp[[3]][[5]]
+model6 <- fittedmodelStrainExp[[3]][[6]]
+model7 <- fittedmodelStrainExp[[3]][[7]]
+model8 <- fittedmodelStrainExp[[3]][[8]]
+# Extract coefficients
+coef_model1 <- coef(model1)
+coef_model2 <- coef(model2)
+coef_model3 <- coef(model3)
+coef_model4 <- coef(model4)
+coef_model5 <- coef(model5)
+coef_model6 <- coef(model6)
+coef_model7 <- coef(model7)
+coef_model8 <- coef(model8)
+# Perform t-test
+t_test_result <- t.test(coef_model1, coef_model2)
+
+# Extract relevant information
+result_data <- data.frame(
+  t_test = t_test_result$statistic,
+  p_value = t_test_result$p.value,
+  Df = t_test_result$parameter,
+  conf_interval_lower = t_test_result$conf.int[1],
+  conf_interval_upper = t_test_result$conf.int[2],
+  method = t_test_result$method,
+  alternative = t_test_result$alternative,
+  Fit_model = c("Model1", "Model2")  # Adjust as needed
+)
+
+  
+  
+  
+  
+
+
 
 #Comparing model for strains from Exp phase
 fittedmodelStrainExp<-fittedmodel 
@@ -438,6 +477,113 @@ fittedmodelStrainExp<-fittedmodel
   anova077127Exp$FitComparison <- '077_127_Exp'
   anovaStrainExp<-rbind(anova056077Exp, anova048127Exp, anova056048Exp, anova077048Exp, anova056127Exp, anova077127Exp)
   anovaStrainExp <-anovaStrainExp %>% 
+  drop_na(Df) 
+  rm(anova056077Exp, anova048127Exp, anova056048Exp, anova077048Exp, anova056127Exp, anova077127Exp)
+
+  fittedmodelStrainExp<-fittedmodel 
+  anova056077Exp<-t.test(fittedmodelStrainExp[[3]][[7]], fittedmodelStrainExp[[3]][[8]])
+  anova056077Exp$FitComparison <- '056_077_Exp'
+  anova048127Exp<-t.test(fittedmodelStrainExp[[3]][[6]], fittedmodelStrainExp[[3]][[5]])
+  anova048127Exp$FitComparison <- '048_127_Exp'
+  anova056048Exp<-t.test(fittedmodelStrainExp[[3]][[7]], fittedmodelStrainExp[[3]][[6]])
+  anova056048Exp$FitComparison <- '056_048_Exp'
+  anova077048Exp<-t.test(fittedmodelStrainExp[[3]][[8]], fittedmodelStrainExp[[3]][[6]])
+  anova077048Exp$FitComparison <- '077_048_Exp'
+  anova056127Exp<-t.test(fittedmodelStrainExp[[3]][[7]], fittedmodelStrainExp[[3]][[5]])
+  anova056127Exp$FitComparison <- '056_127_Exp'
+  anova077127Exp<-t.test(fittedmodelStrainExp[[3]][[8]], fittedmodelStrainExp[[3]][[5]])
+  anova077127Exp$FitComparison <- '077_127_Exp'
+  anovaStrainExp<-rbind(anova056077Exp, anova048127Exp, anova056048Exp, anova077048Exp, anova056127Exp, anova077127Exp)
+  ttestStrainExp <-anovaStrainExp %>% 
+  drop_na(Df) 
+  rm(anova056077Exp, anova048127Exp, anova056048Exp, anova077048Exp, anova056127Exp, anova077127Exp)
+  
+
+#Comparing model for strains from St phase
+fittedmodelStrainSt<-fittedmodel 
+  anova056077St<-anova(fittedmodelStrainSt[[3]][[2]], fittedmodelStrainSt[[3]][[3]])
+  anova056077St$FitComparison <- '056_077_St'
+  anova048127St<-anova(fittedmodelStrainSt[[3]][[1]], fittedmodelStrainSt[[3]][[4]])
+  anova048127St$FitComparison <- '048_127_St'
+  anova056048St<-anova(fittedmodelStrainSt[[3]][[1]], fittedmodelStrainSt[[3]][[2]])
+  anova056048St$FitComparison <- '056_048_St'
+  anova077048St<-anova(fittedmodelStrainSt[[3]][[3]], fittedmodelStrainSt[[3]][[1]])
+  anova077048St$FitComparison <- '077_048_St'
+  anova056127St<-anova(fittedmodelStrainSt[[3]][[2]], fittedmodelStrainSt[[3]][[4]])
+  anova056127St$FitComparison <- '056_127_St'
+  anova077127St<-anova(fittedmodelStrainSt[[3]][[3]], fittedmodelStrainSt[[3]][[4]])
+  anova077127St$FitComparison <- '077_127_St'
+  anovaStrainSt<-rbind(anova056077St, anova048127St, anova056048St, anova077048St, anova056127St, anova077127St)
+  anovaStrainSt <-anovaStrainSt %>% 
+  drop_na(Df) 
+  rm(anova056077St, anova048127St, anova056048St, anova077048St, anova056127St, anova077127St)
+  
+  
+#Comparing model for each strains from different phase (Exp vs St)
+fittedmodelPhase<-fittedmodel 
+  anova056ExpSt<-anova(fittedmodelPhase[[3]][[7]], fittedmodelPhase[[3]][[2]])
+  anova056ExpSt$FitComparison <- '056_Exp_St'
+  anova077ExpSt<-anova(fittedmodelPhase[[3]][[8]], fittedmodelPhase[[3]][[3]])
+  anova077ExpSt$FitComparison <- '077_Exp_St'
+  anova048ExpSt<-anova(fittedmodelPhase[[3]][[6]], fittedmodelPhase[[3]][[1]])
+  anova048ExpSt$FitComparison <- '048_Exp_St'
+  anova127ExpSt<-anova(fittedmodelPhase[[3]][[5]], fittedmodelPhase[[3]][[4]])
+  anova127ExpSt$FitComparison <- '127_Exp_St'
+  anovaPhase<-rbind(anova056ExpSt, anova077ExpSt, anova048ExpSt, anova127ExpSt)
+  anovaPhase <-anovaPhase %>% 
+  drop_na(Df) 
+  rm(anova056ExpSt, anova077ExpSt, anova048ExpSt, anova127ExpSt)
+
+  Anova_GS_Model<-rbind(anovaStrainExp, anovaStrainSt, anovaPhase)
+```
+
+
+# Anova from the model - compare fit from all light to selected one light
+
+```{r}
+#1->048 St
+#2->056 St
+#3->077 St
+#4->127 St
+#5->127 Exp
+#6->048 Exp
+#7->056 Exp
+#8->077 Exp
+
+#Comparing model for strains from Exp phase
+fittedmodelStrainExp<-fittedmodel 
+  anova056077Exp<-anova(fittedmodelStrainExp[[3]][[7]], fittedmodelStrainExp[[3]][[8]])
+  anova056077Exp$FitComparison <- '056_077_Exp'
+  anova048127Exp<-anova(fittedmodelStrainExp[[3]][[6]], fittedmodelStrainExp[[3]][[5]])
+  anova048127Exp$FitComparison <- '048_127_Exp'
+  anova056048Exp<-anova(fittedmodelStrainExp[[3]][[7]], fittedmodelStrainExp[[3]][[6]])
+  anova056048Exp$FitComparison <- '056_048_Exp'
+  anova077048Exp<-anova(fittedmodelStrainExp[[3]][[8]], fittedmodelStrainExp[[3]][[6]])
+  anova077048Exp$FitComparison <- '077_048_Exp'
+  anova056127Exp<-anova(fittedmodelStrainExp[[3]][[7]], fittedmodelStrainExp[[3]][[5]])
+  anova056127Exp$FitComparison <- '056_127_Exp'
+  anova077127Exp<-anova(fittedmodelStrainExp[[3]][[8]], fittedmodelStrainExp[[3]][[5]])
+  anova077127Exp$FitComparison <- '077_127_Exp'
+  anovaStrainExp<-rbind(anova056077Exp, anova048127Exp, anova056048Exp, anova077048Exp, anova056127Exp, anova077127Exp)
+  anovaStrainExp <-anovaStrainExp %>% 
+  drop_na(Df) 
+  rm(anova056077Exp, anova048127Exp, anova056048Exp, anova077048Exp, anova056127Exp, anova077127Exp)
+
+  fittedmodelStrainExp<-fittedmodel 
+  anova056077Exp<-t.test(fittedmodelStrainExp[[3]][[7]], fittedmodelStrainExp[[3]][[8]])
+  anova056077Exp$FitComparison <- '056_077_Exp'
+  anova048127Exp<-t.test(fittedmodelStrainExp[[3]][[6]], fittedmodelStrainExp[[3]][[5]])
+  anova048127Exp$FitComparison <- '048_127_Exp'
+  anova056048Exp<-t.test(fittedmodelStrainExp[[3]][[7]], fittedmodelStrainExp[[3]][[6]])
+  anova056048Exp$FitComparison <- '056_048_Exp'
+  anova077048Exp<-t.test(fittedmodelStrainExp[[3]][[8]], fittedmodelStrainExp[[3]][[6]])
+  anova077048Exp$FitComparison <- '077_048_Exp'
+  anova056127Exp<-t.test(fittedmodelStrainExp[[3]][[7]], fittedmodelStrainExp[[3]][[5]])
+  anova056127Exp$FitComparison <- '056_127_Exp'
+  anova077127Exp<-t.test(fittedmodelStrainExp[[3]][[8]], fittedmodelStrainExp[[3]][[5]])
+  anova077127Exp$FitComparison <- '077_127_Exp'
+  anovaStrainExp<-rbind(anova056077Exp, anova048127Exp, anova056048Exp, anova077048Exp, anova056127Exp, anova077127Exp)
+  ttestStrainExp <-anovaStrainExp %>% 
   drop_na(Df) 
   rm(anova056077Exp, anova048127Exp, anova056048Exp, anova077048Exp, anova056127Exp, anova077127Exp)
 
