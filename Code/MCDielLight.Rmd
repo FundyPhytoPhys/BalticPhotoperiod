@@ -110,7 +110,7 @@ MCData |>
 ```
 
 
-```{r hourly plots}
+```{r hourly plots exploration}
 #temporary
 #use case_when to remove 'dark' periods?
 #bad to filter and only then estimate growth rates; better to do across 1 h window
@@ -145,6 +145,29 @@ MCData |>
   facet_grid(cols = vars(Tube)) +
   theme_bw()
 
+MCData |>
+  filter(Tube == 4) |>
+   filter(time >= 48,
+          time <= 72) |>
+  filter(time - round(time) == 0) |>
+  ggplot() +
+  geom_point(aes(x = ToD, y = mu_Averh, colour = Actinic_photonsm2h)) +
+  geom_line(aes(x = ToD, y = mu_Averh, colour = Actinic_photonsm2h)) +
+  geom_point(aes(x = ToD, y = Actinic_photonsm2h/100000, colour = Actinic_photonsm2h)) +
+  facet_grid(cols = vars(Tube)) +
+  theme_bw()
+
+
+MCData |>
+   filter(time >= 48,
+          time <= 72) |>
+  filter(time - round(time) == 0) |>
+  filter(Actinic_par > 1) |>
+  ggplot() +
+  geom_point(aes(x = ToD, y = mu_Averh, colour = Actinic_photonsm2h)) +
+  geom_line(aes(x = ToD, y = mu_Averh, colour = Actinic_photonsm2h)) +
+  facet_grid(cols = vars(Tube)) +
+  theme_bw()
 ```
 
 
