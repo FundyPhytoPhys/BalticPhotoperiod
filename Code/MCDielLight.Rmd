@@ -83,6 +83,16 @@ MCData |>
   geom_point(aes(x = time, y = 1000 * deltaOD, colour = WL)) +
   facet_grid(cols = vars(Tube)) +
   theme_bw()
+
+MCData |>
+  filter(Tube == 4) |>
+  # filter(time >= 48,
+  #        time <= 72) |>
+  ggplot() +
+  geom_point(aes(x = time, y = Actinic_par)) +
+  geom_point(aes(x = time, y = 1000 * deltaOD, colour = WL)) +
+  facet_grid(cols = vars(Tube)) +
+  theme_bw()
 ```
 
 #https://stackoverflow.com/questions/76603287/calculate-linear-regression-slope-with-moving-window
@@ -91,20 +101,28 @@ MCData |>
 # slope <- function(x) coef(lm(x[, 2] ~ x[, 1]))[[2]]
 slope <- function(x) cov(x[, 1], x[, 2]) / var(x[, 1])
 
-MCData <- MCData |>
+#FitWindow_h <- 2
+#maybe issues still with changes in light level that do not align with growth measurement points
+
+#maybe should estimate growth rates, then use 'summarize' to do sum of actinic photon dose for each hour?
+
+MCDataHour <- MCData |>
   group_by(Filename, Tube, Day) |>
   filter(deltaOD > 0) |>
-  mutate(Actinic_photonsm2h = zoo::rollsum(Actinic_par * 5, k = 12, fill = NA, align = "right")) |> # will not work b/c will sum across entire df
-  mutate(mu_deltaODwindow = rollapply(cbind(time, log(deltaOD)), 12, slope, by.column=FALSE, fill=NA)) |>
-  mutate(mu_Averh = zoo::rollmean(mu_deltaODwindow, k = 12, fill = NA, align = "right")) |>
-  ungroup()
+  mutate(Actinic_photonsm2h = zoo::rollsum(Actinic_par, k = 12, fill = NA, align = "right") * 5 * 60) |> 
+  mutate(mu_deltaODwindow = rollapply(cbind(time, log(deltaOD)), 24, slope, by.column=FALSE, fill=NA)) |>
+  #mutate(mu_Averh = zoo::rollmean(mu_deltaODwindow, k = 12, fill = NA, align = "right")) |>
+  ungroup() |>
+  filter(time - round(time) == 0)
 
-MCData |>
-  filter(time >= 48,
-         time <= 72) |>
+MCDataHour |>
+  # filter(time >= 48,
+  #        time <= 72) |>
+  filter(time < 100) |>
   ggplot() +
-  geom_point(aes(x = time, y = mu_deltaODwindow, colour = WL)) +
-  geom_point(aes(x = time, y = mu_Averh)) +
+  geom_point(aes(x = time, y = mu_deltaODwindow, colour = Actinic_photonsm2h)) +
+  geom_point(aes(x = time, y = deltaOD), colour = "green") +
+  #geom_point(aes(x = time, y = mu_Averh)) +
   facet_grid(cols = vars(Tube)) +
   theme_bw()
 ```
@@ -115,66 +133,54 @@ MCData |>
 #use case_when to remove 'dark' periods?
 #bad to filter and only then estimate growth rates; better to do across 1 h window
 
-MCData |>
-   filter(time >= 48,
-          time <= 72) |>
-  filter(time - round(time) == 0) |>
+MCDataHour |>
+   filter(time <= 100) |>
   ggplot() +
   geom_point(aes(x = time, y = Actinic_photonsm2h, colour = WL)) +
-  geom_point(aes(x = time, y = mu_Averh * 10000)) +
+  geom_point(aes(x = time, y = mu_deltaODwindow * 10000)) +
   facet_grid(cols = vars(Tube)) +
   theme_bw()
 
-MCData |>
-   filter(time >= 48,
-          time <= 72) |>
-  filter(time - round(time) == 0) |>
+MCDataHour |>
+   filter(time <= 100) |>
   ggplot() +
-  geom_point(aes(x = Actinic_photonsm2h, y = mu_Averh, colour = ToD)) +
-  geom_line(aes(x = Actinic_photonsm2h, y = mu_Averh, colour = ToD)) +
+  geom_point(aes(x = Actinic_photonsm2h, y = mu_deltaODwindow, colour = ToD)) +
+  geom_line(aes(x = Actinic_photonsm2h, y = mu_deltaODwindow, colour = ToD)) +
   facet_grid(cols = vars(Tube)) +
   theme_bw()
 
-MCData |>
-   filter(time >= 48,
-          time <= 72) |>
-  filter(time - round(time) == 0) |>
+MCDataHour |>
+   filter(time <= 100) |>
   ggplot() +
-  geom_point(aes(x = ToD, y = mu_Averh, colour = Actinic_photonsm2h)) +
-  geom_line(aes(x = ToD, y = mu_Averh, colour = Actinic_photonsm2h)) +
+  geom_point(aes(x = ToD, y = mu_deltaODwindow, colour = Actinic_photonsm2h)) +
+  geom_line(aes(x = ToD, y = mu_deltaODwindow, colour = Actinic_photonsm2h)) +
   facet_grid(cols = vars(Tube)) +
   theme_bw()
 
-MCData |>
+MCDataHour |>
   filter(Tube == 4) |>
-   filter(time >= 48,
-          time <= 72) |>
-  filter(time - round(time) == 0) |>
   ggplot() +
-  geom_point(aes(x = ToD, y = mu_Averh, colour = Actinic_photonsm2h)) +
-  geom_line(aes(x = ToD, y = mu_Averh, colour = Actinic_photonsm2h)) +
-  geom_point(aes(x = ToD, y = Actinic_photonsm2h/100000, colour = Actinic_photonsm2h)) +
+  geom_point(aes(x = ToD, y = mu_deltaODwindow, colour = Actinic_photonsm2h)) +
+  geom_line(aes(x = ToD, y = mu_deltaODwindow, colour = Actinic_photonsm2h)) +
   facet_grid(cols = vars(Tube)) +
   theme_bw()
 
 
-MCData |>
-   filter(time >= 48,
-          time <= 72) |>
-  filter(time - round(time) == 0) |>
+MCDataHour |>
+   filter(time <= 100) |>
   filter(Actinic_par > 1) |>
   ggplot() +
-  geom_point(aes(x = ToD, y = mu_Averh, colour = Actinic_photonsm2h)) +
-  geom_line(aes(x = ToD, y = mu_Averh, colour = Actinic_photonsm2h)) +
+  geom_point(aes(x = ToD, y = mu_deltaODwindow, colour = Actinic_photonsm2h)) +
+  geom_line(aes(x = ToD, y = mu_deltaODwindow, colour = Actinic_photonsm2h)) +
   facet_grid(cols = vars(Tube)) +
   theme_bw()
 
-MCData |>
-  filter(time - round(time) == 0) |>
+MCDataHour |>
+   filter(time <= 100) |>
   filter(Actinic_par > 1) |>
   ggplot() +
-  geom_point(aes(x = ToD, y = mu_Averh, colour = Actinic_photonsm2h)) +
-  geom_line(aes(x = ToD, y = mu_Averh, colour = Actinic_photonsm2h)) +
+  geom_point(aes(x = ToD, y = mu_deltaODwindow, colour = Actinic_photonsm2h)) +
+  geom_line(aes(x = ToD, y = mu_deltaODwindow, colour = Actinic_photonsm2h)) +
   facet_grid(cols = vars(Tube)) +
   theme_bw()
 ```
