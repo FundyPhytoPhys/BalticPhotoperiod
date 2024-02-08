@@ -741,7 +741,7 @@ data_text_AnovaSt48P<- data.frame(WL = c("WW"), Phase = c("Pre-stationary"), O2=
 data_text_AnovaSt127P<- data.frame(WL = c("WW"), Phase = c("Pre-stationary"), O2=c(21), Strain  = c("PE-rich_127"),  label = c("B"))
 
 
-data_text_AnovaPhase<- data.frame(WL = c("WW", "WW"), Phase = c("Exponential"), O2=c(21, 21, 21, 21), Strain  = c("PC-rich_056", "PC-rich_077", "PE-rich_048", "PE-rich_127"),  label = c('Welch’s t-test, \u03B1 = 0.05', 'Welch’s t-test, \u03B1 = 0.05', 'Welch’s t-test, \u03B1 = 0.05', 'Welch’s t-test, \u03B1 = 0.05'))
+data_text_AnovaPhase<- data.frame(WL = c("WW", "WW"), Phase = c("Exponential"), O2=c(21, 21, 21, 21), Strain  = c("PC-rich_056", "PC-rich_077", "PE-rich_048", "PE-rich_127"),  label = c('ANOVA, \u03B1 = 0.05', 'ANOVA, \u03B1 = 0.05', 'ANOVA, \u03B1 = 0.05', 'ANOVA, \u03B1 = 0.05'))
 
 
 
@@ -793,7 +793,7 @@ ggplot(SolFitsExpFitAll590, aes(x = PARPhotonDose_day, y = Sig_nm2psii)) +
   geom_text(data=data_text_AnovaSt48P, aes(x=75000000, y=1.5, label=label), colour = "blue", size=4) +
   geom_text(data=data_text_AnovaSt127P, aes(x=75000000, y=1, label=label), colour = "blue", size=4) +
   
-  geom_text(data=data_text_AnovaPhase, aes(x=26000000, y=-0.8, label=label), colour = "blue", size=4) +
+  geom_text(data=data_text_AnovaPhase, aes(x=24000000, y=-0.8, label=label), colour = "blue", size=4) +
   
   scale_shape_manual(values = c(15, 16, 17,18), name="", labels = lab1) +
   scale_colour_manual(values = c("darkslategray", "lightblue4", "hotpink4", "indianred3",  "goldenrod2", "khaki2"), name="", labels = lab2) +
@@ -1316,16 +1316,6 @@ Anova_Sig445_Model<-rbind(modelExp, modelSt, modelExpSt)
 rm(modelExp, modelSt, modelExpSt)
 ```
 
-```{r}
-# SolFits77_127St<-SolFitsExpFitAll %>%
-#   filter(Phase == "Pre-stationary") %>%
-#   filter(Ex_WL == 445) %>%
-#   filter(Strain == "PC-rich_077" | Strain == "PE-rich_127") %>% 
-#   select(c(Strain, Sig_nm2psii, PARPhotonDose_day))
-# model_77_127St<-summary(lm(Sig_nm2psii ~ PARPhotonDose_day + Strain + PARPhotonDose_day:Strain,data=SolFits77_127St))
-# 
-# Anova_Sig445_Model<-data.frame(unclass(summary(model_77_127St[["coefficients"]])), check.names = FALSE, stringsAsFactors = FALSE)
-```
 
 # Save RDS that create stats and tables
 
@@ -1337,7 +1327,7 @@ saveRDS(Anova_Sig445_Model, file.path(TableRdsPath, paste(Project, "Anova_Sig445
 # Removed unneccessary df from the environment
 
 ```{r}
-# rm(SolFitsExpFit590Clean, fitted_Param590, data_text_lambdaExp, data_text_y0Exp, data_text_yfExp, data_text_lambdaSt, data_text_y0St, data_text_yfSt, data_text_AnovaExp, data_text_AnovaSt, fitted590, fittedmodel, fittedmodelPhase, fittedmodelStrainExp, fittedmodelStrainSt, SigFit590Stats, SolFitsExpFitAll590, SolFitsExpFitAll_1, SolFitsExpFitAll_2, SolFitsExpFitAll_3, augmented590)
+rm(SolFitsExpFit590Clean, fitted_Param590, data_text_lambdaExp, data_text_y0Exp, data_text_yfExp, data_text_lambdaSt, data_text_y0St, data_text_yfSt, data_text_AnovaExp, data_text_AnovaSt, fitted590, fittedmodel, fittedmodelPhase, fittedmodelStrainExp, fittedmodelStrainSt, SigFit590Stats, SolFitsExpFitAll590, SolFitsExpFitAll_1, SolFitsExpFitAll_2, SolFitsExpFitAll_3, augmented590)
 ```
 
 # Removed unneccessary df from the environment
@@ -1830,7 +1820,7 @@ data_text_AnovaSt77P<- data.frame(WL = c("WW"), Phase = c("Pre-stationary"), O2=
 data_text_AnovaSt48P<- data.frame(WL = c("WW"), Phase = c("Pre-stationary"), O2=c(21), Strain  = c("PE-rich_048"),  label = c("B"))
 data_text_AnovaSt127P<- data.frame(WL = c("WW"), Phase = c("Pre-stationary"), O2=c(21), Strain  = c("PE-rich_127"),  label = c("B"))
 
-data_text_AnovaPhase<- data.frame(WL = c("WW", "WW"), Phase = c("Exponential"), O2=c(21, 21, 21, 21), Strain  = c("PC-rich_056", "PC-rich_077", "PE-rich_048", "PE-rich_127"),  label = c('Welch’s t-test, \u03B1 = 0.05', 'Welch’s t-test, \u03B1 = 0.05', 'Welch’s t-test, \u03B1 = 0.05', 'Welch’s t-test, \u03B1 = 0.05'))
+data_text_AnovaPhase<- data.frame(WL = c("WW", "WW"), Phase = c("Exponential"), O2=c(21, 21, 21, 21), Strain  = c("PC-rich_056", "PC-rich_077", "PE-rich_048", "PE-rich_127"),  label = c('ANOVA, \u03B1 = 0.05', 'ANOVA, \u03B1 = 0.05', 'ANOVA, \u03B1 = 0.05', 'ANOVA, \u03B1 = 0.05'))
 
 WL.labs <- c("Phase of growth")
 names(WL.labs) <- c("WW")
@@ -1876,7 +1866,7 @@ ggplot(PhycoChlaRatioChoosen, aes(x = PARPhotonDose_day, y = PhycoChlaRatio)) +
   geom_text(data=data_text_AnovaSt127P, aes(x=75000000, y=-1.0, label=label), colour = "blue", size=4) +
   
   
-  geom_text(data=data_text_AnovaPhase, aes(x=26000000, y=-0.8, label=label), colour = "blue", size=4) +
+  geom_text(data=data_text_AnovaPhase, aes(x=24000000, y=-0.8, label=label), colour = "blue", size=4) +
   
   scale_shape_manual(values = c(15, 16, 17,18), name="", labels = lab1) +
   scale_colour_manual(values = c("darkslategray", "lightblue4", "hotpink4", "indianred3",  "goldenrod2", "khaki2"), name="", labels = lab2) +
@@ -2135,7 +2125,7 @@ S11<-MCPigmentAllExpStChoosen %>%
   
 PhycoChlaRatioChoosenPUR<-rbind(S1, S2, S22, S3, S4, S5, S55, S6, S7, S8, S9, S10, S11)
 
-rm(S1, S2, S3, S4, S5, S6, S7, S8, S9, S10, S11)
+rm(S1, S2, S22, S3, S4, S5, S55, S6, S7, S8, S9, S10, S11)
 ```
 
 
@@ -2226,7 +2216,7 @@ data_text_AnovaSt77P<- data.frame(WL = c("WW"), Phase = c("Pre-stationary"), O2=
 data_text_AnovaSt48P<- data.frame(WL = c("WW"), Phase = c("Pre-stationary"), O2=c(21), Strain  = c("PE-rich_048"),  label = c("B"))
 data_text_AnovaSt127P<- data.frame(WL = c("WW"), Phase = c("Pre-stationary"), O2=c(21), Strain  = c("PE-rich_127"),  label = c("B"))
 
-data_text_AnovaPhase<- data.frame(WL = c("WW", "WW"), Phase = c("Exponential"), O2=c(21, 21, 21, 21), Strain  = c("PC-rich_056", "PC-rich_077", "PE-rich_048", "PE-rich_127"),  label = c('Welch’s t-test, \u03B1 = 0.05', 'Welch’s t-test, \u03B1 = 0.05', 'Welch’s t-test, \u03B1 = 0.05', 'Welch’s t-test, \u03B1 = 0.05'))
+data_text_AnovaPhase<- data.frame(WL = c("WW", "WW"), Phase = c("Exponential"), O2=c(21, 21, 21, 21), Strain  = c("PC-rich_056", "PC-rich_077", "PE-rich_048", "PE-rich_127"),  label = c('ANOVA, \u03B1 = 0.05', 'ANOVA, \u03B1 = 0.05', 'ANOVA, \u03B1 = 0.05', 'ANOVA, \u03B1 = 0.05'))
 
 WL.labs <- c("Phase of growth")
 names(WL.labs) <- c("WW")
@@ -2271,7 +2261,7 @@ ggplot(PhycoChlaRatioChoosenPUR, aes(x = PARPhotonDose_day, y = PURPARRatio)) +
   geom_text(data=data_text_AnovaSt48P, aes(x=75000000, y=0.05, label=label), colour = "blue", size=4) +
   geom_text(data=data_text_AnovaSt127P, aes(x=75000000, y=0.2, label=label), colour = "blue", size=4) +
   
-  geom_text(data=data_text_AnovaPhase, aes(x=26000000, y=-0.04, label=label), colour = "blue", size=4) +
+  geom_text(data=data_text_AnovaPhase, aes(x=24000000, y=-0.04, label=label), colour = "blue", size=4) +
   
   scale_shape_manual(values = c(15, 16, 17,18), name="", labels = lab1) +
   scale_colour_manual(values = c("darkslategray", "lightblue4", "hotpink4", "indianred3",  "goldenrod2", "khaki2"), name="", labels = lab2) +
@@ -3496,67 +3486,10 @@ SolFitsAllPigmentPCPE590dark %>%
 ```
 
 
-
-
-The anova() function will take the model objects as arguments, and return an ANOVA testing whether the more complex model is significantly better at capturing the data than the simpler model. If the resulting p-value is sufficiently low (usually less than 0.05), we conclude that the more complex model is significantly better than the simpler model, and thus favor the more complex model. If the p-value is not sufficiently low (usually greater than 0.05), we should favor the simpler model.
-
-# Exstracting models for each fit - models were not all fitted to the same size of dataset
-
-```{r}
-# StatsSigLM<-SolFitsAllPigmentPCPE %>% 
-#   drop_na(Sig_nm2psii, AllmeanPhycoChlaRatio) 
-# 
-# StatsSigLM$Strain <- factor(StatsSigLM$Strain)
-# StatsSigLM$Phase <- factor(StatsSigLM$Phase)  
-# StatsSigLM$AllmeanPhycoChlaRatio <- factor(StatsSigLM$AllmeanPhycoChlaRatio) 
-# 
-# SolFitsBA56Exp<-StatsSigLM %>%
-#   filter(Strain == "PC-rich_056")
-#   SolFitsBA56Exp <- SolFitsBA56Exp[-c(883:990), ]
-# 
-# SolFitsBA77Exp<-StatsSigLM %>%
-#   filter(Strain == "PC-rich_077") 
-#   SolFitsBA77Exp <- SolFitsBA77Exp[-c(883:998), ]
-# 
-# SolFitsBA48Exp<-StatsSigLM %>%
-#   filter(Strain == "PE-rich_048") 
-#   SolFitsBA48Exp <- SolFitsBA48Exp[-c(883:883), ]
-# 
-# SolFitsBA127Exp<-StatsSigLM %>%
-#   filter(Strain == "PE-rich_127") 
-#   SolFitsBA127Exp <- SolFitsBA127Exp[-c(883:894), ]
-# 
-# model1 <- lm(Sig_nm2psii~AllmeanPhycoChlaRatio, data = SolFitsBA56Exp)
-# model2 <- lm(Sig_nm2psii~AllmeanPhycoChlaRatio, data = SolFitsBA77Exp)
-# ANOVA_LinModel<-anova(model1, model2, test="F")
-#   
-#   
-# model<-aov(Sig_nm2psii~AllmeanPhycoChlaRatio*Phase*Strain, data=StatsSigLM)
-# AnovaTest_SigLM<-data.frame(unclass(summary(model)), check.names = FALSE, stringsAsFactors = FALSE)
-# TukeyHSDTest_Sig<-TukeyHSD(model, which = c("Phase", "Strain"))
-
-
-#  diamonds.mod1 <- lm(Sig_nm2psii~PhycoChlaRatio, data = SolFitsAllExp)
-#   diamonds.mod2 <- lm(Sig_nm2psii~PhycoChlaRatio, data = SolFitsAllSt)
-#   anova(diamonds.mod1, diamonds.mod2, test="Chisq")
-
-```
-
-
-
-
-
 # Clean the environment
 
 ```{r}
 rm(SolFitsAllPigmentfitPhycoChlalineardarkStrain, SolFitsAllPigmentfitPhycoChlalineardarkStrainGroup, SolFitsAllPigmentfitPhycoChlalinearStrain, SolFitsAllPigmentfitPhycoChlalinearStrain1s, SolFitsAllPigmentfitPhycoChlalinearStrainGroup, SolFitsAllPigmentfitPhycoChlalinearStrainGroup1s)
-```
-# Remove stats
-
-```{r}
-rm(anova127ExpSt, anova48ExpSt, anova56ExpSt, anova77ExpSt, anova127Exp, anova48Exp, anova56Exp, anova77Exp, anova127St, anova48St, anova56St, anova77St, TukeyHSDTest_PhycoChlaRatio, TukeyHSDTest_PURPARRatio, TukeyHSDTest_Sig, AnovaTest_PhycoChlaRatio, AnovaTest_PhycoChlaRatio_Param, AnovaTest_PURPARRatio, AnovaTest_Sig, anova_PURPARRatioModelStrainSt, anova_PURPARRatioModelStrainExp, anova_PURPARRatioModelPhase, anova_SigModelStrainSt, anova_SigModelStrainExp, anova_SigModelPhase, anova_PhycoChlaRatioModelStrainSt, anova_PhycoChlaRatioModelStrainExp, 
-   data_text_yfSt, data_text_yfExp, data_text_y0St, data_text_y0Exp, data_text_lambdaSt, data_text_lambdaExp, data_text_AnovaSt, data_text_AnovaExp, fitted_Param590Pig, fitted_Param590PUR, fitted590Pig, fitted590PUR, fittedmodelPhase, fittedmodelPig, fittedmodelPUR, fittedmodelStrainExp, fittedmodelStrainSt, S22, S55, SolFitsBA127Exp, SolFitsBA48Exp, SolFitsBA56Exp, SolFitsBA77Exp, AnovaTest_PURPARRatio_Param, AnovaTest_Sig590_Param, AnovaTest_SigLM, anova_PhycoChlaRatioModelPhase, augmented590Pig, augmented590PUR,
-   SolFitsExpFit590CleanPig, SolFitsExpFit590CleanPUR)
 ```
 
 
@@ -3648,7 +3581,7 @@ SolFitsAllPigmentPCPETurner %>%
 # Clean the environment
 
 ```{r}
-rm(Turnercatalog, ChlData, SolFitsAllPigmentPCPE, SolFitsAllPigmentPCPE1s)
+rm(Turnercatalog, ChlData, SolFitsAllPigmentPCPE, SolFitsAllPigmentPCPE1s, data_text_AnovaExp56P, data_text_AnovaExp77P, data_text_AnovaExp48P, data_text_AnovaExp127P, data_text_AnovaExp56, data_text_AnovaExp77, data_text_AnovaExp48, data_text_AnovaExp127, data_text_AnovaSt56P, data_text_AnovaSt77P, data_text_AnovaSt48P, data_text_AnovaSt127P, data_text_AnovaSt56, data_text_AnovaSt77, data_text_AnovaSt48, data_text_AnovaSt127, augmented590Pig, augmented590pigment, augmented590pigmentdark, augmented590PUR, data_text_AnovaPhase, fit, SolFits48_127Exp, SolFits48_127Exp, SolFits56_127Exp, SolFits56_127St, SolFits56_48Exp, SolFits56_48St, SolFits77_48Exp, SolFits77_48St, SolFits77_127Exp, SolFits77_127St, Stats56_77Exp, Stats56_77St, Stats56_ExpSt, Stats56_ExpSt, Stats77_ExpSt, Stats48_ExpSt, Stats127_ExpSt, x, SolFitsPigmentExp, SolFitsExpFitAll, SolFitsExpFit590CleanPUR, SolFitsExpFit590CleanPig, model, MCPigmentAll, MCPigmentAllExpSt, PhycoChlaRatioChoosen, PhycoChlaRatioChoosenPUR, SigFit445Stats, SolFits48_127St, SolFitsAllPigmentfitPhycoChlalinear, SolFitsAllPigmentfitPhycoChlalineardark, SolFitsAllPigmentPCPE590, SolFitsAllPigmentPCPE590dark)
 ```
 
 ```{r}
@@ -3672,6 +3605,65 @@ saveRDS(SolFitsAllPigmentPCPETurner, file.path(DataOut, paste(Project, "Processe
 ```{r}
 colnames(SolFitsAllPigmentPCPETurner)
 ```
+
+
+
+
+
+
+The anova() function will take the model objects as arguments, and return an ANOVA testing whether the more complex model is significantly better at capturing the data than the simpler model. If the resulting p-value is sufficiently low (usually less than 0.05), we conclude that the more complex model is significantly better than the simpler model, and thus favor the more complex model. If the p-value is not sufficiently low (usually greater than 0.05), we should favor the simpler model.
+
+# Exstracting models for each fit - models were not all fitted to the same size of dataset
+
+```{r}
+# StatsSigLM<-SolFitsAllPigmentPCPE %>% 
+#   drop_na(Sig_nm2psii, AllmeanPhycoChlaRatio) 
+# 
+# StatsSigLM$Strain <- factor(StatsSigLM$Strain)
+# StatsSigLM$Phase <- factor(StatsSigLM$Phase)  
+# StatsSigLM$AllmeanPhycoChlaRatio <- factor(StatsSigLM$AllmeanPhycoChlaRatio) 
+# 
+# SolFitsBA56Exp<-StatsSigLM %>%
+#   filter(Strain == "PC-rich_056")
+#   SolFitsBA56Exp <- SolFitsBA56Exp[-c(883:990), ]
+# 
+# SolFitsBA77Exp<-StatsSigLM %>%
+#   filter(Strain == "PC-rich_077") 
+#   SolFitsBA77Exp <- SolFitsBA77Exp[-c(883:998), ]
+# 
+# SolFitsBA48Exp<-StatsSigLM %>%
+#   filter(Strain == "PE-rich_048") 
+#   SolFitsBA48Exp <- SolFitsBA48Exp[-c(883:883), ]
+# 
+# SolFitsBA127Exp<-StatsSigLM %>%
+#   filter(Strain == "PE-rich_127") 
+#   SolFitsBA127Exp <- SolFitsBA127Exp[-c(883:894), ]
+# 
+# model1 <- lm(Sig_nm2psii~AllmeanPhycoChlaRatio, data = SolFitsBA56Exp)
+# model2 <- lm(Sig_nm2psii~AllmeanPhycoChlaRatio, data = SolFitsBA77Exp)
+# ANOVA_LinModel<-anova(model1, model2, test="F")
+#   
+#   
+# model<-aov(Sig_nm2psii~AllmeanPhycoChlaRatio*Phase*Strain, data=StatsSigLM)
+# AnovaTest_SigLM<-data.frame(unclass(summary(model)), check.names = FALSE, stringsAsFactors = FALSE)
+# TukeyHSDTest_Sig<-TukeyHSD(model, which = c("Phase", "Strain"))
+
+
+#  diamonds.mod1 <- lm(Sig_nm2psii~PhycoChlaRatio, data = SolFitsAllExp)
+#   diamonds.mod2 <- lm(Sig_nm2psii~PhycoChlaRatio, data = SolFitsAllSt)
+#   anova(diamonds.mod1, diamonds.mod2, test="Chisq")
+
+```
+
+# Remove stats
+
+```{r}
+# rm(anova127ExpSt, anova48ExpSt, anova56ExpSt, anova77ExpSt, anova127Exp, anova48Exp, anova56Exp, anova77Exp, anova127St, anova48St, anova56St, anova77St, TukeyHSDTest_PhycoChlaRatio, TukeyHSDTest_PURPARRatio, TukeyHSDTest_Sig, AnovaTest_PhycoChlaRatio, AnovaTest_PhycoChlaRatio_Param, AnovaTest_PURPARRatio, AnovaTest_Sig, anova_PURPARRatioModelStrainSt, anova_PURPARRatioModelStrainExp, anova_PURPARRatioModelPhase, anova_SigModelStrainSt, anova_SigModelStrainExp, anova_SigModelPhase, anova_PhycoChlaRatioModelStrainSt, anova_PhycoChlaRatioModelStrainExp, 
+#    data_text_yfSt, data_text_yfExp, data_text_y0St, data_text_y0Exp, data_text_lambdaSt, data_text_lambdaExp, data_text_AnovaSt, data_text_AnovaExp, fitted_Param590Pig, fitted_Param590PUR, fitted590Pig, fitted590PUR, fittedmodelPhase, fittedmodelPig, fittedmodelPUR, fittedmodelStrainExp, fittedmodelStrainSt, S22, S55, SolFitsBA127Exp, SolFitsBA48Exp, SolFitsBA56Exp, SolFitsBA77Exp, AnovaTest_PURPARRatio_Param, AnovaTest_Sig590_Param, AnovaTest_SigLM, anova_PhycoChlaRatioModelPhase, augmented590Pig, augmented590PUR,
+#    SolFitsExpFit590CleanPig, SolFitsExpFit590CleanPUR)
+```
+
+
 dodawanie modeli zeby sprawdzic, czy sa istotne roznice pomiedzy szczepami i fazami wzrostu
 https://stats.stackexchange.com/questions/435644/is-there-a-method-to-look-for-significant-difference-between-two-linear-regressi
 
