@@ -1,0 +1,1515 @@
+---
+title: "Process_SolisensePigmentsData"
+author:
+- Sylwia Sliwinska-Wilczewska
+- Douglas A. Campbell
+date: "`r format(Sys.Date())`"
+output:
+bookdown::html_document2:
+    code_folding: show
+    keep_md: yes
+    toc: TRUE
+    toc_float: TRUE
+    toc_depth: 6
+    fig_caption: yes
+bibliography: BalticPhotoperiod.bib
+csl: plos-one.csl
+editor_options: 
+  markdown: 
+    wrap: 72
+---
+
+# Set Chunk Options
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE)
+knitr::opts_chunk$set(fig.path='Figs/')
+```
+
+# Introduction
+
+Process_SolisensePigmentsData.Rmd processes and combines BalticPhotoperiod_Imported_SolisenseDarkafterLight.Rds and BalticPhotoperiod_Imported_SolisenseLight.Rds from Data/ImportedData/ImportedSolisenseData folder. This .Rmd generates BalticPhotoperiod_Processed_SolisenseData.Rds (stored in Data/ProcessedData/ProcessedSolisenseData folder), plots stored in Output/Figures folder, and tables stored in Output/TablesRds folder.
+
+# Load Libraries and set Project Variables
+
+```{r load libraries, warning = FALSE, echo=FALSE} 
+library(tidyverse)
+library(lubridate)
+library(stringr)
+library(broom)
+library(knitr)
+library(OneR)
+library(zoo)
+library(ggpubr)
+library(caret)
+library(reshape2)
+library(gcookbook)
+library(scales)
+library(Cairo) #for greek symbols
+library(googledrive)
+library(googlesheets4)
+library(readxl)
+library(multcompView)
+```
+
+```{r set project variables}
+Project <- "BalticPhotoperiod"
+DataOut <- file.path("..", "Data", "ProcessedData", "ProcessedSolisenseData")
+DataIn <- file.path("..", "Data", "ImportedData", "ImportedSolisenseData", fsep = .Platform$file.sep)
+
+FigPath <- file.path("..", "Output", "Figures")
+FigRdsPath <- file.path("..", "Output", "FiguresRds")
+TableRdsPath <- file.path("..", "Output", "TablesRDS")
+```
+
+# List and read Imported_Solisense RDS
+
+```{r Exported Rmd}
+list.files(path = DataIn, pattern = Project, full.names = TRUE)
+```
+
+# This RDS contained only data from corresponding growth light 
+# Also, conteined mean sig - mean for replica measured on the same day
+
+```{r read ProcessFile Sol}
+SolisenseFile <- "../Data/ImportedData/ImportedSolisenseData/BalticPhotoperiod_Imported_SolisenseLight.Rds"  
+
+SolisenseFileName <- str_split(string = SolisenseFile, "/")[[1]][3] %>%
+  str_remove(pattern = ".Rds")
+
+SolFits <- readRDS(SolisenseFile)  %>%
+  ungroup()
+```
+
+# This RDS contained only sigma in 1s of dark after corresponding light (it caused problems when I tried to combain them with sig in the light)
+# Also, conteined mean for sig1s - mean for replica measured on the same day
+
+```{r read ProcessFile Sol1s}
+# Solisense1sFile <- "../Data/ImportedData/ImportedSolisenseData/BalticPhotoperiod_Imported_SolisenseDarkafterLight.Rds"
+# 
+# Solisense1sFileName <- str_split(string = Solisense1sFile, "/")[[1]][3] %>%
+#   str_remove(pattern = ".Rds")
+# 
+# SolFits1s <- readRDS(Solisense1sFile)  %>%
+#   ungroup()
+```
+
+
+```{r Preparing df for further analysis}
+SolFits <-SolFits %>% 
+  select(c(SampleID, Run, Strain, ExpDate, Par_ue, Photoperiod, MC, Tube, O2, WL, LightShape, ExpEndDate, PARPhotonDose_day, FilenameSolisense, ObsDate, ObsTime, Ex_WL, ActPAR, LR_s, nm445, nm590, nm445Corr, nm590Corr, ActPARCorr, Sig, Sig_nm2psii, Sigdark, Sigdark_nm2psii, ActPARCorr_photonsm2s, FoOxbo, qpOxbo,  JVPSII_aLHIIOxbomax, JVPSII_ETRtauav_FoSig, JVPSII_ETRqpOxbo_FoSig, JVPSII_ETRtauav_aLHII_Sig, JVPSII_ETRqpOxbo_aLHII_Sig, E_days, Time_h)) %>% 
+  filter(Strain=="BA127R"| Strain=="BA48R"| Strain=="BA56G"| Strain=="BA77G") %>% 
+  filter(WL=="WW") %>% 
+  filter(O2==21) %>% 
+  mutate(Strain=case_when(Strain=="BA127R"~"PE-rich_127",
+         Strain=="BA48R"~"PE-rich_048",
+        Strain=="BA56G"~"PC-rich_056",
+         Strain=="BA77G"~"PC-rich_077")) 
+SolFits$facetsPhotonDose_day = factor(SolFits$WL, labels = c("PAR~photon~dose~(µmol~photons~m^{-2}~d^{-1})"))
+SolFits$facetsExcitation = factor(SolFits$WL, labels = c("Excitation~(nm)"))
+SolFits$facetsStrain = factor(SolFits$WL, labels = c("Strain"))
+
+
+# SolFits1s <-SolFits1s %>% 
+#   select(c(SampleID, Run, Strain, ExpDate, Par_ue, Photoperiod, MC, Tube, O2, WL, LightShape, ExpEndDate, PARPhotonDose_day, FilenameSolisense, ObsDate, ObsTime, Ex_WL, ActPAR, LR_s, nm445, nm590, nm445Corr, nm590Corr, ActPARCorr, Sig1s, Sig1s_nm2psii, ActPARCorr_photonsm2s, E_days, Time_h)) %>% 
+#   filter(Strain=="BA127R"| Strain=="BA48R"| Strain=="BA56G"| Strain=="BA77G") %>% 
+#   filter(WL=="WW") %>% 
+#   filter(O2==21) %>% 
+#   mutate(Strain=case_when(Strain=="BA127R"~"PE-rich_127",
+#          Strain=="BA48R"~"PE-rich_048",
+#         Strain=="BA56G"~"PC-rich_056",
+#          Strain=="BA77G"~"PC-rich_077")) 
+# SolFits1s$facetsPhotonDose_day = factor(SolFits1s$WL, labels = c("PAR~photon~dose~(µmol~photons~m^{-2}~d^{-1})"))
+# SolFits1s$facetsExcitation = factor(SolFits1s$WL, labels = c("Excitation~(nm)"))
+# SolFits1s$facetsStrain = factor(SolFits1s$WL, labels = c("Strain"))
+```
+
+# Filter unrevelant data and outliers
+
+```{r filter outliers}
+# #Filter one unrevelant data point at 445nm, 16h, 900uE
+SolFitsAll445<-SolFits %>%
+  filter(Ex_WL == 445) %>%
+  filter(Sig<250) 
+SolFitsAll590<-SolFits %>%
+  filter(Ex_WL == 590)
+SolFits<-rbind(SolFitsAll445,SolFitsAll590)
+  rm(SolFitsAll445,SolFitsAll590)
+  
+# SolFitsAll4451s<-SolFits1s %>%
+#   filter(Ex_WL == 445) %>%
+#   filter(Sig1s<250) 
+# SolFitsAll5901s<-SolFits1s %>%
+#   filter(Ex_WL == 590)
+# SolFits1s<-rbind(SolFitsAll4451s,SolFitsAll5901s)
+#   rm(SolFitsAll4451s,SolFitsAll5901s)  
+```
+
+# Create preliminary plots 
+
+```{r preliminary plot}
+lab1=c(expression("PC-rich_056"), expression("PC-rich_077"), expression("PE-rich_048"), expression("PE-rich_127"))
+lab2=c(expression("8 h"), expression("12 h"), expression("16 h"), expression("24 h"))
+lab3=c(expression("30 µE"), expression("90 µE"), expression("180 µE"), expression("300 µE"), expression("900 µE"))
+
+SolFits %>%
+  ggplot() +
+  geom_point(aes(x = Par_ue, y = Sig, colour = as.factor(Strain)), size = 3.5, show.legend = T) +
+  scale_colour_discrete(type=c("seagreen4", "palegreen3", "brown1", "brown4"), name="", labels = lab1) +
+  facet_grid(rows = vars(Ex_WL), cols = vars(Photoperiod)) +
+  theme_bw()
+```
+
+# Load tmaxAG catalog and create 4 df for vertical lines (coloured as Strain) contained tMaxAG values
+
+```{r}
+gs4_deauth()
+tmaxAG<- read_sheet("https://docs.google.com/spreadsheets/d/1ksY7xlg9wOsICOBRmZkHPKdd9KOislNwPDzyuJ3UIUI/edit#gid=0")
+as.data.frame(tmaxAG)
+tmaxAG <- tmaxAG
+
+tmaxAG<-tmaxAG %>% 
+  mutate(Par_ue = as.numeric(Par_ue)) %>%
+  mutate(Photoperiod = as.numeric(Photoperiod)) %>%
+  mutate(tMaxAG = as.numeric(tMaxAG)) %>%
+  mutate(Strain=case_when(Strain=="BA127R"~"PE-rich_127",
+         Strain=="BA48R"~"PE-rich_048",
+        Strain=="BA56G"~"PC-rich_056",
+         Strain=="BA77G"~"PC-rich_077"))
+```
+
+```{r select revelant columns}
+tMaxAGLines_056<-tmaxAG %>% 
+  filter(Strain == "PC-rich_056") %>% 
+  select(c(Par_ue, Photoperiod, tMaxAG)) %>% 
+  unique()
+tMaxAGLines_077<-tmaxAG %>% 
+  filter(Strain == "PC-rich_077") %>% 
+  select(c(Par_ue, Photoperiod, tMaxAG)) %>% 
+  unique()
+tMaxAGLines_048<-tmaxAG %>% 
+  filter(Strain == "PE-rich_048") %>% 
+  select(c(Par_ue, Photoperiod, tMaxAG)) %>% 
+  unique()
+tMaxAGLines_127<-tmaxAG %>% 
+  filter(Strain == "PE-rich_127") %>% 
+  select(c(Par_ue, Photoperiod, tMaxAG)) %>% 
+  unique()
+```
+
+# Choose only exp data for sigma and JVPSII in the corresponding light
+
+```{r choose only exp data}
+O1 <- SolFits %>%
+  filter(Par_ue == 300 | Par_ue == 90 | Par_ue == 180 | Par_ue == 600 | Par_ue == 900) %>% 
+  filter(Photoperiod == 24) %>% 
+  filter(E_days <= 4)
+
+O2 <- SolFits %>%
+  filter(Par_ue == 90 | Par_ue == 180 | Par_ue == 300) %>% 
+  filter(Photoperiod == 16) %>% 
+  filter(E_days < 9)
+
+O3 <- SolFits %>%
+  filter(Par_ue == 900 | Par_ue == 600) %>% 
+  filter(Photoperiod == 16) %>% 
+  filter(E_days <= 4)
+
+O4 <- SolFits %>%
+  filter(Par_ue == 30) %>% 
+  filter(Photoperiod == 16) %>% 
+  filter(E_days <= 14)
+
+O5 <- SolFits %>%
+  filter(Par_ue == 30) %>% 
+  filter(Photoperiod == 8 | Photoperiod == 12) %>% 
+  filter(E_days <=14)
+  
+O6 <- SolFits %>%
+  filter(Par_ue == 90) %>% 
+  filter(Photoperiod == 8) %>% 
+  filter(E_days <=14)
+
+O7 <- SolFits %>%
+  filter(Par_ue == 90) %>% 
+  filter(Photoperiod == 12) %>% 
+  filter(E_days <=10)
+
+O8 <- SolFits %>%
+  filter(Par_ue == 180 | Par_ue == 300) %>% 
+  filter(Photoperiod == 8 | Photoperiod == 12) %>% 
+  filter(E_days <=10)
+
+O9 <- SolFits %>%
+  filter(Par_ue == 900) %>% 
+  filter(Photoperiod == 8 | Photoperiod == 12) %>% 
+  filter(E_days <=7)
+
+O10 <- SolFits %>%
+  filter(Par_ue == 30) %>% 
+  filter(Photoperiod == 24) %>% 
+  filter(E_days <= 8)
+
+SolFitsExp <-rbind(O1, O2, O3, O4, O5, O6, O7, O8, O9, O10)
+
+rm(O1, O2, O3, O4, O5, O6, O7, O8, O9, O10)
+```
+
+
+# Choose only Stationary data for sigma and JVPSII in the corresponding light
+
+```{r choose only St data}
+O1 <- SolFits %>%
+  filter(Par_ue == 300 | Par_ue == 90 | Par_ue == 180 | Par_ue == 600 | Par_ue == 900) %>%
+  filter(Photoperiod == 24) %>%
+  filter(E_days > 4)
+
+O2 <- SolFits %>%
+  filter(Par_ue == 30) %>%
+  filter(Photoperiod == 12 | Photoperiod == 16) %>%
+  filter(E_days >14)
+  
+O3 <- SolFits %>%
+  filter(Par_ue == 90) %>%
+  filter(Photoperiod == 12 | Photoperiod == 16) %>%
+  filter(E_days >10)
+
+O4 <- SolFits %>%
+  filter(Par_ue == 180 | Par_ue == 300) %>%
+  filter(Photoperiod == 8 | Photoperiod == 12 | Photoperiod == 16) %>%
+  filter(E_days >10)
+
+O5 <- SolFits %>%
+  filter(Par_ue == 900 | Par_ue == 600) %>% 
+  filter(Photoperiod == 8 | Photoperiod == 16) %>% 
+  filter(E_days >7)
+
+SolFitsSt <-rbind(O1, O2, O3, O4, O5)
+
+rm(O1, O2, O3, O4, O5)
+```
+
+
+
+# Choose only exp data for sigma at 1s after corresponding light
+
+```{r choose only exp data for Sig 1s}
+# O1 <- SolFits1s %>%
+#   filter(Par_ue == 300 | Par_ue == 90 | Par_ue == 180 | Par_ue == 600 | Par_ue == 900) %>% 
+#   filter(Photoperiod == 24) %>% 
+#   filter(E_days <= 4)
+# 
+# O2 <- SolFits1s %>%
+#   filter(Par_ue == 90 | Par_ue == 180 | Par_ue == 300) %>% 
+#   filter(Photoperiod == 16) %>% 
+#   filter(E_days < 9)
+# 
+# O3 <- SolFits1s %>%
+#   filter(Par_ue == 900 | Par_ue == 600) %>% 
+#   filter(Photoperiod == 16) %>% 
+#   filter(E_days <= 4)
+# 
+# O4 <- SolFits1s %>%
+#   filter(Par_ue == 30) %>% 
+#   filter(Photoperiod == 16) %>% 
+#   filter(E_days <= 14)
+# 
+# O5 <- SolFits1s %>%
+#   filter(Par_ue == 30) %>% 
+#   filter(Photoperiod == 8 | Photoperiod == 12) %>% 
+#   filter(E_days <=14)
+#   
+# O6 <- SolFits1s %>%
+#   filter(Par_ue == 90) %>% 
+#   filter(Photoperiod == 8) %>% 
+#   filter(E_days <=14)
+# 
+# O7 <- SolFits1s %>%
+#   filter(Par_ue == 90) %>% 
+#   filter(Photoperiod == 12) %>% 
+#   filter(E_days <=10)
+# 
+# O8 <- SolFits1s %>%
+#   filter(Par_ue == 180 | Par_ue == 300) %>% 
+#   filter(Photoperiod == 8 | Photoperiod == 12) %>% 
+#   filter(E_days <=10)
+# 
+# O9 <- SolFits1s %>%
+#   filter(Par_ue == 900) %>% 
+#   filter(Photoperiod == 8 | Photoperiod == 12) %>% 
+#   filter(E_days <=7)
+# 
+# O10 <- SolFits1s %>%
+#   filter(Par_ue == 30) %>% 
+#   filter(Photoperiod == 24) %>% 
+#   filter(E_days <= 8)
+# 
+# SolFitsExp1s <-rbind(O1, O2, O3, O4, O5, O6, O7, O8, O9, O10)
+# 
+# rm(O1, O2, O3, O4, O5, O6, O7, O8, O9, O10)
+```
+
+
+# Choose only Stationary data for sigma at 1s after corresponding light
+
+```{r choose only St data}
+# O1 <- SolFits1s %>%
+#   filter(Par_ue == 300 | Par_ue == 90 | Par_ue == 180 | Par_ue == 600 | Par_ue == 900) %>%
+#   filter(Photoperiod == 24) %>%
+#   filter(E_days > 4)
+# 
+# O2 <- SolFits1s %>%
+#   filter(Par_ue == 30) %>%
+#   filter(Photoperiod == 12 | Photoperiod == 16) %>%
+#   filter(E_days >14)
+#   
+# O3 <- SolFits1s %>%
+#   filter(Par_ue == 90) %>%
+#   filter(Photoperiod == 12 | Photoperiod == 16) %>%
+#   filter(E_days >10)
+# 
+# O4 <- SolFits1s %>%
+#   filter(Par_ue == 180 | Par_ue == 300) %>%
+#   filter(Photoperiod == 8 | Photoperiod == 12 | Photoperiod == 16) %>%
+#   filter(E_days >10)
+# 
+# O5 <- SolFits1s %>%
+#   filter(Par_ue == 900 | Par_ue == 600) %>% 
+#   filter(Photoperiod == 8 | Photoperiod == 16) %>% 
+#   filter(E_days >7)
+# 
+# SolFitsSt1s <-rbind(O1, O2, O3, O4, O5)
+# 
+# rm(O1, O2, O3, O4, O5)
+```
+
+
+# Create preliminary plot
+
+```{r preliminary plot}
+lab1=c(expression("PC-rich_056"), expression("PC-rich_077"), expression("PE-rich_048"), expression("PE-rich_127"))
+lab2=c(expression("8 h"), expression("12 h"), expression("16 h"), expression("24 h"))
+lab3=c(expression("30 µE"), expression("90 µE"), expression("180 µE"), expression("300 µE"), expression("900 µE"))
+
+SolFits %>%
+  ggplot() +
+  geom_point(aes(x = Time_h, y = Sig, colour = as.factor(Strain)),  alpha = 0.8, size = 3, show.legend = T) +
+  geom_vline(data = tMaxAGLines_056, aes(xintercept = tMaxAG), linetype="dotdash", colour = "brown4") +
+  geom_vline(data = tMaxAGLines_077, aes(xintercept = tMaxAG), linetype="dotdash", colour = "brown1") +
+  geom_vline(data = tMaxAGLines_048, aes(xintercept = tMaxAG), linetype="dotdash", colour = "seagreen4") +
+  geom_vline(data = tMaxAGLines_127, aes(xintercept = tMaxAG), linetype="dotdash", colour = "palegreen3") +
+  scale_colour_discrete(type=c("seagreen4", "palegreen3", "brown1", "brown4"), name="", labels = lab1) +
+  ggh4x::facet_nested(cols = vars(Photoperiod), rows = vars(Par_ue), labeller = label_parsed) +
+  theme_bw() 
+
+SolFitsExp %>%
+  ggplot() +
+  geom_point(aes(x = Time_h, y = Sig, colour = as.factor(Strain)),  alpha = 0.8, size = 3, show.legend = T) +
+  geom_vline(data = tMaxAGLines_056, aes(xintercept = tMaxAG), linetype="dotdash", colour = "brown4") +
+  geom_vline(data = tMaxAGLines_077, aes(xintercept = tMaxAG), linetype="dotdash", colour = "brown1") +
+  geom_vline(data = tMaxAGLines_048, aes(xintercept = tMaxAG), linetype="dotdash", colour = "seagreen4") +
+  geom_vline(data = tMaxAGLines_127, aes(xintercept = tMaxAG), linetype="dotdash", colour = "palegreen3") +
+  scale_colour_discrete(type=c("seagreen4", "palegreen3", "brown1", "brown4"), name="", labels = lab1) +
+  ggh4x::facet_nested(cols = vars(Photoperiod), rows = vars(Par_ue), labeller = label_parsed) +
+  theme_bw() 
+
+SolFitsSt %>%
+  ggplot() +
+  geom_point(aes(x = Time_h, y = Sig, colour = as.factor(Strain)),  alpha = 0.8, size = 3, show.legend = T) +
+  geom_vline(data = tMaxAGLines_056, aes(xintercept = tMaxAG), linetype="dotdash", colour = "brown4") +
+  geom_vline(data = tMaxAGLines_077, aes(xintercept = tMaxAG), linetype="dotdash", colour = "brown1") +
+  geom_vline(data = tMaxAGLines_048, aes(xintercept = tMaxAG), linetype="dotdash", colour = "seagreen4") +
+  geom_vline(data = tMaxAGLines_127, aes(xintercept = tMaxAG), linetype="dotdash", colour = "palegreen3") +
+  scale_colour_discrete(type=c("seagreen4", "palegreen3", "brown1", "brown4"), name="", labels = lab1) +
+  ggh4x::facet_nested(cols = vars(Photoperiod), rows = vars(Par_ue), labeller = label_parsed) +
+  theme_bw() 
+```
+# Combine Exp and St data
+
+```{r}
+  SolFitsExp$Phase <- 'Exponential'
+  # SolFitsExp1s$Phase <- 'Exponential'
+  
+  SolFitsSt$Phase <- 'Pre-stationary'
+  # SolFitsSt1s$Phase <- 'Pre-stationary'
+  
+  SolFitsExpSt <-rbind(SolFitsExp, SolFitsSt)
+  # SolFitsExpSt1s <-rbind(SolFitsExp1s, SolFitsSt1s)
+  
+  rm(SolFitsExp, SolFitsSt, SolFits)
+  #rm(SolFitsExp1s, SolFitsSt1s, SolFits1s)
+```
+
+#Create preliminary plot
+
+```{r preliminary plot}
+lab1=c(expression("PC-rich_056"), expression("PC-rich_077"), expression("PE-rich_048"), expression("PE-rich_127"))
+lab2=c(expression("8 h"), expression("12 h"), expression("16 h"), expression("24 h"))
+lab3=c(expression("30 µE"), expression("90 µE"), expression("180 µE"), expression("300 µE"), expression("600 µE"), expression("900 µE"))
+
+SolFitsExpSt %>%
+  # filter(E_days!=2) %>% 
+  filter(Ex_WL==445) %>% 
+  ggplot() +
+  geom_point(aes(x = PARPhotonDose_day, y = Sig, colour = as.factor(Par_ue), shape = as.factor(Photoperiod)),  alpha = 0.8, size = 3, show.legend = T) +
+  #scale_colour_discrete(type=c("seagreen4", "palegreen3", "brown1", "brown4"), name="", labels = lab1) +
+  scale_shape_manual(values = c(15, 16, 17,18), name="", labels = lab2) +
+  scale_colour_manual(values = c("darkslategray", "lightblue4", "hotpink4", "indianred3", "goldenrod2", "khaki2"), name="", labels = lab3) +
+  ggh4x::facet_nested(cols = vars(Phase), rows = vars(Strain), labeller = label_parsed) +
+  theme_bw() 
+```
+
+# Calculate Sigma mean from 3 replica measured on the same day
+# 6 replica b/c 3 replica * 2 values ("up" and "down")
+
+```{r calculate Sigma mean from 3 replica measured on the same day}
+SolFitsExpSt <- SolFitsExpSt %>%
+  group_by(SampleID, Ex_WL, ObsDate, Par_ue, Photoperiod, WL, O2, Phase) %>%
+  
+  summarize(SampleID, Ex_WL, FilenameSolisense, Run, Strain, ExpDate, Par_ue, Photoperiod, O2, WL, Phase,  PARPhotonDose_day, ObsDate, ObsTime, Sig, Sig_nm2psii, ActPARCorr_photonsm2s, Sigdark_nm2psii, FoOxbo, qpOxbo, JVPSII_aLHIIOxbomax, JVPSII_ETRtauav_FoSig, JVPSII_ETRqpOxbo_FoSig, JVPSII_ETRtauav_aLHII_Sig, JVPSII_ETRqpOxbo_aLHII_Sig, facetsPhotonDose_day, facetsExcitation, facetsStrain,
+            meanSig_nm2psii = mean(Sig_nm2psii),
+            sdSig_nm2psii = sd(Sig_nm2psii),
+            meanSigdark_nm2psii = mean(Sigdark_nm2psii),
+            sdSigdark_nm2psii = sd(Sigdark_nm2psii)) %>%
+  ungroup()
+
+SolFitsExpSt<- SolFitsExpSt %>%
+group_by(SampleID) %>%
+  arrange(ObsDate) %>%
+  mutate(E_days = as.numeric((ObsDate - ExpDate[1]))) %>%
+ungroup()
+
+SolFitsExpSt<- SolFitsExpSt %>%
+  mutate(Time_h = E_days*24)
+```
+
+# Calculate Sigma1s mean from 3 replica measured on the same day
+# 6 replica b/c 3 replica * 2 values ("up" and "down")
+
+```{r calculate Sigma1s mean from 3 replica measured on the same day}
+# SolFitsExpSt1s <- SolFitsExpSt1s %>%
+#   group_by(SampleID, Ex_WL, ObsDate, Par_ue, Photoperiod, WL, O2, Phase) %>%
+#   
+#   summarize(SampleID, Ex_WL, FilenameSolisense, Run, Strain, ExpDate, Par_ue, Photoperiod, O2, WL, Phase,  PARPhotonDose_day, ObsDate, ObsTime, Sig1s, Sig1s_nm2psii, ActPARCorr_photonsm2s, facetsPhotonDose_day, facetsExcitation, facetsStrain,
+#             meanSig1s_nm2psii = mean(Sig1s_nm2psii),
+#             sdSig1s_nm2psii = sd(Sig1s_nm2psii)) %>%
+#   ungroup()
+# 
+# SolFitsExpSt1s<- SolFitsExpSt1s %>%
+# group_by(SampleID) %>%
+#   arrange(ObsDate) %>%
+#   mutate(E_days = as.numeric((ObsDate - ExpDate[1]))) %>%
+# ungroup()
+# 
+# SolFitsExpSt1s<- SolFitsExpSt1s %>%
+#   mutate(Time_h = E_days*24)
+```
+
+Make "one big - All" mean to combine all days (divided by Exp and St) and all replica when samples were measured 
+(This give me only one value of JVPSII for further growth vs JVPSII plot and sig plot as well)
+
+
+# Calculate Sigma mean from all data measured on Exp or St phase 
+# Usually Allmean contains 12 replica - two different days of measurements * 3 replica * 2 values (up and down)
+
+```{r calculate Sigma mean from exp phase}
+
+SolFitsExpSt<-SolFitsExpSt %>% 
+  group_by(Strain, Ex_WL, Par_ue, Photoperiod, WL, O2, Phase) %>%
+  
+  summarize(SampleID, Ex_WL, FilenameSolisense, Run, Strain, ExpDate, Par_ue, Photoperiod, O2, WL, Phase,  PARPhotonDose_day, ObsDate, ObsTime, Sig, Sig_nm2psii, meanSig_nm2psii, sdSig_nm2psii, ActPARCorr_photonsm2s, Sigdark_nm2psii, meanSigdark_nm2psii, sdSigdark_nm2psii, FoOxbo, qpOxbo, JVPSII_aLHIIOxbomax, JVPSII_ETRtauav_FoSig, JVPSII_ETRqpOxbo_FoSig, JVPSII_ETRtauav_aLHII_Sig, JVPSII_ETRqpOxbo_aLHII_Sig, facetsPhotonDose_day, facetsExcitation, facetsStrain, E_days, Time_h,
+              
+            #  AllmeanJVPSII_aLHIIOxbomax= mean(JVPSII_aLHIIOxbomax),
+            #  AllmeanJVPSII_ETRtauav_FoSig= mean(JVPSII_ETRtauav_FoSig),
+            #  AllmeanJVPSII_ETRqpOxbo_FoSig= mean(JVPSII_ETRqpOxbo_FoSig),
+            # AllmeanJVPSII_ETRtauav_aLHII_Sig = mean(JVPSII_ETRtauav_aLHII_Sig),
+            #  AllmeanJVPSII_ETRqpOxbo_aLHII_Sig= mean(JVPSII_ETRqpOxbo_aLHII_Sig),
+            AllmeanSig_nm2psii = mean(Sig_nm2psii),
+            AllsdSig_nm2psii = sd(Sig_nm2psii),
+            AllmeanSigdark_nm2psii = mean(Sigdark_nm2psii),
+            AllsdSigdark_nm2psii = sd(Sigdark_nm2psii)) %>%
+  ungroup()
+```
+
+# Filter otliers to calculate exponential decay function
+
+```{r filter outliers (5 data points from Exp)}
+
+Sol7<-SolFitsExpSt %>% 
+  filter(Ex_WL==445) 
+
+Sol3<-SolFitsExpSt %>% #keeping all data except <180 (one data point)
+  filter(Phase == "Exponential") %>% 
+  filter(Ex_WL==590) %>% 
+  filter(Par_ue !=900) %>% 
+  filter(Strain=="PC-rich_056") %>% 
+  filter(Sig>180)
+Sol6<-SolFitsExpSt %>% # keeping all except 2 data points
+  filter(Phase == "Exponential") %>% 
+  filter(Ex_WL==590) %>% 
+  filter(Par_ue ==900) %>% 
+  filter(Strain=="PC-rich_056") 
+
+Sol8<-SolFitsExpSt %>% 
+  filter(Phase == "Pre-stationary") %>% 
+  filter(Strain=="PC-rich_056") %>% 
+  filter(Par_ue ==900 | Par_ue ==600) %>% 
+  filter(Sig<230)
+
+Sol9<-SolFitsExpSt %>% 
+  filter(Phase == "Pre-stationary") %>% 
+  filter(Strain=="PC-rich_056") %>% 
+  filter(Par_ue !=900 & Par_ue !=600) %>% 
+  filter(Sig>130)
+
+#BA127
+Sol4<-SolFitsExpSt %>% #removing one data point
+  filter(Phase == "Exponential") %>%
+  filter(Ex_WL==590) %>%
+  filter(Par_ue ==30) %>%
+  filter(Strain=="PE-rich_127") %>%
+  filter(Sig>310)
+Sol5<-SolFitsExpSt %>%
+  filter(Phase == "Exponential") %>% #removing 3 data points
+  filter(Ex_WL==590) %>%
+  filter(Par_ue ==300 | Par_ue ==180 | Par_ue ==90) %>%
+  filter(Strain=="PE-rich_127") %>%
+  filter(Sig>200)
+Sol16<-SolFitsExpSt %>% # keeping all except 2 data points
+  filter(Phase == "Exponential") %>% 
+  filter(Ex_WL==590) %>% 
+  filter(Par_ue ==900 | Par_ue ==600) %>% 
+  filter(Strain=="PE-rich_127")  %>% 
+  filter(Sig<520)
+Sol12<-SolFitsExpSt %>% 
+  filter(Phase == "Pre-stationary") %>% 
+  filter(Strain=="PE-rich_127")
+
+#BA48
+Sol1<-SolFitsExpSt %>% #keeping all data
+  filter(Phase == "Exponential") %>% 
+  filter(Ex_WL==590) %>% 
+  filter(Par_ue !=900) %>% 
+  filter(Strain=="PE-rich_048") 
+Sol15<-SolFitsExpSt %>% # removing 2 data points
+  filter(Phase == "Exponential") %>% 
+  filter(Ex_WL==590) %>% 
+  filter(Par_ue ==900 | Par_ue ==600) %>% 
+  filter(Strain=="PE-rich_048") %>% 
+  filter(Sig<520) 
+Sol10<-SolFitsExpSt %>% # removing few data points
+  filter(Phase == "Pre-stationary") %>% 
+  filter(Par_ue !=900) %>% 
+  filter(Strain=="PE-rich_048") %>% 
+  filter(Sig>290)
+Sol11<-SolFitsExpSt %>% #keeping all data
+  filter(Phase == "Pre-stationary") %>%
+  filter(Par_ue ==900) %>%
+  filter(Strain=="PE-rich_048")
+
+
+#BA77
+Sol2<-SolFitsExpSt %>% #keeping all data
+  filter(Phase == "Exponential") %>% 
+  filter(Ex_WL==590) %>% 
+  filter(Par_ue !=900) %>% 
+  filter(Strain=="PC-rich_077") 
+Sol13<-SolFitsExpSt %>% #keeping all data
+  filter(Phase == "Pre-stationary") %>% 
+  filter(Strain=="PC-rich_077") %>% 
+  filter(Par_ue != 600)  
+  #filter(Sig<490)
+Sol14<-SolFitsExpSt %>% #filter 1 data point
+  filter(Phase == "Pre-stationary") %>% 
+  filter(Strain=="PC-rich_077") %>% 
+  filter(Par_ue==600) %>% 
+  filter(Sig<250)
+Sol17<-SolFitsExpSt %>% # removing 2 data points
+  filter(Phase == "Exponential") %>% 
+  filter(Ex_WL==590) %>% 
+  filter(Par_ue ==900 | Par_ue ==600) %>% 
+  filter(Strain=="PC-rich_077") %>% 
+  filter(Sig<520) 
+
+SolFitsExpFitAll<-rbind(Sol1, Sol2, Sol3, Sol4, Sol5, Sol6, Sol7, Sol8, Sol9, Sol10, Sol11, Sol12, Sol13, Sol14, Sol15, Sol16, Sol17)
+
+rm(Sol1, Sol2, Sol3, Sol4, Sol5, Sol6, Sol7, Sol8, Sol9, Sol10, Sol11, Sol12, Sol13, Sol14, Sol15, Sol16, Sol17)
+
+
+SolFitsExpFitAll_1<-SolFitsExpFitAll %>%
+  filter(Phase == "Exponential") 
+SolFitsExpFitAll_2<-SolFitsExpFitAll %>%
+  filter(Phase == "Pre-stationary") %>%
+  filter(Strain=="PC-rich_056" | Strain=="PC-rich_077") %>%
+  filter(Par_ue!=90)
+SolFitsExpFitAll_3<-SolFitsExpFitAll %>%
+  filter(Phase == "Pre-stationary") %>%
+  filter(Strain=="PE-rich_048" | Strain=="PE-rich_127") 
+
+SolFitsExpFitAll<-rbind(SolFitsExpFitAll_1, SolFitsExpFitAll_2, SolFitsExpFitAll_3)
+
+```
+
+# Create plot to check data before and after filtering outliers
+
+```{r checking data before and after filtering outliers}
+lab1=c(expression("8 h"), expression("12 h"), expression("16 h"), expression("24 h"))
+lab2=c(expression("30 µE"), expression("90 µE"), expression("180 µE"), expression("300 µE"), expression("600 µE"), expression("900 µE"))
+
+SolFitsExpSt %>% 
+  filter(Ex_WL == 590) %>% 
+  ggplot() +
+  geom_point(aes(x = PARPhotonDose_day, y = Sig_nm2psii, colour = as.factor(Par_ue), shape = as.factor(Photoperiod)), size = 3.5, show.legend = T) +
+  scale_shape_manual(values = c(15, 16, 17,18), name="", labels = lab1) +
+  scale_colour_manual(values = c("darkslategray", "lightblue4", "hotpink4", "indianred3",  "goldenrod2", "khaki2"), name="", labels = lab2) +
+  ggh4x::facet_nested(cols = vars(Phase), rows = vars(Strain), labeller = label_parsed) +
+  theme_bw() 
+
+
+SolFitsExpFitAll %>% 
+  filter(Ex_WL == 590) %>% 
+  ggplot() +
+  geom_point(aes(x = PARPhotonDose_day, y = Sig_nm2psii, colour = as.factor(Par_ue), shape = as.factor(Photoperiod)), size = 3.5, show.legend = T) +
+  scale_shape_manual(values = c(15, 16, 17,18), name="", labels = lab1) +
+  scale_colour_manual(values = c("darkslategray", "lightblue4", "hotpink4", "indianred3",  "goldenrod2", "khaki2"), name="", labels = lab2) +
+  ggh4x::facet_nested(cols = vars(Phase), rows = vars(Strain), labeller = label_parsed) +
+  theme_bw() 
+```
+
+# Fit the data to exponential decays
+
+```{r fit the data to exponential decays, echo=FALSE, warning = FALSE}
+SolFitsExpFit590Clean <-SolFitsExpFitAll %>% 
+  drop_na(Sig_nm2psii) %>%
+  filter(Ex_WL == 590) %>% 
+  select(c(Sig_nm2psii, PARPhotonDose_day, Strain, Phase, O2, WL)) 
+
+# Fit the data
+fitted590 <- SolFitsExpFit590Clean %>% 
+  nest(-c(Strain, Phase, O2, WL)) %>%
+  mutate(
+    fit = map(data, ~nls(Sig_nm2psii ~ SSasymp(PARPhotonDose_day, yf, y0, log_alpha), data = .)),
+    tidied = map(fit, tidy),
+    augmented590 = map(fit, augment))  
+
+# Produce a table of fit parameters: y0, yf, alpha
+fitted_Param590<-fitted590 %>% 
+  unnest(tidied) %>% 
+  select(Strain, Phase, term, estimate) %>% 
+pivot_wider(., names_from = c(term), values_from = c(estimate)) %>% 
+  mutate(alpha = exp(log_alpha))
+```
+
+```{r unnest, preparing df to preparing final plot, echo=FALSE, warning = FALSE}
+augmented590<-fitted590  %>%
+  unnest(augmented590) %>%
+  select(c(Strain, Phase, O2, WL, PARPhotonDose_day,Sig_nm2psii, .fitted)) 
+```
+
+# Create Sigma plot at 590
+
+```{r create Sigma plot, fig.height = 8, fig.width = 8, warning = FALSE}
+data_text_y0Exp<- data.frame(WL = c("WW", "WW"), Phase = c("Exponential"), O2=c(21, 21, 21, 21), Strain  = c("PC-rich_056", "PC-rich_077", "PE-rich_048", "PE-rich_127"),  label = c('y0 = 7.4', 'y0 = 5.9', 'y0 = 8.5', 'y0 = 7.9'))
+data_text_yfExp<- data.frame(WL = c("WW", "WW"), Phase = c("Exponential"), O2=c(21, 21, 21, 21), Strain  = c("PC-rich_056", "PC-rich_077", "PE-rich_048", "PE-rich_127"),  label = c('yf = 3.3', 'yf = 1.9', 'yf = 4.4', 'yf = 3.7'))
+data_text_lambdaExp<- data.frame(WL = c("WW", "WW"), Phase = c("Exponential"), O2=c(21, 21, 21, 21), Strain  = c("PC-rich_056", "PC-rich_077", "PE-rich_048", "PE-rich_127"),  label = c('    \u03BB = 3.6e-07', '    \u03BB = 3.1e-07', '    \u03BB = 2.4e-07', '    \u03BB = 3.3e-07'))
+
+data_text_y0St<- data.frame(WL = c("WW", "WW"), Phase = c("Pre-stationary"), O2=c(21, 21, 21, 21), Strain  = c("PC-rich_056", "PC-rich_077", "PE-rich_048", "PE-rich_127"),  label = c(' y0 = 20.8', 'y0 = 9.8', 'y0 = 8.8', 'y0 = 9.5'))
+data_text_yfSt<- data.frame(WL = c("WW", "WW"), Phase = c("Pre-stationary"), O2=c(21, 21, 21, 21), Strain  = c("PC-rich_056", "PC-rich_077", "PE-rich_048", "PE-rich_127"),  label = c('yf = 1.7', 'yf = 1.4', 'yf = 3.0', 'yf = 2.3'))
+data_text_lambdaSt<- data.frame(WL = c("WW", "WW"), Phase = c("Pre-stationary"), O2=c(21, 21, 21, 21), Strain  = c("PC-rich_056", "PC-rich_077", "PE-rich_048", "PE-rich_127"),  label = c('    \u03BB = 1.3e-06', '    \u03BB = 5.3e-07', '    \u03BB = 5.5e-07', '    \u03BB = 6.6e-07'))
+
+# data_text_AnovaExp<- data.frame(WL = c("WW", "WW"), Phase = c("Exponential"), O2=c(21, 21, 21, 21), Strain  = c("PC-rich_056", "PC-rich_077", "PE-rich_048", "PE-rich_127"),  label = c('ANOVA, \u03B1 = 0.05, a', 'ANOVA, \u03B1 = 0.05, a', 'ANOVA, \u03B1 = 0.05, b', ' ANOVA, \u03B1 = 0.05, ab'))
+# data_text_AnovaSt<- data.frame(WL = c("WW", "WW"), Phase = c("Pre-stationary"), O2=c(21, 21, 21, 21), Strain  = c("PC-rich_056", "PC-rich_077", "PE-rich_048", "PE-rich_127"),  label = c('ANOVA, \u03B1 = 0.05, a', 'ANOVA, \u03B1 = 0.05, b', ' ANOVA, \u03B1 = 0.05, bc', 'ANOVA, \u03B1 = 0.05, d'))
+
+data_text_AnovaExp56<- data.frame(WL = c("WW"), Phase = c("Exponential"), O2=c(21), Strain  = c("PC-rich_056"),  label = c('a'))
+data_text_AnovaExp77<- data.frame(WL = c("WW"), Phase = c("Exponential"), O2=c(21), Strain  = c("PC-rich_077"),  label = c("a"))
+data_text_AnovaExp48<- data.frame(WL = c("WW"), Phase = c("Exponential"), O2=c(21), Strain  = c("PE-rich_048"),  label = c("b"))
+data_text_AnovaExp127<- data.frame(WL = c("WW"), Phase = c("Exponential"), O2=c(21), Strain  = c("PE-rich_127"),  label = c("ab"))
+
+data_text_AnovaSt56<- data.frame(WL = c("WW"), Phase = c("Pre-stationary"), O2=c(21), Strain  = c("PC-rich_056"),  label = c('a'))
+data_text_AnovaSt77<- data.frame(WL = c("WW"), Phase = c("Pre-stationary"), O2=c(21), Strain  = c("PC-rich_077"),  label = c("b"))
+data_text_AnovaSt48<- data.frame(WL = c("WW"), Phase = c("Pre-stationary"), O2=c(21), Strain  = c("PE-rich_048"),  label = c("bc"))
+data_text_AnovaSt127<- data.frame(WL = c("WW"), Phase = c("Pre-stationary"), O2=c(21), Strain  = c("PE-rich_127"),  label = c("d"))
+
+data_text_AnovaExp56P<- data.frame(WL = c("WW"), Phase = c("Exponential"), O2=c(21), Strain  = c("PC-rich_056"),  label = c('A'))
+data_text_AnovaExp77P<- data.frame(WL = c("WW"), Phase = c("Exponential"), O2=c(21), Strain  = c("PC-rich_077"),  label = c("A"))
+data_text_AnovaExp48P<- data.frame(WL = c("WW"), Phase = c("Exponential"), O2=c(21), Strain  = c("PE-rich_048"),  label = c("A"))
+data_text_AnovaExp127P<- data.frame(WL = c("WW"), Phase = c("Exponential"), O2=c(21), Strain  = c("PE-rich_127"),  label = c("A"))
+
+data_text_AnovaSt56P<- data.frame(WL = c("WW"), Phase = c("Pre-stationary"), O2=c(21), Strain  = c("PC-rich_056"),  label = c('B'))
+data_text_AnovaSt77P<- data.frame(WL = c("WW"), Phase = c("Pre-stationary"), O2=c(21), Strain  = c("PC-rich_077"),  label = c("B"))
+data_text_AnovaSt48P<- data.frame(WL = c("WW"), Phase = c("Pre-stationary"), O2=c(21), Strain  = c("PE-rich_048"),  label = c("A"))
+data_text_AnovaSt127P<- data.frame(WL = c("WW"), Phase = c("Pre-stationary"), O2=c(21), Strain  = c("PE-rich_127"),  label = c("B"))
+
+
+data_text_AnovaPhase<- data.frame(WL = c("WW", "WW"), Phase = c("Exponential"), O2=c(21, 21, 21, 21), Strain  = c("PC-rich_056", "PC-rich_077", "PE-rich_048", "PE-rich_127"),  label = c('ANOVA, \u03B1 = 0.05', 'ANOVA, \u03B1 = 0.05', 'ANOVA, \u03B1 = 0.05', 'ANOVA, \u03B1 = 0.05'))
+
+
+
+WL.labs <- c("Phase of growth")
+names(WL.labs) <- c("WW")
+O2.labs <- c("Strain")
+names(O2.labs) <- c(21)
+
+scientific_10 <- function(x) {   parse(text=gsub("e\\+*", " %*% 10^", scales::scientific_format()(x))) }
+lab1=c(expression("8 h"), expression("12 h"), expression("16 h"), expression("24 h"))
+lab2=c(expression("30 µE"), expression("90 µE"), expression("180 µE"), expression("300 µE"), expression("600 µE"), expression("900 µE"))
+
+SolFitsExpFitAll590<-SolFitsExpFitAll %>% 
+  filter(Ex_WL==590) 
+
+ggplot(SolFitsExpFitAll590, aes(x = PARPhotonDose_day, y = Sig_nm2psii)) +
+  geom_point(aes(x = PARPhotonDose_day, y = AllmeanSig_nm2psii, colour = as.factor(Par_ue), shape = as.factor(Photoperiod)), size = 3.5, alpha = 0.8, show.legend = T) +
+  geom_point(aes(x = PARPhotonDose_day, y = Sig_nm2psii, colour = as.factor(Par_ue), shape = as.factor(Photoperiod)), size = 1, show.legend = F) +
+  geom_errorbar(aes(x = PARPhotonDose_day, ymin = AllmeanSig_nm2psii - AllsdSig_nm2psii, ymax = AllmeanSig_nm2psii + AllsdSig_nm2psii, colour=as.factor(Par_ue)), width=0, size=0.3, show.legend = F) +
+  geom_line(aes(PARPhotonDose_day, .fitted), colour = "blue", linetype = "solid", size = 0.3, show.legend = F, augmented590) +
+  geom_text(data=data_text_y0Exp, aes(x=70000000, y=10, label=label), size=3.5) +
+  geom_text(data=data_text_yfExp, aes(x=70000000, y=8.5, label=label), size=3.5) +
+  geom_text(data=data_text_lambdaExp, aes(x=70000000, y=7, label=label), size=3.5) +
+  
+  geom_text(data=data_text_y0St, aes(x=7500000, y=10, label=label), size=3.5) +
+  geom_text(data=data_text_yfSt, aes(x=7500000, y=8.5, label=label), size=3.5) +
+  geom_text(data=data_text_lambdaSt, aes(x=7500000, y=7, label=label), size=3.5) +
+  
+  # geom_text(data=data_text_AnovaExp, aes(x=15000000, y=0.5, label=label), colour = "blue", size=3.5) +
+  # geom_text(data=data_text_AnovaSt, aes(x=15000000, y=0.5, label=label), colour = "blue", size=3.5) +
+  
+  geom_text(data=data_text_AnovaExp56, aes(x=75000000, y=4.6, label=label), colour = "blue", size=4) +
+  geom_text(data=data_text_AnovaExp77, aes(x=75000000, y=3.5, label=label), colour = "blue", size=4) +
+  geom_text(data=data_text_AnovaExp48, aes(x=75000000, y=5.5, label=label), colour = "blue", size=4) +
+  geom_text(data=data_text_AnovaExp127, aes(x=75000000, y=5, label=label), colour = "blue", size=4) +
+    
+  geom_text(data=data_text_AnovaSt56, aes(x=75000000, y=3.2, label=label), colour = "blue", size=4) +
+  geom_text(data=data_text_AnovaSt77, aes(x=75000000, y=3.0, label=label), colour = "blue", size=4) +
+  geom_text(data=data_text_AnovaSt48, aes(x=75000000, y=4.5, label=label), colour = "blue", size=4) +
+  geom_text(data=data_text_AnovaSt127, aes(x=75000000, y=4, label=label), colour = "blue", size=4) +
+    
+  geom_text(data=data_text_AnovaExp56P, aes(x=75000000, y=1.6, label=label), colour = "blue", size=4) +
+  geom_text(data=data_text_AnovaExp77P, aes(x=75000000, y=0.5, label=label), colour = "blue", size=4) +
+  geom_text(data=data_text_AnovaExp48P, aes(x=75000000, y=2.5, label=label), colour = "blue", size=4) +
+  geom_text(data=data_text_AnovaExp127P, aes(x=75000000, y=2, label=label), colour = "blue", size=4) +
+    
+  geom_text(data=data_text_AnovaSt56P, aes(x=75000000, y=0.2, label=label), colour = "blue", size=4) +
+  geom_text(data=data_text_AnovaSt77P, aes(x=75000000, y=0.0, label=label), colour = "blue", size=4) +
+  geom_text(data=data_text_AnovaSt48P, aes(x=75000000, y=1.5, label=label), colour = "blue", size=4) +
+  geom_text(data=data_text_AnovaSt127P, aes(x=75000000, y=1, label=label), colour = "blue", size=4) +
+  
+  geom_text(data=data_text_AnovaPhase, aes(x=24000000, y=-0.8, label=label), colour = "blue", size=4) +
+  
+  scale_shape_manual(values = c(15, 16, 17,18), name="", labels = lab1) +
+  scale_colour_manual(values = c("darkslategray", "lightblue4", "hotpink4", "indianred3",  "goldenrod2", "khaki2"), name="", labels = lab2) +
+  labs(y=expression(paste(sigma,""["PSII"]*"' (nm"^"2"*" quanta"^"-1"*")")), x = "Photon dose ( µmol photons "~m^-2~""~d^-1~")") +
+  scale_x_continuous(breaks=seq(0, 60000000, by = 30000000), label=scientific_10) +
+  scale_y_continuous(breaks=seq(0, 10, by = 2)) +
+  coord_cartesian(xlim = c(0, 82000000), ylim = c(-2, 12)) +
+  ggh4x::facet_nested(rows = vars(O2, Strain), cols = vars(WL, Phase), labeller = labeller(WL = WL.labs, O2 = O2.labs)) +
+  theme_bw() +
+  theme(panel.grid.minor = element_blank(),
+        panel.grid.major = element_blank(),
+        axis.text = element_text(size=12),
+        axis.title = element_text(size=16),
+        strip.background = element_rect(fill="white"),
+        strip.text = element_text(size=12),
+        axis.title.y = element_text(margin=margin(r=10)),
+        axis.title.x = element_text(margin=margin(t=10)),
+        legend.background = element_rect(fill="transparent"),
+        legend.position = c(0.90,0.88),
+        legend.key.height= unit(0.003, 'cm'),
+        legend.spacing.y = unit(-0.1, "cm"),
+        legend.spacing.x = unit(-0.1, 'cm'),
+        legend.title = element_blank(),
+        legend.text = element_text(size=11))
+```
+
+# Save plot 
+
+```{r save plot}
+ggsave(file = file.path(FigPath, paste("Fig_Sigma590",".png",sep = "")), height=9, width= 7,  dpi = 300, limitsize = TRUE)
+```
+
+# Calculated Anova and Tukey test from data points
+
+```{r calculated statistics}
+SigFit590Stats <-SolFitsExpFitAll %>% 
+  filter(Ex_WL == 590) 
+
+SigFit590Stats$Par_ue <- factor(SigFit590Stats$Par_ue)
+SigFit590Stats$Photoperiod <- factor(SigFit590Stats$Photoperiod)
+SigFit590Stats$Strain <- factor(SigFit590Stats$Strain)
+SigFit590Stats$Phase <- factor(SigFit590Stats$Phase)
+SigFit590Stats$PARPhotonDose_day <- factor(SigFit590Stats$PARPhotonDose_day)
+
+# Three way Anova with interactions
+model<-aov(Sig_nm2psii~PARPhotonDose_day*Phase*Strain, data=SigFit590Stats)
+Anova_Sig590<-data.frame(unclass(summary(model)), check.names = FALSE, stringsAsFactors = FALSE)
+#TukeyHSDTest_Sig590<-TukeyHSD(model, which = c("PARPhotonDose_day", "Phase", "Strain"))
+```
+
+# Save RDS that create stats and tables
+
+```{r}
+saveRDS(Anova_Sig590, file.path(TableRdsPath, paste(Project, "Anova_Sig590.Rds", sep = "_"), fsep = .Platform$file.sep), ascii = FALSE, version = NULL, compress = "xz", refhook = NULL)
+```
+
+# Calculated Anova and Tukey test from exponential decay parameters
+
+```{r calculated statistics}
+Sig590Stats<-fitted_Param590
+Sig590Stats2<-rbind(Sig590Stats, Sig590Stats)
+Sig590Stats2$Strain <- factor(Sig590Stats2$Strain)
+Sig590Stats2$Phase <- factor(Sig590Stats2$Phase)
+
+# Two-way Anova
+model<-aov(y0~Strain*Phase, data=Sig590Stats2)
+AnovaTest_Sig590_y0<-data.frame(unclass(summary(model)), check.names = FALSE, stringsAsFactors = FALSE)
+AnovaTest_Sig590_y0$Parameter <- 'y0'
+
+model<-aov(yf~Strain*Phase, data=Sig590Stats2)
+AnovaTest_Sig590_yf<-data.frame(unclass(summary(model)), check.names = FALSE, stringsAsFactors = FALSE)
+AnovaTest_Sig590_yf$Parameter <- 'yf'
+
+model<-aov(alpha~Strain*Phase, data=Sig590Stats2)
+AnovaTest_Sig590_alpha<-data.frame(unclass(summary(model)), check.names = FALSE, stringsAsFactors = FALSE)
+AnovaTest_Sig590_alpha$Parameter <- 'alpha'
+
+Anova_Sig590_Param<-rbind(AnovaTest_Sig590_y0, AnovaTest_Sig590_yf, AnovaTest_Sig590_alpha)
+
+rm(AnovaTest_Sig590_y0, AnovaTest_Sig590_yf, AnovaTest_Sig590_alpha, Sig590Stats, Sig590Stats2, model)
+```
+
+# Save RDS that create stats and tables
+
+```{r}
+# saveRDS(Anova_Sig590, file.path(TableRdsPath, paste(Project, "Anova_Sig590.Rds", sep = "_"), fsep = .Platform$file.sep), ascii = FALSE, version = NULL, compress = "xz", refhook = NULL)
+```
+
+# Exstracting models for each fit
+
+```{r}
+fittedmodel<-fitted590  %>%
+  select(c(Strain, Phase, fit))
+```
+
+# Anova from the model 
+(When I made Anova from all models I got a result, but it is not possible to tell, what is sig different. Tukey doesn't work here. That is why I compare each pair of data - models separately)
+
+```{r}
+#1->048 Exp
+#2->077 Exp
+#3->056 Exp
+#4->127 Exp
+#5->056 St
+#6->077 ST
+#7->048 St
+#8->127 St
+
+#Comparing model for strains from Exp phase
+fittedmodelStrainExp<-fittedmodel
+  anova056077Exp<-anova(fittedmodelStrainExp[[3]][[2]], fittedmodelStrainExp[[3]][[3]])
+  anova056077Exp$FitComparison <- '056_077_Exp'
+  anova048127Exp<-anova(fittedmodelStrainExp[[3]][[1]], fittedmodelStrainExp[[3]][[4]])
+  anova048127Exp$FitComparison <- '048_127_Exp'
+  anova056048Exp<-anova(fittedmodelStrainExp[[3]][[1]], fittedmodelStrainExp[[3]][[3]])
+  anova056048Exp$FitComparison <- '056_048_Exp'
+  anova077048Exp<-anova(fittedmodelStrainExp[[3]][[1]], fittedmodelStrainExp[[3]][[2]])
+  anova077048Exp$FitComparison <- '077_048_Exp'
+  anova056127Exp<-anova(fittedmodelStrainExp[[3]][[3]], fittedmodelStrainExp[[3]][[4]])
+  anova056127Exp$FitComparison <- '056_127_Exp'
+  anova077127Exp<-anova(fittedmodelStrainExp[[3]][[2]], fittedmodelStrainExp[[3]][[4]])
+  anova077127Exp$FitComparison <- '077_127_Exp'
+  anova_SigModelStrainExp<-rbind(anova056077Exp, anova048127Exp, anova056048Exp, anova077048Exp, anova056127Exp, anova077127Exp)
+  anova_SigModelStrainExp <-anova_SigModelStrainExp %>% 
+  drop_na(Df) 
+  rm(anova056077Exp, anova048127Exp, anova056048Exp, anova077048Exp, anova056127Exp, anova077127Exp)
+
+#Comparing model for strains from St phase
+fittedmodelStrainSt<-fittedmodel 
+  anova056077St<-anova(fittedmodelStrainSt[[3]][[5]], fittedmodelStrainSt[[3]][[6]])
+  anova056077St$FitComparison <- '056_077_St'
+  anova048127St<-anova(fittedmodelStrainSt[[3]][[7]], fittedmodelStrainSt[[3]][[8]])
+  anova048127St$FitComparison <- '048_127_St'
+  anova056048St<-anova(fittedmodelStrainSt[[3]][[5]], fittedmodelStrainSt[[3]][[7]])
+  anova056048St$FitComparison <- '056_048_St'
+  anova077048St<-anova(fittedmodelStrainSt[[3]][[6]], fittedmodelStrainSt[[3]][[7]])
+  anova077048St$FitComparison <- '077_048_St'
+  anova056127St<-anova(fittedmodelStrainSt[[3]][[5]], fittedmodelStrainSt[[3]][[8]])
+  anova056127St$FitComparison <- '056_127_St'
+  anova077127St<-anova(fittedmodelStrainSt[[3]][[6]], fittedmodelStrainSt[[3]][[8]])
+  anova077127St$FitComparison <- '077_127_St'
+  anova_SigModelStrainSt<-rbind(anova056077St, anova048127St, anova056048St, anova077048St, anova056127St, anova077127St)
+  anova_SigModelStrainSt <-anova_SigModelStrainSt %>% 
+  drop_na(Df) 
+  rm(anova056077St, anova048127St, anova056048St, anova077048St, anova056127St, anova077127St)
+  
+  
+#Comparing model for each strains from different phase (Exp vs St)
+fittedmodelPhase<-fittedmodel 
+  anova056ExpSt<-anova(fittedmodelPhase[[3]][[3]], fittedmodelPhase[[3]][[5]])
+  anova056ExpSt$FitComparison <- '056_Exp_St'
+  anova077ExpSt<-anova(fittedmodelPhase[[3]][[2]], fittedmodelPhase[[3]][[6]])
+  anova077ExpSt$FitComparison <- '077_Exp_St'
+  anova048ExpSt<-anova(fittedmodelPhase[[3]][[1]], fittedmodelPhase[[3]][[7]])
+  anova048ExpSt$FitComparison <- '048_Exp_St'
+  anova127ExpSt<-anova(fittedmodelPhase[[3]][[4]], fittedmodelPhase[[3]][[8]])
+  anova127ExpSt$FitComparison <- '127_Exp_St'
+  anova_SigModelPhase<-rbind(anova056ExpSt, anova077ExpSt, anova048ExpSt, anova127ExpSt)
+  anova_SigModelPhase <-anova_SigModelPhase %>% 
+  drop_na(Df) 
+  
+  Anova_Sig590_Model<-rbind(anova_SigModelStrainExp, anova_SigModelStrainSt, anova_SigModelPhase)
+  
+  rm(anova056ExpSt, anova077ExpSt, anova048ExpSt, anova127ExpSt, anova_SigModelStrainExp, anova_SigModelStrainSt, anova_SigModelPhase)
+```
+
+# Save RDS that create stats and tables
+
+```{r}
+saveRDS(Anova_Sig590_Model, file.path(TableRdsPath, paste(Project, "Anova_Sig590_Model.Rds", sep = "_"), fsep = .Platform$file.sep), ascii = FALSE, version = NULL, compress = "xz", refhook = NULL)
+```
+
+# Removed unneccessary df from the environment
+
+```{r}
+rm(SolFitsExpFit590Clean, fitted_Param590, data_text_lambdaExp, data_text_y0Exp, data_text_yfExp, data_text_lambdaSt, data_text_y0St, data_text_yfSt, fitted590, fittedmodel, fittedmodelPhase, fittedmodelStrainExp, fittedmodelStrainSt, SigFit590Stats, SolFitsExpFitAll590, SolFitsExpFitAll_1, SolFitsExpFitAll_2, SolFitsExpFitAll_3, augmented590)
+```
+
+```{r, warning=FALSE}
+SolFitsExpFit445Clean <-SolFitsExpFitAll %>% 
+  drop_na(Sig_nm2psii) %>%
+  filter(Ex_WL == 445) %>% 
+  select(c(Sig_nm2psii, PARPhotonDose_day, Strain, Phase, O2, WL)) 
+
+# Fit the data
+fitted445 <- SolFitsExpFit445Clean %>% 
+  nest(-c(Strain, Phase, O2, WL)) %>%
+  mutate(Linear_Model = map(data, ~lm(Sig_nm2psii ~ PARPhotonDose_day, data = .))) %>% 
+  mutate(Linear_Model_Param = map(Linear_Model, tidy),          
+         Linear_Model_Predict = map(Linear_Model, possibly(augment)),          
+         Linear_Model_Glance = map(Linear_Model, possibly(glance)))   
+
+augmented445<-fitted445 %>% 
+  unnest(Linear_Model_Predict) %>% 
+  select(c(Strain, Phase, O2, WL, PARPhotonDose_day,Sig_nm2psii, .fitted)) 
+```
+
+# Create Sigma plot at 445
+
+```{r create Sigma plot, fig.height = 8, fig.width = 8, warning = FALSE}
+# data_text_AnovaExp<- data.frame(WL = c("WW", "WW"), Phase = c("Exponential"), O2=c(21, 21, 21, 21), Strain  = c("PC-rich_056", "PC-rich_077", "PE-rich_048", "PE-rich_127"),  label = c('ANOVA, \u03B1 = 0.05, a', 'ANOVA, \u03B1 = 0.05, a', 'ANOVA, \u03B1 = 0.05, a', 'ANOVA, \u03B1 = 0.05, a'))
+# data_text_AnovaSt<- data.frame(WL = c("WW", "WW"), Phase = c("Pre-stationary"), O2=c(21, 21, 21, 21), Strain  = c("PC-rich_056", "PC-rich_077", "PE-rich_048", "PE-rich_127"),  label = c('ANOVA, \u03B1 = 0.05, a', 'ANOVA, \u03B1 = 0.05, a', 'ANOVA, \u03B1 = 0.05, b', 'ANOVA, \u03B1 = 0.05, a'))
+# data_text_AnovaPhase<- data.frame(WL = c("WW", "WW"), Phase = c("Pre-stationary"), O2=c(21, 21, 21, 21), Strain  = c("PC-rich_056", "PC-rich_077", "PE-rich_048", "PE-rich_127"),  label = c("Phase, p > 0.05", 'Phase, p < 0.05', 'Phase, p < 0.05', 'Phase, p < 0.05'))
+
+data_text_AnovaExp56<- data.frame(WL = c("WW"), Phase = c("Exponential"), O2=c(21), Strain  = c("PC-rich_056"),  label = c('a'))
+data_text_AnovaExp77<- data.frame(WL = c("WW"), Phase = c("Exponential"), O2=c(21), Strain  = c("PC-rich_077"),  label = c("a"))
+data_text_AnovaExp48<- data.frame(WL = c("WW"), Phase = c("Exponential"), O2=c(21), Strain  = c("PE-rich_048"),  label = c("a"))
+data_text_AnovaExp127<- data.frame(WL = c("WW"), Phase = c("Exponential"), O2=c(21), Strain  = c("PE-rich_127"),  label = c("a"))
+
+data_text_AnovaSt56<- data.frame(WL = c("WW"), Phase = c("Pre-stationary"), O2=c(21), Strain  = c("PC-rich_056"),  label = c('a'))
+data_text_AnovaSt77<- data.frame(WL = c("WW"), Phase = c("Pre-stationary"), O2=c(21), Strain  = c("PC-rich_077"),  label = c("a"))
+data_text_AnovaSt48<- data.frame(WL = c("WW"), Phase = c("Pre-stationary"), O2=c(21), Strain  = c("PE-rich_048"),  label = c("b"))
+data_text_AnovaSt127<- data.frame(WL = c("WW"), Phase = c("Pre-stationary"), O2=c(21), Strain  = c("PE-rich_127"),  label = c("a"))
+
+data_text_AnovaExp56P<- data.frame(WL = c("WW"), Phase = c("Exponential"), O2=c(21), Strain  = c("PC-rich_056"),  label = c('A'))
+data_text_AnovaExp77P<- data.frame(WL = c("WW"), Phase = c("Exponential"), O2=c(21), Strain  = c("PC-rich_077"),  label = c("A"))
+data_text_AnovaExp48P<- data.frame(WL = c("WW"), Phase = c("Exponential"), O2=c(21), Strain  = c("PE-rich_048"),  label = c("A"))
+data_text_AnovaExp127P<- data.frame(WL = c("WW"), Phase = c("Exponential"), O2=c(21), Strain  = c("PE-rich_127"),  label = c("A"))
+
+data_text_AnovaSt56P<- data.frame(WL = c("WW"), Phase = c("Pre-stationary"), O2=c(21), Strain  = c("PC-rich_056"),  label = c('A'))
+data_text_AnovaSt77P<- data.frame(WL = c("WW"), Phase = c("Pre-stationary"), O2=c(21), Strain  = c("PC-rich_077"),  label = c("B"))
+data_text_AnovaSt48P<- data.frame(WL = c("WW"), Phase = c("Pre-stationary"), O2=c(21), Strain  = c("PE-rich_048"),  label = c("B"))
+data_text_AnovaSt127P<- data.frame(WL = c("WW"), Phase = c("Pre-stationary"), O2=c(21), Strain  = c("PE-rich_127"),  label = c("B"))
+
+data_text_AnovaPhase<- data.frame(WL = c("WW", "WW"), Phase = c("Exponential"), O2=c(21, 21, 21, 21), Strain  = c("PC-rich_056", "PC-rich_077", "PE-rich_048", "PE-rich_127"),  label = c('t-test, \u03B1 = 0.05', 't-test, \u03B1 = 0.05', 't-test, \u03B1 = 0.05', 't-test, \u03B1 = 0.05'))
+
+WL.labs <- c("Phase of growth")
+names(WL.labs) <- c("WW")
+O2.labs <- c("Strain")
+names(O2.labs) <- c(21)
+
+scientific_10 <- function(x) {   parse(text=gsub("e\\+*", " %*% 10^", scales::scientific_format()(x))) }
+lab1=c(expression("8 h"), expression("12 h"), expression("16 h"), expression("24 h"))
+lab2=c(expression("30 µE"), expression("90 µE"), expression("180 µE"), expression("300 µE"), expression("600 µE"), expression("900 µE"))
+
+SolFitsExpFitAll445<-SolFitsExpFitAll %>% 
+  filter(Ex_WL==445) 
+
+ggplot(SolFitsExpFitAll445, aes(x = PARPhotonDose_day, y = Sig_nm2psii)) +
+  geom_point(aes(x = PARPhotonDose_day, y = AllmeanSig_nm2psii, colour = as.factor(Par_ue), shape = as.factor(Photoperiod)), size = 3.5, alpha = 0.8, show.legend = T) +
+  geom_point(aes(x = PARPhotonDose_day, y = Sig_nm2psii, colour = as.factor(Par_ue), shape = as.factor(Photoperiod)), size = 1, show.legend = F) +
+  geom_errorbar(aes(x = PARPhotonDose_day, ymin = AllmeanSig_nm2psii - AllsdSig_nm2psii, ymax = AllmeanSig_nm2psii + AllsdSig_nm2psii, colour=as.factor(Par_ue)), width=0, size=0.3, show.legend = F) +
+  geom_line(aes(PARPhotonDose_day, .fitted), colour = "blue", linetype = "solid", size = 0.3, show.legend = F, augmented445) +
+  
+  geom_text(data=data_text_AnovaExp56, aes(x=75000000, y=3, label=label), colour = "blue", size=4) +
+  geom_text(data=data_text_AnovaExp77, aes(x=75000000, y=3.0, label=label), colour = "blue", size=4) +
+  geom_text(data=data_text_AnovaExp48, aes(x=75000000, y=3.0, label=label), colour = "blue", size=4) +
+  geom_text(data=data_text_AnovaExp127, aes(x=75000000, y=3, label=label), colour = "blue", size=4) +
+    
+  geom_text(data=data_text_AnovaSt56, aes(x=75000000, y=2.7, label=label), colour = "blue", size=4) +
+  geom_text(data=data_text_AnovaSt77, aes(x=75000000, y=3.0, label=label), colour = "blue", size=4) +
+  geom_text(data=data_text_AnovaSt48, aes(x=75000000, y=3.0, label=label), colour = "blue", size=4) +
+  geom_text(data=data_text_AnovaSt127, aes(x=75000000, y=2.5, label=label), colour = "blue", size=4) +
+    
+  geom_text(data=data_text_AnovaExp56P, aes(x=75000000, y=0, label=label), colour = "blue", size=4) +
+  geom_text(data=data_text_AnovaExp77P, aes(x=75000000, y=0.0, label=label), colour = "blue", size=4) +
+  geom_text(data=data_text_AnovaExp48P, aes(x=75000000, y=0.0, label=label), colour = "blue", size=4) +
+  geom_text(data=data_text_AnovaExp127P, aes(x=75000000, y=0, label=label), colour = "blue", size=4) +
+    
+  geom_text(data=data_text_AnovaSt56P, aes(x=75000000, y=-0.7, label=label), colour = "blue", size=4) +
+  geom_text(data=data_text_AnovaSt77P, aes(x=75000000, y=0.0, label=label), colour = "blue", size=4) +
+  geom_text(data=data_text_AnovaSt48P, aes(x=75000000, y=0.0, label=label), colour = "blue", size=4) +
+  geom_text(data=data_text_AnovaSt127P, aes(x=75000000, y=-0.5, label=label), colour = "blue", size=4) +
+  
+  geom_text(data=data_text_AnovaPhase, aes(x=18000000, y=-0.8, label=label), colour = "blue", size=4) +
+  
+  scale_shape_manual(values = c(15, 16, 17,18), name="", labels = lab1) +
+  scale_colour_manual(values = c("darkslategray", "lightblue4", "hotpink4", "indianred3",  "goldenrod2", "khaki2"), name="", labels = lab2) +
+  labs(y=expression(paste(sigma,""["PSII"]*"' (nm"^"2"*" quanta"^"-1"*")")), x = "Photon dose ( µmol photons "~m^-2~""~d^-1~")") +
+  scale_x_continuous(breaks=seq(0, 60000000, by = 30000000), label=scientific_10) +
+  scale_y_continuous(breaks=seq(0, 10, by = 2)) +
+  coord_cartesian(xlim = c(0, 82000000), ylim = c(-2, 12)) +
+  ggh4x::facet_nested(rows = vars(O2, Strain), cols = vars(WL, Phase), labeller = labeller(WL = WL.labs, O2 = O2.labs)) +
+  theme_bw() +
+  theme(panel.grid.minor = element_blank(),
+        panel.grid.major = element_blank(),
+        axis.text = element_text(size=12),
+        axis.title = element_text(size=16),
+        strip.background = element_rect(fill="white"),
+        strip.text = element_text(size=12),
+        axis.title.y = element_text(margin=margin(r=10)),
+        axis.title.x = element_text(margin=margin(t=10)),
+        legend.background = element_rect(fill="transparent"),
+        legend.position = c(0.90,0.88),
+        legend.key.height= unit(0.003, 'cm'),
+        legend.spacing.y = unit(-0.1, "cm"),
+        legend.spacing.x = unit(-0.1, 'cm'),
+        legend.title = element_blank(),
+        legend.text = element_text(size=11))
+```
+
+# Save plot 
+
+```{r save plot}
+ggsave(file = file.path(FigPath, paste("SFig_Sigma445",".png",sep = "")), height=9, width= 7,  dpi = 300, limitsize = TRUE)
+```
+
+# Calculated Anova and Tukey test from data points
+
+```{r calculated statistics}
+SigFit445Stats <-SolFitsExpFitAll %>% 
+  filter(Ex_WL == 445) 
+
+SigFit445Stats$Par_ue <- factor(SigFit445Stats$Par_ue)
+SigFit445Stats$Photoperiod <- factor(SigFit445Stats$Photoperiod)
+SigFit445Stats$Strain <- factor(SigFit445Stats$Strain)
+SigFit445Stats$Phase <- factor(SigFit445Stats$Phase)
+SigFit445Stats$PARPhotonDose_day <- factor(SigFit445Stats$PARPhotonDose_day)
+
+# Three way Anova with interactions
+model<-aov(Sig_nm2psii~PARPhotonDose_day*Phase*Strain, data=SigFit445Stats)
+Anova_Sig445<-data.frame(unclass(summary(model)), check.names = FALSE, stringsAsFactors = FALSE)
+#TukeyHSDTest_Sig<-TukeyHSD(model, which = c("PARPhotonDose_day", "Phase", "Strain"))
+```
+
+# Save RDS that create stats and tables
+
+```{r}
+saveRDS(Anova_Sig445, file.path(TableRdsPath, paste(Project, "Anova_Sig445.Rds", sep = "_"), fsep = .Platform$file.sep), ascii = FALSE, version = NULL, compress = "xz", refhook = NULL)
+```
+
+# Anova from the linear model 
+https://stackoverflow.com/questions/24527116/write-regression-summary-to-the-csv-file-in-r
+
+t-test from the linear model Exp
+```{r}
+# Exp
+Stats56_77Exp<-SolFitsExpFitAll %>%
+  filter(Phase == "Exponential") %>%
+  filter(Ex_WL == 445) %>%
+  filter(Strain == "PC-rich_056" | Strain == "PC-rich_077") 
+  fit <- lm(Sig_nm2psii ~ PARPhotonDose_day + Strain + PARPhotonDose_day:Strain,data=Stats56_77Exp)
+x <- cbind(t(as.numeric(coefficients(fit))), t(as.numeric(summary(fit)$coefficients[4, 4])), t(as.numeric(summary(fit)$coefficients[4, 3])), t(as.numeric(summary(fit)$coefficients[4, 2])))
+model_56_77Exp<-data.frame(unclass(x), check.names = FALSE, stringsAsFactors = FALSE) %>% 
+  rename("Estimate" = "4", "Std.Error" = "7", "t_value" = "6", "p_value" = "5") %>% 
+  select(c("Estimate", "Std.Error", "t_value", "p_value"))
+  model_56_77Exp$FitComparison <- '056_077_Exp'
+
+SolFits56_48Exp<-SolFitsExpFitAll %>%
+  filter(Phase == "Exponential") %>%
+  filter(Ex_WL == 445) %>%
+  filter(Strain == "PC-rich_056" | Strain == "PE-rich_048") 
+  fit <- lm(Sig_nm2psii ~ PARPhotonDose_day + Strain + PARPhotonDose_day:Strain,data=SolFits56_48Exp)
+x <- cbind(t(as.numeric(coefficients(fit))), t(as.numeric(summary(fit)$coefficients[4, 4])), t(as.numeric(summary(fit)$coefficients[4, 3])), t(as.numeric(summary(fit)$coefficients[4, 2])))
+model_56_48Exp<-data.frame(unclass(x), check.names = FALSE, stringsAsFactors = FALSE) %>% 
+  rename("Estimate" = "4", "Std.Error" = "7", "t_value" = "6", "p_value" = "5") %>% 
+  select(c("Estimate", "Std.Error", "t_value", "p_value"))
+  model_56_48Exp$FitComparison <- '056_048_Exp'
+
+SolFits56_127Exp<-SolFitsExpFitAll %>%
+  filter(Phase == "Exponential") %>%
+  filter(Ex_WL == 445) %>%
+  filter(Strain == "PC-rich_056" | Strain == "PE-rich_127")  
+  fit <- lm(Sig_nm2psii ~ PARPhotonDose_day + Strain + PARPhotonDose_day:Strain,data=SolFits56_127Exp)
+x <- cbind(t(as.numeric(coefficients(fit))), t(as.numeric(summary(fit)$coefficients[4, 4])), t(as.numeric(summary(fit)$coefficients[4, 3])), t(as.numeric(summary(fit)$coefficients[4, 2])))
+model_56_127Exp<-data.frame(unclass(x), check.names = FALSE, stringsAsFactors = FALSE) %>% 
+  rename("Estimate" = "4", "Std.Error" = "7", "t_value" = "6", "p_value" = "5") %>% 
+  select(c("Estimate", "Std.Error", "t_value", "p_value"))
+  model_56_127Exp$FitComparison <- '056_127_Exp'
+
+SolFits48_127Exp<-SolFitsExpFitAll %>%
+  filter(Phase == "Exponential") %>%
+  filter(Ex_WL == 445) %>%
+  filter(Strain == "PE-rich_048" | Strain == "PE-rich_127")  
+  fit <- lm(Sig_nm2psii ~ PARPhotonDose_day + Strain + PARPhotonDose_day:Strain,data=SolFits48_127Exp)
+x <- cbind(t(as.numeric(coefficients(fit))), t(as.numeric(summary(fit)$coefficients[4, 4])), t(as.numeric(summary(fit)$coefficients[4, 3])), t(as.numeric(summary(fit)$coefficients[4, 2])))
+model_48_127Exp<-data.frame(unclass(x), check.names = FALSE, stringsAsFactors = FALSE) %>% 
+  rename("Estimate" = "4", "Std.Error" = "7", "t_value" = "6", "p_value" = "5") %>% 
+  select(c("Estimate", "Std.Error", "t_value", "p_value"))
+  model_48_127Exp$FitComparison <- '048_127_Exp'
+
+SolFits77_48Exp<-SolFitsExpFitAll %>%
+  filter(Phase == "Exponential") %>%
+  filter(Ex_WL == 445) %>%
+  filter(Strain == "PC-rich_077" | Strain == "PE-rich_048") 
+  fit <- lm(Sig_nm2psii ~ PARPhotonDose_day + Strain + PARPhotonDose_day:Strain,data=SolFits77_48Exp)
+x <- cbind(t(as.numeric(coefficients(fit))), t(as.numeric(summary(fit)$coefficients[4, 4])), t(as.numeric(summary(fit)$coefficients[4, 3])), t(as.numeric(summary(fit)$coefficients[4, 2])))
+model_77_48Exp<-data.frame(unclass(x), check.names = FALSE, stringsAsFactors = FALSE) %>% 
+  rename("Estimate" = "4", "Std.Error" = "7", "t_value" = "6", "p_value" = "5") %>% 
+  select(c("Estimate", "Std.Error", "t_value", "p_value"))
+  model_77_48Exp$FitComparison <- '077_048_Exp'
+
+SolFits77_127Exp<-SolFitsExpFitAll %>%
+  filter(Phase == "Exponential") %>%
+  filter(Ex_WL == 445) %>%
+  filter(Strain == "PC-rich_077" | Strain == "PE-rich_127") 
+  fit <- lm(Sig_nm2psii ~ PARPhotonDose_day + Strain + PARPhotonDose_day:Strain,data=SolFits77_127Exp)
+x <- cbind(t(as.numeric(coefficients(fit))), t(as.numeric(summary(fit)$coefficients[4, 4])), t(as.numeric(summary(fit)$coefficients[4, 3])), t(as.numeric(summary(fit)$coefficients[4, 2])))
+model_77_127Exp<-data.frame(unclass(x), check.names = FALSE, stringsAsFactors = FALSE) %>% 
+  rename("Estimate" = "4", "Std.Error" = "7", "t_value" = "6", "p_value" = "5") %>% 
+  select(c("Estimate", "Std.Error", "t_value", "p_value"))
+  model_77_127Exp$FitComparison <- '077_127_Exp'
+
+modelExp<-rbind(model_56_77Exp, model_56_48Exp, model_56_127Exp, model_48_127Exp, model_77_48Exp, model_77_127Exp)
+  rm(model_56_77Exp, model_56_48Exp, model_56_127Exp, model_48_127Exp, model_77_48Exp, model_77_127Exp)
+```
+
+t-test from the linear model St
+```{r}
+# Exp
+Stats56_77St<-SolFitsExpFitAll %>%
+  filter(Phase == "Pre-stationary") %>%
+  filter(Ex_WL == 445) %>%
+  filter(Strain == "PC-rich_056" | Strain == "PC-rich_077") 
+  fit <- lm(Sig_nm2psii ~ PARPhotonDose_day + Strain + PARPhotonDose_day:Strain,data=Stats56_77St)
+x <- cbind(t(as.numeric(coefficients(fit))), t(as.numeric(summary(fit)$coefficients[4, 4])), t(as.numeric(summary(fit)$coefficients[4, 3])), t(as.numeric(summary(fit)$coefficients[4, 2])))
+model_56_77St<-data.frame(unclass(x), check.names = FALSE, stringsAsFactors = FALSE) %>% 
+  rename("Estimate" = "4", "Std.Error" = "7", "t_value" = "6", "p_value" = "5") %>% 
+  select(c("Estimate", "Std.Error", "t_value", "p_value"))
+  model_56_77St$FitComparison <- '056_077_St'
+
+SolFits56_48St<-SolFitsExpFitAll %>%
+  filter(Phase == "Pre-stationary") %>%
+  filter(Ex_WL == 445) %>%
+  filter(Strain == "PC-rich_056" | Strain == "PE-rich_048") 
+  fit <- lm(Sig_nm2psii ~ PARPhotonDose_day + Strain + PARPhotonDose_day:Strain,data=SolFits56_48St)
+x <- cbind(t(as.numeric(coefficients(fit))), t(as.numeric(summary(fit)$coefficients[4, 4])), t(as.numeric(summary(fit)$coefficients[4, 3])), t(as.numeric(summary(fit)$coefficients[4, 2])))
+model_56_48St<-data.frame(unclass(x), check.names = FALSE, stringsAsFactors = FALSE) %>% 
+  rename("Estimate" = "4", "Std.Error" = "7", "t_value" = "6", "p_value" = "5") %>% 
+  select(c("Estimate", "Std.Error", "t_value", "p_value"))
+  model_56_48St$FitComparison <- '056_048_St'
+
+SolFits56_127St<-SolFitsExpFitAll %>%
+  filter(Phase == "Pre-stationary") %>%
+  filter(Ex_WL == 445) %>%
+  filter(Strain == "PC-rich_056" | Strain == "PE-rich_127")  
+  fit <- lm(Sig_nm2psii ~ PARPhotonDose_day + Strain + PARPhotonDose_day:Strain,data=SolFits56_127St)
+x <- cbind(t(as.numeric(coefficients(fit))), t(as.numeric(summary(fit)$coefficients[4, 4])), t(as.numeric(summary(fit)$coefficients[4, 3])), t(as.numeric(summary(fit)$coefficients[4, 2])))
+model_56_127St<-data.frame(unclass(x), check.names = FALSE, stringsAsFactors = FALSE) %>% 
+  rename("Estimate" = "4", "Std.Error" = "7", "t_value" = "6", "p_value" = "5") %>% 
+  select(c("Estimate", "Std.Error", "t_value", "p_value"))
+  model_56_127St$FitComparison <- '056_127_St'
+
+SolFits48_127St<-SolFitsExpFitAll %>%
+  filter(Phase == "Pre-stationary") %>%
+  filter(Ex_WL == 445) %>%
+  filter(Strain == "PE-rich_048" | Strain == "PE-rich_127")  
+  fit <- lm(Sig_nm2psii ~ PARPhotonDose_day + Strain + PARPhotonDose_day:Strain,data=SolFits48_127St)
+x <- cbind(t(as.numeric(coefficients(fit))), t(as.numeric(summary(fit)$coefficients[4, 4])), t(as.numeric(summary(fit)$coefficients[4, 3])), t(as.numeric(summary(fit)$coefficients[4, 2])))
+model_48_127St<-data.frame(unclass(x), check.names = FALSE, stringsAsFactors = FALSE) %>% 
+  rename("Estimate" = "4", "Std.Error" = "7", "t_value" = "6", "p_value" = "5") %>% 
+  select(c("Estimate", "Std.Error", "t_value", "p_value"))
+  model_48_127St$FitComparison <- '048_127_St'
+
+SolFits77_48St<-SolFitsExpFitAll %>%
+  filter(Phase == "Pre-stationary") %>%
+  filter(Ex_WL == 445) %>%
+  filter(Strain == "PC-rich_077" | Strain == "PE-rich_048") 
+  fit <- lm(Sig_nm2psii ~ PARPhotonDose_day + Strain + PARPhotonDose_day:Strain,data=SolFits77_48St)
+x <- cbind(t(as.numeric(coefficients(fit))), t(as.numeric(summary(fit)$coefficients[4, 4])), t(as.numeric(summary(fit)$coefficients[4, 3])), t(as.numeric(summary(fit)$coefficients[4, 2])))
+model_77_48St<-data.frame(unclass(x), check.names = FALSE, stringsAsFactors = FALSE) %>% 
+  rename("Estimate" = "4", "Std.Error" = "7", "t_value" = "6", "p_value" = "5") %>% 
+  select(c("Estimate", "Std.Error", "t_value", "p_value"))
+  model_77_48St$FitComparison <- '077_048_St'
+
+SolFits77_127St<-SolFitsExpFitAll %>%
+  filter(Phase == "Pre-stationary") %>%
+  filter(Ex_WL == 445) %>%
+  filter(Strain == "PC-rich_077" | Strain == "PE-rich_127") 
+  fit <- lm(Sig_nm2psii ~ PARPhotonDose_day + Strain + PARPhotonDose_day:Strain,data=SolFits77_127St)
+x <- cbind(t(as.numeric(coefficients(fit))), t(as.numeric(summary(fit)$coefficients[4, 4])), t(as.numeric(summary(fit)$coefficients[4, 3])), t(as.numeric(summary(fit)$coefficients[4, 2])))
+model_77_127St<-data.frame(unclass(x), check.names = FALSE, stringsAsFactors = FALSE) %>% 
+  rename("Estimate" = "4", "Std.Error" = "7", "t_value" = "6", "p_value" = "5") %>% 
+  select(c("Estimate", "Std.Error", "t_value", "p_value"))
+  model_77_127St$FitComparison <- '077_127_St'
+
+modelSt<-rbind(model_56_77St, model_56_48St, model_56_127St, model_48_127St, model_77_48St, model_77_127St)
+  rm(model_56_77St, model_56_48St, model_56_127St, model_48_127St, model_77_48St, model_77_127St)
+```
+
+t-test from the linear model Phase
+```{r}
+# Exp
+Stats56_ExpSt<-SolFitsExpFitAll %>%
+  filter(Phase == "Exponential" | Phase == "Pre-stationary") %>%
+  filter(Ex_WL == 445) %>%
+  filter(Strain == "PC-rich_056") 
+  fit <- lm(Sig_nm2psii ~ PARPhotonDose_day + Phase + PARPhotonDose_day:Phase,data=Stats56_ExpSt)
+x <- cbind(t(as.numeric(coefficients(fit))), t(as.numeric(summary(fit)$coefficients[4, 4])), t(as.numeric(summary(fit)$coefficients[4, 3])), t(as.numeric(summary(fit)$coefficients[4, 2])))
+model_56ExpSt<-data.frame(unclass(x), check.names = FALSE, stringsAsFactors = FALSE) %>% 
+  rename("Estimate" = "4", "Std.Error" = "7", "t_value" = "6", "p_value" = "5") %>% 
+  select(c("Estimate", "Std.Error", "t_value", "p_value"))
+  model_56ExpSt$FitComparison <- '056_Exp_St'
+
+Stats77_ExpSt<-SolFitsExpFitAll %>%
+  filter(Phase == "Exponential" | Phase == "Pre-stationary") %>%
+  filter(Ex_WL == 445) %>%
+  filter(Strain == "PC-rich_077") 
+  fit <- lm(Sig_nm2psii ~ PARPhotonDose_day + Phase + PARPhotonDose_day:Phase,data=Stats77_ExpSt)
+x <- cbind(t(as.numeric(coefficients(fit))), t(as.numeric(summary(fit)$coefficients[4, 4])), t(as.numeric(summary(fit)$coefficients[4, 3])), t(as.numeric(summary(fit)$coefficients[4, 2])))
+model_77ExpSt<-data.frame(unclass(x), check.names = FALSE, stringsAsFactors = FALSE) %>% 
+  rename("Estimate" = "4", "Std.Error" = "7", "t_value" = "6", "p_value" = "5") %>% 
+  select(c("Estimate", "Std.Error", "t_value", "p_value"))
+  model_77ExpSt$FitComparison <- '077_Exp_St'
+
+Stats48_ExpSt<-SolFitsExpFitAll %>%
+  filter(Phase == "Exponential" | Phase == "Pre-stationary") %>%
+  filter(Ex_WL == 445) %>%
+  filter(Strain == "PE-rich_048") 
+  fit <- lm(Sig_nm2psii ~ PARPhotonDose_day + Phase + PARPhotonDose_day:Phase,data=Stats48_ExpSt)
+x <- cbind(t(as.numeric(coefficients(fit))), t(as.numeric(summary(fit)$coefficients[4, 4])), t(as.numeric(summary(fit)$coefficients[4, 3])), t(as.numeric(summary(fit)$coefficients[4, 2])))
+model_48ExpSt<-data.frame(unclass(x), check.names = FALSE, stringsAsFactors = FALSE) %>% 
+  rename("Estimate" = "4", "Std.Error" = "7", "t_value" = "6", "p_value" = "5") %>% 
+  select(c("Estimate", "Std.Error", "t_value", "p_value"))
+  model_48ExpSt$FitComparison <- '048_Exp_St'
+
+Stats127_ExpSt<-SolFitsExpFitAll %>%
+  filter(Phase == "Exponential" | Phase == "Pre-stationary") %>%
+  filter(Ex_WL == 445) %>%
+  filter(Strain == "PE-rich_127") 
+  fit <- lm(Sig_nm2psii ~ PARPhotonDose_day + Phase + PARPhotonDose_day:Phase,data=Stats127_ExpSt)
+x <- cbind(t(as.numeric(coefficients(fit))), t(as.numeric(summary(fit)$coefficients[4, 4])), t(as.numeric(summary(fit)$coefficients[4, 3])), t(as.numeric(summary(fit)$coefficients[4, 2])))
+model_127ExpSt<-data.frame(unclass(x), check.names = FALSE, stringsAsFactors = FALSE) %>% 
+  rename("Estimate" = "4", "Std.Error" = "7", "t_value" = "6", "p_value" = "5") %>% 
+  select(c("Estimate", "Std.Error", "t_value", "p_value"))
+  model_127ExpSt$FitComparison <- '127_Exp_St'
+
+
+modelExpSt<-rbind(model_56ExpSt, model_77ExpSt, model_48ExpSt, model_127ExpSt)
+  rm(model_56ExpSt, model_77ExpSt, model_48ExpSt, model_127ExpSt, x)
+```
+
+# Merge statistic
+```{r}
+Anova_Sig445_Model<-rbind(modelExp, modelSt, modelExpSt)
+rm(modelExp, modelSt, modelExpSt)
+```
+
+# Save RDS that create stats and tables
+
+```{r}
+saveRDS(Anova_Sig445_Model, file.path(TableRdsPath, paste(Project, "Anova_Sig445_Model.Rds", sep = "_"), fsep = .Platform$file.sep), ascii = FALSE, version = NULL, compress = "xz", refhook = NULL)
+```
+
+
+# Clean the environment
+
+```{r}
+rm(tMaxAGLines_056, tMaxAGLines_077, tMaxAGLines_048, tMaxAGLines_127, tmaxAG, data_text_AnovaExp56P, data_text_AnovaExp77P, data_text_AnovaExp48P, data_text_AnovaExp127P, data_text_AnovaExp56, data_text_AnovaExp77, data_text_AnovaExp48, data_text_AnovaExp127, data_text_AnovaSt56P, data_text_AnovaSt77P, data_text_AnovaSt48P, data_text_AnovaSt127P, data_text_AnovaSt56, data_text_AnovaSt77, data_text_AnovaSt48, data_text_AnovaSt127, data_text_AnovaPhase, fit, fitted445, model, augmented445, SolFits48_127Exp, SolFits48_127Exp, SolFits56_127Exp, SolFits56_127St, SolFits56_48Exp, SolFits56_48St, SolFits77_48Exp, SolFits77_48St, SolFits77_127Exp, SolFits77_127St, SolFits48_127St, Stats56_77Exp, Stats56_77St, Stats56_ExpSt, Stats56_ExpSt, Stats77_ExpSt, Stats48_ExpSt, Stats127_ExpSt, SigFit445Stats, SolFitsExpFitAll445, SolFitsExpFit445Clean, SolFitsExpFitAll)
+```
+
+# Save Rds for further analysis
+
+```{r save rds}
+saveRDS(SolFitsExpSt, file.path(DataOut, paste(Project, "Processed_SolisenseData.Rds", sep = "_"), fsep = .Platform$file.sep), ascii = FALSE, version = NULL, compress = "xz", refhook = NULL)
+```
+
+# Variable names used in Data Dictionary
+
+```{r}
+colnames(SolFitsExpSt)
+```
+
+
+
+
+
+
+The anova() function will take the model objects as arguments, and return an ANOVA testing whether the more complex model is significantly better at capturing the data than the simpler model. If the resulting p-value is sufficiently low (usually less than 0.05), we conclude that the more complex model is significantly better than the simpler model, and thus favor the more complex model. If the p-value is not sufficiently low (usually greater than 0.05), we should favor the simpler model.
+
+# Exstracting models for each fit - models were not all fitted to the same size of dataset
+
+```{r}
+# StatsSigLM<-SolFitsAllPigmentPCPE %>% 
+#   drop_na(Sig_nm2psii, AllmeanPhycoChlaRatio) 
+# 
+# StatsSigLM$Strain <- factor(StatsSigLM$Strain)
+# StatsSigLM$Phase <- factor(StatsSigLM$Phase)  
+# StatsSigLM$AllmeanPhycoChlaRatio <- factor(StatsSigLM$AllmeanPhycoChlaRatio) 
+# 
+# SolFitsBA56Exp<-StatsSigLM %>%
+#   filter(Strain == "PC-rich_056")
+#   SolFitsBA56Exp <- SolFitsBA56Exp[-c(883:990), ]
+# 
+# SolFitsBA77Exp<-StatsSigLM %>%
+#   filter(Strain == "PC-rich_077") 
+#   SolFitsBA77Exp <- SolFitsBA77Exp[-c(883:998), ]
+# 
+# SolFitsBA48Exp<-StatsSigLM %>%
+#   filter(Strain == "PE-rich_048") 
+#   SolFitsBA48Exp <- SolFitsBA48Exp[-c(883:883), ]
+# 
+# SolFitsBA127Exp<-StatsSigLM %>%
+#   filter(Strain == "PE-rich_127") 
+#   SolFitsBA127Exp <- SolFitsBA127Exp[-c(883:894), ]
+# 
+# model1 <- lm(Sig_nm2psii~AllmeanPhycoChlaRatio, data = SolFitsBA56Exp)
+# model2 <- lm(Sig_nm2psii~AllmeanPhycoChlaRatio, data = SolFitsBA77Exp)
+# ANOVA_LinModel<-anova(model1, model2, test="F")
+#   
+#   
+# model<-aov(Sig_nm2psii~AllmeanPhycoChlaRatio*Phase*Strain, data=StatsSigLM)
+# AnovaTest_SigLM<-data.frame(unclass(summary(model)), check.names = FALSE, stringsAsFactors = FALSE)
+# TukeyHSDTest_Sig<-TukeyHSD(model, which = c("Phase", "Strain"))
+
+
+#  diamonds.mod1 <- lm(Sig_nm2psii~PhycoChlaRatio, data = SolFitsAllExp)
+#   diamonds.mod2 <- lm(Sig_nm2psii~PhycoChlaRatio, data = SolFitsAllSt)
+#   anova(diamonds.mod1, diamonds.mod2, test="Chisq")
+
+```
+
+
+```{r}
+#108 value per 1 condition - b/c mean OD
+# Test<-SolFitsAllPigmentPCPETurner %>% 
+#   filter(Strain == "PC-rich_077") %>% 
+#   filter(Photoperiod == 12) %>% 
+#   filter(Par_ue == 90) %>% 
+#   filter(Ex_WL == 445)
+```
+
+
+dodawanie modeli zeby sprawdzic, czy sa istotne roznice pomiedzy szczepami i fazami wzrostu
+https://stats.stackexchange.com/questions/435644/is-there-a-method-to-look-for-significant-difference-between-two-linear-regressi
+
+```{r}
+# set.seed(123)
+# df = data.frame(Age=sample(1:100))
+# df$Height[1:50] = df$Age[1:50] + rpois(50,30)
+# df$Height[51:100] = 1.3*df$Age[51:100] + rpois(50,30)
+# df$Fladen = rep(c("A","B"),each=50)
+# 
+# summary(lm(Height ~ Age + Fladen + Age:Fladen,data=df))
+
+# So the last term, Age:FladenB shows a coefficient of 0.29, meaning the slope (Height vs Age) in Fladen B is .29 more than that in Fladen A
+
+# StatsExp590<-SolFitsAllPigmentPCPE %>%
+#   filter(Phase == "Exponential") %>%
+#   filter(Ex_WL == 590) %>%
+#   select(c(Strain, Sig_nm2psii, AllmeanPhycoChlaRatio))
+# summary(lm(Sig_nm2psii ~ AllmeanPhycoChlaRatio + Strain + AllmeanPhycoChlaRatio:Strain,data=StatsExp590))
+
+```
+
+# compact letter display
+```{r}
+# # analysis of variance
+# anova <- aov(weight ~ feed, data = chickwts)
+# 
+# # Tukey's test
+# tukey <- TukeyHSD(anova)
+# 
+# # compact letter display
+# cld <- multcompLetters4(anova, tukey)
+# 
+# # table with factors and 3rd quantile
+# dt <- group_by(chickwts, feed) %>%
+#   summarise(w=mean(weight), sd = sd(weight)) %>%
+#   arrange(desc(w))
+# 
+# # extracting the compact letter display and adding to the Tk table
+# cld <- as.data.frame.list(cld$feed)
+# dt$cld <- cld$Letters
+# 
+# print(dt)
+```
+
+
+
+
+
+
+Set up R codes for Greek letters
+
+\u0391  Α   Greek Capital Letter Alpha
+\u0392  Β   Greek Capital Letter Beta
+\u0393  Γ   Greek Capital Letter Gamma
+\u0394  Δ   Greek Capital Letter Delta
+\u0395  Ε   Greek Capital Letter Epsilon
+\u0396  Ζ   Greek Capital Letter Zeta
+\u0397  Η   Greek Capital Letter Eta
+\u0398  Θ   Greek Capital Letter Theta
+\u0399  Ι   Greek Capital Letter Iota
+\u039A  Κ   Greek Capital Letter Kappa
+\u039B  Λ   Greek Capital Letter Lambda
+\u039C  Μ   Greek Capital Letter Mu
+\u039D  Ν   Greek Capital Letter Nu
+\u039E  Ξ   Greek Capital Letter Xi
+\u039F  Ο   Greek Capital Letter Omicron
+\u03A0  Π   Greek Capital Letter Pi
+\u03A1  Ρ   Greek Capital Letter Rho
+\u03A3  Σ   Greek Capital Letter Sigma
+\u03A4  Τ   Greek Capital Letter Tau
+\u03A5  Υ   Greek Capital Letter Upsilon
+\u03A6  Φ   Greek Capital Letter Phi
+\u03A7  Χ   Greek Capital Letter Chi
+\u03A8  Ψ   Greek Capital Letter Psi
+\u03A9  Ω   Greek Capital Letter Omega
+\u03B1  α   Greek Small Letter alpha
+\u03B2  β   Greek Small Letter beta
+\u03B3  γ   Greek Small Letter gamma
+\u03B4  δ   Greek Small Letter delta
+\u03B5  ε   Greek Small Letter epsilon
+\u03B6  ζ   Greek Small Letter zeta
+\u03B7  η   Greek Small Letter eta
+\u03B8  θ   Greek Small Letter theta
+\u03B9  ι   Greek Small Letter iota
+\u03BA  κ   Greek Small Letter kappa
+\u03BB  λ   Greek Small Letter lambda
+\u03BC  μ   Greek Small Letter mu
+\u03BD  ν   Greek Small Letter nu
+\u03BE  ξ   Greek Small Letter xi
+\u03BF  ο   Greek Small Letter omicron
+\u03C0  π   Greek Small Letter pi
+\u03C1  ρ   Greek Small Letter rho
+\u03C2  ς   Greek Small Letter final sigma
+\u03C3  σ   Greek Small Letter sigma
+\u03C4  τ   Greek Small Letter tau
+\u03C5  υ   Greek Small Letter upsilon
+\u03C6  φ   Greek Small Letter phi
+\u03C7  χ   Greek Small Letter chi
+\u03C8  ψ   Greek Small Letter psi
+\u03C9  ω   Greek Small Letter omega
+
+
+
+
+
