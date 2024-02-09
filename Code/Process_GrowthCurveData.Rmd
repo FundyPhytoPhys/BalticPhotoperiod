@@ -777,5 +777,82 @@ saveRDS(MultiCultiDataAll, file.path(DataOut, paste(Project, "Processed_GrowthCu
 colnames(MultiCultiDataAll)
 ```
 
+----------------------------------# Add logistic fits --------------------------------------------------------
+
+
+```{r set project variables}
+Project <- "BalticPhotoperiod"
+DataOut <- file.path("..", "Data", "ProcessedData", "ProcessedGrowthRateData")
+DataIn <- file.path("..", "Data", "CleanedData", "CleanedMCData", fsep = .Platform$file.sep)
+
+FigPath <- file.path("..", "Output", "Figures")
+FigRdsPath <- file.path("..", "Output", "FiguresRds")
+TableRdsPath <- file.path("..", "Output", "TablesRDS")
+
+FileEncode <- "UTF-8" 
+Delimiter <- ""
+HeaderRows <- 0
+```
+
+# List and read files
+
+```{r Exported Rmd only first time in session}
+list.files(path = DataIn, full.names = TRUE)
+```
+
+```{r read file}
+MultiCultiGrowthFile <- "../Data/CleanedData/CleanedMCData/PICO_Cleaned_MCData.Rds"
+
+MultiCultiGrowthFileName <- str_split(string = MultiCultiGrowthFile, "/")[[1]][3] %>%
+  str_remove(pattern = ".Rds") 
+
+MultiCultiGrowth <- readRDS(MultiCultiGrowthFile)  %>%
+  ungroup()
+```
+
+# Select revelant variables and preparing for further analysis
+
+```{r}
+MultiCultiGrowth<-MultiCultiGrowth %>% 
+  dplyr::select(c(Tube, ExpDate, MC, Run, SampleID, Strain, Par_ue, Photoperiod, WL, O2, LightShape, PARPhotonDose_day, OD720_Lmu_se, OD720_Lmu_corr, deltaOD_Lmu_se, deltaOD_Lmu_corr, tubedata, OD720_logistic_predict, deltaOD_logistic_predict, OD720trunc_logistic_predict, deltaODtrunc_logistic_predict))
+  
+MultiCultiGrowth<-MultiCultiGrowth %>% 
+  mutate(Strain=case_when(Strain=="BA127R"~"PE-rich_127",
+         Strain=="BA48R"~"PE-rich_048",
+        Strain=="BA56G"~"PC-rich_056",
+         Strain=="BA77G"~"PC-rich_077"))
+
+MultiCultiGrowth1<-MultiCultiGrowth %>% 
+  filter(Run==77) %>% 
+  filter(Strain =="PC-rich_077")
+MultiCultiGrowth2<-MultiCultiGrowth %>% 
+  filter(Run==121) %>% 
+  filter(Strain !="PC-rich_077")
+MultiCultiGrowth3<-MultiCultiGrowth %>% 
+  filter(Run!=121 & Run!= 77) 
+MCGrowthRate<-rbind(MultiCultiGrowth1, MultiCultiGrowth2, MultiCultiGrowth3)
+  rm(MultiCultiGrowth, MultiCultiGrowth1, MultiCultiGrowth2, MultiCultiGrowth3)
+```
+
+# Create preliminary plot
+
+```{r preliminary plot, warning = FALSE}
+# augmentedMCGrowthRate %>%
+#   ggplot() +
+#   geom_point(aes(x = time, y = .fitted), size = 3.5, alpha = 0.9, show.legend = T) +
+#   
+#   # scale_colour_discrete(type=c("seagreen4", "palegreen3", "brown1", "brown4")) +
+#   # ggh4x::facet_nested(rows = vars(Strain), cols = vars(Photoperiod)) +
+#   theme_bw()
+```
+
+```{r unnest, preparing df to preparing final plot, echo=FALSE, warning = FALSE}
+augmentedMCGrowthRate<-MCGrowthRate  %>%
+  unnest(OD720_logistic_predict) %>%
+  select(c(OD720, time, .fitted)) 
+```
+
+
+
 
 

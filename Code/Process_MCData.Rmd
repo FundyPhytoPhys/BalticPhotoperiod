@@ -32,7 +32,6 @@ Process_MCData.Rmd processes and combines all .Rds from Data/ImportedData/Import
 20220122_PICO_MC257_RUN46_ProcessDataNestGrowth.Rds, 
 20220206_PICO_MC257_RUN50_ProcessDataNestGrowth.Rds, 
 20220405_PICO_MC247_RUN60_ProcessDataNestGrowth.Rds, 
-20220405_PICO_MC247_RUN60_ProcessDataNestGrowth.Rds, 
 20220410_PICO_MC257_RUN62_ProcessDataNestGrowth.Rds, 
 20220420_PICO_MC257_RUN65_ProcessDataNestGrowth.Rds, 
 20220507_PICO_MC257_RUN71_ProcessDataNestGrowth.Rds, 
