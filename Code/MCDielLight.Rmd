@@ -41,9 +41,12 @@ library(zoo)
 ```
 
 ## Read Data
-```{r read data}
+```{r data files}
 MCFiles <- list.files(path = file.path("..", "Data", "ImportedData", "ImportedMCData"), full.names = TRUE)
 MCFiles
+```
+
+```{r read data}
 
 MCData <- readRDS(file = MCFiles[1]) |>
   ungroup() |>
@@ -111,7 +114,7 @@ MCDataHour <- MCData |>
   filter(deltaOD > 0) |>
   mutate(Actinic_photonsm2h = zoo::rollsum(Actinic_par, k = 12, fill = NA, align = "right") * 5 * 60) |> 
   mutate(mu_deltaODwindow = rollapply(cbind(time, log(deltaOD)), 24, slope, by.column=FALSE, fill=NA)) |>
-  #mutate(mu_Averh = zoo::rollmean(mu_deltaODwindow, k = 12, fill = NA, align = "right")) |>
+  mutate(mu_Averh = zoo::rollmean(mu_deltaODwindow, k = 12, fill = NA, align = "right")) |>
   ungroup() |>
   filter(time - round(time) == 0)
 
@@ -121,6 +124,17 @@ MCDataHour |>
   filter(time < 100) |>
   ggplot() +
   geom_point(aes(x = time, y = mu_deltaODwindow, colour = Actinic_photonsm2h)) +
+  geom_point(aes(x = time, y = deltaOD), colour = "green") +
+  #geom_point(aes(x = time, y = mu_Averh)) +
+  facet_grid(cols = vars(Tube)) +
+  theme_bw()
+
+MCDataHour |>
+  # filter(time >= 48,
+  #        time <= 72) |>
+  filter(time < 100) |>
+  ggplot() +
+  geom_point(aes(x = time, y = mu_Averh, colour = Actinic_photonsm2h)) +
   geom_point(aes(x = time, y = deltaOD), colour = "green") +
   #geom_point(aes(x = time, y = mu_Averh)) +
   facet_grid(cols = vars(Tube)) +
@@ -137,31 +151,30 @@ MCDataHour |>
    filter(time <= 100) |>
   ggplot() +
   geom_point(aes(x = time, y = Actinic_photonsm2h, colour = WL)) +
-  geom_point(aes(x = time, y = mu_deltaODwindow * 10000)) +
+  geom_point(aes(x = time, y = mu_Averh * 10000)) +
   facet_grid(cols = vars(Tube)) +
   theme_bw()
 
 MCDataHour |>
    filter(time <= 100) |>
   ggplot() +
-  geom_point(aes(x = Actinic_photonsm2h, y = mu_deltaODwindow, colour = ToD)) +
-  geom_line(aes(x = Actinic_photonsm2h, y = mu_deltaODwindow, colour = ToD)) +
+  geom_point(aes(x = Actinic_photonsm2h, y = mu_Averh, colour = ToD)) +
+  geom_line(aes(x = Actinic_photonsm2h, mu_Averh, colour = ToD)) +
   facet_grid(cols = vars(Tube)) +
   theme_bw()
 
 MCDataHour |>
    filter(time <= 100) |>
   ggplot() +
-  geom_point(aes(x = ToD, y = mu_deltaODwindow, colour = Actinic_photonsm2h)) +
-  geom_line(aes(x = ToD, y = mu_deltaODwindow, colour = Actinic_photonsm2h)) +
+  geom_point(aes(x = ToD, y = mu_Averh, colour = Actinic_photonsm2h)) +
+  geom_line(aes(x = ToD, y = mu_Averh, colour = Actinic_photonsm2h)) +
   facet_grid(cols = vars(Tube)) +
   theme_bw()
 
 MCDataHour |>
   filter(Tube == 4) |>
   ggplot() +
-  geom_point(aes(x = ToD, y = mu_deltaODwindow, colour = Actinic_photonsm2h)) +
-  geom_line(aes(x = ToD, y = mu_deltaODwindow, colour = Actinic_photonsm2h)) +
+  geom_point(aes(x = ToD, y = mu_Averh, colour = Actinic_photonsm2h)) +
   facet_grid(cols = vars(Tube)) +
   theme_bw()
 
@@ -170,9 +183,9 @@ MCDataHour |>
    filter(time <= 100) |>
   #filter(Actinic_par > 1) |>
   ggplot() +
-  geom_point(aes(x = ToD, y = mu_deltaODwindow, colour = Actinic_photonsm2h)) +
-  geom_line(aes(x = ToD, y = mu_deltaODwindow, colour = Actinic_photonsm2h)) +
-  geom_smooth(aes(x = ToD, y = mu_deltaODwindow)) +
+  geom_point(aes(x = ToD, y = mu_Averh, colour = Actinic_photonsm2h)) +
+  geom_line(aes(x = ToD, y = mu_Averh, colour = Actinic_photonsm2h)) +
+  geom_smooth(aes(x = ToD, y = mu_Averh)) +
   facet_grid(cols = vars(Tube)) +
   theme_bw()
 
