@@ -69,6 +69,7 @@ MCData <- readRDS(file = MCFiles[1])
   # colnames(MCData)
 ```
 
+
 # Read MetaData Catalog
 
 ```{r read locally stored metadata from rds}
@@ -108,40 +109,45 @@ MCData_24<- MCData_24 %>%
 rm(MC_RUN43, MC_RUN46, MC_RUN65, MC_RUN39, MC_RUN44, MC_RUN62, MC_RUN40, MC_RUN45, MC_RUN50, MC_RUN60, MC_RUN71, MC_RUN74, MC_RUN77, MC_RUN121)
 ```
 
-
 ```{r par_time_plot}
-# MCData |>
-#   ggplot() +
-#   geom_point(aes(x = time, y = Actinic_par, colour = WL)) +
-#   facet_grid(cols = vars(Tube)) +
-#   theme_bw()
-# 
-# MCData |>
-#   filter(time >= 48,
-#          time <= 72) |>
-#   ggplot() +
-#   geom_point(aes(x = time, y = Actinic_par, colour = WL)) +
-#   facet_grid(cols = vars(Tube)) +
-#   theme_bw()
-# 
-# MCData |>
-#   filter(time >= 48,
-#          time <= 72) |>
-#   ggplot() +
-#   geom_point(aes(x = time, y = deltaOD, colour = WL)) +
-#   facet_grid(cols = vars(Tube)) +
-#   theme_bw()
-# 
-# MCData |>
-#   filter(time >= 48,
-#          time <= 72) |>
-#   ggplot() +
-#   geom_point(aes(x = time, y = Actinic_par)) +
-#   geom_point(aes(x = time, y = 1000 * deltaOD, colour = WL)) +
-#   facet_grid(cols = vars(Tube)) +
-#   theme_bw()
+MCData_12 |>
+  filter(Run == 39) %>% 
+  ggplot() +
+  geom_point(aes(x = time, y = Actinic_par, colour = WL)) +
+  facet_grid(cols = vars(Tube)) +
+  theme_bw()
 
 MCData_12 |>
+  filter(Run == 39) %>% 
+  filter(time >= 48,
+         time <= 72) |>
+  ggplot() +
+  geom_point(aes(x = time, y = Actinic_par, colour = WL)) +
+  facet_grid(cols = vars(Tube)) +
+  theme_bw()
+
+MCData_12 |>
+  filter(Run == 39) %>% 
+  filter(time >= 48,
+         time <= 72) |>
+  ggplot() +
+  geom_point(aes(x = time, y = deltaOD, colour = WL)) +
+  facet_grid(cols = vars(Tube)) +
+  theme_bw()
+
+MCData_12 |>
+  filter(Run == 39) %>% 
+  filter(time >= 48,
+         time <= 72) |>
+  ggplot() +
+  geom_point(aes(x = time, y = Actinic_par)) +
+  geom_point(aes(x = time, y = 1000 * deltaOD, colour = WL)) +
+  facet_grid(cols = vars(Tube)) +
+  theme_bw()
+
+
+MCData_12 |>
+  filter(Run == 39) %>% 
   filter(Tube == 2) |>
   # filter(time >= 48,
   #        time <= 72) |>
@@ -210,92 +216,100 @@ MCDataHour<-rbind(MCDataHour_8, MCDataHour_12, MCDataHour_16, MCDataHour_24)
 # Create preliminary plot
 
 ```{r}
-# MCDataHour |>
-#   # filter(time >= 48,
-#   #        time <= 72) |>
-#   filter(time < 100) |>
-#   ggplot() +
-#   geom_point(aes(x = time, y = mu_deltaODwindow, colour = Actinic_photonsm2h)) +
-#   geom_point(aes(x = time, y = deltaOD), colour = "green") +
-#   #geom_point(aes(x = time, y = mu_Averh)) +
-#   facet_grid(cols = vars(Tube)) +
-#   theme_bw()
-# 
-# MCDataHour |>
-#   filter(Tube == 5) %>% 
-#   filter(time >= 48,
-#          time <= 72) |>
-#   #filter(time < 24) |>
-#   ggplot() +
-#   geom_point(aes(x = time, y = mu_deltaODwindow, colour = Actinic_photonsm2h)) +
-#   geom_point(aes(x = time, y = deltaOD), colour = "green") +
-#   #geom_point(aes(x = time, y = mu_Averh)) +
-#   facet_grid(cols = vars(Tube)) +
-#   theme_bw()
+MCDataHour |>
+    filter(Run == 39) %>% 
+  # filter(time >= 48,
+  #        time <= 72) |>
+  filter(time < 100) |>
+  ggplot() +
+  geom_point(aes(x = time, y = mu_deltaODwindow, colour = Actinic_photonsm2h)) +
+  geom_point(aes(x = time, y = deltaOD), colour = "green") +
+  #geom_point(aes(x = time, y = mu_Averh)) +
+  facet_grid(cols = vars(Tube)) +
+  theme_bw()
+
+MCDataHour |>
+    filter(Run == 39) %>% 
+  filter(Tube == 5) %>%
+  filter(time >= 48,
+         time <= 72) |>
+  #filter(time < 24) |>
+  ggplot() +
+  geom_point(aes(x = time, y = mu_deltaODwindow, colour = Actinic_photonsm2h)) +
+  geom_point(aes(x = time, y = deltaOD), colour = "green") +
+  #geom_point(aes(x = time, y = mu_Averh)) +
+  facet_grid(cols = vars(Tube)) +
+  theme_bw()
 ```
 
 
 ```{r hourly plots exploration}
-# #temporary
-# #use case_when to remove 'dark' periods?
-# #bad to filter and only then estimate growth rates; better to do across 1 h window
-# 
-# MCDataHour |>
-#    filter(time <= 100) |>
-#   ggplot() +
-#   geom_point(aes(x = time, y = Actinic_photonsm2h, colour = WL)) +
-#   geom_point(aes(x = time, y = mu_deltaODwindow * 10000)) +
-#   facet_grid(cols = vars(Tube)) +
-#   theme_bw()
-# 
-# MCDataHour |>
-#    filter(time <= 100) |>
-#   ggplot() +
-#   geom_point(aes(x = Actinic_photonsm2h, y = mu_deltaODwindow, colour = ToD)) +
-#   geom_line(aes(x = Actinic_photonsm2h, y = mu_deltaODwindow, colour = ToD)) +
-#   facet_grid(cols = vars(Tube)) +
-#   theme_bw()
-# 
-# MCDataHour |>
-#    filter(time <= 100) |>
-#   ggplot() +
-#   geom_point(aes(x = ToD, y = mu_deltaODwindow, colour = Actinic_photonsm2h)) +
-#   geom_line(aes(x = ToD, y = mu_deltaODwindow, colour = Actinic_photonsm2h)) +
-#   facet_grid(cols = vars(Tube)) +
-#   theme_bw()
-# 
-# MCDataHour |>
-#   filter(Tube == 2) |>
-#   ggplot() +
-#   geom_point(aes(x = ToD, y = mu_deltaODwindow, colour = Actinic_photonsm2h)) +
-#   geom_line(aes(x = ToD, y = mu_deltaODwindow, colour = Actinic_photonsm2h)) +
-#   facet_grid(cols = vars(Tube)) +
-#   theme_bw()
-# 
-# MCDataHour |>
-#    filter(time <= 100) |>
-#   #filter(Actinic_par > 1) |>
-#   ggplot() +
-#   geom_point(aes(x = ToD, y = mu_deltaODwindow, colour = Actinic_photonsm2h)) +
-#   geom_line(aes(x = ToD, y = mu_deltaODwindow, colour = Actinic_photonsm2h)) +
-#   geom_smooth(aes(x = ToD, y = mu_deltaODwindow)) +
-#   facet_grid(cols = vars(Tube)) +
-#   theme_bw()
-# 
-# 
-# myPalette <- colorRampPalette(rev(brewer.pal(11, "Spectral")))
-# sc <- scale_colour_gradientn(colours = myPalette(100), limits=c(100, 1000000))
-# MCDataHour |>
-#   filter(Tube == 5) %>% 
-#    filter(time <= 250) |>
-#      filter(time >= 48) |>
-#   #filter(Actinic_par > 1) |>
-#   ggplot() +
-#   geom_point(aes(x = time, y = mu_deltaODwindow, colour = Actinic_photonsm2h)) +
-#   geom_line(aes(x = time, y = mu_deltaODwindow, colour = Actinic_photonsm2h)) +
-#   sc +
-#   facet_grid(cols = vars(Tube)) +
-#   theme_bw()
+#temporary
+#use case_when to remove 'dark' periods?
+#bad to filter and only then estimate growth rates; better to do across 1 h window
+
+MCDataHour |>
+  filter(Run == 39) %>% 
+   filter(time <= 100) |>
+  ggplot() +
+  geom_point(aes(x = time, y = Actinic_photonsm2h, colour = WL)) +
+  geom_point(aes(x = time, y = mu_deltaODwindow * 10000)) +
+  facet_grid(cols = vars(Tube)) +
+  theme_bw()
+
+MCDataHour |>
+  filter(Run == 39) %>% 
+   filter(time <= 100) |>
+  ggplot() +
+  geom_point(aes(x = Actinic_photonsm2h, y = mu_deltaODwindow, colour = ToD)) +
+  geom_line(aes(x = Actinic_photonsm2h, y = mu_deltaODwindow, colour = ToD)) +
+  facet_grid(cols = vars(Tube)) +
+  theme_bw()
+
+MCDataHour |>
+    filter(Run == 39) %>% 
+   filter(time <= 100) |>
+  ggplot() +
+  geom_point(aes(x = ToD, y = mu_deltaODwindow, colour = Actinic_photonsm2h)) +
+  geom_line(aes(x = ToD, y = mu_deltaODwindow, colour = Actinic_photonsm2h)) +
+  facet_grid(cols = vars(Tube)) +
+  theme_bw()
+
+MCDataHour |>
+    filter(Run == 39) %>% 
+  filter(Tube == 2) |>
+  ggplot() +
+  geom_point(aes(x = ToD, y = mu_deltaODwindow, colour = Actinic_photonsm2h)) +
+  geom_line(aes(x = ToD, y = mu_deltaODwindow, colour = Actinic_photonsm2h)) +
+  facet_grid(cols = vars(Tube)) +
+  theme_bw()
+
+MCDataHour |>
+    filter(Run == 39) %>% 
+   filter(time <= 100) |>
+  #filter(Actinic_par > 1) |>
+  ggplot() +
+  geom_point(aes(x = ToD, y = mu_deltaODwindow, colour = Actinic_photonsm2h)) +
+  geom_line(aes(x = ToD, y = mu_deltaODwindow, colour = Actinic_photonsm2h)) +
+  geom_smooth(aes(x = ToD, y = mu_deltaODwindow)) +
+  facet_grid(cols = vars(Tube)) +
+  theme_bw()
+
+
+myPalette <- colorRampPalette(rev(brewer.pal(11, "Spectral")))
+sc <- scale_colour_gradientn(colours = myPalette(100), limits=c(100, 1000000))
+MCDataHour |>
+    filter(Run == 39) %>% 
+  filter(Tube == 5) %>%
+   filter(time <= 250) |>
+     filter(time >= 48) |>
+  #filter(Actinic_par > 1) |>
+  ggplot() +
+  geom_point(aes(x = time, y = mu_deltaODwindow, colour = Actinic_photonsm2h)) +
+  geom_line(aes(x = time, y = mu_deltaODwindow, colour = Actinic_photonsm2h)) +
+  sc +
+  facet_grid(cols = vars(Tube)) +
+  theme_bw()
 
 ```
 
@@ -346,7 +360,7 @@ MCImportAll<-result
 # Clean the environment
 
 ```{r}
-rm(MCData_8, MCData_12, MCData_16, MCData_24, MCDataHour_8, MCDataHour_12, MCDataHour_16, MCDataHour_24, result, MCDataHourTest)
+rm(MCData_8, MCData_12, MCData_16, MCData_24, MCDataHour_8, MCDataHour_12, MCDataHour_16, MCDataHour_24, result, MCDataHourTest, myPalette, sc)
 ```
 
 # Save Rds for further analysis
@@ -369,7 +383,8 @@ colnames(MCImportAll)
 ```{r}
 # Plot the results
 MCImportAll %>%
-  #filter(Tube == 4) %>% 
+  filter(Par_ue == 300) %>% 
+  filter(Photoperiod == 16) %>% 
   ggplot() +
   geom_point(aes(x = time, y = mu_deltaODwindow), alpha = 0.4) +
   geom_line(aes(x = time, y = svr_pred, color = 'SVR_radial'), size = 1.3) +
@@ -391,11 +406,10 @@ MCImportAll %>%
   facet_grid(rows = vars(Strain), cols = vars (Photoperiod)) +
   theme_bw()
 
-
-# Plot the results
 MCImportAll %>%
   filter(Par_ue == 300) %>% 
-  filter(Photoperiod == 16) %>% 
+  filter(Photoperiod == 12) %>% 
+  filter(Strain == "BA127R") %>% 
   ggplot() +
   geom_point(aes(x = time, y = mu_deltaODwindow), alpha = 0.4) +
   geom_line(aes(x = time, y = svr_pred, color = 'SVR_radial'), size = 1.3) +
@@ -450,11 +464,7 @@ MCImportAll %>%
   
   geom_point(aes(x = time, y = mu_deltaODwindow, colour = as.factor(Strain)), alpha = 0.2) +
   geom_line(aes(x = time, y = svr_pred, colour = as.factor(Strain)), size = 0.6) +
-  #geom_line(aes(x = time, y = mu_deltaODwindow)) +
   
-  
-  # geom_area(aes(x = Time_h, y = meanActinic_par_h), size = 0.1, fill = "tan1", alpha = 0.6) +
-  # geom_line(aes(x = Time_h, y = meanOD680_h, colour = as.factor(Strain)), size = 0.5, show.legend = T) +
   # geom_vline(data = tMaxAGLines_056, aes(xintercept = tMaxAG), linetype="dotdash", colour = "seagreen4", size=0.4) +
   # geom_vline(data = tMaxAGLines_077, aes(xintercept = tMaxAG), linetype="dotdash", colour = "palegreen3", size=0.4) +
   # geom_vline(data = tMaxAGLines_048, aes(xintercept = tMaxAG), linetype="dotdash", colour = "brown4", size=0.4) +
