@@ -885,7 +885,36 @@ MCGrowthRateFitOD720 %>%
         legend.text = element_text(size=11))
 ```
 
+## Read Data
+```{r read data}
+MCFiles <- list.files(path = file.path("..", "Data", "ImportedData", "ImportedMCData"), full.names = TRUE)
+MCFiles
 
+MCData <- readRDS(file = MCFiles[1])
+  # ungroup() |>
+  # mutate(deltaOD = OD680 - OD720)
+  # colnames(MCData)
+```
+
+
+# Read MetaData Catalog
+
+```{r read locally stored metadata from rds}
+MC_RUN39 <- readRDS(file = file.path("..", "Data", "ImportedData", "ImportedMCData", "20211214_PICO_MC247_RUN39_TargetDataMetaFilter.Rds"))
+MC_RUN40 <- readRDS(file = file.path("..", "Data", "ImportedData", "ImportedMCData", "20211223_PICO_MC257_RUN40_TargetDataMetaFilter.Rds"))
+MC_RUN43 <- readRDS(file = file.path("..", "Data", "ImportedData", "ImportedMCData", "20211229_PICO_MC247_RUN43_TargetDataMetaFilter.Rds"))
+MC_RUN44 <- readRDS(file = file.path("..", "Data", "ImportedData", "ImportedMCData", "20220107_PICO_MC257_RUN44_TargetDataMetaFilter.Rds"))
+MC_RUN45 <- readRDS(file = file.path("..", "Data", "ImportedData", "ImportedMCData", "20220113_PICO_MC247_RUN45_TargetDataMetaFilter.Rds"))
+MC_RUN46 <- readRDS(file = file.path("..", "Data", "ImportedData", "ImportedMCData", "20220122_PICO_MC257_RUN46_TargetDataMetaFilter.Rds"))
+MC_RUN50 <- readRDS(file = file.path("..", "Data", "ImportedData", "ImportedMCData", "20220206_PICO_MC257_RUN50_TargetDataMetaFilter.Rds"))
+MC_RUN60 <- readRDS(file = file.path("..", "Data", "ImportedData", "ImportedMCData", "20220405_PICO_MC247_RUN60_TargetDataMetaFilter.Rds"))
+MC_RUN62 <- readRDS(file = file.path("..", "Data", "ImportedData", "ImportedMCData", "20220410_PICO_MC257_RUN62_TargetDataMetaFilter.Rds"))
+MC_RUN65 <- readRDS(file = file.path("..", "Data", "ImportedData", "ImportedMCData", "20220420_PICO_MC257_RUN65_TargetDataMetaFilter.Rds"))
+MC_RUN71 <- readRDS(file = file.path("..", "Data", "ImportedData", "ImportedMCData", "20220507_PICO_MC257_RUN71_TargetDataMetaFilter.Rds"))
+MC_RUN74 <- readRDS(file = file.path("..", "Data", "ImportedData", "ImportedMCData", "20220607_PICO_MC257_RUN74_TargetDataMetaFilter.Rds"))
+MC_RUN77 <- readRDS(file = file.path("..", "Data", "ImportedData", "ImportedMCData", "20220615_PICO_MC257_RUN77_TargetDataMetaFilter.Rds"))
+MC_RUN121 <- readRDS(file = file.path("..", "Data", "ImportedData", "ImportedMCData", "20230816_PICO_MC257_RUN121_TargetDataMetaFilter.Rds"))
+```
 
 
 
