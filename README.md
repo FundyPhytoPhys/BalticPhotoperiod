@@ -247,7 +247,7 @@ https://docs.google.com/spreadsheets/d/1byJ7NV2LrHfzkcw9GQgZdQijKw1UbdzvtvZ1d1KL
 
 ### Manuscript
 
-- URL for main Manucript:
+- URL for main Manuscript:
 https://docs.google.com/document/d/1rpUJyodvmd8ISzSk8PKRrZo73a6tK26yKlcucbD-EHI/edit
 
 - URL for Supplementary materials:
