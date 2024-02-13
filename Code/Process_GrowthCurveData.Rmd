@@ -835,31 +835,76 @@ MCGrowthRate<-rbind(MultiCultiGrowth1, MultiCultiGrowth2, MultiCultiGrowth3)
 ```
 
 ```{r unnest, preparing df to preparing final plot, echo=FALSE, warning = FALSE}
-augmentedMCGrowthRate<-MCGrowthRate  %>%
+augmentedMCGrowthRateFitOD720<-MCGrowthRate  %>%
   unnest(OD720_logistic_predict) %>%
   select(c(OD720, time, .fitted)) 
+
+augmentedMCGrowthRateFitOD720Trunc<-MCGrowthRate  %>%
+  unnest(OD720trunc_logistic_predict) %>%
+  select(c(OD720, time, .fitted)) 
+
+augmentedMCGrowthRateFitDeltaOD<-MCGrowthRate  %>%
+  unnest(deltaOD_logistic_predict) %>%
+  select(c(deltaOD, time, .fitted)) 
+
+augmentedMCGrowthRateFitDeltaODTrunc<-MCGrowthRate  %>%
+  unnest(deltaODtrunc_logistic_predict) %>%
+  select(c(deltaOD, time, .fitted)) 
+
+
+augmentedMCGrowthRateTubedata<-MCGrowthRate  %>%
+  unnest(tubedata)
+augmentedMCGrowthRateTubedata<-augmentedMCGrowthRateTubedata %>% 
+  select(-c(OD720_logistic_predict, deltaOD_logistic_predict, OD720trunc_logistic_predict, deltaODtrunc_logistic_predict))
+
 ```
 
+# Merge tubedata and fit prediction - OD720
 ```{r}
-# colnames(MultiCultiDataAll)
+MCGrowthRateFitOD720 <- augmentedMCGrowthRateFitOD720 %>%
+  left_join(., augmentedMCGrowthRateTubedata, by = c("OD720" = "OD720", "time" = "time"))
+MCGrowthRateFitOD720<-MCGrowthRateFitOD720 %>% 
+  rename(fittedOD720 = .fitted) 
+  
+MCGrowthRateFitOD720PTrunc <- augmentedMCGrowthRateFitOD720Trunc %>%
+  left_join(., MCGrowthRateFitOD720, by = c("OD720" = "OD720", "time" = "time"))
+MCGrowthRateFitOD720PTrunc<-MCGrowthRateFitOD720PTrunc %>% 
+  rename(fittedOD720Trunc = .fitted) 
 
-MCGrowthRateFitOD720 <- augmentedMCGrowthRate %>%
-  left_join(., MultiCultiDataAll, by = c("OD720" = "meanOD720_h"))
+MCGrowthRateFitDeltaOD <- augmentedMCGrowthRateFitDeltaOD %>%
+  left_join(., MCGrowthRateFitOD720PTrunc, by = c("deltaOD" = "deltaOD", "time" = "time"))
+MCGrowthRateFitDeltaOD<-MCGrowthRateFitDeltaOD %>% 
+  rename(fittedDeltaOD = .fitted) 
 
-# MCGrowthRateFitOD720<-MCGrowthRateFitOD720 %>%
-#   mutate(.fitted = as.numeric(.fitted))
-#   drop_na(time)
+MCGrowthRateFitDeltaODTrunc <- augmentedMCGrowthRateFitDeltaODTrunc %>%
+  left_join(., MCGrowthRateFitDeltaOD, by = c("deltaOD" = "deltaOD", "time" = "time"))
+MCGrowthRateFitDeltaODTrunc<-MCGrowthRateFitDeltaODTrunc %>% 
+  rename(fittedDeltaODTrunc = .fitted) 
+
+MCGrowthRateFitData<-MCGrowthRateFitDeltaODTrunc
+
+rm(MCGrowthRateFitOD720, MCGrowthRateFitOD720PTrunc, MCGrowthRateFitDeltaOD, MCGrowthRateFitDeltaODTrunc, augmentedMCGrowthRateFitOD720, augmentedMCGrowthRateFitOD720Trunc, augmentedMCGrowthRateFitDeltaOD, augmentedMCGrowthRateFitDeltaODTrunc, augmentedMCGrowthRateTubedata)
+
 ```
+
+# Adding facet labels
+```{r}
+MCGrowthRateFitData$facetsPar_ue = factor(MCGrowthRateFitData$O2, labels = c("PAR~(µmol~photons~m^{-2}~s^{-1})"))
+MCGrowthRateFitData$facetsPhotoperiod = factor(MCGrowthRateFitData$WL, labels = c("Photoperiod~(h)"))
+MCGrowthRateFitData$facetsStrain = factor(MCGrowthRateFitData$WL, labels = c("Strain"))
+```
+
 
 # Create preliminary plot
 
 ```{r preliminary plot, warning = FALSE}
-MCGrowthRateFitOD720 %>%
+MCGrowthRateFitData %>%
   #filter(Par_ue != 600) %>% 
   filter(Run != 77) %>% 
   ggplot() +
   #geom_area(aes(x = Time_h, y = meanActinic_par_h), size = 0.1, fill = "tan1", alpha = 0.6) +
-  geom_line(aes(x = time, y = .fitted, colour = as.factor(Strain)), size = 0.5, show.legend = T) +
+  geom_line(aes(x = time, y = fittedOD720, colour = as.factor(Strain)), size = 0.5, show.legend = T) +
+  geom_line(aes(x = time, y = OD720, colour = as.factor(Strain)), size = 0.5, show.legend = T) +
   # geom_vline(data = tMaxAGLines_056, aes(xintercept = tMaxAG), linetype="dotdash", colour = "seagreen4", size=0.4) +
   # geom_vline(data = tMaxAGLines_077, aes(xintercept = tMaxAG), linetype="dotdash", colour = "palegreen3", size=0.4) +
   # geom_vline(data = tMaxAGLines_048, aes(xintercept = tMaxAG), linetype="dotdash", colour = "brown4", size=0.4) +
