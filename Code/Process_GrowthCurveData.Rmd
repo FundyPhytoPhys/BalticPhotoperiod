@@ -832,7 +832,7 @@ MCGrowthRateFitData %>%
 # Save plot 
 
 ```{r save plot}
-ggsave(file = file.path(FigPath, paste("SFig_GrowthCurve_Fittest",".png",sep = "")), height=9, width= 7,  dpi = 300, limitsize = TRUE)
+ggsave(file = file.path(FigPath, paste("SFig_GrowthCurve_FitStrain",".png",sep = "")), height=9, width= 7,  dpi = 300, limitsize = TRUE)
 ```
 
 
@@ -867,7 +867,7 @@ MCGrowthRateFitData %>%
 # Save plot 
 
 ```{r save plot}
-ggsave(file = file.path(FigPath, paste("SFig_GrowthCurve_Fittestlight",".png",sep = "")), height=9, width= 7,  dpi = 300, limitsize = TRUE)
+ggsave(file = file.path(FigPath, paste("SFig_GrowthCurve_FitLight",".png",sep = "")), height=9, width= 7,  dpi = 300, limitsize = TRUE)
 ```
 
 
