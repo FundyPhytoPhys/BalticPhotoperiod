@@ -625,122 +625,6 @@ MultiCultiDataAll %>%
 ggsave(file = file.path(FigPath, paste("SFig_GrowthCurve_DeltaOD",".png",sep = "")), height=9, width= 7,  dpi = 300, limitsize = TRUE)
 ```
 
-Create GrowthCurve plot
-
-```{r create GrowthCurve plot, warning = FALSE}
-lab2=c(expression("30 µE"), expression("90 µE"), expression("180 µE"), expression("300 µE"), expression("600 µE"), expression("900 µE"))
-MultiCultiDataAll %>%
-  #filter(Par_ue != 600) %>% 
-  filter(Run != 77) %>% 
-  ggplot() +
-  #geom_area(aes(x = Time_h, y = meanActinic_par_h), size = 0.1, fill = "tan1", alpha = 0.6) +
-  geom_line(aes(x = Time_h, y = meanOD680_h, colour = as.factor(Par_ue)), size = 0.5, show.legend = T) +
-  scale_colour_manual(values = c("darkslategray", "lightblue4", "hotpink4", "indianred3",  "goldenrod2", "khaki2"), name="", labels = lab2) +
-  #scale_colour_discrete(type=c("seagreen4", "palegreen3", "brown1", "brown4"), name="") +
-  scale_y_continuous(breaks=seq(0, 1, by = 0.25)) +
-  coord_cartesian(ylim = c(0, 1.0)) +
-  labs(y = "Optical density ("~OD[680]~")", x = "Elapsed time (h)") +
-  ggh4x::facet_nested(cols = vars(facetsPhotoperiod, Photoperiod), rows = vars(Strain), labeller = label_parsed) +
-  theme_bw() +
-  theme(panel.grid.minor = element_blank(),
-        panel.grid.major = element_blank(),
-        axis.text = element_text(size=12),
-        axis.title = element_text(size=16),
-        strip.background = element_rect(fill="white"),
-        strip.text = element_text(size=12),
-        axis.title.y = element_text(margin=margin(r=10)),
-        axis.title.x = element_text(margin=margin(t=10)),
-        legend.background = element_rect(fill="transparent"),
-        legend.position = c(0.07,0.90),
-        legend.key.height= unit(0.005, 'cm'),
-        legend.spacing.x = unit(0.01, 'cm'),
-        legend.text = element_text(size=11))
-```
-
-# Save plot 
-
-```{r save plot}
-# ggsave(file = file.path(FigPath, paste("SFig_GrowthCurve_OD680_Photoperiod",".png",sep = "")), height=9, width= 7,  dpi = 300, limitsize = TRUE)
-```
-
-
-Create GrowthCurve plot
-
-```{r create GrowthCurve plot, warning = FALSE}
-lab2=c(expression("30 µE"), expression("90 µE"), expression("180 µE"), expression("300 µE"), expression("600 µE"), expression("900 µE"))
-MultiCultiDataAll %>%
-  #filter(Par_ue != 600) %>% 
-  filter(Run != 77) %>% 
-  ggplot() +
-  #geom_area(aes(x = Time_h, y = meanActinic_par_h), size = 0.1, fill = "tan1", alpha = 0.6) +
-  geom_line(aes(x = Time_h, y = meanOD720_h, colour = as.factor(Par_ue)), size = 0.5, show.legend = T) +
-  scale_colour_manual(values = c("darkslategray", "lightblue4", "hotpink4", "indianred3",  "goldenrod2", "khaki2"), name="", labels = lab2) +
-  #scale_colour_discrete(type=c("seagreen4", "palegreen3", "brown1", "brown4"), name="") +
-  scale_y_continuous(breaks=seq(0, 1, by = 0.25)) +
-  coord_cartesian(ylim = c(0, 1.0)) +
-  labs(y = "Optical density ("~OD[720]~")", x = "Elapsed time (h)") +
-  ggh4x::facet_nested(cols = vars(facetsPhotoperiod, Photoperiod), rows = vars(Strain), labeller = label_parsed) +
-  theme_bw() +
-  theme(panel.grid.minor = element_blank(),
-        panel.grid.major = element_blank(),
-        axis.text = element_text(size=12),
-        axis.title = element_text(size=16),
-        strip.background = element_rect(fill="white"),
-        strip.text = element_text(size=12),
-        axis.title.y = element_text(margin=margin(r=10)),
-        axis.title.x = element_text(margin=margin(t=10)),
-        legend.background = element_rect(fill="transparent"),
-        legend.position = c(0.07,0.90),
-        legend.key.height= unit(0.005, 'cm'),
-        legend.spacing.x = unit(0.01, 'cm'),
-        legend.text = element_text(size=11))
-```
-
-# Save plot 
-
-```{r save plot}
-# ggsave(file = file.path(FigPath, paste("SFig_GrowthCurve_OD720_Photoperiod",".png",sep = "")), height=9, width= 7,  dpi = 300, limitsize = TRUE)
-```
-
-
-Create GrowthCurve plot
-
-```{r create GrowthCurve plot, warning = FALSE}
-lab2=c(expression("30 µE"), expression("90 µE"), expression("180 µE"), expression("300 µE"), expression("600 µE"), expression("900 µE"))
-MultiCultiDataAll %>%
-  #filter(Par_ue != 600) %>% 
-  filter(Run != 77) %>% 
-  ggplot() +
-  #geom_area(aes(x = Time_h, y = meanActinic_par_h), size = 0.1, fill = "tan1", alpha = 0.6) +
-  geom_line(aes(x = Time_h, y = meanDeltaOD_h, colour = as.factor(Par_ue)), size = 0.5, show.legend = T) +
-  scale_colour_manual(values = c("darkslategray", "lightblue4", "hotpink4", "indianred3",  "goldenrod2", "khaki2"), name="", labels = lab2) +
-  #scale_colour_discrete(type=c("seagreen4", "palegreen3", "brown1", "brown4"), name="") +
-  scale_y_continuous(breaks=seq(0, 1, by = 0.25)) +
-  coord_cartesian(ylim = c(0, 1.0)) +
-  labs(y = "Optical density (Delta OD)", x = "Elapsed time (h)") +
-  ggh4x::facet_nested(cols = vars(facetsPhotoperiod, Photoperiod), rows = vars(Strain), labeller = label_parsed) +
-  theme_bw() +
-  theme(panel.grid.minor = element_blank(),
-        panel.grid.major = element_blank(),
-        axis.text = element_text(size=12),
-        axis.title = element_text(size=16),
-        strip.background = element_rect(fill="white"),
-        strip.text = element_text(size=12),
-        axis.title.y = element_text(margin=margin(r=10)),
-        axis.title.x = element_text(margin=margin(t=10)),
-        legend.background = element_rect(fill="transparent"),
-        legend.position = c(0.07,0.90),
-        legend.key.height= unit(0.005, 'cm'),
-        legend.spacing.x = unit(0.01, 'cm'),
-        legend.text = element_text(size=11))
-```
-
-# Save plot 
-
-```{r save plot}
-# ggsave(file = file.path(FigPath, paste("SFig_GrowthCurve_DeltaOD_Photoperiod",".png",sep = "")), height=9, width= 7,  dpi = 300, limitsize = TRUE)
-```
-
 
 # Create preliminary plot - loop
 
@@ -751,12 +635,6 @@ MultiCultiDataAll %>%
   scale_colour_discrete(type=c("seagreen4", "palegreen3", "brown1", "brown4"), name="") +
   ggh4x::facet_nested(cols = vars(facetsPhotoperiod, Photoperiod), rows = vars(facetsPar_ue, Par_ue), labeller = label_parsed) +
   theme_bw() 
-```
-
-# Cleaning df before saving as rds and removed unnecessary files from the environment
-
-```{r cleanifng d}
-# rm(tMaxAGLines_056, tMaxAGLines_077, tMaxAGLines_048, tMaxAGLines_127, tmaxAG, MultiCultiData)
 ```
 
 # Save Fig Rds
@@ -777,7 +655,8 @@ saveRDS(MultiCultiDataAll, file.path(DataOut, paste(Project, "Processed_GrowthCu
 colnames(MultiCultiDataAll)
 ```
 
-----------------------------------# Add logistic fits --------------------------------------------------------
+
+-------------------------------------------------# Logistic fits --------------------------------------------------------
 
 
 ```{r set project variables}
@@ -860,7 +739,7 @@ augmentedMCGrowthRateTubedata<-augmentedMCGrowthRateTubedata %>%
 ```
 
 # Merge tubedata and fit prediction - OD720
-```{r}
+```{r warning = FALSE}
 MCGrowthRateFitOD720 <- augmentedMCGrowthRateFitOD720 %>%
   left_join(., augmentedMCGrowthRateTubedata, by = c("OD720" = "OD720", "time" = "time"))
 MCGrowthRateFitOD720<-MCGrowthRateFitOD720 %>% 
@@ -887,7 +766,32 @@ rm(MCGrowthRateFitOD720, MCGrowthRateFitOD720PTrunc, MCGrowthRateFitDeltaOD, MCG
 
 ```
 
+```{r Import Run and calculate mean OD, echo = FALSE, warning = FALSE}
+
+MCGrowthRateFitData$ToD = sub("\\..*", "", MCGrowthRateFitData$ToD)
+MCGrowthRateFitData$time = sub("\\..*", "", MCGrowthRateFitData$time)
+
+MCGrowthRateFitData <- MCGrowthRateFitData %>% 
+  mutate(ToD=as.numeric(ToD)) %>% 
+  mutate(time=as.numeric(time)) %>% 
+  mutate(Actinic_par = Actinic_par/1000) %>% 
+  rename(time_h=time) 
+  
+
+colnames(MCGrowthRateFitData)
+
+MCGrowthRateFitData <- MCGrowthRateFitData %>%   
+  group_by(SampleID, Day, ToD, time_h) %>% 
+  summarize(deltaOD, time_h, fittedDeltaOD, OD720, fittedOD720, Tube, ExpDate, MC, Run, SampleID, Strain, Par_ue, Photoperiod, WL, O2, LightShape, PARPhotonDose_day, OD720_Lmu_se, OD720_Lmu_corr, deltaOD_Lmu_se, deltaOD_Lmu_corr, ToD, Day, Actinic_par, OD680, meanActinic_par_h = mean(Actinic_par), meanOD680_h = mean(OD680), meanOD720_h = mean(OD720), meanDeltaOD_h = mean(deltaOD), 
+            meanfittedOD720_h = mean(fittedOD720), meanfittedDeltaOD_h = mean(fittedDeltaOD)) %>%
+  ungroup() %>% 
+  select(-c(Actinic_par, OD680, OD720, deltaOD, fittedOD720, fittedDeltaOD)) %>% 
+  unique()
+```
+
+
 # Adding facet labels
+
 ```{r}
 MCGrowthRateFitData$facetsPar_ue = factor(MCGrowthRateFitData$O2, labels = c("PAR~(µmol~photons~m^{-2}~s^{-1})"))
 MCGrowthRateFitData$facetsPhotoperiod = factor(MCGrowthRateFitData$WL, labels = c("Photoperiod~(h)"))
@@ -895,24 +799,19 @@ MCGrowthRateFitData$facetsStrain = factor(MCGrowthRateFitData$WL, labels = c("St
 ```
 
 
-# Create preliminary plot
+# Create GrowthCurve plot with fits
 
-```{r preliminary plot, warning = FALSE}
+```{r create GrowthCurve plot, fig.height = 8, fig.width = 8, warning = FALSE}
 MCGrowthRateFitData %>%
-  #filter(Par_ue != 600) %>% 
   filter(Run != 77) %>% 
   ggplot() +
-  #geom_area(aes(x = Time_h, y = meanActinic_par_h), size = 0.1, fill = "tan1", alpha = 0.6) +
-  geom_line(aes(x = time, y = fittedOD720, colour = as.factor(Strain)), size = 0.5, show.legend = T) +
-  geom_line(aes(x = time, y = OD720, colour = as.factor(Strain)), size = 0.5, show.legend = T) +
-  # geom_vline(data = tMaxAGLines_056, aes(xintercept = tMaxAG), linetype="dotdash", colour = "seagreen4", size=0.4) +
-  # geom_vline(data = tMaxAGLines_077, aes(xintercept = tMaxAG), linetype="dotdash", colour = "palegreen3", size=0.4) +
-  # geom_vline(data = tMaxAGLines_048, aes(xintercept = tMaxAG), linetype="dotdash", colour = "brown4", size=0.4) +
-  # geom_vline(data = tMaxAGLines_127, aes(xintercept = tMaxAG), linetype="dotdash", colour = "brown1", size=0.4) +
+  #geom_area(aes(x = time_h, y = meanActinic_par_h), size = 0.1, fill = "tan1", alpha = 0.6) +
+  geom_line(aes(x = time_h, y = meanDeltaOD_h, colour = as.factor(Strain)), size = 0.3, alpha = 0.4, show.legend = F) +
+  geom_line(aes(x = time_h, y = meanfittedDeltaOD_h, colour = as.factor(Strain)), size = 0.7, alpha = 0.9, show.legend = T) +
   scale_colour_discrete(type=c("seagreen4", "palegreen3", "brown1", "brown4"), name="") +
-  scale_y_continuous(breaks=seq(0, 1, by = 0.25)) +
-  coord_cartesian(ylim = c(0, 1.0)) +
-  labs(y = "Optical density ("~OD[680]~")", x = "Elapsed time (h)") +
+  # scale_y_continuous(breaks=seq(0, 1, by = 0.25)) +
+  # coord_cartesian(ylim = c(0, 1.0)) +
+  labs(y = "Optical density (Delta OD)", x = "Elapsed time (h)") +
   ggh4x::facet_nested(cols = vars(facetsPhotoperiod, Photoperiod), rows = vars(facetsPar_ue, Par_ue), labeller = label_parsed) +
   theme_bw() +
   theme(panel.grid.minor = element_blank(),
@@ -930,36 +829,57 @@ MCGrowthRateFitData %>%
         legend.text = element_text(size=11))
 ```
 
-## Read Data
-```{r read data}
-MCFiles <- list.files(path = file.path("..", "Data", "ImportedData", "ImportedMCData"), full.names = TRUE)
-MCFiles
+# Save plot 
 
-MCData <- readRDS(file = MCFiles[1])
-  # ungroup() |>
-  # mutate(deltaOD = OD680 - OD720)
-  # colnames(MCData)
+```{r save plot}
+ggsave(file = file.path(FigPath, paste("SFig_GrowthCurve_Fittest",".png",sep = "")), height=9, width= 7,  dpi = 300, limitsize = TRUE)
 ```
 
 
-# Read MetaData Catalog
-
-```{r read locally stored metadata from rds}
-MC_RUN39 <- readRDS(file = file.path("..", "Data", "ImportedData", "ImportedMCData", "20211214_PICO_MC247_RUN39_TargetDataMetaFilter.Rds"))
-MC_RUN40 <- readRDS(file = file.path("..", "Data", "ImportedData", "ImportedMCData", "20211223_PICO_MC257_RUN40_TargetDataMetaFilter.Rds"))
-MC_RUN43 <- readRDS(file = file.path("..", "Data", "ImportedData", "ImportedMCData", "20211229_PICO_MC247_RUN43_TargetDataMetaFilter.Rds"))
-MC_RUN44 <- readRDS(file = file.path("..", "Data", "ImportedData", "ImportedMCData", "20220107_PICO_MC257_RUN44_TargetDataMetaFilter.Rds"))
-MC_RUN45 <- readRDS(file = file.path("..", "Data", "ImportedData", "ImportedMCData", "20220113_PICO_MC247_RUN45_TargetDataMetaFilter.Rds"))
-MC_RUN46 <- readRDS(file = file.path("..", "Data", "ImportedData", "ImportedMCData", "20220122_PICO_MC257_RUN46_TargetDataMetaFilter.Rds"))
-MC_RUN50 <- readRDS(file = file.path("..", "Data", "ImportedData", "ImportedMCData", "20220206_PICO_MC257_RUN50_TargetDataMetaFilter.Rds"))
-MC_RUN60 <- readRDS(file = file.path("..", "Data", "ImportedData", "ImportedMCData", "20220405_PICO_MC247_RUN60_TargetDataMetaFilter.Rds"))
-MC_RUN62 <- readRDS(file = file.path("..", "Data", "ImportedData", "ImportedMCData", "20220410_PICO_MC257_RUN62_TargetDataMetaFilter.Rds"))
-MC_RUN65 <- readRDS(file = file.path("..", "Data", "ImportedData", "ImportedMCData", "20220420_PICO_MC257_RUN65_TargetDataMetaFilter.Rds"))
-MC_RUN71 <- readRDS(file = file.path("..", "Data", "ImportedData", "ImportedMCData", "20220507_PICO_MC257_RUN71_TargetDataMetaFilter.Rds"))
-MC_RUN74 <- readRDS(file = file.path("..", "Data", "ImportedData", "ImportedMCData", "20220607_PICO_MC257_RUN74_TargetDataMetaFilter.Rds"))
-MC_RUN77 <- readRDS(file = file.path("..", "Data", "ImportedData", "ImportedMCData", "20220615_PICO_MC257_RUN77_TargetDataMetaFilter.Rds"))
-MC_RUN121 <- readRDS(file = file.path("..", "Data", "ImportedData", "ImportedMCData", "20230816_PICO_MC257_RUN121_TargetDataMetaFilter.Rds"))
+```{r create GrowthCurve plot, fig.height = 8, fig.width = 8, warning = FALSE}
+lab2=c(expression("30 µE"), expression("90 µE"), expression("180 µE"), expression("300 µE"), expression("600 µE"), expression("900 µE"))
+MCGrowthRateFitData %>%
+  filter(Run != 77) %>% 
+  ggplot() +
+  geom_line(aes(x = time_h, y = meanDeltaOD_h, colour = as.factor(Par_ue)), size = 0.4, alpha = 0.4, show.legend = F) +
+  geom_line(aes(x = time_h, y = meanfittedDeltaOD_h, colour = as.factor(Par_ue)), size = 0.7, alpha = 0.9, show.legend = T) +
+  scale_colour_manual(values = c("darkslategray", "lightblue4", "hotpink4", "indianred3",  "goldenrod2", "khaki2"), name="", labels = lab2) +
+  # scale_y_continuous(breaks=seq(0, 1, by = 0.25)) +
+  # coord_cartesian(ylim = c(0, 1.0)) +
+  labs(y = "Optical density (Delta OD)", x = "Elapsed time (h)") +
+  ggh4x::facet_nested(cols = vars(facetsPhotoperiod, Photoperiod), rows = vars(Strain), labeller = label_parsed) +
+  theme_bw() +
+  theme(panel.grid.minor = element_blank(),
+        panel.grid.major = element_blank(),
+        axis.text = element_text(size=12),
+        axis.title = element_text(size=16),
+        strip.background = element_rect(fill="white"),
+        strip.text = element_text(size=12),
+        axis.title.y = element_text(margin=margin(r=10)),
+        axis.title.x = element_text(margin=margin(t=10)),
+        legend.background = element_rect(fill="transparent"),
+        legend.position = c(0.07,0.94),
+        legend.key.height= unit(0.005, 'cm'),
+        legend.spacing.x = unit(0.01, 'cm'),
+        legend.text = element_text(size=11))
 ```
+
+# Save plot 
+
+```{r save plot}
+ggsave(file = file.path(FigPath, paste("SFig_GrowthCurve_Fittestlight",".png",sep = "")), height=9, width= 7,  dpi = 300, limitsize = TRUE)
+```
+
+
+# Cleaning df before saving as rds and removed unnecessary files from the environment
+
+```{r cleanifng d}
+rm(tMaxAGLines_056, tMaxAGLines_077, tMaxAGLines_048, tMaxAGLines_127, tmaxAG, MultiCultiData, MCGrowthRate)
+```
+
+
+
+
 
 
 
