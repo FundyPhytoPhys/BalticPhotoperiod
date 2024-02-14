@@ -131,8 +131,7 @@ GrowthRateAll %>%
   ggh4x::facet_nested(rows = vars(Strain), cols = vars(Photoperiod)) +
   theme_bw()
 ```
-# issue - add to process solisenda Turner data!!!! 
-# issue - import solisense again to get hours of measurements!!!!!!
+
 
 ```{r read ProcessFile}
 SolisenseFile <- "../Data/ProcessedData/ProcessedSolisenseData/BalticPhotoperiod_Processed_SolisenseData.Rds"

@@ -1485,7 +1485,7 @@ SolFitsAllPigmentPCPE590dark %>%
 rm(SolFitsAllPigmentfitPhycoChlalineardarkStrain, SolFitsAllPigmentfitPhycoChlalineardarkStrainGroup, SolFitsAllPigmentfitPhycoChlalinearStrain, SolFitsAllPigmentfitPhycoChlalinearStrain1s, SolFitsAllPigmentfitPhycoChlalinearStrainGroup, SolFitsAllPigmentfitPhycoChlalinearStrainGroup1s)
 ```
 
--------------------------------                    --# Add Turner Catalog--------------------------------------------------
+------------------------------------------------------# Add Turner Catalog--------------------------------------------------
 
 # Load Turner catalog
 
