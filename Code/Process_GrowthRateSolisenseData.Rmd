@@ -52,9 +52,10 @@ library(minpack.lm) #Standard 'nls' framework that uses 'nls.lm' for fitting
 ```{r set project variables}
 Project <- "BalticPhotoperiod"
 DataOut <- file.path("..", "Data", "ProcessedData", "ProcessedGrowthRateSolisenseData")
-DataInGrowthRate <- file.path("..", "Data", "ProcessedData", "ProcessedGrowthRateData", fsep = .Platform$file.sep)
 
+DataInGrowthRate <- file.path("..", "Data", "ProcessedData", "ProcessedGrowthRateData", fsep = .Platform$file.sep)
 DataInSolisense <- file.path("..", "Data", "ProcessedData", "ProcessedSolisenseData", fsep = .Platform$file.sep)
+DataInGrowthRate_h <- file.path("..", "Data", "ProcessedData", "ProcessedMCDielLightData", fsep = .Platform$file.sep)
 
 FigPath <- file.path("..", "Output", "Figures")
 FigRdsPath <- file.path("..", "Output", "FiguresRds")
@@ -70,6 +71,7 @@ HeaderRows <- 0
 ```{r Exported Rmd}
 list.files(path = DataInGrowthRate, pattern = Project, full.names = TRUE)
 list.files(path = DataInSolisense, pattern = Project, full.names = TRUE)
+list.files(path = DataInGrowthRate_h, pattern = Project, full.names = TRUE)
 ```
 
 ```{r read ProcessFile}
@@ -91,13 +93,37 @@ GrowthRate<-GrowthRate %>%
   select(c(SampleID, Run, Strain, Tube, MC, ExpDate, Par_ue, Photoperiod, O2, WL, LightShape, PARPhotonDose_day, FilenameMC, ExpEndDate, OD720_Lmu_se, OD720_Lmu_corr, deltaOD_Lmu_se, deltaOD_Lmu_corr)) %>% 
   unique()
 
-#E_days, ToD, Time_h, - problem
+#E_days, ToD, Time_h - issue
 ```
 
-# Create preliminary plot
+```{r read ProcessFile}
+GrowthRate_hFile <- "../Data/ProcessedData/ProcessedMCDielLightData/BalticPhotoperiod_Processed_MCDielLightData.Rds"
+GrowthRate_hFileName <- str_split(string = GrowthRate_hFile, "/")[[1]][3] %>%
+  str_remove(pattern = ".Rds")
+
+GrowthRate_h <- readRDS(GrowthRate_hFile)  %>%
+  ungroup()
+
+GrowthRate_h <- GrowthRate_h %>% 
+  filter(Strain == "BA127R" | Strain == "BA48R" | Strain == "BA56G" | Strain == "BA77G") %>% 
+  mutate(Strain=case_when(Strain=="BA127R"~"PE-rich_127",
+         Strain=="BA48R"~"PE-rich_048",
+        Strain=="BA56G"~"PC-rich_056",
+         Strain=="BA77G"~"PC-rich_077")) 
+```
+
+# Merge Growth rate and Growth rate_h
+
+```{r Joining growth rate and Solisense exp data}
+GrowthRateAll <- GrowthRate_h %>% 
+  left_join(., GrowthRate, by = c("SampleID"="SampleID", "Run"="Run", "Strain"="Strain", "Tube" = "Tube",  "Par_ue"="Par_ue","Photoperiod"="Photoperiod", "O2"="O2", "WL"="WL")) 
+```
+
+
+# Create preliminary plot - issue - missing one point when was no growth - N/A issue? Fix this Sylwia!
 
 ```{r preliminary plot, warning = FALSE}
-GrowthRate %>%
+GrowthRateAll %>%
   ggplot() +
   geom_point(aes(x = Par_ue, y = deltaOD_Lmu_corr,colour=as.factor(Strain)), size = 3.5, alpha = 0.9, show.legend = T) +
   geom_errorbar(aes(x = Par_ue, ymin = deltaOD_Lmu_corr - deltaOD_Lmu_se, ymax = deltaOD_Lmu_corr + deltaOD_Lmu_se), alpha = 0.5) +
@@ -105,10 +131,11 @@ GrowthRate %>%
   ggh4x::facet_nested(rows = vars(Strain), cols = vars(Photoperiod)) +
   theme_bw()
 ```
-
+# issue - add to process solisenda Turner data!!!! 
+# issue - import solisense again to get hours of measurements!!!!!!
 
 ```{r read ProcessFile}
-SolisenseFile <- "../Data/ProcessedData/ProcessedSolisenseData/BalticPhotoperiod_Processed_SolisensePigmentsAll.Rds"
+SolisenseFile <- "../Data/ProcessedData/ProcessedSolisenseData/BalticPhotoperiod_Processed_SolisenseData.Rds"
 SolisenseFileName <- str_split(string = SolisenseFile, "/")[[1]][3] %>%
   str_remove(pattern = ".Rds")
 

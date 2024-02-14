@@ -601,7 +601,7 @@ MultiCultiDataAll %>%
   scale_colour_discrete(type=c("seagreen4", "palegreen3", "brown1", "brown4"), name="") +
   scale_y_continuous(breaks=seq(0, 1, by = 0.25)) +
   coord_cartesian(ylim = c(0, 1.0)) +
-  labs(y = "Optical density (Delta OD)", x = "Elapsed time (h)") +
+  labs(y = "Optical density (\u0394 OD)", x = "Elapsed time (h)") +
   ggh4x::facet_nested(cols = vars(facetsPhotoperiod, Photoperiod), rows = vars(facetsPar_ue, Par_ue), labeller = label_parsed) +
   theme_bw() +
   theme(panel.grid.minor = element_blank(),
@@ -811,7 +811,7 @@ MCGrowthRateFitData %>%
   scale_colour_discrete(type=c("seagreen4", "palegreen3", "brown1", "brown4"), name="") +
   # scale_y_continuous(breaks=seq(0, 1, by = 0.25)) +
   # coord_cartesian(ylim = c(0, 1.0)) +
-  labs(y = "Optical density (Delta OD)", x = "Elapsed time (h)") +
+  labs(y = "Optical density (\u0394 OD)", x = "Elapsed time (h)") +
   ggh4x::facet_nested(cols = vars(facetsPhotoperiod, Photoperiod), rows = vars(facetsPar_ue, Par_ue), labeller = label_parsed) +
   theme_bw() +
   theme(panel.grid.minor = element_blank(),
@@ -846,7 +846,7 @@ MCGrowthRateFitData %>%
   scale_colour_manual(values = c("darkslategray", "lightblue4", "hotpink4", "indianred3",  "goldenrod2", "khaki2"), name="", labels = lab2) +
   # scale_y_continuous(breaks=seq(0, 1, by = 0.25)) +
   # coord_cartesian(ylim = c(0, 1.0)) +
-  labs(y = "Optical density (Delta OD)", x = "Elapsed time (h)") +
+  labs(y = "Optical density (\u0394 OD)", x = "Elapsed time (h)") +
   ggh4x::facet_nested(cols = vars(facetsPhotoperiod, Photoperiod), rows = vars(Strain), labeller = label_parsed) +
   theme_bw() +
   theme(panel.grid.minor = element_blank(),
