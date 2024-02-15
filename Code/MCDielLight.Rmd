@@ -53,6 +53,10 @@ MCData <- readRDS(file = MCFiles[1]) |>
   mutate(deltaOD = OD680 - OD720)
 
   colnames(MCData)
+  
+MCDataAll <- map_df(MCFiles, readRDS) |>
+  ungroup() |>
+  mutate(deltaOD = OD680 - OD720)
 ```
 
 ```{r par_time_plot}
@@ -113,10 +117,10 @@ ODinterval<-5
 
 MCDataHour <- MCData |>
   group_by(Filename, Tube, Day) |>
-  filter(deltaOD > 0) |>
-  mutate(Actinic_photonsm2h = zoo::rollsum(Actinic_par * 5 * 60, k = 12, fill = NA, align = "right")) |> #PAR per h
-  mutate(mu_deltaODwindow = rollapply(cbind(time, log(deltaOD)), 12, slope, by.column=FALSE, fill=NA)) |> #slope
-  mutate(mu_Averh = zoo::rollmean(mu_deltaODwindow, k = 12, fill = NA, align = "right")) |> #average of first 12 row
+  #filter(deltaOD > 0) |> issue with filter for estimation of Actinic_photonsm2h
+  mutate(Actinic_photonsm2h = zoo::rollsum(Actinic_par * 5 * 60, k = 60/ODinterval, fill = NA, align = "right")) |> #PAR per h
+  mutate(mu_deltaODwindow = zoo::rollapply(cbind(time, log(deltaOD)), width = 60/ODinterval, by = 1, slope, by.column=FALSE, fill=NA)) |> #slope
+  mutate(mu_Averh = zoo::rollmean(mu_deltaODwindow, k = 60/ODinterval, fill = NA, align = "right")) |> #average of first 12 row
   ungroup() |>
   filter(time - round(time) == 0)
 
@@ -137,11 +141,12 @@ MCDataHour |>
   filter(time < 100) |>
   ggplot() +
   geom_point(aes(x = time, y = mu_Averh, colour = Actinic_photonsm2h)) +
+  scale_color_gradient(low = "black", high = "yellow") +
   geom_point(aes(x = time, y = deltaOD), colour = "green") +
-  #geom_point(aes(x = time, y = mu_Averh)) +
   facet_grid(cols = vars(Tube)) +
   theme_bw()
 ```
+
 
 
 ```{r hourly plots exploration}
@@ -162,6 +167,7 @@ MCDataHour |>
   ggplot() +
   geom_point(aes(x = Actinic_photonsm2h, y = mu_Averh, colour = ToD)) +
   geom_line(aes(x = Actinic_photonsm2h, mu_Averh, colour = ToD)) +
+  scale_color_gradient(low = "black", high = "yellow") +
   facet_grid(cols = vars(Tube)) +
   theme_bw()
 
@@ -170,6 +176,7 @@ MCDataHour |>
   ggplot() +
   geom_point(aes(x = ToD, y = mu_Averh, colour = Actinic_photonsm2h)) +
   geom_line(aes(x = ToD, y = mu_Averh, colour = Actinic_photonsm2h)) +
+  scale_color_gradient(low = "black", high = "yellow") +
   facet_grid(cols = vars(Tube)) +
   theme_bw()
 
@@ -177,6 +184,7 @@ MCDataHour |>
   filter(Tube == 4) |>
   ggplot() +
   geom_point(aes(x = ToD, y = mu_Averh, colour = Actinic_photonsm2h)) +
+  scale_color_gradient(low = "black", high = "yellow") +
   facet_grid(cols = vars(Tube)) +
   theme_bw()
 
@@ -187,10 +195,25 @@ MCDataHour |>
   ggplot() +
   geom_point(aes(x = ToD, y = mu_Averh, colour = Actinic_photonsm2h)) +
   geom_line(aes(x = ToD, y = mu_Averh, colour = Actinic_photonsm2h)) +
+  scale_color_gradient(low = "black", high = "yellow") +
   geom_smooth(aes(x = ToD, y = mu_Averh)) +
   facet_grid(cols = vars(Tube)) +
   theme_bw()
 
 ```
 
+```{r cumulative diel PAR}
+MCDataHour <- MCDataHour |>
+  group_by(Filename, Day, Tube) |>
+  mutate(Actinic_photonsm2d = sum(Actinic_photonsm2h, na.rm = TRUE)) |>
+  ungroup()
+
+MCDataHour |>
+  ggplot() +
+  geom_point(aes(x = PARPhotonDose_day, y = Actinic_photonsm2d)) +
+  geom_line(aes(x = PARPhotonDose_day, y = Actinic_photonsm2d)) +
+  facet_grid(rows = vars(Photoperiod), cols = vars(Tube)) +
+  theme_bw()
+
+```
 
