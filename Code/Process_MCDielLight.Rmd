@@ -65,9 +65,8 @@ MCFiles
 
 MCData1 <- readRDS(file = MCFiles[1])
 
-#Doug will write
-# MCDataAll <- map(MCFiles, readRDS) |>
-#   tibble()
+
+ MCDataAll <- map_df(MCFiles, readRDS)
 
   # ungroup() |>
   # mutate(deltaOD = OD680 - OD720)
@@ -78,89 +77,102 @@ MCData1 <- readRDS(file = MCFiles[1])
 # Read MetaData Catalog
 
 ```{r read locally stored metadata from rds}
-MC_RUN39 <- readRDS(file = file.path("..", "Data", "ImportedData", "ImportedMCData", "20211214_PICO_MC247_RUN39_TargetDataMetaFilter.Rds"))
-MC_RUN40 <- readRDS(file = file.path("..", "Data", "ImportedData", "ImportedMCData", "20211223_PICO_MC257_RUN40_TargetDataMetaFilter.Rds"))
-MC_RUN43 <- readRDS(file = file.path("..", "Data", "ImportedData", "ImportedMCData", "20211229_PICO_MC247_RUN43_TargetDataMetaFilter.Rds"))
-MC_RUN44 <- readRDS(file = file.path("..", "Data", "ImportedData", "ImportedMCData", "20220107_PICO_MC257_RUN44_TargetDataMetaFilter.Rds"))
-MC_RUN45 <- readRDS(file = file.path("..", "Data", "ImportedData", "ImportedMCData", "20220113_PICO_MC247_RUN45_TargetDataMetaFilter.Rds"))
-MC_RUN46 <- readRDS(file = file.path("..", "Data", "ImportedData", "ImportedMCData", "20220122_PICO_MC257_RUN46_TargetDataMetaFilter.Rds"))
-MC_RUN50 <- readRDS(file = file.path("..", "Data", "ImportedData", "ImportedMCData", "20220206_PICO_MC257_RUN50_TargetDataMetaFilter.Rds"))
-MC_RUN60 <- readRDS(file = file.path("..", "Data", "ImportedData", "ImportedMCData", "20220405_PICO_MC247_RUN60_TargetDataMetaFilter.Rds"))
-MC_RUN62 <- readRDS(file = file.path("..", "Data", "ImportedData", "ImportedMCData", "20220410_PICO_MC257_RUN62_TargetDataMetaFilter.Rds"))
-MC_RUN65 <- readRDS(file = file.path("..", "Data", "ImportedData", "ImportedMCData", "20220420_PICO_MC257_RUN65_TargetDataMetaFilter.Rds"))
-MC_RUN71 <- readRDS(file = file.path("..", "Data", "ImportedData", "ImportedMCData", "20220507_PICO_MC257_RUN71_TargetDataMetaFilter.Rds"))
-MC_RUN74 <- readRDS(file = file.path("..", "Data", "ImportedData", "ImportedMCData", "20220607_PICO_MC257_RUN74_TargetDataMetaFilter.Rds"))
-MC_RUN77 <- readRDS(file = file.path("..", "Data", "ImportedData", "ImportedMCData", "20220615_PICO_MC257_RUN77_TargetDataMetaFilter.Rds"))
-MC_RUN121 <- readRDS(file = file.path("..", "Data", "ImportedData", "ImportedMCData", "20230816_PICO_MC257_RUN121_TargetDataMetaFilter.Rds"))
+# MC_RUN39 <- readRDS(file = file.path("..", "Data", "ImportedData", "ImportedMCData", "20211214_PICO_MC247_RUN39_TargetDataMetaFilter.Rds"))
+# MC_RUN40 <- readRDS(file = file.path("..", "Data", "ImportedData", "ImportedMCData", "20211223_PICO_MC257_RUN40_TargetDataMetaFilter.Rds"))
+# MC_RUN43 <- readRDS(file = file.path("..", "Data", "ImportedData", "ImportedMCData", "20211229_PICO_MC247_RUN43_TargetDataMetaFilter.Rds"))
+# MC_RUN44 <- readRDS(file = file.path("..", "Data", "ImportedData", "ImportedMCData", "20220107_PICO_MC257_RUN44_TargetDataMetaFilter.Rds"))
+# MC_RUN45 <- readRDS(file = file.path("..", "Data", "ImportedData", "ImportedMCData", "20220113_PICO_MC247_RUN45_TargetDataMetaFilter.Rds"))
+# MC_RUN46 <- readRDS(file = file.path("..", "Data", "ImportedData", "ImportedMCData", "20220122_PICO_MC257_RUN46_TargetDataMetaFilter.Rds"))
+# MC_RUN50 <- readRDS(file = file.path("..", "Data", "ImportedData", "ImportedMCData", "20220206_PICO_MC257_RUN50_TargetDataMetaFilter.Rds"))
+# MC_RUN60 <- readRDS(file = file.path("..", "Data", "ImportedData", "ImportedMCData", "20220405_PICO_MC247_RUN60_TargetDataMetaFilter.Rds"))
+# MC_RUN62 <- readRDS(file = file.path("..", "Data", "ImportedData", "ImportedMCData", "20220410_PICO_MC257_RUN62_TargetDataMetaFilter.Rds"))
+# MC_RUN65 <- readRDS(file = file.path("..", "Data", "ImportedData", "ImportedMCData", "20220420_PICO_MC257_RUN65_TargetDataMetaFilter.Rds"))
+# MC_RUN71 <- readRDS(file = file.path("..", "Data", "ImportedData", "ImportedMCData", "20220507_PICO_MC257_RUN71_TargetDataMetaFilter.Rds"))
+# MC_RUN74 <- readRDS(file = file.path("..", "Data", "ImportedData", "ImportedMCData", "20220607_PICO_MC257_RUN74_TargetDataMetaFilter.Rds"))
+# MC_RUN77 <- readRDS(file = file.path("..", "Data", "ImportedData", "ImportedMCData", "20220615_PICO_MC257_RUN77_TargetDataMetaFilter.Rds"))
+# MC_RUN121 <- readRDS(file = file.path("..", "Data", "ImportedData", "ImportedMCData", "20230816_PICO_MC257_RUN121_TargetDataMetaFilter.Rds"))
 ```
 
 ```{r}
-MCData_8<- rbind(MC_RUN43, MC_RUN46, MC_RUN65)
-MCData_8<-MCData_8 %>% 
-    mutate(deltaOD = OD680 - OD720)
-
-MCData_12<- rbind(MC_RUN39, MC_RUN44, MC_RUN62)
-MCData_12<-MCData_12 %>% 
-    mutate(deltaOD = OD680 - OD720)
-
-MCData_16<- rbind(MC_RUN40, MC_RUN45, MC_RUN50, MC_RUN60)
-MCData_16<-MCData_16 %>% 
-     mutate(deltaOD = OD680 - OD720)
-
-MCData_24<- rbind(MC_RUN71, MC_RUN74, MC_RUN77, MC_RUN121)
-MCData_24<- MCData_24 %>% 
-     mutate(deltaOD = OD680 - OD720)
-
-rm(MC_RUN43, MC_RUN46, MC_RUN65, MC_RUN39, MC_RUN44, MC_RUN62, MC_RUN40, MC_RUN45, MC_RUN50, MC_RUN60, MC_RUN71, MC_RUN74, MC_RUN77, MC_RUN121)
+# MCData_8<- rbind(MC_RUN43, MC_RUN46, MC_RUN65)
+# MCData_8<-MCData_8 %>% 
+#     mutate(deltaOD = OD680 - OD720)
+# 
+# MCData_12<- rbind(MC_RUN39, MC_RUN44, MC_RUN62)
+# MCData_12<-MCData_12 %>% 
+#     mutate(deltaOD = OD680 - OD720)
+# 
+# MCData_16<- rbind(MC_RUN40, MC_RUN45, MC_RUN50, MC_RUN60)
+# MCData_16<-MCData_16 %>% 
+#      mutate(deltaOD = OD680 - OD720)
+# 
+# MCData_24<- rbind(MC_RUN71, MC_RUN74, MC_RUN77, MC_RUN121)
+# MCData_24<- MCData_24 %>% 
+#      mutate(deltaOD = OD680 - OD720)
+# 
+# rm(MC_RUN43, MC_RUN46, MC_RUN65, MC_RUN39, MC_RUN44, MC_RUN62, MC_RUN40, MC_RUN45, MC_RUN50, MC_RUN60, MC_RUN71, MC_RUN74, MC_RUN77, MC_RUN121)
 ```
 
 ```{r par_time_plot}
-MCData_12 |>
-  filter(Run == 39) %>% 
-  ggplot() +
+
+MCDataAll |>
+ggplot() +
   geom_point(aes(x = time, y = Actinic_par, colour = WL)) +
-  facet_grid(cols = vars(Tube)) +
+  facet_grid(cols = vars(Tube), rows = vars(Filename)) +
   theme_bw()
 
-MCData_12 |>
-  filter(Run == 39) %>% 
-  filter(time >= 48,
-         time <= 72) |>
-  ggplot() +
+MCDataAll |>
+ggplot() +
   geom_point(aes(x = time, y = Actinic_par, colour = WL)) +
-  facet_grid(cols = vars(Tube)) +
+  facet_grid(cols = vars(Strain), rows = vars(Photoperiod, Par_ue)) +
   theme_bw()
 
-MCData_12 |>
-  filter(Run == 39) %>% 
-  filter(time >= 48,
-         time <= 72) |>
-  ggplot() +
-  geom_point(aes(x = time, y = deltaOD, colour = WL)) +
-  facet_grid(cols = vars(Tube)) +
-  theme_bw()
-
-MCData_12 |>
-  filter(Run == 39) %>% 
-  filter(time >= 48,
-         time <= 72) |>
-  ggplot() +
-  geom_point(aes(x = time, y = Actinic_par)) +
-  geom_point(aes(x = time, y = 1000 * deltaOD, colour = WL)) +
-  facet_grid(cols = vars(Tube)) +
-  theme_bw()
-
-
-MCData_12 |>
-  filter(Run == 39) %>% 
-  filter(Tube == 2) |>
-  # filter(time >= 48,
-  #        time <= 72) |>
-  ggplot() +
-  geom_point(aes(x = time, y = Actinic_par)) +
-  geom_point(aes(x = time, y = 1000 * deltaOD, colour = WL)) +
-  facet_grid(cols = vars(Photoperiod, Tube)) +
-  theme_bw()
+# MCData_12 |>
+#   filter(Run == 39) %>% 
+#   ggplot() +
+#   geom_point(aes(x = time, y = Actinic_par, colour = WL)) +
+#   facet_grid(cols = vars(Tube)) +
+#   theme_bw()
+# 
+# MCData_12 |>
+#   filter(Run == 39) %>% 
+#   filter(time >= 48,
+#          time <= 72) |>
+#   ggplot() +
+#   geom_point(aes(x = time, y = Actinic_par, colour = WL)) +
+#   facet_grid(cols = vars(Tube)) +
+#   theme_bw()
+# 
+# MCData_12 |>
+#   filter(Run == 39) %>% 
+#   filter(time >= 48,
+#          time <= 72) |>
+#   ggplot() +
+#   geom_point(aes(x = time, y = deltaOD, colour = WL)) +
+#   facet_grid(cols = vars(Tube)) +
+#   theme_bw()
+# 
+# MCData_12 |>
+#   filter(Run == 39) %>% 
+#   filter(time >= 48,
+#          time <= 72) |>
+#   ggplot() +
+#   geom_point(aes(x = time, y = Actinic_par)) +
+#   geom_point(aes(x = time, y = 1000 * deltaOD, colour = WL)) +
+#   facet_grid(cols = vars(Tube)) +
+#   theme_bw()
+# 
+# 
+# MCData_12 |>
+#   filter(Run == 39) %>% 
+#   filter(Tube == 2) |>
+#   # filter(time >= 48,
+#   #        time <= 72) |>
+#   ggplot() +
+#   geom_point(aes(x = time, y = Actinic_par)) +
+#   geom_point(aes(x = time, y = 1000 * deltaOD, colour = WL)) +
+#   facet_grid(cols = vars(Photoperiod, Tube)) +
+#   theme_bw()
 ```
 
 #https://stackoverflow.com/questions/76603287/calculate-linear-regression-slope-with-moving-window
