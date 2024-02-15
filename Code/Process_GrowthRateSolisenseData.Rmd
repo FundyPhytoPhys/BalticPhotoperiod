@@ -158,24 +158,25 @@ Solisense %>%
   theme_bw()
 ```
 
-Issue - too ma y points, code works too slow.
-I filter growth rate per h during the night - when I do not collect solisense data for sure
 
-But it is not enought - I need to merge by time - to bet the same time when I measured Solisense and growth rate per h !!!! Fix this Sylwia!!!!!!!
 
-```{r}
-GrowthRateAllChoosen<-GrowthRateAll %>% 
-  filter(ToD >= 7) %>% 
-  filter(ToD <= 20)
-```
-
+Maybe merge with time - think how to do this Sylwia!!!!!!
 
 # Merge Growth rate and Solisense
 
 ```{r Joining growth rate and Solisense exp data}
-GrowthRateSoliExp <- GrowthRateAllChoosen %>% 
-  left_join(., Solisense, by = c("SampleID"="SampleID", "Run"="Run",  "Strain"="Strain", "ExpDate"="ExpDate", "Par_ue"="Par_ue","Photoperiod"="Photoperiod", "O2"="O2", "WL"="WL", "PARPhotonDose_day"="PARPhotonDose_day", "Day" = "E_days")) 
+GrowthRateSoliExp <- GrowthRateAll %>% 
+  full_join(., Solisense, by = c("SampleID"="SampleID", "Run"="Run",  "Strain"="Strain", "ExpDate"="ExpDate", "Par_ue"="Par_ue","Photoperiod"="Photoperiod", "O2"="O2", "WL"="WL", "PARPhotonDose_day"="PARPhotonDose_day", "Day" = "E_days")) 
 
+```
+I filter growth rate per h during the night - when I do not collect solisense data for sure
+but this eliminate somehow the one point 900uE, 24h, PE-rich_048 - probalby N/A issue - fix this Sylwia!!!!!!
+
+```{r}
+GrowthRateSoliExp<-GrowthRateSoliExp %>% 
+  filter(ToD >= 7) %>% 
+  filter(ToD <= 20) %>% 
+  rename(E_days = Day)
 ```
 
 
@@ -209,23 +210,23 @@ Later - come back to OD680data from Multiculti and choose cell/ml (based on pama
 
 ```{r Test plot}
 
-lab1=c(expression("8 h"), expression("12 h"), expression("16 h"), expression("24 h"))
-lab2=c(expression("30 µE"), expression("90 µE"), expression("180 µE"), expression("300 µE"), expression("600 µE"),  expression("900 µE"))
-
-GrowthRateSoliExp %>% 
-  ggplot() +
-  geom_point(aes(x = AllmeanPhycoChlaRatio, y = AllmeanSig_nm2psii, colour = as.factor(Par_ue), shape = as.factor(Photoperiod)), size = 3.5, show.legend = T) +
-  scale_shape_manual(values = c(15, 16, 17,18), name="", labels = lab1) +
-  scale_colour_manual(values = c("darkslategray", "lightblue4", "hotpink4", "indianred3","goldenrod2", "khaki2"), name="", labels = lab2) +
-  ggh4x::facet_nested(cols = vars(Phase, Ex_WL), rows = vars(Strain), labeller = label_parsed) +
-  theme_bw()
-
-GrowthRateSoliExp %>% 
-  ggplot() +
-  geom_point(aes(y = AllmeanPhycoChlaRatio, x = JVPSII_ETRqpOxbo_aLHII_Sig, colour = as.factor(Strain)), size = 3.5, show.legend = T) +
-  scale_colour_discrete(type=c("seagreen4", "palegreen3", "brown1", "brown4")) +
-  ggh4x::facet_nested(cols = vars(Photoperiod), rows = vars(Par_ue), labeller = label_parsed) +
-  theme_bw()
+# lab1=c(expression("8 h"), expression("12 h"), expression("16 h"), expression("24 h"))
+# lab2=c(expression("30 µE"), expression("90 µE"), expression("180 µE"), expression("300 µE"), expression("600 µE"),  expression("900 µE"))
+# 
+# GrowthRateSoliExp %>% 
+#   ggplot() +
+#   geom_point(aes(x = AllmeanPhycoChlaRatio, y = AllmeanSig_nm2psii, colour = as.factor(Par_ue), shape = as.factor(Photoperiod)), size = 3.5, show.legend = T) +
+#   scale_shape_manual(values = c(15, 16, 17,18), name="", labels = lab1) +
+#   scale_colour_manual(values = c("darkslategray", "lightblue4", "hotpink4", "indianred3","goldenrod2", "khaki2"), name="", labels = lab2) +
+#   ggh4x::facet_nested(cols = vars(Phase, Ex_WL), rows = vars(Strain), labeller = label_parsed) +
+#   theme_bw()
+# 
+# GrowthRateSoliExp %>% 
+#   ggplot() +
+#   geom_point(aes(y = AllmeanPhycoChlaRatio, x = JVPSII_ETRqpOxbo_aLHII_Sig, colour = as.factor(Strain)), size = 3.5, show.legend = T) +
+#   scale_colour_discrete(type=c("seagreen4", "palegreen3", "brown1", "brown4")) +
+#   ggh4x::facet_nested(cols = vars(Photoperiod), rows = vars(Par_ue), labeller = label_parsed) +
+#   theme_bw()
 ```
 
 
@@ -236,14 +237,14 @@ JVPSII vs Chl Turner (ug/L) and JVPSII vs photonDose
 
 ```{r warning = FALSE}
 
-GrowthRateSoliExp %>% 
-  ggplot() +
-  geom_point(aes(x = ChlaugmL, y = JVPSII_ETRqpOxbo_aLHII_Sig, colour = as.factor(Par_ue), shape = as.factor(Photoperiod)), size = 3.5, show.legend = T) +
-  # geom_errorbar(aes(x = ChlapgcellExp, ymin = AllmeanSig_nm2psii - AllsdSig_nm2psii, ymax = AllmeanSig_nm2psii + AllsdSig_nm2psii, colour=as.factor(Par_ue))) +
-  scale_shape_manual(values = c(15, 16, 17,18), name="", labels = lab1) +
-  scale_colour_manual(values = c("darkslategray", "lightblue4", "hotpink4", "indianred3", "goldenrod2", "khaki2"), name="", labels = lab2) +
-  ggh4x::facet_nested(cols = vars(Ex_WL), rows = vars(Strain), labeller = label_parsed) +
-  theme_bw()
+# GrowthRateSoliExp %>% 
+#   ggplot() +
+#   geom_point(aes(x = ChlaugmL, y = JVPSII_ETRqpOxbo_aLHII_Sig, colour = as.factor(Par_ue), shape = as.factor(Photoperiod)), size = 3.5, show.legend = T) +
+#   # geom_errorbar(aes(x = ChlapgcellExp, ymin = AllmeanSig_nm2psii - AllsdSig_nm2psii, ymax = AllmeanSig_nm2psii + AllsdSig_nm2psii, colour=as.factor(Par_ue))) +
+#   scale_shape_manual(values = c(15, 16, 17,18), name="", labels = lab1) +
+#   scale_colour_manual(values = c("darkslategray", "lightblue4", "hotpink4", "indianred3", "goldenrod2", "khaki2"), name="", labels = lab2) +
+#   ggh4x::facet_nested(cols = vars(Ex_WL), rows = vars(Strain), labeller = label_parsed) +
+#   theme_bw()
 
 
 GrowthRateSoliExp %>%
@@ -295,6 +296,9 @@ ggplot() +
 
 
 JVPSII per Turner Chl ug/L and per cell/L (cellL_OD680; meanTurChl_ugL)
+
+add cell/ml per MCcalibration!!!
+
 ```{r}
 #colnames(SolFitsAllPigment)
 
