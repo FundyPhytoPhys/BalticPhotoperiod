@@ -141,7 +141,7 @@ Using whole-cell absorbance spectra of *Synechococcus* sp. cultures as described
 
 
 ```{r OlisSpectra, fig.cap = OlisSpectra_cap, fig.height = 6, fig.width = 8, echo = FALSE}
-OlisSpectra_cap<- glue("**Whole-cell absorbance spectra of PC-rich (solid green lines) or PE-rich (dashed red lines) cultures of *Synechococcus* sp.** Representative spectra, normalized to absorbance at 440 nm, were measured from the the exponential or pre-stationary phases of growth, together with emission spectra of the white LED lamp (Photosynthetically Active Radiation (PAR), normalized to emission at 440 nm (light gray area), of 300 µmol photons m^−2^s^−1^) used for culture growth. Estimated Photosynthetically Usable Radiation (PUR) is shown as a green area for the PC-rich strain and a red area for the PE-rich strain, with total PUR given for each culture (µE = µmol photons m^−2^s^−1^). Peaks characteristic of known pigments are labelled; Chl *a*, chlorophyll *a*; PC, phycocyanin; PEB-rich PE, phycoerythin-rich phycoerythrin; PUB-rich PE, phycourobilin-rich phycoerythrin, Car, carotenoids.", .sep = " ")
+OlisSpectra_cap<- glue("**Whole-cell absorbance spectra of PC-rich (solid green lines) or PE-rich (dashed red lines) cultures of *Synechococcus* sp.** Representative absorbance spectra, normalized A~440nm~, were measured from the exponential or pre-stationary phases of growth, together with emission spectra of the white LED lampused for culture growth (Photosynthetically Active Radiation (PAR), normalized to emission at 440 nm (light gray area), in this example 300 µmol photons m^−2^s^−1^). Estimated Photosynthetically Usable Radiation (PUR) is shown as a green area for the PC-rich strain and a red area for the PE-rich strain, with total PUR given for each culture (µE = µmol photons m^−2^s^−1^). Peaks characteristic of known pigments are labelled; Chl *a*, chlorophyll *a*; PC, phycocyanin; PEB-rich PE, phycoerythin-rich phycoerythrin; PUB-rich PE, phycourobilin-rich phycoerythrin, Car, carotenoids.", .sep = " ")
 knitr::include_graphics(file.path( FiguresFP,"Fig_OlisSpectra.png")) 
 ```
 
@@ -196,37 +196,91 @@ All analysis of obtained results was conducted using R version 4.3.0 [@rcoreteam
 
 ## Changes in chlorophyll specific exponential growth rate {.unnumbered}
 
+Research Question:
+Does cumulative diel photon dose consistently explain achieved growth rates across a matrix of photoperiods and peak PAR?
+
+Test:  Do strains show distinct growth responses to cumulative diel photon dose, depending upon photoperiod?
+  Yes.  Every strain shows photoperiod-specific responses to cumulative diel photon dose that differ from a single light response model fit to the pooled data from a strain.
+  
+
+Test:  Do strains show distinct growth responses to cumulative diel photon dose, depending upon peak PAR?
+  Yes.  In supplmental data, strains generally show peak-PAR specific responses to cumulative diel photon dose, that differ from a single light response model fit to the pooled data from a strain. Exceptions are that for strains 77 and 48 peak PAR of 600 or 900 µmol photons m^−2^d^−1^ are not significantly different from the pooled data model.  A caveat to this findings is that cumulative diel photon dose is, of course, a product of photoperiod and PAR, so the highest levels of cumulative photon dose are only achieved under the 600 or 900 µmol photons m^−2^d^−1^.
+  
+All four strains show saturation of growth rate under increasing cumulative diel PAR, but the achieved estimates of µ~max~ vary depending upon photoperiod and peak diel PAR.  Plots of growth rates vs. cumulative diel PUR, estimated for exponential phase cultures, show similar patterns (Supplemental).
+
 ```{r GrowthRatePhotoperiod, fig.cap = GrowthRatePhotoperiod_cap, fig.height = 6, fig.width = 8, echo = FALSE}
-GrowthRatePhotoperiod_cap<- glue("**Chlorophyll specific exponential growth rates (d^−1^) vs. cumulative diel photon dose (µmol photons m^−2^d^−1^).** Growth rates (+/- SE falling within symbols) were estimated from logistic fits of chlorophyll proxy OD~680~-OD~720~ vs. elapsed time (Fig. S1), for two PhycoCyanin(PC)-rich cultures (056, 077) and two PhycoErythrin(PE)-rich cultures (048, 127) of *Synechococcus* sp. originating from the Baltic Sea. Cultures were grown at 30 (dark gray), 90 (light gray), 180 (purple), 300 (red), 600 (orange), or 900 (yellow) peak PAR µmol photons m^−2^s^−1^ (µE); and photoperiods of 8 (square), 12 (circle), 16 (triangle), or 24 (diamond) h. Solid blue line shows a fit of the pooled growth rates for each strain, with a three parameter model (Harrison and Platt, 1986). We also fit the same model separately for 8 (dotted line), 12 (long dash line), 16 (dashed line), or 24 (two dash line) h photoperiods, since they were significantly different (ANOVA, *p* < 0.05) from the fit of pooled data.", .sep = " ")
+GrowthRatePhotoperiod_cap<- glue("**Chlorophyll specific exponential growth rates (d^−1^) vs. cumulative diel photon dose (µmol photons m^−2^d^−1^).** Growth rates (+/- SE falling within symbols) were estimated from logistic fits of chlorophyll proxy OD~680~-OD~720~ vs. elapsed time (Fig. S1), for two PhycoCyanin(PC)-rich cultures (056, 077) and two PhycoErythrin(PE)-rich cultures (048, 127) of *Synechococcus* sp. originating from the Baltic Sea. Cultures were grown at 30 (dark gray), 90 (light gray), 180 (purple), 300 (red), 600 (orange), or 900 (yellow) peak PAR µmol photons m^−2^s^−1^ (µE); and photoperiods of 8 (square), 12 (circle), 16 (triangle), or 24 (diamond) h. Solid blue line shows a fit of the pooled growth rates for each strain, with a three parameter model (Harrison and Platt, 1986). We also fit the same model separately for 8 (dotted line), 12 (long dash line), 16 (dashed line), or 24 (two dash line) h photoperiods, since for all strains they were significantly different (ANOVA, *p* < 0.05) from the fit of pooled data.", .sep = " ")
 knitr::include_graphics(file.path(FiguresFP,"Fig_GrowthRate_Photoperiod.png"))
 ```
 
 ## Changes of diel growth symmetry {.unnumbered}
+Supplemental figures show consistent variations in short term growth rates over diel cycles.  We sought to analyze the intra-diel patterns of growth, initially by separating growth over the photoperiod into an acclerating phase of increasing hourly growth increments, and a deceleration phase, of decreasing hourly growth increments.
+
+Research Question:
+Do strains show consistent patterns of diel growth across cumulative diel photon doses?
+
+No.
+The length of the diel acceleration phase of growth increases with increasing photoperiod, but the slope of accleration phase vs. cumulative diel photon dose decreases with increasing peak PAR. 
+
+During pre-stationary phase these responses dampen but persist.
 
 ```{r AccLen, fig.cap = AccLen_cap, fig.height = 6, fig.width = 8, echo = FALSE}
-AccLen_cap<- glue("**Hours of photoperiod to reach maximum daily growth (h) vs. cumulative diel photon dose (µmol photons m^−2^d^−1^).** Time-resolved growth was estimated over hourly intervals for two PhycoCyanin(PC)-rich cultures (056, 077) and two PhycoErythrin(PE)-rich cultures (048, 127) of *Synechococcus* sp. originating from the Baltic Sea. Cultures were grown at 30 (dark gray), 90 (light gray), 180 (purple), 300 (red), or 900 (yellow) peak PAR µmol photons m^−2^s^−1^ (µE); and photoperiods of 8 (square), 12 (circle), or 16 (triangle) h. The horizontal lines indicate the time (h) to reach the maximum light for a given photoperiod; 4 h for the 8 h photoperiod; 6 h for the 12 h photoperiod; or 8 h for the 16 h photoperiod. Figure presents data (small symbols) and means (big symbols) from exponential phase of growth, or from pre-stationary phase of growth, *n* = 0-5.", .sep = " ")
+AccLen_cap<- glue("**Hours of photoperiod to reach maximum hourly growth vs. cumulative diel photon dose (µmol photons m^−2^d^−1^).** Time-resolved growth was estimated over hourly intervals for two PhycoCyanin(PC)-rich cultures (056, 077) and two PhycoErythrin(PE)-rich cultures (048, 127) of *Synechococcus* sp. originating from the Baltic Sea. Cultures were grown at 30 (dark gray), 90 (light gray), 180 (purple), 300 (red), or 900 (yellow) peak PAR µmol photons m^−2^s^−1^ (µE); and photoperiods of 8 (square), 12 (circle), or 16 (triangle) h. The horizontal lines indicate the time (h) to reach the maximum light for a given photoperiod; 4 h for the 8 h photoperiod; 6 h for the 12 h photoperiod; or 8 h for the 16 h photoperiod. Figure presents data (small symbols) and means (big symbols) from exponential phase of growth, or from pre-stationary phase of growth, *n* = 1-5.", .sep = " ")
 knitr::include_graphics(file.path(FiguresFP,"Fig_AccLen.png"))
 ```
 
+Research Question:
+Do strains show consistent patterns of diel symmetry (AccLen/DecLen) across cumulative diel photon doses?
+
+Yes.
+The ratio of the diel acceleration phase of growth to the deceleration phase shows a consistent exponential decay in relation to cumulative photon dose, across different combinations of photoperiod and peak PAR.
+Although all strains shows this response pattern, the exponential decay model parameters differ significantly among strains.
+During pre-stationary phase this response dampens and even disappears. 
 
 ```{r GS, fig.cap = GS_cap, fig.height = 6, fig.width = 8, echo = FALSE}
-GS_cap<- glue("**Index of diel growth symmetry (AccLen/DecLen ratio) vs. cumulative diel photon dose (µmol photons m^−2^d^−1^).** Index of diel growth symmetry (AccLen/DecLen ratio) was estimated for two PhycoCyanin(PC)-rich cultures (056, 077) and two PhycoErythrin(PE)-rich cultures (048, 127) of *Synechococcus* sp. originating from the Baltic Sea. Cultures were grown at 30 (dark gray), 90 (light gray), 180 (purple), 300 (red), or 900 (yellow) peak PAR µmol photons m^−2^s^−1^ (µE); and photoperiods of 8 (square), 12 (circle), or 16 (triangle) h. Figure presents data (small symbols) and means (big symbols) from exponential phase of growth, or from pre-stationary phase of growth, *n* = 0-5. Blue solid line shows single phase exponential decay fit for data from each strain and growth phase, fit parameters are presented. Different lowercase letters indicate significant differences between the fit models for different strains within a given phase of growth. Different uppercase letters indicate significant differences between the fit models for different phases of growth within a given strain (ANOVA; *p* < 0.05).", .sep = " ")
+GS_cap<- glue("**Index of diel growth symmetry (AccLen/DecLen ratio) vs. cumulative diel photon dose (µmol photons m^−2^d^−1^).** Diel growth symmetry was estimated for two PhycoCyanin(PC)-rich cultures (056, 077) and two PhycoErythrin(PE)-rich cultures (048, 127) of *Synechococcus* sp. originating from the Baltic Sea. Cultures were grown at 30 (dark gray), 90 (light gray), 180 (purple), 300 (red), or 900 (yellow) peak PAR µmol photons m^−2^s^−1^ (µE); and photoperiods of 8 (square), 12 (circle), or 16 (triangle) h. Figure presents data (small symbols) and means (big symbols) from exponential phase of growth, or from pre-stationary phase of growth, *n* = 1-5. Blue solid line shows single phase exponential decay fit for data from each strain and growth phase, with fit parameters presented. Different lowercase letters indicate significant differences between the fit models for different strains within a given phase of growth. Different uppercase letters indicate significant differences between the fit models for different phases of growth within a given strain (ANOVA; *p* < 0.05).", .sep = " ")
 knitr::include_graphics(file.path( FiguresFP,"Fig_GS.png"))
 ```
 
 ## Changes of PUR/PAR ratio {.unnumbered}
 
+Research Question:
+Do strains show consistent patterns of light capture efficacy (PUR/PAR ratio) across cumulative diel photon doses?
+
+Yes.
+The ratio of PUR/PAR shows a consistent exponential decay in relation to cumulative photon dose, across different combinations of photoperiod and peak PAR.
+Although all strains shows this response pattern, the exponential decay model parameters differ significantly among strains.
+During pre-stationary phase this response dampens and even disappears. 
+The PE-rich strains show a much higher PUR/PAR ratio under low cumulative diel photon dose, but decay towards a plateau close to the PC-rich strains as cumulative diel photon dose increases.
+
 ```{r PURPARRatio, fig.cap = PURPARRatio_cap, fig.height = 6, fig.width = 8, echo = FALSE}
-PURPARRatio_cap<- glue("**Changes of PUR/PAR ratio vs. cumulative diel photon dose (µmol photons m^−2^d^−1^).** PUR/PAR ratio was estimated for two PhycoCyanin(PC)-rich cultures (056, 077) and two PhycoErythrin(PE)-rich cultures (048, 127) of *Synechococcus* sp. originating from the Baltic Sea. Cultures were grown at 30 (dark gray), 90 (light gray), 180 (purple), 300 (red), 600 (orange), or 900 (yellow) peak PAR µmol photons m^−2^s^−1^ (µE); and photoperiods of 8 (square), 12 (circle), 16 (triangle), or 24 (diamond) h. Figure presents data (small symbols) and means (big symbols) from exponential phase of growth, or from pre-stationary phase of growth. Blue solid line shows single phase exponential decay fit for data from each strain and growth phase, fit parameters are presented. Different lowercase letters indicate significant differences between the fit models for different strains within a given phase of growth. Different uppercase letters indicate significant differences between the fit models for different phases of growth within a given strain (ANOVA; *p* < 0.05).", .sep = " ")
+PURPARRatio_cap<- glue("**Changes of PUR/PAR ratio vs. cumulative diel photon dose (µmol photons m^−2^d^−1^).** PUR/PAR ratio was estimated for two PhycoCyanin(PC)-rich cultures (056, 077) and two PhycoErythrin(PE)-rich cultures (048, 127) of *Synechococcus* sp. originating from the Baltic Sea. Cultures were grown at 30 (dark gray), 90 (light gray), 180 (purple), 300 (red), 600 (orange), or 900 (yellow) peak PAR µmol photons m^−2^s^−1^ (µE); and photoperiods of 8 (square), 12 (circle), 16 (triangle), or 24 (diamond) h. Figure presents data (small symbols) and means (big symbols) from exponential phase of growth, or from pre-stationary phase of growth. Blue solid line shows single phase exponential decay fit for data from each strain and growth phase, with fit parameters presented. Different lowercase letters indicate significant differences between the fit models for different strains within a given phase of growth. Different uppercase letters indicate significant differences between the fit models for different phases of growth within a given strain (ANOVA; *p* < 0.05).", .sep = " ")
 knitr::include_graphics(file.path(FiguresFP,"Fig_PURPARRatio.png"))
 ```
 
 ## Changes effective absorption cross section of PSII {.unnumbered}
 
+Research Question:
+Do strains show consistent patterns of effective absorption cross section for PSII photochemistry across cumulative diel photon doses?
+
+Yes.
+The \u03C3~PSII~' shows a consistent, sharp exponential decay in relation to cumulative photon dose, across different combinations of photoperiod and peak PAR.
+Although all strains shows this response pattern, the exponential decay model parameters differ significantly among strains.
+During pre-stationary phase this response dampens but persists. 
+The PE-rich strains show a much higher \u03C3~PSII~' under low cumulative diel photon dose, and remain higher than the PC-rich strains even as cumulative diel photon dose increases.
+
+
 ```{r Sigma590, fig.cap = Sigma590_cap, fig.height = 6, fig.width = 8, echo = FALSE}
-Sigma590_cap<- glue("**Effective absorption cross section of PSII** (\u03C3~PSII~'; nm^2^ quanta^-1^) **measured under diel peak PAR growth light under Ex590 nm (orange) excitation vs. cumulative diel photon dose (µmol photons m^−2^d^−1^).** Effective absorption cross section of PSII (\u03C3~PSII~'; nm^2^ quanta^-1^) was estimated for two PhycoCyanin(PC)-rich cultures (056, 077) and two PhycoErythrin(PE)-rich cultures (048, 127) of *Synechococcus* sp. originating from the Baltic Sea. Cultures were grown at 30 (dark gray), 90 (light gray), 180 (purple), 300 (red), 600 (orange), or 900 (yellow) peak PAR µmol photons m^−2^s^−1^ (µE); and photoperiods of 8 (square), 12 (circle), 16 (triangle), or 24 (diamond) h. Figure presents data (small symbols) and means (big symbols) from exponential phase of growth, or from pre-stationary phase of growth. Blue solid line shows single phase exponential decay fit for data from each strain and growth phase, fit parameters are presented. Different lowercase letters indicate significant differences between the fit models for different strains within a given phase of growth. Different uppercase letters indicate significant differences between the fit models for different phases of growth within a given strain (ANOVA; *p* < 0.05).", .sep = " ")
+Sigma590_cap<- glue("**Effective absorption cross section of PSII** (\u03C3~PSII~'; nm^2^ quanta^-1^) **measured under diel peak PAR growth light  vs. cumulative diel photon dose (µmol photons m^−2^d^−1^).** Effective absorption cross section of PSII (\u03C3~PSII~'; nm^2^ quanta^-1^) was estimated using FRRf induction curves with excitation of phycobilisomes using Ex~590nm~ (orange) excitation, for two PhycoCyanin(PC)-rich cultures (056, 077) and two PhycoErythrin(PE)-rich cultures (048, 127) of *Synechococcus* sp. originating from the Baltic Sea. Cultures were grown at 30 (dark gray), 90 (light gray), 180 (purple), 300 (red), 600 (orange), or 900 (yellow) peak PAR µmol photons m^−2^s^−1^ (µE); and photoperiods of 8 (square), 12 (circle), 16 (triangle), or 24 (diamond) h. Figure presents data (small symbols) and means (big symbols) from exponential phase of growth, or from pre-stationary phase of growth. Blue solid line shows single phase exponential decay fit for data from each strain and growth phase. Different lowercase letters indicate significant differences between the fit models for different strains within a given phase of growth. Different uppercase letters indicate significant differences between the fit models for different phases of growth within a given strain (T-test; *p* < 0.05).", .sep = " ")
 knitr::include_graphics(file.path( FiguresFP,"Fig_Sigma590.png"))
 ```
+
+Research Question:
+Does \u03C3~PSII~' show a consistent relation to phycobilisome:chlorophyll ratio?
+The \u03C3~PSII~' excited through chlorophyll absorbance at 445 nm was consistently small across strains and growth conditions, since in cyanobacteria the number of chlorophyll serving PSII is nearly fixed (CITATIONS DOUG). For \u03C3~PSII~' excited through phycobilisome absorbance at 590 nm, strains show consistent positive correlation with phycobilin:chlorophyll ratio.  Strains in exponential growth show significant scatter around this positive relation, likely related to regulatory control of \u03C3~PSII~', beyond pigment composition.  Under pre-stationary phase the plots of \u03C3~PSII~' vs. phycobilin:chlorophyll show much less scatter, suggesting an increase in reliance upon compositional regulation to control light delivery to PSII, as opposed to shorter term regulation.
+
+The linear fits also vary significantly among strains.
+
 
 ```{r SigmaPig590, fig.cap = SigmaPig590_cap, fig.height = 6, fig.width = 8, echo = FALSE}
 SigmaPig590_cap<- glue("**Changes of effective absorption cross section of PSII** (\u03C3~PSII~'; nm^2^ quanta^-1^) **measured under diel peak PAR growth light under Ex590 nm (orange) excitation vs. total Phyco/Chl *a* ratio.** Effective absorption cross section of PSII (\u03C3~PSII~'; nm^2^ quanta^-1^) was estimated for two PhycoCyanin(PC)-rich cultures (056, 077) and two PhycoErythrin(PE)-rich cultures (048, 127) of *Synechococcus* sp. originating from the Baltic Sea. Cultures were grown at 30 (dark gray), 90 (light gray), 180 (purple), 300 (red), 600 (orange), or 900 (yellow) peak PAR µmol photons m^−2^s^−1^ (µE); and photoperiods of 8 (square), 12 (circle), 16 (triangle), or 24 (diamond) h. Figure presents data (small symbols) and means (big symbols) from exponential phase of growth, or from pre-stationary phase of growth. Blue solid line shows linear model fit for data from each strain and growth phase. Different lowercase letters indicate significant differences between the fit models for different strains within a given phase of growth. Different uppercase letters indicate significant differences between the fit models for different phases of growth within a given strain (t-test; *p* < 0.05).", .sep = " ")
