@@ -171,7 +171,7 @@ slope <- function(x) cov(x[, 1], x[, 2]) / var(x[, 1])
 
 MCDataHour_8 <- MCData_8 |>
   group_by(Filename, Tube, Day, Run) |>
-  filter(deltaOD > 0) |>
+  filter(deltaOD >= 0) |>
   mutate(Actinic_photonsm2h = zoo::rollsum(Actinic_par, k = 8, fill = NA, align = "right") * 5 * 60) |> 
   mutate(mu_deltaODwindow = rollapply(cbind(time, log(deltaOD)), 24, slope, by.column=FALSE, fill=NA)) |>
   #mutate(mu_Averh = zoo::rollmean(mu_deltaODwindow, k = 12, fill = NA, align = "right")) |>
@@ -180,7 +180,7 @@ MCDataHour_8 <- MCData_8 |>
 
 MCDataHour_12 <- MCData_12 |>
   group_by(Filename, Tube, Day, Run) |>
-  filter(deltaOD > 0) |>
+  filter(deltaOD >= 0) |>
   mutate(Actinic_photonsm2h = zoo::rollsum(Actinic_par, k = 12, fill = NA, align = "right") * 5 * 60) |> 
   mutate(mu_deltaODwindow = rollapply(cbind(time, log(deltaOD)), 24, slope, by.column=FALSE, fill=NA)) |>
   #mutate(mu_Averh = zoo::rollmean(mu_deltaODwindow, k = 12, fill = NA, align = "right")) |>
@@ -189,7 +189,7 @@ MCDataHour_12 <- MCData_12 |>
 
 MCDataHour_16 <- MCData_16 |>
   group_by(Filename, Tube, Day, Run) |>
-  filter(deltaOD > 0) |>
+  filter(deltaOD >= 0) |>
   mutate(Actinic_photonsm2h = zoo::rollsum(Actinic_par, k = 16, fill = NA, align = "right") * 5 * 60) |> 
   mutate(mu_deltaODwindow = rollapply(cbind(time, log(deltaOD)), 24, slope, by.column=FALSE, fill=NA)) |>
   #mutate(mu_Averh = zoo::rollmean(mu_deltaODwindow, k = 12, fill = NA, align = "right")) |>
@@ -198,7 +198,7 @@ MCDataHour_16 <- MCData_16 |>
 
 MCDataHour_24 <- MCData_24 |>
   group_by(Filename, Tube, Day, Run) |>
-  filter(deltaOD > 0) |>
+  filter(deltaOD >= 0) |>
   mutate(Actinic_photonsm2h = zoo::rollsum(Actinic_par, k = 24, fill = NA, align = "right") * 5 * 60) |> 
   mutate(mu_deltaODwindow = rollapply(cbind(time, log(deltaOD)), 24, slope, by.column=FALSE, fill=NA)) |>
   #mutate(mu_Averh = zoo::rollmean(mu_deltaODwindow, k = 12, fill = NA, align = "right")) |>

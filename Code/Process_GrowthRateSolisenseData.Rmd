@@ -116,11 +116,11 @@ GrowthRate_h <- GrowthRate_h %>%
 
 ```{r Joining growth rate and Solisense exp data}
 GrowthRateAll <- GrowthRate_h %>% 
-  left_join(., GrowthRate, by = c("SampleID"="SampleID", "Run"="Run", "Strain"="Strain", "Tube" = "Tube",  "Par_ue"="Par_ue","Photoperiod"="Photoperiod", "O2"="O2", "WL"="WL")) 
+  full_join(., GrowthRate, by = c("SampleID"="SampleID", "Run"="Run", "Strain"="Strain", "Tube" = "Tube",  "Par_ue"="Par_ue","Photoperiod"="Photoperiod", "O2"="O2", "WL"="WL")) 
 ```
 
 
-# Create preliminary plot - issue - missing one point when was no growth - N/A issue? Fix this Sylwia!
+# Create preliminary plot 
 
 ```{r preliminary plot, warning = FALSE}
 GrowthRateAll %>%
@@ -158,11 +158,23 @@ Solisense %>%
   theme_bw()
 ```
 
+Issue - too ma y points, code works too slow.
+I filter growth rate per h during the night - when I do not collect solisense data for sure
+
+But it is not enought - I need to merge by time - to bet the same time when I measured Solisense and growth rate per h !!!! Fix this Sylwia!!!!!!!
+
+```{r}
+GrowthRateAllChoosen<-GrowthRateAll %>% 
+  filter(ToD >= 7) %>% 
+  filter(ToD <= 20)
+```
+
+
 # Merge Growth rate and Solisense
 
 ```{r Joining growth rate and Solisense exp data}
-GrowthRateSoliExp <- GrowthRate %>% 
-  left_join(., Solisense, by = c("SampleID"="SampleID", "Run"="Run",  "Strain"="Strain", "Tube" = "Tube", "MC"="MC",  "ExpDate"="ExpDate", "Par_ue"="Par_ue","Photoperiod"="Photoperiod", "O2"="O2", "WL"="WL", "PARPhotonDose_day"="PARPhotonDose_day", "LightShape" = "LightShape", "FilenameMC" = "FilenameMC", "ExpEndDate"= "ExpEndDate")) 
+GrowthRateSoliExp <- GrowthRateAllChoosen %>% 
+  left_join(., Solisense, by = c("SampleID"="SampleID", "Run"="Run",  "Strain"="Strain", "ExpDate"="ExpDate", "Par_ue"="Par_ue","Photoperiod"="Photoperiod", "O2"="O2", "WL"="WL", "PARPhotonDose_day"="PARPhotonDose_day", "Day" = "E_days")) 
 
 ```
 
