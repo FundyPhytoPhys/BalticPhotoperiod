@@ -109,12 +109,14 @@ slope <- function(x) cov(x[, 1], x[, 2]) / var(x[, 1])
 
 #maybe should estimate growth rates, then use 'summarize' to do sum of actinic photon dose for each hour?
 
+ODinterval<-5
+
 MCDataHour <- MCData |>
   group_by(Filename, Tube, Day) |>
   filter(deltaOD > 0) |>
-  mutate(Actinic_photonsm2h = zoo::rollsum(Actinic_par, k = 12, fill = NA, align = "right") * 5 * 60) |> 
-  mutate(mu_deltaODwindow = rollapply(cbind(time, log(deltaOD)), 24, slope, by.column=FALSE, fill=NA)) |>
-  mutate(mu_Averh = zoo::rollmean(mu_deltaODwindow, k = 12, fill = NA, align = "right")) |>
+  mutate(Actinic_photonsm2h = zoo::rollsum(Actinic_par * 5 * 60, k = 12, fill = NA, align = "right")) |> #PAR per h
+  mutate(mu_deltaODwindow = rollapply(cbind(time, log(deltaOD)), 12, slope, by.column=FALSE, fill=NA)) |> #slope
+  mutate(mu_Averh = zoo::rollmean(mu_deltaODwindow, k = 12, fill = NA, align = "right")) |> #average of first 12 row
   ungroup() |>
   filter(time - round(time) == 0)
 
