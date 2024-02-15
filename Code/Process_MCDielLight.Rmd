@@ -63,7 +63,12 @@ HeaderRows <- 0
 MCFiles <- list.files(path = file.path("..", "Data", "ImportedData", "ImportedMCData"), full.names = TRUE)
 MCFiles
 
-MCData <- readRDS(file = MCFiles[1])
+MCData1 <- readRDS(file = MCFiles[1])
+
+#Doug will write
+# MCDataAll <- map(MCFiles, readRDS) |>
+#   tibble()
+
   # ungroup() |>
   # mutate(deltaOD = OD680 - OD720)
   # colnames(MCData)
