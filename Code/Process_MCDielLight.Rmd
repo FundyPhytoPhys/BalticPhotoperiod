@@ -127,52 +127,6 @@ ggplot() +
   facet_grid(cols = vars(Strain), rows = vars(Photoperiod, Par_ue)) +
   theme_bw()
 
-# MCData_12 |>
-#   filter(Run == 39) %>% 
-#   ggplot() +
-#   geom_point(aes(x = time, y = Actinic_par, colour = WL)) +
-#   facet_grid(cols = vars(Tube)) +
-#   theme_bw()
-# 
-# MCData_12 |>
-#   filter(Run == 39) %>% 
-#   filter(time >= 48,
-#          time <= 72) |>
-#   ggplot() +
-#   geom_point(aes(x = time, y = Actinic_par, colour = WL)) +
-#   facet_grid(cols = vars(Tube)) +
-#   theme_bw()
-# 
-# MCData_12 |>
-#   filter(Run == 39) %>% 
-#   filter(time >= 48,
-#          time <= 72) |>
-#   ggplot() +
-#   geom_point(aes(x = time, y = deltaOD, colour = WL)) +
-#   facet_grid(cols = vars(Tube)) +
-#   theme_bw()
-# 
-# MCData_12 |>
-#   filter(Run == 39) %>% 
-#   filter(time >= 48,
-#          time <= 72) |>
-#   ggplot() +
-#   geom_point(aes(x = time, y = Actinic_par)) +
-#   geom_point(aes(x = time, y = 1000 * deltaOD, colour = WL)) +
-#   facet_grid(cols = vars(Tube)) +
-#   theme_bw()
-# 
-# 
-# MCData_12 |>
-#   filter(Run == 39) %>% 
-#   filter(Tube == 2) |>
-#   # filter(time >= 48,
-#   #        time <= 72) |>
-#   ggplot() +
-#   geom_point(aes(x = time, y = Actinic_par)) +
-#   geom_point(aes(x = time, y = 1000 * deltaOD, colour = WL)) +
-#   facet_grid(cols = vars(Photoperiod, Tube)) +
-#   theme_bw()
 ```
 
 #https://stackoverflow.com/questions/76603287/calculate-linear-regression-slope-with-moving-window
