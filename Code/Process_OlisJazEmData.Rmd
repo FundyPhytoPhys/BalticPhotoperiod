@@ -315,7 +315,7 @@ OLISSpectraMetaPURShort %>%
   scale_linetype_manual(values = c("PC-rich_077" ="solid", "PE-rich_127" ="longdash")) +
   stat_wl_strip(aes(x = nm), ymin = -Inf, ymax = -0.025, alpha = 0.5) +
   scale_fill_identity() +
-  labs(y = "Normalized absorbance", x = "Wavelength (nm)") +
+  labs(y = "Normalized whole-cell absorbance, lamp emission, and PUR", x = "Wavelength (nm)") +
   scale_y_continuous(breaks=seq(0, 1.2, by = 0.4)) +
   coord_cartesian(ylim = c (-0.01, 1.25)) +
   ggh4x::facet_nested(cols = vars(Par_ue, E_days), rows = vars(O2, Strain),labeller = labeller(Ex_WL = label_both, WL = label_both, E_days = E_days.labs, Photoperiod = Photoperiod.labs, Par_ue = Par_ue.labs, Strain = Strain.labs, O2 = O2.labs, )) +
@@ -425,7 +425,7 @@ OLISSpectraMetaPURShort %>%
   scale_linetype_manual(values = c("PE-rich_127" ="longdash", "PC-rich_077" ="solid")) +
   stat_wl_strip(aes(x = nm), ymin = -Inf, ymax = -0.025, alpha = 0.5) + 
   scale_fill_identity() +
-  labs(y = "Normalized absorbance", x = "Wavelength (nm)") +
+  labs(y = "Normalized whole-cell absorbance, lamp emission, and PUR", x = "Wavelength (nm)") +
   scale_y_continuous(breaks=seq(0, 1.2, by = 0.4)) +
   coord_cartesian(ylim = c (-0.01, 1.25)) +
   ggh4x::facet_nested(cols = vars(Par_ue, E_days), labeller = labeller(Ex_WL = label_both, WL = label_both, E_days = E_days.labs, Photoperiod = Photoperiod.labs, Par_ue = Par_ue.labs, Strain = Strain.labs)) +
@@ -570,7 +570,7 @@ rm(OLISSelectBA56Exp, OLISSelectBA77Exp, OLISSelectBA48Exp, OLISSelectBA127Exp, 
 
 # Create preliminary plot
 
-```{r preliminary plot, fig.height = 8, fig.width = 8}
+```{r preliminary plot}
 # data_text_Exp<- data.frame(WL = c("WW", "WW"), facetsPhase = c("Phase~of~growth"), Phase = c("Exponential"), facetsStrain = c("Strain"), Strain  = c("PC-rich_056", "PC-rich_077", "PE-rich_048", "PE-rich_127"),  label = c('Max peak - day 3, 30 µE, 12 h', 'Max peak - day 4, 30 µE, 16 h', 'Max peak - day 2, 30 µE, 8 h', 'Max peak - day 2, 300 µE, 12 h'))
 # 
 # data_text_St<- data.frame(WL = c("WW", "WW"), facetsPhase = c("Phase~of~growth"), Phase = c("Pre-stationary"), facetsStrain = c("Strain"), Strain  = c("PC-rich_056", "PC-rich_077", "PE-rich_048", "PE-rich_127"),  label = c('Max peak - day 7, 900 µE, 8 h', 'Max peak - day 7, 900 µE, 8 h', 'Max peak - day 14, 30 µE, 12 h', 'Max peak - day 14, 30 µE, 12 h'))
@@ -626,11 +626,6 @@ OLISSpectraMetaPURMaxAG %>%
         legend.text = element_text(size=10))
 ```
 
-# Save plot 
-
-```{r save plot}
-# ggsave(file = file.path(FigPath, paste("Fig_OlisSpectra_Phase",".png",sep = "")), height=9, width= 7,  dpi = 300, limitsize = TRUE)
-```
 
 # Create preliminary plot
 
@@ -652,7 +647,7 @@ OLISSpectraMetaPURMaxAG %>%
   scale_colour_discrete(type=c("seagreen4", "palegreen3", "brown1", "brown4")) +
   scale_y_continuous(breaks=seq(0, 3, by = 1)) +
   coord_cartesian(ylim = c(0, 3)) +
-  labs(y = "Normalized absorbance", x = "Wavelength (nm)") +
+  labs(y = "Normalized whole-cell absorbance, lamp emission, and PUR", x = "Wavelength (nm)") +
   ggh4x::facet_nested(cols = vars(facetsPhotoperiod, Photoperiod), rows = vars(facetsStrain, Strain), labeller = label_parsed) +
   theme_bw() +
   theme(panel.grid.minor = element_blank(),
@@ -677,6 +672,53 @@ OLISSpectraMetaPURMaxAG %>%
 
 ```{r save plot}
 ggsave(file = file.path(FigPath, paste("SFig_OlisSpectra_Photoperiod",".png",sep = "")), height=9, width= 7,  dpi = 300, limitsize = TRUE)
+```
+
+# Create preliminary plot
+
+```{r preliminary plot, fig.height = 8, fig.width = 8}
+
+lab1=c(expression("PC-rich_056"), expression("PC-rich_077"), expression("PE-rich_048"), expression("PE-rich_127"))
+lab2=c(expression("8 h"), expression("12 h"), expression("16 h"), expression("24 h"))
+lab3=c(expression("30 µE"), expression("90 µE"), expression("180 µE"), expression("300 µE"), expression("600 µE"), expression("900 µE"))
+
+OLISSpectraMetaPURMaxAG %>%
+  filter(Phase == "Exponential" | Phase == "Pre-stationary") %>% 
+  filter(E_days != 1) %>% 
+  ggplot() +
+  geom_area(aes(x = nm, y = EmNormJaz439), fill = "gray84", alpha = 0.6, show.legend = F) +
+  geom_line(aes(x = nm, y = AbsNorm440, colour = as.factor(Strain)), show.legend = F, linewidth = 0.7,  alpha = 0.5) +
+  # geom_line(aes(x = nm, y = AbsNorm440), show.legend = F, linewidth = 0.5,  colour = "gray20", alpha = 0.7, OLISSelect) +
+  stat_wl_strip(aes(x = nm), ymin = -Inf, ymax = -0.025, alpha = 0.5) +
+  scale_fill_identity() +
+  scale_colour_discrete(type=c("seagreen4", "palegreen3", "brown1", "brown4")) +
+  scale_y_continuous(breaks=seq(0, 3, by = 1)) +
+  coord_cartesian(ylim = c(0, 3)) +
+  labs(y = "Normalized whole-cell absorbance, lamp emission, and PUR", x = "Wavelength (nm)") +
+  ggh4x::facet_nested(cols = vars(facetsPar_ue, Par_ue), rows = vars(facetsStrain, Strain), labeller = label_parsed) +
+  theme_bw() +
+  theme(panel.grid.minor = element_blank(),
+        panel.grid.major = element_blank(),
+        panel.spacing.x = unit(0.4, 'cm'),
+        axis.text = element_text(size=12),
+        axis.title = element_text(size=16),
+        strip.background = element_rect(fill="white"),
+        strip.text = element_text(size=12),
+        axis.title.y = element_text(margin=margin(r=10)),
+        axis.title.x = element_text(margin=margin(t=10)),
+        legend.background = element_rect(fill="white"),
+        legend.position = c(0.08,0.87),
+        legend.key.height= unit(0.005, 'cm'),
+        legend.spacing.y = unit(-0.005, "cm"),
+        legend.spacing.x = unit(-0.005, "cm"),
+        legend.title = element_blank(),
+        legend.text = element_text(size=10))
+```
+
+# Save plot 
+
+```{r save plot}
+ggsave(file = file.path(FigPath, paste("SFig_OlisSpectra_Light",".png",sep = "")), height=9, width= 7,  dpi = 300, limitsize = TRUE)
 ```
 
 # Removed unnecessary files from the environment
