@@ -592,15 +592,15 @@ MultiCultiDataAll %>%
   #filter(Par_ue != 600) %>% 
   filter(Run != 77) %>% 
   ggplot() +
-  geom_area(aes(x = Time_h, y = meanActinic_par_h), size = 0.1, fill = "tan1", alpha = 0.6) +
+  geom_area(aes(x = Time_h, y = meanActinic_par_h/2), size = 0.1, fill = "tan1", alpha = 0.6) +
   geom_line(aes(x = Time_h, y = meanDeltaOD_h, colour = as.factor(Strain)), size = 0.5, show.legend = T) +
   geom_vline(data = tMaxAGLines_056, aes(xintercept = tMaxAG), linetype="dotdash", colour = "seagreen4", size=0.4) +
   geom_vline(data = tMaxAGLines_077, aes(xintercept = tMaxAG), linetype="dotdash", colour = "palegreen3", size=0.4) +
   geom_vline(data = tMaxAGLines_048, aes(xintercept = tMaxAG), linetype="dotdash", colour = "brown4", size=0.4) +
   geom_vline(data = tMaxAGLines_127, aes(xintercept = tMaxAG), linetype="dotdash", colour = "brown1", size=0.4) +
   scale_colour_discrete(type=c("seagreen4", "palegreen3", "brown1", "brown4"), name="") +
-  scale_y_continuous(breaks=seq(0, 1, by = 0.25)) +
-  coord_cartesian(ylim = c(0, 1.0)) +
+  # scale_y_continuous(breaks=seq(0, 1, by = 0.25)) +
+  # coord_cartesian(ylim = c(0, 1.0)) +
   labs(y = "Optical density (\u0394 OD)", x = "Elapsed time (h)") +
   ggh4x::facet_nested(cols = vars(facetsPhotoperiod, Photoperiod), rows = vars(facetsPar_ue, Par_ue), labeller = label_parsed) +
   theme_bw() +
@@ -622,7 +622,7 @@ MultiCultiDataAll %>%
 # Save plot 
 
 ```{r save plot}
-ggsave(file = file.path(FigPath, paste("SFig_GrowthCurve_DeltaOD",".png",sep = "")), height=9, width= 7,  dpi = 300, limitsize = TRUE)
+ggsave(file = file.path(FigPath, paste("SFig_GrowthCurve_DeltaOD_2",".png",sep = "")), height=9, width= 7,  dpi = 300, limitsize = TRUE)
 ```
 
 

@@ -160,11 +160,11 @@ list.files(path = DataIn, pattern = Project, full.names = TRUE)
 ```
 
 ```{r read imported pigments Exp file}
-PigmentFile <- "../Data/ProcessedData/ProcessedPigmentsData/BalticPhotoperiod_Processed_PigmentsExp.Rds"
-PigmentFileName <- str_split(string = PigmentFile, "/")[[1]][3] %>%
-  str_remove(pattern = ".Rds")
-PigmentExp <- readRDS(PigmentFile)  %>%
-  ungroup()
+# PigmentFile <- "../Data/ProcessedData/ProcessedPigmentsData/BalticPhotoperiod_Processed_PigmentsExp.Rds"
+# PigmentFileName <- str_split(string = PigmentFile, "/")[[1]][3] %>%
+#   str_remove(pattern = ".Rds")
+# PigmentExp <- readRDS(PigmentFile)  %>%
+#   ungroup()
 ```
 
 ```{r read imported pigments All file}
@@ -173,6 +173,13 @@ PigmentAllFileName <- str_split(string = PigmentAllFile, "/")[[1]][3] %>%
   str_remove(pattern = ".Rds")
 PigmentAll <- readRDS(PigmentAllFile)  %>%
   ungroup()
+```
+
+
+Pigment exp do not contain 24 and 900uE data! Fix this Sylwia!!!!!
+```{r}
+# PigmentAllSmall<-PigmentAll %>% 
+#   drop_na(PUR)
 ```
 
 # Combine growth rate and Exp pigments to get PUR
@@ -253,17 +260,117 @@ StartingPoints <- read_sheet("https://docs.google.com/spreadsheets/d/1Ns_u26HagT
 
 # MCGrowthRate$facetsStrain <- 'Strain'
 
-MCGrowthRateExpSP<-MCGrowthRateAll %>% 
-  dplyr::select(c(Strain, Par_ue, Photoperiod, O2, WL, deltaOD_Lmu_se, deltaOD_Lmu_corr, PARPhotonDose_day, facetsStrain))
-
-MCGrowthSP<-rbind(MCGrowthRateExpSP, StartingPoints)
-  rm(MCGrowthRateExpSP, StartingPoints)
+MCGrowthRateAllSP<-MCGrowthRateAll %>% 
+  dplyr::select(c(Strain, Par_ue, Photoperiod, O2, WL, deltaOD_Lmu_se, deltaOD_Lmu_corr, PARPhotonDose_day, PURPhotonDose_day, facetsStrain))
+MCGrowthSP<-rbind(MCGrowthRateAllSP, StartingPoints)
   
 MCGrowthSP<-MCGrowthSP %>% 
   unique() %>% 
   drop_na(deltaOD_Lmu_corr) %>% 
   mutate(deltaOD_Lmu_corr = deltaOD_Lmu_corr*24) #calculate growth rate per day
+
+
+
+MCGrowthRateExpSP<-MCGrowthRateExp %>% 
+  dplyr::select(c(Strain, Par_ue, Photoperiod, O2, WL, deltaOD_Lmu_se, deltaOD_Lmu_corr, PARPhotonDose_day, PURPhotonDose_day, facetsStrain))
+MCGrowthExpSP<-rbind(MCGrowthRateExpSP, StartingPoints)
+
+MCGrowthExpSP<-MCGrowthExpSP %>% 
+  unique() %>% 
+  drop_na(deltaOD_Lmu_corr) %>% 
+  mutate(deltaOD_Lmu_corr = deltaOD_Lmu_corr*24) #calculate growth rate per day
+
+  rm(MCGrowthRateAllSP, MCGrowthRateExpSP, StartingPoints)
 ```
+
+```{r}
+MCGrowthExpSP %>%
+  ggplot() +
+  geom_point(aes(x = PURPhotonDose_day, y = deltaOD_Lmu_corr, colour = as.factor(Par_ue), shape = as.factor(Photoperiod)), size = 3.5, alpha = 0.9, show.legend = T) +
+  geom_errorbar(aes(x = PURPhotonDose_day, ymin = deltaOD_Lmu_corr - deltaOD_Lmu_se, ymax = deltaOD_Lmu_corr + deltaOD_Lmu_se), alpha = 0.5, width=0) +
+  # scale_x_continuous(breaks=seq(0, 80000000, by = 20000000)) +
+  # coord_cartesian(xlim = c(-100, 83000000)) +
+  scale_shape_manual(values = c(15, 16, 17, 18), name="", labels = lab1) +
+  scale_colour_manual(values = c("darkslategray", "lightblue4", "hotpink4", "indianred3", "goldenrod2", "khaki2"), name="", labels = lab2) +
+  labs(y = "Logistic growth rate " ~ "("~d^-1~")", x = "PUR photon dose ( µmol photons "~m^-2~""~d^-1~")") +
+  ggh4x::facet_nested(rows = vars(O2, Strain), labeller = labeller(O2 = O2.labs)) +
+  scale_x_continuous(label=scientific_10) +
+  guides(color = guide_legend(order = 1), shape = guide_legend(order = 2)) +
+  theme_bw()
+```
+
+-------------------------------------  Harrison & Platt, 1986 fit for PUR photon dose------------------------------------------
+
+# Estimated Harrison & Platt, 1986 fit - for all uE and each uE separately
+
+```{r platt fit}
+#Harrison & Platt, 1986
+grcplatt <- function(I, a, b, Pmax){Pmax * (1-exp(-a*I/Pmax)) * exp(-b*I/Pmax)}
+
+MCGrowthExpSPFit <- MCGrowthExpSP %>%   
+  nest(data = -c("Strain", "facetsStrain")) %>%  
+  mutate(GRCplatt_Model = map(data, ~nlsLM(deltaOD_Lmu_corr ~ grcplatt(I = PURPhotonDose_day, a, b, Pmax),
+         data = .x,start = list(a = 0.1/2e7, b = 0.01/2e7, Pmax = 0.2),lower = c(0, 0, 0)))) %>%    
+  mutate(GRCplatt_Param = map(GRCplatt_Model, tidy),          
+         GRCplatt_Predict = map(GRCplatt_Model, possibly(augment)),          
+         GRCplatt_Glance = map(GRCplatt_Model, possibly(glance)))
+GRCplatt_PredictGrowthExpAll <- MCGrowthExpSPFit %>% 
+  unnest(GRCplatt_Predict)%>% 
+  unnest(GRCplatt_Param)
+
+```
+
+# Create preliminary plot - per Par_ue and photoperiod
+
+```{r create plot, fig.height = 8, fig.width = 8, warning = FALSE}
+lab1=c(expression("8 h"), expression("12 h"), expression("16 h"), expression("24 h"))
+lab2=c(expression("30 µE"), expression("90 µE"), expression("180 µE"), expression("300 µE"), expression("600 µE"), expression("900 µE"))
+lab4=c(expression(""), expression(""), expression(""), expression(""))
+scientific_10 <- function(x) {   parse(text=gsub("e\\+*", " %*% 10^", scales::scientific_format()(x))) }
+
+ggplot(MCGrowthExpSP, aes(PURPhotonDose_day, deltaOD_Lmu_corr)) +
+  geom_point(aes(PURPhotonDose_day, deltaOD_Lmu_corr, colour = as.factor(Par_ue), shape = as.factor(Photoperiod)), alpha = 0.8, size = 3.5, show.legend = T) +
+  geom_errorbar(aes(x = PURPhotonDose_day, ymin = deltaOD_Lmu_corr - deltaOD_Lmu_se, ymax = deltaOD_Lmu_corr + deltaOD_Lmu_se, colour = as.factor(Par_ue)), width=0, size=0.3, data = . %>% filter(deltaOD_Lmu_se<8.057558e-03), show.legend = F) +
+  geom_line(aes(PURPhotonDose_day, .fitted), colour = "blue", linetype = "solid", size = 0.3, show.legend = F, GRCplatt_PredictGrowthExpAll) +
+  scale_x_continuous(label=scientific_10) +
+  scale_colour_manual(values = c("darkslategray", "lightblue4", "hotpink4", "indianred3", "goldenrod2", "khaki2"), name="", labels = lab2, breaks=c('30', "90", "180", "300", "600","900")) +
+  scale_shape_manual(values = c(15, 16, 17, 18), name="", labels = lab1) +
+  labs(y = "Chlorophyll specific exponential growth rate " ~ "("~d^-1~")", x = " PUR photon dose ( µmol photons "~m^-2~""~d^-1~")") +
+  ggh4x::facet_nested(rows = vars(facetsStrain, Strain), labeller = label_parsed) +
+  theme_bw() +
+  theme(panel.grid.minor = element_blank(),
+        panel.grid.major = element_blank(),
+        axis.text = element_text(size=12),
+        axis.title = element_text(size=16),
+        strip.background = element_rect(fill="white"),
+        strip.text = element_text(size=12),
+        axis.title.y = element_text(margin=margin(r=10)),
+        axis.title.x = element_text(margin=margin(t=10)),
+        legend.background = element_rect(fill="white"),
+        legend.position = c(0.90,0.88),
+        legend.key.height= unit(0.003, 'cm'),
+        legend.spacing.y = unit(-0.1, "cm"),
+        legend.spacing.x = unit(-0.1, 'cm'),
+        legend.title = element_blank(),
+        legend.text = element_text(size=11))
+```
+
+
+# Save plot 
+
+```{r save plot}
+ggsave(file = file.path(FigPath, paste("SFig_GrowthRate_PUR",".png",sep = "")), height=9, width= 7,  dpi = 300, limitsize = TRUE)
+```
+
+# Cleaning the environment
+
+```{r}
+rm(GRCplatt_PredictGrowthExpAll, MCGrowthExpSP, MCGrowthExpSPFit, MCGrowthRateExp)
+```
+
+
+
+-------------------------------------  Harrison & Platt, 1986 fit for PAR photon dose------------------------------------------
 
 # Estimated Harrison & Platt, 1986 fit - for all uE and each uE separately
 
