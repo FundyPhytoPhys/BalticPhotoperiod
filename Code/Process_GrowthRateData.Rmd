@@ -160,11 +160,11 @@ list.files(path = DataIn, pattern = Project, full.names = TRUE)
 ```
 
 ```{r read imported pigments Exp file}
-# PigmentFile <- "../Data/ProcessedData/ProcessedPigmentsData/BalticPhotoperiod_Processed_PigmentsExp.Rds"
-# PigmentFileName <- str_split(string = PigmentFile, "/")[[1]][3] %>%
-#   str_remove(pattern = ".Rds")
-# PigmentExp <- readRDS(PigmentFile)  %>%
-#   ungroup()
+PigmentFile <- "../Data/ProcessedData/ProcessedPigmentsData/BalticPhotoperiod_Processed_PigmentsExp.Rds"
+PigmentFileName <- str_split(string = PigmentFile, "/")[[1]][3] %>%
+  str_remove(pattern = ".Rds")
+PigmentExp <- readRDS(PigmentFile)  %>%
+  ungroup()
 ```
 
 ```{r read imported pigments All file}
@@ -175,12 +175,6 @@ PigmentAll <- readRDS(PigmentAllFile)  %>%
   ungroup()
 ```
 
-
-Pigment exp do not contain 24 and 900uE data! Fix this Sylwia!!!!!
-```{r}
-# PigmentAllSmall<-PigmentAll %>% 
-#   drop_na(PUR)
-```
 
 # Combine growth rate and Exp pigments to get PUR
 

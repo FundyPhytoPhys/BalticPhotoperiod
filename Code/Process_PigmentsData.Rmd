@@ -1660,7 +1660,10 @@ rm(MCPigmentPlot)
 -----------------------# Create df with only one exp pigment data for specific condition--------------------------------------
 
 ```{r create df with only one exp pigment data for specific condition}
-MCPigmenttMaxAGChoosen<-MCPigmentAllSelect 
+
+MCPigmenttMaxAGChoosen<-MCPigmentAll %>% #MCPigmentAllSelect 
+  drop_na(PUR) %>% 
+  filter(ToD==10)
 
 O1 <- MCPigmenttMaxAGChoosen %>%
   filter(Par_ue == 30 | Par_ue == 300 | Par_ue == 90 | Par_ue == 180) %>%
@@ -1753,9 +1756,18 @@ O17 <- MCPigmenttMaxAGChoosen %>%
   filter(Photoperiod == 24) %>%
   filter(Time_h < 100 & Time_h > 72)
 
-MCPigmenttMaxAGExp <-rbind(O1, O2, O3, O4, O5, O6, O7, O8, O9, O10, O11, O12, O13, O14, O15, O16, O17)
+O18 <- MCPigmenttMaxAGChoosen %>%
+  filter(Run==121) %>% 
+  filter(Strain == "PE-rich_048" | Strain == "PE-rich_127")
 
-rm(O1, O2, O3, O4, O5, O6, O7, O8, O9, O10, O11, O12, O13, O14, O15, O16, O17)
+O19 <- MCPigmenttMaxAGChoosen %>%
+  filter(Run==121) %>% 
+  filter(Strain == "PC-rich_056" | Strain == "PC-rich_077") %>% 
+  filter(E_days!=2)
+
+MCPigmenttMaxAGExp <-rbind(O1, O2, O3, O4, O5, O6, O7, O8, O9, O10, O11, O12, O13, O14, O15, O16, O17, O18, O19)
+
+rm(O1, O2, O3, O4, O5, O6, O7, O8, O9, O10, O11, O12, O13, O14, O15, O16, O17, O18, O19)
 ```
 
 # Change variable names to know that these columns include onlychoosen Exp data
@@ -1771,6 +1783,7 @@ MCPigmenttMaxAGExp<-MCPigmenttMaxAGExp %>%
   mutate(PhycoChlaRatioExp = PhycopgcellExp/ChlapgcellExp) %>%
   select(-c(PURPARRatio, cellL_OD680, Chlapgcell, Phycopgcell, E_days, Time_h))
 ```
+
 
 # Create preliminary plots
 
