@@ -68,7 +68,7 @@ TableRdsPath <- file.path("..", "Output", "TablesRDS")
 list.files(path = DataIn, pattern = Project, full.names = TRUE)
 ```
 
-# This RDS contained only data from corresponding growth light 
+# This RDS contained only data from corresponding growth light and dark
 # Also, conteined mean sig - mean for replica measured on the same day
 
 ```{r read ProcessFile Sol}
@@ -111,7 +111,7 @@ MCPigmentAll <- MCPigmentAll %>%
 ```
 
 
-# Altrough MCPigmentAll already contain Exp and St phase, I took exactly the same parameters (settings) like Sig, b/c MCPigmentAll do not contain information on 600 uE. And for one case I took date from very early st phase.
+# Altrough MCPigmentAll already contain Exp and St phase, I took exactly the same parameters (settings) like Sig, b/c MCPigmentAll do not contain information on 600 uE. 
 
 # Choose only exp data
 
@@ -767,7 +767,6 @@ data_text_AnovaSt127P<- data.frame(facetsPhase = c("Phase~of~growth"), Phase = c
 
 data_text_AnovaPhase<- data.frame(facetsPhase = c("Phase~of~growth"), Phase = c("Exponential"), facetsStrain = c("Strain"), Strain  = c("PC-rich_056", "PC-rich_077", "PE-rich_048", "PE-rich_127"),  label = c('t-test, \u03B1 = 0.05', 't-test, \u03B1 = 0.05', 't-test, \u03B1 = 0.05', 't-test, \u03B1 = 0.05'))
 
-
 scientific_10 <- function(x) {   parse(text=gsub("e\\+*", " %*% 10^", scales::scientific_format()(x))) }
 lab1=c(expression("8 h"), expression("12 h"), expression("16 h"), expression("24 h"))
 lab2=c(expression("30 µE"), expression("90 µE"), expression("180 µE"), expression("300 µE"), expression("600 µE"), expression("900 µE"))
@@ -777,7 +776,9 @@ SolFitsAllPigmentPCPE590 %>%
   ggplot() +
   geom_point(aes(x = AllmeanPhycoChlaRatio, y = AllmeanSig_nm2psii, colour = as.factor(Par_ue), shape = as.factor(Photoperiod)), size = 3.5, alpha = 0.8, show.legend = T, SolFitsAllPigmentPCPE590) + 
   geom_point(aes(x = AllmeanPhycoChlaRatio, y = Sig_nm2psii, colour = as.factor(Par_ue), shape = as.factor(Photoperiod)), size = 1, show.legend = F, SolFitsAllPigmentPCPE590) + 
+  # geom_point(aes(x = PhycoChlaRatio, y = AllmeanSig_nm2psii, colour = as.factor(Par_ue), shape = as.factor(Photoperiod)), size = 1, show.legend = F, SolFitsAllPigmentPCPE590) + 
   geom_errorbar(aes(x = AllmeanPhycoChlaRatio, ymin = AllmeanSig_nm2psii - AllsdSig_nm2psii, ymax = AllmeanSig_nm2psii + AllsdSig_nm2psii, colour = as.factor(Par_ue)), show.legend = F, width=0, size=0.3, SolFitsAllPigmentPCPE590) +
+  # geom_errorbar(aes(y = AllmeanSig_nm2psii, xmin = AllmeanPhycoChlaRatio - AllsdPhycoChlaRatio, xmax = AllmeanPhycoChlaRatio + AllsdPhycoChlaRatio, colour = as.factor(Par_ue)), show.legend = F, width=0, size=0.3, SolFitsAllPigmentPCPE590) +
   geom_line(aes(x = AllmeanPhycoChlaRatio, y = `.fitted`), colour = "blue", linetype = "solid", size = 0.3, show.legend = F, augmented590pigment) +   
   
   geom_text(data=data_text_AnovaExp56, aes(x=3, y=8, label=label), colour = "blue", size=4) +
@@ -787,8 +788,8 @@ SolFitsAllPigmentPCPE590 %>%
     
   geom_text(data=data_text_AnovaSt56, aes(x=2.3, y=6.0, label=label), colour = "blue", size=4) +
   geom_text(data=data_text_AnovaSt77, aes(x=3.5, y=6.9, label=label), colour = "blue", size=4) +
-  geom_text(data=data_text_AnovaSt48, aes(x=3.3, y=7.5, label=label), colour = "blue", size=4) +
-  geom_text(data=data_text_AnovaSt127, aes(x=3.7, y=7, label=label), colour = "blue", size=4) +
+  geom_text(data=data_text_AnovaSt48, aes(x=3.0, y=7.5, label=label), colour = "blue", size=4) +
+  geom_text(data=data_text_AnovaSt127, aes(x=3.0, y=7, label=label), colour = "blue", size=4) +
     
   geom_text(data=data_text_AnovaExp56P, aes(x=3, y=4, label=label), colour = "blue", size=4) +
   geom_text(data=data_text_AnovaExp77P, aes(x=3.8, y=2.5, label=label), colour = "blue", size=4) +
@@ -797,8 +798,8 @@ SolFitsAllPigmentPCPE590 %>%
     
   geom_text(data=data_text_AnovaSt56P, aes(x=2.3, y=1.0, label=label), colour = "blue", size=4) +
   geom_text(data=data_text_AnovaSt77P, aes(x=3.5, y=2.9, label=label), colour = "blue", size=4) +
-  geom_text(data=data_text_AnovaSt48P, aes(x=3.3, y=2.5, label=label), colour = "blue", size=4) +
-  geom_text(data=data_text_AnovaSt127P, aes(x=3.7, y=3, label=label), colour = "blue", size=4) +
+  geom_text(data=data_text_AnovaSt48P, aes(x=3.0, y=2.5, label=label), colour = "blue", size=4) +
+  geom_text(data=data_text_AnovaSt127P, aes(x=3.0, y=3, label=label), colour = "blue", size=4) +
   
   geom_text(data=data_text_AnovaPhase, aes(x=1.2, y=-0.2, label=label), colour = "blue", size=4) +
   
@@ -1119,7 +1120,6 @@ data_text_AnovaSt127P<- data.frame(facetsPhase = c("Phase~of~growth"), Phase = c
 
 data_text_AnovaPhase<- data.frame(facetsPhase = c("Phase~of~growth"), Phase = c("Exponential"), facetsStrain = c("Strain"), Strain  = c("PC-rich_056", "PC-rich_077", "PE-rich_048", "PE-rich_127"), label = c('t-test, \u03B1 = 0.05', 't-test, \u03B1 = 0.05', 't-test, \u03B1 = 0.05', 't-test, \u03B1 = 0.05'))
 
-
 scientific_10 <- function(x) {   parse(text=gsub("e\\+*", " %*% 10^", scales::scientific_format()(x))) }
 lab1=c(expression("8 h"), expression("12 h"), expression("16 h"), expression("24 h"))
 lab2=c(expression("30 µE"), expression("90 µE"), expression("180 µE"), expression("300 µE"), expression("600 µE"), expression("900 µE"))
@@ -1131,7 +1131,6 @@ SolFitsAllPigmentPCPE590 %>%
   geom_point(aes(x = AllmeanPhycoChlaRatio, y = Sig_nm2psii, colour = as.factor(Par_ue), shape = as.factor(Photoperiod)), size = 1, show.legend = F, SolFitsAllPigmentPCPE590) + 
   geom_errorbar(aes(x = AllmeanPhycoChlaRatio, ymin = AllmeanSig_nm2psii - AllsdSig_nm2psii, ymax = AllmeanSig_nm2psii + AllsdSig_nm2psii, colour = as.factor(Par_ue)), show.legend = F, width=0, size=0.3, SolFitsAllPigmentPCPE590) +
   geom_line(aes(x = AllmeanPhycoChlaRatio, y = `.fitted`), colour = "blue", linetype = "solid", size = 0.3, show.legend = F, augmented590pigment) +   
-  
   
   geom_text(data=data_text_AnovaExp56, aes(x=3, y=3, label=label), colour = "blue", size=4) +
   geom_text(data=data_text_AnovaExp77, aes(x=3.8, y=3, label=label), colour = "blue", size=4) +
@@ -1154,8 +1153,6 @@ SolFitsAllPigmentPCPE590 %>%
   geom_text(data=data_text_AnovaSt127P, aes(x=3.7, y=-0.5, label=label), colour = "blue", size=4) +
   
   geom_text(data=data_text_AnovaPhase, aes(x=1.2, y=-0.4, label=label), colour = "blue", size=4) +
-  
-  
   
   scale_shape_manual(values = c(15, 16, 17,18), name="", labels = lab1) +
   scale_colour_manual(values = c("darkslategray", "lightblue4", "hotpink4", "indianred3", "goldenrod2", "khaki2"), name="", labels = lab2) +
@@ -1429,9 +1426,7 @@ saveRDS(Anova_SigPig445_Model, file.path(TableRdsPath, paste(Project, "Anova_Sig
 
 
 
-
-
-
+----------------------------------------------------- Sig in the dark -----------------------------------------
 
 ```{r unnest, preparing df to preparing final plot, echo=FALSE, warning = FALSE}
 augmented590pigmentdark<-SolFitsAllPigmentfitPhycoChlalineardarkStrain  %>%
@@ -1472,11 +1467,316 @@ SolFitsAllPigmentPCPE590dark %>%
   theme_bw() 
 ```
 
+```{r fig.height = 8, fig.width = 8, warning = FALSE}
+# WL.labs <- c("Excitation (nm)")
+# names(WL.labs) <- c("WW")
+# O2.labs <- c("Strain")
+# names(O2.labs) <- c(21)
+
+data_text_AnovaExp56<- data.frame(facetsPhase = c("Phase~of~growth"), Phase = c("Exponential"), facetsStrain = c("Strain"), Strain  = c("PC-rich_056"), label = c('a'))
+data_text_AnovaExp77<- data.frame(facetsPhase = c("Phase~of~growth"), Phase = c("Exponential"), facetsStrain = c("Strain"), Strain  = c("PC-rich_077"), label = c("a"))
+data_text_AnovaExp48<- data.frame(facetsPhase = c("Phase~of~growth"), Phase = c("Exponential"), facetsStrain = c("Strain"), Strain  = c("PE-rich_048"), label = c("b"))
+data_text_AnovaExp127<- data.frame(facetsPhase = c("Phase~of~growth"), Phase = c("Exponential"), facetsStrain = c("Strain"), Strain  = c("PE-rich_127"), label = c("c"))
+
+data_text_AnovaSt56<- data.frame(facetsPhase = c("Phase~of~growth"), Phase = c("Pre-stationary"), facetsStrain = c("Strain"), Strain  = c("PC-rich_056"), label = c('a'))
+data_text_AnovaSt77<- data.frame(facetsPhase = c("Phase~of~growth"), Phase = c("Pre-stationary"), facetsStrain = c("Strain"), Strain  = c("PC-rich_077"), label = c("b"))
+data_text_AnovaSt48<- data.frame(facetsPhase = c("Phase~of~growth"), Phase = c("Pre-stationary"), facetsStrain = c("Strain"), Strain  = c("PE-rich_048"), label = c("c"))
+data_text_AnovaSt127<- data.frame(facetsPhase = c("Phase~of~growth"), Phase = c("Pre-stationary"), facetsStrain = c("Strain"), Strain  = c("PE-rich_127"), label = c("ad"))
+
+
+data_text_AnovaExp56P<- data.frame(facetsPhase = c("Phase~of~growth"), Phase = c("Exponential"), facetsStrain = c("Strain"), Strain  = c("PC-rich_056"), label = c('A'))
+data_text_AnovaExp77P<- data.frame(facetsPhase = c("Phase~of~growth"), Phase = c("Exponential"), facetsStrain = c("Strain"), Strain  = c("PC-rich_077"), label = c("A"))
+data_text_AnovaExp48P<- data.frame(facetsPhase = c("Phase~of~growth"), Phase = c("Exponential"), facetsStrain = c("Strain"), Strain  = c("PE-rich_048"), label = c("A"))
+data_text_AnovaExp127P<- data.frame(facetsPhase = c("Phase~of~growth"), Phase = c("Exponential"), facetsStrain = c("Strain"), Strain  = c("PE-rich_127"), label = c("A"))
+
+data_text_AnovaSt56P<- data.frame(facetsPhase = c("Phase~of~growth"), Phase = c("Pre-stationary"), facetsStrain = c("Strain"), Strain  = c("PC-rich_056"), label = c('B'))
+data_text_AnovaSt77P<- data.frame(facetsPhase = c("Phase~of~growth"), Phase = c("Pre-stationary"), facetsStrain = c("Strain"), Strain  = c("PC-rich_077"), label = c("B"))
+data_text_AnovaSt48P<- data.frame(facetsPhase = c("Phase~of~growth"), Phase = c("Pre-stationary"), facetsStrain = c("Strain"), Strain  = c("PE-rich_048"), label = c("A"))
+data_text_AnovaSt127P<- data.frame(facetsPhase = c("Phase~of~growth"), Phase = c("Pre-stationary"), facetsStrain = c("Strain"), Strain  = c("PE-rich_127"), label = c("A"))
+
+data_text_AnovaPhase<- data.frame(facetsPhase = c("Phase~of~growth"), Phase = c("Exponential"), facetsStrain = c("Strain"), Strain  = c("PC-rich_056", "PC-rich_077", "PE-rich_048", "PE-rich_127"), label = c('t-test, \u03B1 = 0.05', 't-test, \u03B1 = 0.05', 't-test, \u03B1 = 0.05', 't-test, \u03B1 = 0.05'))
+
+scientific_10 <- function(x) {   parse(text=gsub("e\\+*", " %*% 10^", scales::scientific_format()(x))) }
+lab1=c(expression("8 h"), expression("12 h"), expression("16 h"), expression("24 h"))
+lab2=c(expression("30 µE"), expression("90 µE"), expression("180 µE"), expression("300 µE"), expression("600 µE"), expression("900 µE"))
+
+  
+SolFitsAllPigmentPCPE590dark %>% 
+  ggplot() +
+  geom_point(aes(x = AllmeanPhycoChlaRatio, y = AllmeanSigdark_nm2psii, colour = as.factor(Par_ue), shape = as.factor(Photoperiod)), size = 3.5, alpha = 0.8, show.legend = T, SolFitsAllPigmentPCPE590dark) + 
+  geom_point(aes(x = AllmeanPhycoChlaRatio, y = Sigdark_nm2psii, colour = as.factor(Par_ue), shape = as.factor(Photoperiod)), size = 1, show.legend = F, SolFitsAllPigmentPCPE590dark) + 
+  geom_errorbar(aes(x = AllmeanPhycoChlaRatio, ymin = AllmeanSigdark_nm2psii - AllsdSigdark_nm2psii, ymax = AllmeanSigdark_nm2psii + AllsdSigdark_nm2psii, colour = as.factor(Par_ue)), show.legend = F, width=0, size=0.3, SolFitsAllPigmentPCPE590dark) +
+  geom_line(aes(x = AllmeanPhycoChlaRatio, y = `.fitted`), colour = "blue", linetype = "solid", size = 0.3, show.legend = F, augmented590pigmentdark) + 
+
+  geom_text(data=data_text_AnovaExp56, aes(x=3, y=7, label=label), colour = "blue", size=4) +
+  geom_text(data=data_text_AnovaExp77, aes(x=3.8, y=7, label=label), colour = "blue", size=4) +
+  geom_text(data=data_text_AnovaExp48, aes(x=4.8, y=9, label=label), colour = "blue", size=4) +
+  geom_text(data=data_text_AnovaExp127, aes(x=4.5, y=9, label=label), colour = "blue", size=4) +
+    
+  geom_text(data=data_text_AnovaSt56, aes(x=2.3, y=4.5, label=label), colour = "blue", size=4) +
+  geom_text(data=data_text_AnovaSt77, aes(x=3.5, y=6.5, label=label), colour = "blue", size=4) +
+  geom_text(data=data_text_AnovaSt48, aes(x=3.0, y=6.5, label=label), colour = "blue", size=4) +
+  geom_text(data=data_text_AnovaSt127, aes(x=3.1, y=6, label=label), colour = "blue", size=4) +
+    
+  geom_text(data=data_text_AnovaExp56P, aes(x=3, y=2, label=label), colour = "blue", size=4) +
+  geom_text(data=data_text_AnovaExp77P, aes(x=3.8, y=2, label=label), colour = "blue", size=4) +
+  geom_text(data=data_text_AnovaExp48P, aes(x=4.8, y=5, label=label), colour = "blue", size=4) +
+  geom_text(data=data_text_AnovaExp127P, aes(x=4.5, y=3, label=label), colour = "blue", size=4) +
+    
+  geom_text(data=data_text_AnovaSt56P, aes(x=2.3, y=0.5, label=label), colour = "blue", size=4) +
+  geom_text(data=data_text_AnovaSt77P, aes(x=3.5, y=2.5, label=label), colour = "blue", size=4) +
+  geom_text(data=data_text_AnovaSt48P, aes(x=3.0, y=2.5, label=label), colour = "blue", size=4) +
+  geom_text(data=data_text_AnovaSt127P, aes(x=3.1, y=2.5, label=label), colour = "blue", size=4) +
+  
+  geom_text(data=data_text_AnovaPhase, aes(x=1.2, y=-0.4, label=label), colour = "blue", size=4) +
+  
+  scale_shape_manual(values = c(15, 16, 17,18), name="", labels = lab1) +
+  scale_colour_manual(values = c("darkslategray", "lightblue4", "hotpink4", "indianred3", "goldenrod2", "khaki2"), name="", labels = lab2) +
+  scale_x_continuous(breaks=seq(0, 5, by = 1)) +
+  scale_y_continuous(breaks=seq(0, 8, by = 2)) +
+  coord_cartesian(xlim = c(0, 5.5), ylim = c(-1.5, 10)) +
+  
+  labs(y=expression(paste(sigma,""["PSII"]*" (nm"^"2"*" quanta"^"-1"*")")), x = "Total phyco/Chl" ~italic(a)~ "ratio") +
+  ggh4x::facet_nested(cols = vars(facetsPhase, Phase), rows = vars(facetsStrain, Strain), labeller = label_parsed) +
+  theme_bw() +
+  theme(panel.grid.minor = element_blank(),
+        panel.grid.major = element_blank(),
+        axis.text = element_text(size=12),
+        axis.title = element_text(size=16),
+        strip.background = element_rect(fill="white"),
+        strip.text = element_text(size=12),
+        axis.title.y = element_text(margin=margin(r=10)),
+        axis.title.x = element_text(margin=margin(t=10)),
+        legend.background = element_rect(fill="transparent"),
+        legend.position = c(0.9,0.88),
+        legend.key.height= unit(0.005, 'cm'),
+        legend.spacing.y = unit(-0.1, "cm"),
+        legend.title = element_blank(),
+        legend.text = element_text(size=11))
+```
+
+
 # Save plot 
 
 ```{r save plot}
-# ggsave(file = file.path(FigPath, paste("Fig_SigmaPig590dark",".png",sep = "")), height=10, width= 8,  dpi = 300, limitsize = TRUE)
+ggsave(file = file.path(FigPath, paste("SFig_SigmaPig590dark",".png",sep = "")), height=10, width= 8,  dpi = 300, limitsize = TRUE)
 ```
+
+# Anova from the linear model 
+https://stackoverflow.com/questions/24527116/write-regression-summary-to-the-csv-file-in-r
+
+t-test from the linear model Exp
+```{r}
+# Exp
+Stats56_77Exp<-SolFitsAllPigmentPCPE %>%
+  filter(Phase == "Exponential") %>%
+  filter(Ex_WL == 590) %>%
+  filter(Strain == "PC-rich_056" | Strain == "PC-rich_077") 
+  fit <- lm(Sigdark_nm2psii ~ AllmeanPhycoChlaRatio + Strain + AllmeanPhycoChlaRatio:Strain,data=Stats56_77Exp)
+x <- cbind(t(as.numeric(coefficients(fit))), t(as.numeric(summary(fit)$coefficients[4, 4])), t(as.numeric(summary(fit)$coefficients[4, 3])), t(as.numeric(summary(fit)$coefficients[4, 2])))
+model_56_77Exp<-data.frame(unclass(x), check.names = FALSE, stringsAsFactors = FALSE) %>% 
+  rename("Estimate" = "4", "Std.Error" = "7", "t_value" = "6", "p_value" = "5") %>% 
+  select(c("Estimate", "Std.Error", "t_value", "p_value"))
+  model_56_77Exp$FitComparison <- '056_077_Exp'
+
+SolFits56_48Exp<-SolFitsAllPigmentPCPE %>%
+  filter(Phase == "Exponential") %>%
+  filter(Ex_WL == 590) %>%
+  filter(Strain == "PC-rich_056" | Strain == "PE-rich_048") 
+  fit <- lm(Sigdark_nm2psii ~ AllmeanPhycoChlaRatio + Strain + AllmeanPhycoChlaRatio:Strain,data=SolFits56_48Exp)
+x <- cbind(t(as.numeric(coefficients(fit))), t(as.numeric(summary(fit)$coefficients[4, 4])), t(as.numeric(summary(fit)$coefficients[4, 3])), t(as.numeric(summary(fit)$coefficients[4, 2])))
+model_56_48Exp<-data.frame(unclass(x), check.names = FALSE, stringsAsFactors = FALSE) %>% 
+  rename("Estimate" = "4", "Std.Error" = "7", "t_value" = "6", "p_value" = "5") %>% 
+  select(c("Estimate", "Std.Error", "t_value", "p_value"))
+  model_56_48Exp$FitComparison <- '056_048_Exp'
+
+SolFits56_127Exp<-SolFitsAllPigmentPCPE %>%
+  filter(Phase == "Exponential") %>%
+  filter(Ex_WL == 590) %>%
+  filter(Strain == "PC-rich_056" | Strain == "PE-rich_127")  
+  fit <- lm(Sigdark_nm2psii ~ AllmeanPhycoChlaRatio + Strain + AllmeanPhycoChlaRatio:Strain,data=SolFits56_127Exp)
+x <- cbind(t(as.numeric(coefficients(fit))), t(as.numeric(summary(fit)$coefficients[4, 4])), t(as.numeric(summary(fit)$coefficients[4, 3])), t(as.numeric(summary(fit)$coefficients[4, 2])))
+model_56_127Exp<-data.frame(unclass(x), check.names = FALSE, stringsAsFactors = FALSE) %>% 
+  rename("Estimate" = "4", "Std.Error" = "7", "t_value" = "6", "p_value" = "5") %>% 
+  select(c("Estimate", "Std.Error", "t_value", "p_value"))
+  model_56_127Exp$FitComparison <- '056_127_Exp'
+
+SolFits48_127Exp<-SolFitsAllPigmentPCPE %>%
+  filter(Phase == "Exponential") %>%
+  filter(Ex_WL == 590) %>%
+  filter(Strain == "PE-rich_048" | Strain == "PE-rich_127")  
+  fit <- lm(Sigdark_nm2psii ~ AllmeanPhycoChlaRatio + Strain + AllmeanPhycoChlaRatio:Strain,data=SolFits48_127Exp)
+x <- cbind(t(as.numeric(coefficients(fit))), t(as.numeric(summary(fit)$coefficients[4, 4])), t(as.numeric(summary(fit)$coefficients[4, 3])), t(as.numeric(summary(fit)$coefficients[4, 2])))
+model_48_127Exp<-data.frame(unclass(x), check.names = FALSE, stringsAsFactors = FALSE) %>% 
+  rename("Estimate" = "4", "Std.Error" = "7", "t_value" = "6", "p_value" = "5") %>% 
+  select(c("Estimate", "Std.Error", "t_value", "p_value"))
+  model_48_127Exp$FitComparison <- '048_127_Exp'
+
+SolFits77_48Exp<-SolFitsAllPigmentPCPE %>%
+  filter(Phase == "Exponential") %>%
+  filter(Ex_WL == 590) %>%
+  filter(Strain == "PC-rich_077" | Strain == "PE-rich_048") 
+  fit <- lm(Sigdark_nm2psii ~ AllmeanPhycoChlaRatio + Strain + AllmeanPhycoChlaRatio:Strain,data=SolFits77_48Exp)
+x <- cbind(t(as.numeric(coefficients(fit))), t(as.numeric(summary(fit)$coefficients[4, 4])), t(as.numeric(summary(fit)$coefficients[4, 3])), t(as.numeric(summary(fit)$coefficients[4, 2])))
+model_77_48Exp<-data.frame(unclass(x), check.names = FALSE, stringsAsFactors = FALSE) %>% 
+  rename("Estimate" = "4", "Std.Error" = "7", "t_value" = "6", "p_value" = "5") %>% 
+  select(c("Estimate", "Std.Error", "t_value", "p_value"))
+  model_77_48Exp$FitComparison <- '077_048_Exp'
+
+SolFits77_127Exp<-SolFitsAllPigmentPCPE %>%
+  filter(Phase == "Exponential") %>%
+  filter(Ex_WL == 590) %>%
+  filter(Strain == "PC-rich_077" | Strain == "PE-rich_127") 
+  fit <- lm(Sigdark_nm2psii ~ AllmeanPhycoChlaRatio + Strain + AllmeanPhycoChlaRatio:Strain,data=SolFits77_127Exp)
+x <- cbind(t(as.numeric(coefficients(fit))), t(as.numeric(summary(fit)$coefficients[4, 4])), t(as.numeric(summary(fit)$coefficients[4, 3])), t(as.numeric(summary(fit)$coefficients[4, 2])))
+model_77_127Exp<-data.frame(unclass(x), check.names = FALSE, stringsAsFactors = FALSE) %>% 
+  rename("Estimate" = "4", "Std.Error" = "7", "t_value" = "6", "p_value" = "5") %>% 
+  select(c("Estimate", "Std.Error", "t_value", "p_value"))
+  model_77_127Exp$FitComparison <- '077_127_Exp'
+
+modelExpdark<-rbind(model_56_77Exp, model_56_48Exp, model_56_127Exp, model_48_127Exp, model_77_48Exp, model_77_127Exp)
+  rm(model_56_77Exp, model_56_48Exp, model_56_127Exp, model_48_127Exp, model_77_48Exp, model_77_127Exp)
+```
+
+t-test from the linear model St
+```{r}
+# Exp
+Stats56_77St<-SolFitsAllPigmentPCPE %>%
+  filter(Phase == "Pre-stationary") %>%
+  filter(Ex_WL == 590) %>%
+  filter(Strain == "PC-rich_056" | Strain == "PC-rich_077") 
+  fit <- lm(Sigdark_nm2psii ~ AllmeanPhycoChlaRatio + Strain + AllmeanPhycoChlaRatio:Strain,data=Stats56_77St)
+x <- cbind(t(as.numeric(coefficients(fit))), t(as.numeric(summary(fit)$coefficients[4, 4])), t(as.numeric(summary(fit)$coefficients[4, 3])), t(as.numeric(summary(fit)$coefficients[4, 2])))
+model_56_77St<-data.frame(unclass(x), check.names = FALSE, stringsAsFactors = FALSE) %>% 
+  rename("Estimate" = "4", "Std.Error" = "7", "t_value" = "6", "p_value" = "5") %>% 
+  select(c("Estimate", "Std.Error", "t_value", "p_value"))
+  model_56_77St$FitComparison <- '056_077_St'
+
+SolFits56_48St<-SolFitsAllPigmentPCPE %>%
+  filter(Phase == "Pre-stationary") %>%
+  filter(Ex_WL == 590) %>%
+  filter(Strain == "PC-rich_056" | Strain == "PE-rich_048") 
+  fit <- lm(Sigdark_nm2psii ~ AllmeanPhycoChlaRatio + Strain + AllmeanPhycoChlaRatio:Strain,data=SolFits56_48St)
+x <- cbind(t(as.numeric(coefficients(fit))), t(as.numeric(summary(fit)$coefficients[4, 4])), t(as.numeric(summary(fit)$coefficients[4, 3])), t(as.numeric(summary(fit)$coefficients[4, 2])))
+model_56_48St<-data.frame(unclass(x), check.names = FALSE, stringsAsFactors = FALSE) %>% 
+  rename("Estimate" = "4", "Std.Error" = "7", "t_value" = "6", "p_value" = "5") %>% 
+  select(c("Estimate", "Std.Error", "t_value", "p_value"))
+  model_56_48St$FitComparison <- '056_048_St'
+
+SolFits56_127St<-SolFitsAllPigmentPCPE %>%
+  filter(Phase == "Pre-stationary") %>%
+  filter(Ex_WL == 590) %>%
+  filter(Strain == "PC-rich_056" | Strain == "PE-rich_127")  
+  fit <- lm(Sigdark_nm2psii ~ AllmeanPhycoChlaRatio + Strain + AllmeanPhycoChlaRatio:Strain,data=SolFits56_127St)
+x <- cbind(t(as.numeric(coefficients(fit))), t(as.numeric(summary(fit)$coefficients[4, 4])), t(as.numeric(summary(fit)$coefficients[4, 3])), t(as.numeric(summary(fit)$coefficients[4, 2])))
+model_56_127St<-data.frame(unclass(x), check.names = FALSE, stringsAsFactors = FALSE) %>% 
+  rename("Estimate" = "4", "Std.Error" = "7", "t_value" = "6", "p_value" = "5") %>% 
+  select(c("Estimate", "Std.Error", "t_value", "p_value"))
+  model_56_127St$FitComparison <- '056_127_St'
+
+SolFits48_127St<-SolFitsAllPigmentPCPE %>%
+  filter(Phase == "Pre-stationary") %>%
+  filter(Ex_WL == 590) %>%
+  filter(Strain == "PE-rich_048" | Strain == "PE-rich_127")  
+  fit <- lm(Sigdark_nm2psii ~ AllmeanPhycoChlaRatio + Strain + AllmeanPhycoChlaRatio:Strain,data=SolFits48_127St)
+x <- cbind(t(as.numeric(coefficients(fit))), t(as.numeric(summary(fit)$coefficients[4, 4])), t(as.numeric(summary(fit)$coefficients[4, 3])), t(as.numeric(summary(fit)$coefficients[4, 2])))
+model_48_127St<-data.frame(unclass(x), check.names = FALSE, stringsAsFactors = FALSE) %>% 
+  rename("Estimate" = "4", "Std.Error" = "7", "t_value" = "6", "p_value" = "5") %>% 
+  select(c("Estimate", "Std.Error", "t_value", "p_value"))
+  model_48_127St$FitComparison <- '048_127_St'
+
+SolFits77_48St<-SolFitsAllPigmentPCPE %>%
+  filter(Phase == "Pre-stationary") %>%
+  filter(Ex_WL == 590) %>%
+  filter(Strain == "PC-rich_077" | Strain == "PE-rich_048") 
+  fit <- lm(Sigdark_nm2psii ~ AllmeanPhycoChlaRatio + Strain + AllmeanPhycoChlaRatio:Strain,data=SolFits77_48St)
+x <- cbind(t(as.numeric(coefficients(fit))), t(as.numeric(summary(fit)$coefficients[4, 4])), t(as.numeric(summary(fit)$coefficients[4, 3])), t(as.numeric(summary(fit)$coefficients[4, 2])))
+model_77_48St<-data.frame(unclass(x), check.names = FALSE, stringsAsFactors = FALSE) %>% 
+  rename("Estimate" = "4", "Std.Error" = "7", "t_value" = "6", "p_value" = "5") %>% 
+  select(c("Estimate", "Std.Error", "t_value", "p_value"))
+  model_77_48St$FitComparison <- '077_048_St'
+
+SolFits77_127St<-SolFitsAllPigmentPCPE %>%
+  filter(Phase == "Pre-stationary") %>%
+  filter(Ex_WL == 590) %>%
+  filter(Strain == "PC-rich_077" | Strain == "PE-rich_127") 
+  fit <- lm(Sigdark_nm2psii ~ AllmeanPhycoChlaRatio + Strain + AllmeanPhycoChlaRatio:Strain,data=SolFits77_127St)
+x <- cbind(t(as.numeric(coefficients(fit))), t(as.numeric(summary(fit)$coefficients[4, 4])), t(as.numeric(summary(fit)$coefficients[4, 3])), t(as.numeric(summary(fit)$coefficients[4, 2])))
+model_77_127St<-data.frame(unclass(x), check.names = FALSE, stringsAsFactors = FALSE) %>% 
+  rename("Estimate" = "4", "Std.Error" = "7", "t_value" = "6", "p_value" = "5") %>% 
+  select(c("Estimate", "Std.Error", "t_value", "p_value"))
+  model_77_127St$FitComparison <- '077_127_St'
+
+modelStdark<-rbind(model_56_77St, model_56_48St, model_56_127St, model_48_127St, model_77_48St, model_77_127St)
+  rm(model_56_77St, model_56_48St, model_56_127St, model_48_127St, model_77_48St, model_77_127St)
+```
+
+t-test from the linear model Phase
+```{r}
+# Exp
+Stats56_ExpSt<-SolFitsAllPigmentPCPE %>%
+  filter(Phase == "Exponential" | Phase == "Pre-stationary") %>%
+  filter(Ex_WL == 590) %>%
+  filter(Strain == "PC-rich_056") 
+  fit <- lm(Sigdark_nm2psii ~ AllmeanPhycoChlaRatio + Phase + AllmeanPhycoChlaRatio:Phase,data=Stats56_ExpSt)
+x <- cbind(t(as.numeric(coefficients(fit))), t(as.numeric(summary(fit)$coefficients[4, 4])), t(as.numeric(summary(fit)$coefficients[4, 3])), t(as.numeric(summary(fit)$coefficients[4, 2])))
+model_56ExpSt<-data.frame(unclass(x), check.names = FALSE, stringsAsFactors = FALSE) %>% 
+  rename("Estimate" = "4", "Std.Error" = "7", "t_value" = "6", "p_value" = "5") %>% 
+  select(c("Estimate", "Std.Error", "t_value", "p_value"))
+  model_56ExpSt$FitComparison <- '056_Exp_St'
+
+Stats77_ExpSt<-SolFitsAllPigmentPCPE %>%
+  filter(Phase == "Exponential" | Phase == "Pre-stationary") %>%
+  filter(Ex_WL == 590) %>%
+  filter(Strain == "PC-rich_077") 
+  fit <- lm(Sigdark_nm2psii ~ AllmeanPhycoChlaRatio + Phase + AllmeanPhycoChlaRatio:Phase,data=Stats77_ExpSt)
+x <- cbind(t(as.numeric(coefficients(fit))), t(as.numeric(summary(fit)$coefficients[4, 4])), t(as.numeric(summary(fit)$coefficients[4, 3])), t(as.numeric(summary(fit)$coefficients[4, 2])))
+model_77ExpSt<-data.frame(unclass(x), check.names = FALSE, stringsAsFactors = FALSE) %>% 
+  rename("Estimate" = "4", "Std.Error" = "7", "t_value" = "6", "p_value" = "5") %>% 
+  select(c("Estimate", "Std.Error", "t_value", "p_value"))
+  model_77ExpSt$FitComparison <- '077_Exp_St'
+
+Stats48_ExpSt<-SolFitsAllPigmentPCPE %>%
+  filter(Phase == "Exponential" | Phase == "Pre-stationary") %>%
+  filter(Ex_WL == 590) %>%
+  filter(Strain == "PE-rich_048") 
+  fit <- lm(Sigdark_nm2psii ~ AllmeanPhycoChlaRatio + Phase + AllmeanPhycoChlaRatio:Phase,data=Stats48_ExpSt)
+x <- cbind(t(as.numeric(coefficients(fit))), t(as.numeric(summary(fit)$coefficients[4, 4])), t(as.numeric(summary(fit)$coefficients[4, 3])), t(as.numeric(summary(fit)$coefficients[4, 2])))
+model_48ExpSt<-data.frame(unclass(x), check.names = FALSE, stringsAsFactors = FALSE) %>% 
+  rename("Estimate" = "4", "Std.Error" = "7", "t_value" = "6", "p_value" = "5") %>% 
+  select(c("Estimate", "Std.Error", "t_value", "p_value"))
+  model_48ExpSt$FitComparison <- '048_Exp_St'
+
+Stats127_ExpSt<-SolFitsAllPigmentPCPE %>%
+  filter(Phase == "Exponential" | Phase == "Pre-stationary") %>%
+  filter(Ex_WL == 590) %>%
+  filter(Strain == "PE-rich_127") 
+  fit <- lm(Sigdark_nm2psii ~ AllmeanPhycoChlaRatio + Phase + AllmeanPhycoChlaRatio:Phase,data=Stats127_ExpSt)
+x <- cbind(t(as.numeric(coefficients(fit))), t(as.numeric(summary(fit)$coefficients[4, 4])), t(as.numeric(summary(fit)$coefficients[4, 3])), t(as.numeric(summary(fit)$coefficients[4, 2])))
+model_127ExpSt<-data.frame(unclass(x), check.names = FALSE, stringsAsFactors = FALSE) %>% 
+  rename("Estimate" = "4", "Std.Error" = "7", "t_value" = "6", "p_value" = "5") %>% 
+  select(c("Estimate", "Std.Error", "t_value", "p_value"))
+  model_127ExpSt$FitComparison <- '127_Exp_St'
+
+
+modelExpStdark<-rbind(model_56ExpSt, model_77ExpSt, model_48ExpSt, model_127ExpSt)
+  rm(model_56ExpSt, model_77ExpSt, model_48ExpSt, model_127ExpSt)
+```
+
+# Merge statistic
+```{r}
+Anova_SigPig590dark_Model<-rbind(modelExpdark, modelStdark, modelExpStdark)
+rm(modelExpdark, modelStdark, modelExpStdark)
+```
+
+
+# Save RDS that create stats and tables
+
+```{r}
+saveRDS(Anova_SigPig590dark_Model, file.path(TableRdsPath, paste(Project, "Anova_SigPig590dark_Model.Rds", sep = "_"), fsep = .Platform$file.sep), ascii = FALSE, version = NULL, compress = "xz", refhook = NULL)
+```
+
+
 
 
 # Clean the environment
