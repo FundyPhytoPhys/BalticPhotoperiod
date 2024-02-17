@@ -303,7 +303,7 @@ colnames(MultiCultiDataAll)
 ```
 
 
--------------------------------------------------# Logistic fits --------------------------------------------------------
+-------------------------------------------------# Logistic fits till Pmax-------------------------------------------------------
 
 
 ```{r set project variables}
@@ -342,9 +342,6 @@ MultiCultiGrowth <- readRDS(MultiCultiGrowthFile)  %>%
 MultiCultiGrowth<-MultiCultiGrowth %>% 
   dplyr::select(c(Tube, ExpDate, MC, Run, SampleID, Strain, Par_ue, Photoperiod, WL, O2, LightShape, PARPhotonDose_day, OD720_Lmu_se, OD720_Lmu_corr, deltaOD_Lmu_se, deltaOD_Lmu_corr, tubedata, deltaOD_logistic_predict))
 
-# MultiCultiGrowth<-MultiCultiGrowth %>% 
-#   dplyr::select(c(Tube, ExpDate, MC, Run, SampleID, Strain, Par_ue, Photoperiod, WL, O2, LightShape, PARPhotonDose_day, OD720_Lmu_se, OD720_Lmu_corr, deltaOD_Lmu_se, deltaOD_Lmu_corr, tubedata, OD720_logistic_predict, deltaOD_logistic_predict, OD720trunc_logistic_predict, deltaODtrunc_logistic_predict))
-  
 MultiCultiGrowth<-MultiCultiGrowth %>% 
   mutate(Strain=case_when(Strain=="BA127R"~"PE-rich_127",
          Strain=="BA48R"~"PE-rich_048",
@@ -364,22 +361,10 @@ MCGrowthRate<-rbind(MultiCultiGrowth1, MultiCultiGrowth2, MultiCultiGrowth3)
 ```
 
 ```{r unnest, preparing df to preparing final plot, echo=FALSE, warning = FALSE}
-# augmentedMCGrowthRateFitOD720<-MCGrowthRate  %>%
-#   unnest(OD720_logistic_predict) %>%
-#   select(c(OD720, time, .fitted)) 
-
-# augmentedMCGrowthRateFitOD720Trunc<-MCGrowthRate  %>%
-#   unnest(OD720trunc_logistic_predict) %>%
-#   select(c(OD720, time, .fitted)) 
 
 augmentedMCGrowthRateFitDeltaOD<-MCGrowthRate  %>%
   unnest(deltaOD_logistic_predict) %>%
   select(c(deltaOD, time, .fitted)) 
-
-# augmentedMCGrowthRateFitDeltaODTrunc<-MCGrowthRate  %>%
-#   unnest(deltaODtrunc_logistic_predict) %>%
-#   select(c(deltaOD, time, .fitted)) 
-
 
 augmentedMCGrowthRateTubedata<-MCGrowthRate  %>%
   unnest(tubedata)
@@ -389,7 +374,8 @@ augmentedMCGrowthRateTubedata<-augmentedMCGrowthRateTubedata %>%
 
 ```
 
-# Merge tubedata and fit prediction - OD720
+# Merge tubedata and fit prediction - DeltaOD
+
 ```{r warning = FALSE}
 
 MCGrowthRateFitDeltaOD <- augmentedMCGrowthRateFitDeltaOD %>%
@@ -401,33 +387,6 @@ MCGrowthRateFitData<-MCGrowthRateFitDeltaOD
 
 ```
 
-# Merge tubedata and fit prediction - OD720
-```{r warning = FALSE}
-# MCGrowthRateFitOD720 <- augmentedMCGrowthRateFitOD720 %>%
-#   left_join(., augmentedMCGrowthRateTubedata, by = c("OD720" = "OD720", "time" = "time"))
-# MCGrowthRateFitOD720<-MCGrowthRateFitOD720 %>% 
-#   rename(fittedOD720 = .fitted) 
-#   
-# MCGrowthRateFitOD720PTrunc <- augmentedMCGrowthRateFitOD720Trunc %>%
-#   left_join(., MCGrowthRateFitOD720, by = c("OD720" = "OD720", "time" = "time"))
-# MCGrowthRateFitOD720PTrunc<-MCGrowthRateFitOD720PTrunc %>% 
-#   rename(fittedOD720Trunc = .fitted) 
-# 
-# MCGrowthRateFitDeltaOD <- augmentedMCGrowthRateFitDeltaOD %>%
-#   left_join(., MCGrowthRateFitOD720PTrunc, by = c("deltaOD" = "deltaOD", "time" = "time"))
-# MCGrowthRateFitDeltaOD<-MCGrowthRateFitDeltaOD %>% 
-#   rename(fittedDeltaOD = .fitted) 
-# 
-# MCGrowthRateFitDeltaODTrunc <- augmentedMCGrowthRateFitDeltaODTrunc %>%
-#   left_join(., MCGrowthRateFitDeltaOD, by = c("deltaOD" = "deltaOD", "time" = "time"))
-# MCGrowthRateFitDeltaODTrunc<-MCGrowthRateFitDeltaODTrunc %>% 
-#   rename(fittedDeltaODTrunc = .fitted) 
-# 
-# MCGrowthRateFitData<-MCGrowthRateFitDeltaODTrunc
-# 
-# rm(MCGrowthRateFitOD720, MCGrowthRateFitOD720PTrunc, MCGrowthRateFitDeltaOD, MCGrowthRateFitDeltaODTrunc, augmentedMCGrowthRateFitOD720, augmentedMCGrowthRateFitOD720Trunc, augmentedMCGrowthRateFitDeltaOD, augmentedMCGrowthRateFitDeltaODTrunc, augmentedMCGrowthRateTubedata)
-
-```
 
 ```{r Import Run and calculate mean OD, echo = FALSE, warning = FALSE}
 
@@ -464,11 +423,15 @@ MCGrowthRateFitData$facetsStrain = factor(MCGrowthRateFitData$WL, labels = c("St
 # Create GrowthCurve plot with fits
 
 ```{r create GrowthCurve plot, fig.height = 8, fig.width = 8, warning = FALSE}
+
+MultiCultiDataAll<-MultiCultiDataAll %>% 
+  filter(Run != 77) 
+
 MCGrowthRateFitData %>%
   filter(Run != 77) %>% 
   ggplot() +
   #geom_area(aes(x = time_h, y = meanActinic_par_h), size = 0.1, fill = "tan1", alpha = 0.6) +
-  geom_line(aes(x = time_h, y = meanDeltaOD_h, colour = as.factor(Strain)), size = 0.3, alpha = 0.4, show.legend = F) +
+  geom_line(aes(x = Time_h, y = meanDeltaOD_h, colour = as.factor(Strain)), size = 0.7, alpha = 0.2, show.legend = F, MultiCultiDataAll) +
   geom_line(aes(x = time_h, y = meanfittedDeltaOD_h, colour = as.factor(Strain)), size = 0.7, alpha = 0.9, show.legend = T) +
   scale_colour_discrete(type=c("seagreen4", "palegreen3", "brown1", "brown4"), name="") +
   # scale_y_continuous(breaks=seq(0, 1, by = 0.25)) +
@@ -491,10 +454,11 @@ MCGrowthRateFitData %>%
         legend.text = element_text(size=11))
 ```
 
+
 # Save plot 
 
 ```{r save plot}
-ggsave(file = file.path(FigPath, paste("SFig_GrowthCurve_FitStrain",".png",sep = "")), height=9, width= 7,  dpi = 300, limitsize = TRUE)
+ggsave(file = file.path(FigPath, paste("SFig_GrowthCurve_FitPmax",".png",sep = "")), height=9, width= 7,  dpi = 300, limitsize = TRUE)
 ```
 
 
@@ -529,7 +493,7 @@ MCGrowthRateFitData %>%
 # Save plot 
 
 ```{r save plot}
-ggsave(file = file.path(FigPath, paste("SFig_GrowthCurve_FitLight",".png",sep = "")), height=9, width= 7,  dpi = 300, limitsize = TRUE)
+ggsave(file = file.path(FigPath, paste("SFig_GrowthCurve_FitLightPmax",".png",sep = "")), height=9, width= 7,  dpi = 300, limitsize = TRUE)
 ```
 
 
@@ -542,49 +506,40 @@ rm(tMaxAGLines_056, tMaxAGLines_077, tMaxAGLines_048, tMaxAGLines_127, tmaxAG, M
 
 
 
-
 -------------------------------------------------# Whole Logistic fits --------------------------------------------------------
-
 
 ```{r set project variables}
 Project <- "BalticPhotoperiod"
-#DataOut <- file.path("..", "Data", "ProcessedData", "ProcessedGrowthRateData")
-DataIn <- file.path("..", "Data", "ProcessedData", "ProcessedMCDataLogisticFit", fsep = .Platform$file.sep)
+# DataOut <- file.path("..", "Data", "ProcessedData", "ProcessedMCDielLightData")
 
 FigPath <- file.path("..", "Output", "Figures")
 FigRdsPath <- file.path("..", "Output", "FiguresRds")
 TableRdsPath <- file.path("..", "Output", "TablesRDS")
-
-FileEncode <- "UTF-8" 
-Delimiter <- ""
-HeaderRows <- 0
 ```
 
-# List and read files
-
-```{r Exported Rmd only first time in session}
-list.files(path = DataIn, full.names = TRUE)
+## Read Data
+```{r data files}
+MCFilesFit <- list.files(path = file.path("..", "Data", "ProcessedData", "ProcessedMCDataLogisticFit"), full.names = TRUE)
+MCFilesFit
 ```
 
-```{r read file}
-MultiCultiGrowthFile <- "../Data/ProcessedData/ProcessedMCDataLogisticFit/20211214_PICO_MC247_RUN39_ProcessDataNestGrowthFit.Rds"
+```{r read data}
 
-MultiCultiGrowthFileName <- str_split(string = MultiCultiGrowthFile, "/")[[1]][3] %>%
-  str_remove(pattern = ".Rds") 
-
-MultiCultiGrowth <- readRDS(MultiCultiGrowthFile)  %>%
-  ungroup()
+# MCData <- readRDS(file = MCFilesFit[1]) |>
+#   ungroup()
+  
+MCDataAllFit <- map_df(MCFilesFit, readRDS) |>
+  ungroup() 
 ```
+
 
 # Select revelant variables and preparing for further analysis
 
 ```{r}
-MultiCultiGrowth<-MultiCultiGrowth %>% 
+MultiCultiGrowth<-MCDataAllFit %>% 
   dplyr::select(c(Tube, ExpDate, MC, Run, SampleID, Strain, Par_ue, Photoperiod, WL, O2, LightShape, PARPhotonDose_day, tubedata, deltaOD_logistic_predict))
 
-# MultiCultiGrowth<-MultiCultiGrowth %>% 
-#   dplyr::select(c(Tube, ExpDate, MC, Run, SampleID, Strain, Par_ue, Photoperiod, WL, O2, LightShape, PARPhotonDose_day, OD720_Lmu_se, OD720_Lmu_corr, deltaOD_Lmu_se, deltaOD_Lmu_corr, tubedata, OD720_logistic_predict, deltaOD_logistic_predict, OD720trunc_logistic_predict, deltaODtrunc_logistic_predict))
-  
+
 MultiCultiGrowth<-MultiCultiGrowth %>% 
   mutate(Strain=case_when(Strain=="BA127R"~"PE-rich_127",
          Strain=="BA48R"~"PE-rich_048",
@@ -639,7 +594,7 @@ MCGrowthRateFitData$time = sub("\\..*", "", MCGrowthRateFitData$time)
 MCGrowthRateFitData <- MCGrowthRateFitData %>% 
   mutate(ToD=as.numeric(ToD)) %>% 
   mutate(time=as.numeric(time)) %>% 
-  mutate(Actinic_par = Actinic_par/1000) %>% 
+  mutate(Actinic_par = Actinic_par/2000) %>% 
   rename(time_h=time) 
   
 
@@ -696,7 +651,7 @@ MCGrowthRateFitData %>%
 # Save plot 
 
 ```{r save plot}
-ggsave(file = file.path(FigPath, paste("SFig_GrowthCurve_FitStrain",".png",sep = "")), height=9, width= 7,  dpi = 300, limitsize = TRUE)
+ggsave(file = file.path(FigPath, paste("SFig_GrowthCurve_FitAll",".png",sep = "")), height=9, width= 7,  dpi = 300, limitsize = TRUE)
 ```
 
 
