@@ -647,7 +647,7 @@ OLISSpectraMetaPURMaxAG %>%
   scale_colour_discrete(type=c("seagreen4", "palegreen3", "brown1", "brown4")) +
   scale_y_continuous(breaks=seq(0, 3, by = 1)) +
   coord_cartesian(ylim = c(0, 3)) +
-  labs(y = "Normalized whole-cell absorbance, lamp emission, and PUR", x = "Wavelength (nm)") +
+  labs(y = "Normalized whole-cell absorbance and lamp emission", x = "Wavelength (nm)") +
   ggh4x::facet_nested(cols = vars(facetsPhotoperiod, Photoperiod), rows = vars(facetsStrain, Strain), labeller = label_parsed) +
   theme_bw() +
   theme(panel.grid.minor = element_blank(),
@@ -694,7 +694,7 @@ OLISSpectraMetaPURMaxAG %>%
   scale_colour_discrete(type=c("seagreen4", "palegreen3", "brown1", "brown4")) +
   scale_y_continuous(breaks=seq(0, 3, by = 1)) +
   coord_cartesian(ylim = c(0, 3)) +
-  labs(y = "Normalized whole-cell absorbance, lamp emission, and PUR", x = "Wavelength (nm)") +
+  labs(y = "Normalized whole-cell absorbance and lamp emission", x = "Wavelength (nm)") +
   ggh4x::facet_nested(cols = vars(facetsPar_ue, Par_ue), rows = vars(facetsStrain, Strain), labeller = label_parsed) +
   theme_bw() +
   theme(panel.grid.minor = element_blank(),

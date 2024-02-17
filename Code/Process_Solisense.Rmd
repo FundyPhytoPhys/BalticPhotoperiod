@@ -519,11 +519,11 @@ SolFitsExpSt<-SolFitsExpSt %>%
   
   summarize(SampleID, Ex_WL, FilenameSolisense, Run, Strain, ExpDate, Par_ue, Photoperiod, O2, WL, Phase,  PARPhotonDose_day, ObsDate, ObsTime, ObsDateTime, Sig, Sig_nm2psii, meanSig_nm2psii, sdSig_nm2psii, ActPARCorr_photonsm2s, Sigdark_nm2psii, meanSigdark_nm2psii, sdSigdark_nm2psii, FoOxbo, qpOxbo, JVPSII_aLHIIOxbomax, JVPSII_ETRtauav_FoSig, JVPSII_ETRqpOxbo_FoSig, JVPSII_ETRtauav_aLHII_Sig, JVPSII_ETRqpOxbo_aLHII_Sig, facetsPhotonDose_day, facetsExcitation, facetsStrain, E_days, Time_h,
               
-            #  AllmeanJVPSII_aLHIIOxbomax= mean(JVPSII_aLHIIOxbomax),
-            #  AllmeanJVPSII_ETRtauav_FoSig= mean(JVPSII_ETRtauav_FoSig),
-            #  AllmeanJVPSII_ETRqpOxbo_FoSig= mean(JVPSII_ETRqpOxbo_FoSig),
-            # AllmeanJVPSII_ETRtauav_aLHII_Sig = mean(JVPSII_ETRtauav_aLHII_Sig),
-            #  AllmeanJVPSII_ETRqpOxbo_aLHII_Sig= mean(JVPSII_ETRqpOxbo_aLHII_Sig),
+            AllmeanJVPSII_aLHIIOxbomax= mean(JVPSII_aLHIIOxbomax),
+            AllmeanJVPSII_ETRtauav_FoSig= mean(JVPSII_ETRtauav_FoSig),
+            AllmeanJVPSII_ETRqpOxbo_FoSig= mean(JVPSII_ETRqpOxbo_FoSig),
+            AllmeanJVPSII_ETRtauav_aLHII_Sig = mean(JVPSII_ETRtauav_aLHII_Sig),
+            AllmeanJVPSII_ETRqpOxbo_aLHII_Sig= mean(JVPSII_ETRqpOxbo_aLHII_Sig),
             AllmeanSig_nm2psii = mean(Sig_nm2psii),
             AllsdSig_nm2psii = sd(Sig_nm2psii),
             AllmeanSigdark_nm2psii = mean(Sigdark_nm2psii),
@@ -1373,7 +1373,8 @@ It is "bigger" df than SolFitsPigmentExp, b/c I have 3 replica for Turner
 
 ```{r}
 SolFitsExpStTurner <- ChlData %>%
-  left_join(., SolFitsExpSt, by = c("SampleID"="SampleID", "ObsDate"="ObsDate"))
+  full_join(., SolFitsExpSt, by = c("SampleID"="SampleID", "ObsDate"="ObsDate")) %>% 
+  drop_na(Strain)
 ```
 
 # Filter only revelant strains
@@ -1397,19 +1398,11 @@ SolFitsExpStTurner %>%
 
 SolFitsExpStTurner %>% 
   ggplot() +
-  geom_point(aes(x = meanTurChl_ugL, y = JVPSII_ETRqpOxbo_aLHII_Sig, colour = as.factor(Par_ue), shape = as.factor(Photoperiod)), size = 3.5, show.legend = T) +
+  geom_point(aes(x = meanTurChl_ugL, y = AllmeanJVPSII_ETRqpOxbo_aLHII_Sig, colour = as.factor(Par_ue), shape = as.factor(Photoperiod)), size = 3.5, show.legend = T) +
   scale_shape_manual(values = c(15, 16, 17,18), name="", labels = lab1) +
   scale_colour_manual(values = c("darkslategray", "lightblue4", "hotpink4", "indianred3","goldenrod2", "khaki2"), name="", labels = lab2) +
   ggh4x::facet_nested(cols = vars(Ex_WL), rows = vars(Strain), labeller = label_parsed) +
   theme_bw()
-
-# SolFitsExpStTurner %>%
-#   ggplot() +
-#   geom_point(aes(x = cellL_OD680, y = JVPSII_ETRqpOxbo_aLHII_Sig, colour = as.factor(Par_ue), shape = as.factor(Photoperiod)), size = 3.5, show.legend = T) +
-#   scale_shape_manual(values = c(15, 16, 17,18), name="", labels = lab1) +
-#   scale_colour_manual(values = c("darkslategray", "lightblue4", "hotpink4", "indianred3","goldenrod2", "khaki2"), name="", labels = lab2) +
-#   ggh4x::facet_nested(cols = vars(Ex_WL), rows = vars(Strain), labeller = label_parsed) +
-#   theme_bw()
 
 
 SolFitsExpStTurner %>% 

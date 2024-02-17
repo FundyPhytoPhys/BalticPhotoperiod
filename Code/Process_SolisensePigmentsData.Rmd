@@ -404,7 +404,7 @@ MCPigmentAllExpStChoosen %>%
   theme_bw() 
 ```
 # Make "one big - All" mean to combine all days (divided by Exp and St) and all replica when samples were measured 
-(This give me only one value of Phyco/Chla ratio JVPSII plot and sig plot as well)
+(This give me only one value of Phyco/Chla ratio for JVPSII plot and sig plot as well)
 
 # Calculate one "big" mean from Phyco/Chla ratio from all data measured on Exp or St phase 
 # AllmeanPhycoChlaRatio contains 1-7 measurements (different days)
@@ -421,7 +421,8 @@ MCPigmentAllExpStChoosen<-MCPigmentAllExpStChoosen %>%
             AllmeanPhycoChlaRatio = mean(PhycoChlaRatio),
             AllsdPhycoChlaRatio = sd(PhycoChlaRatio),
             AllmeanPURPARRatio = mean(PURPARRatio),
-            AllsdPURPARRatio = sd(PURPARRatio)) %>%
+            AllsdPURPARRatio = sd(PURPARRatio), 
+            AllmeancellL_OD680 = mean(cellL_OD680)) %>%
   ungroup()
 ```
 
@@ -788,8 +789,8 @@ SolFitsAllPigmentPCPE590 %>%
     
   geom_text(data=data_text_AnovaSt56, aes(x=2.3, y=6.0, label=label), colour = "blue", size=4) +
   geom_text(data=data_text_AnovaSt77, aes(x=3.5, y=6.9, label=label), colour = "blue", size=4) +
-  geom_text(data=data_text_AnovaSt48, aes(x=3.0, y=7.5, label=label), colour = "blue", size=4) +
-  geom_text(data=data_text_AnovaSt127, aes(x=3.0, y=7, label=label), colour = "blue", size=4) +
+  geom_text(data=data_text_AnovaSt48, aes(x=3.1, y=7.5, label=label), colour = "blue", size=4) +
+  geom_text(data=data_text_AnovaSt127, aes(x=3.7, y=7, label=label), colour = "blue", size=4) +
     
   geom_text(data=data_text_AnovaExp56P, aes(x=3, y=4, label=label), colour = "blue", size=4) +
   geom_text(data=data_text_AnovaExp77P, aes(x=3.8, y=2.5, label=label), colour = "blue", size=4) +
@@ -798,8 +799,8 @@ SolFitsAllPigmentPCPE590 %>%
     
   geom_text(data=data_text_AnovaSt56P, aes(x=2.3, y=1.0, label=label), colour = "blue", size=4) +
   geom_text(data=data_text_AnovaSt77P, aes(x=3.5, y=2.9, label=label), colour = "blue", size=4) +
-  geom_text(data=data_text_AnovaSt48P, aes(x=3.0, y=2.5, label=label), colour = "blue", size=4) +
-  geom_text(data=data_text_AnovaSt127P, aes(x=3.0, y=3, label=label), colour = "blue", size=4) +
+  geom_text(data=data_text_AnovaSt48P, aes(x=3.1, y=2.5, label=label), colour = "blue", size=4) +
+  geom_text(data=data_text_AnovaSt127P, aes(x=3.7, y=3, label=label), colour = "blue", size=4) +
   
   geom_text(data=data_text_AnovaPhase, aes(x=1.2, y=-0.2, label=label), colour = "blue", size=4) +
   
@@ -1474,14 +1475,14 @@ SolFitsAllPigmentPCPE590dark %>%
 # names(O2.labs) <- c(21)
 
 data_text_AnovaExp56<- data.frame(facetsPhase = c("Phase~of~growth"), Phase = c("Exponential"), facetsStrain = c("Strain"), Strain  = c("PC-rich_056"), label = c('a'))
-data_text_AnovaExp77<- data.frame(facetsPhase = c("Phase~of~growth"), Phase = c("Exponential"), facetsStrain = c("Strain"), Strain  = c("PC-rich_077"), label = c("a"))
-data_text_AnovaExp48<- data.frame(facetsPhase = c("Phase~of~growth"), Phase = c("Exponential"), facetsStrain = c("Strain"), Strain  = c("PE-rich_048"), label = c("b"))
-data_text_AnovaExp127<- data.frame(facetsPhase = c("Phase~of~growth"), Phase = c("Exponential"), facetsStrain = c("Strain"), Strain  = c("PE-rich_127"), label = c("c"))
+data_text_AnovaExp77<- data.frame(facetsPhase = c("Phase~of~growth"), Phase = c("Exponential"), facetsStrain = c("Strain"), Strain  = c("PC-rich_077"), label = c("b"))
+data_text_AnovaExp48<- data.frame(facetsPhase = c("Phase~of~growth"), Phase = c("Exponential"), facetsStrain = c("Strain"), Strain  = c("PE-rich_048"), label = c("c"))
+data_text_AnovaExp127<- data.frame(facetsPhase = c("Phase~of~growth"), Phase = c("Exponential"), facetsStrain = c("Strain"), Strain  = c("PE-rich_127"), label = c("d"))
 
 data_text_AnovaSt56<- data.frame(facetsPhase = c("Phase~of~growth"), Phase = c("Pre-stationary"), facetsStrain = c("Strain"), Strain  = c("PC-rich_056"), label = c('a'))
 data_text_AnovaSt77<- data.frame(facetsPhase = c("Phase~of~growth"), Phase = c("Pre-stationary"), facetsStrain = c("Strain"), Strain  = c("PC-rich_077"), label = c("b"))
-data_text_AnovaSt48<- data.frame(facetsPhase = c("Phase~of~growth"), Phase = c("Pre-stationary"), facetsStrain = c("Strain"), Strain  = c("PE-rich_048"), label = c("c"))
-data_text_AnovaSt127<- data.frame(facetsPhase = c("Phase~of~growth"), Phase = c("Pre-stationary"), facetsStrain = c("Strain"), Strain  = c("PE-rich_127"), label = c("ad"))
+data_text_AnovaSt48<- data.frame(facetsPhase = c("Phase~of~growth"), Phase = c("Pre-stationary"), facetsStrain = c("Strain"), Strain  = c("PE-rich_048"), label = c("a"))
+data_text_AnovaSt127<- data.frame(facetsPhase = c("Phase~of~growth"), Phase = c("Pre-stationary"), facetsStrain = c("Strain"), Strain  = c("PE-rich_127"), label = c("a"))
 
 
 data_text_AnovaExp56P<- data.frame(facetsPhase = c("Phase~of~growth"), Phase = c("Exponential"), facetsStrain = c("Strain"), Strain  = c("PC-rich_056"), label = c('A'))
@@ -1492,7 +1493,7 @@ data_text_AnovaExp127P<- data.frame(facetsPhase = c("Phase~of~growth"), Phase = 
 data_text_AnovaSt56P<- data.frame(facetsPhase = c("Phase~of~growth"), Phase = c("Pre-stationary"), facetsStrain = c("Strain"), Strain  = c("PC-rich_056"), label = c('B'))
 data_text_AnovaSt77P<- data.frame(facetsPhase = c("Phase~of~growth"), Phase = c("Pre-stationary"), facetsStrain = c("Strain"), Strain  = c("PC-rich_077"), label = c("B"))
 data_text_AnovaSt48P<- data.frame(facetsPhase = c("Phase~of~growth"), Phase = c("Pre-stationary"), facetsStrain = c("Strain"), Strain  = c("PE-rich_048"), label = c("A"))
-data_text_AnovaSt127P<- data.frame(facetsPhase = c("Phase~of~growth"), Phase = c("Pre-stationary"), facetsStrain = c("Strain"), Strain  = c("PE-rich_127"), label = c("A"))
+data_text_AnovaSt127P<- data.frame(facetsPhase = c("Phase~of~growth"), Phase = c("Pre-stationary"), facetsStrain = c("Strain"), Strain  = c("PE-rich_127"), label = c("B"))
 
 data_text_AnovaPhase<- data.frame(facetsPhase = c("Phase~of~growth"), Phase = c("Exponential"), facetsStrain = c("Strain"), Strain  = c("PC-rich_056", "PC-rich_077", "PE-rich_048", "PE-rich_127"), label = c('t-test, \u03B1 = 0.05', 't-test, \u03B1 = 0.05', 't-test, \u03B1 = 0.05', 't-test, \u03B1 = 0.05'))
 
@@ -1515,8 +1516,8 @@ SolFitsAllPigmentPCPE590dark %>%
     
   geom_text(data=data_text_AnovaSt56, aes(x=2.3, y=4.5, label=label), colour = "blue", size=4) +
   geom_text(data=data_text_AnovaSt77, aes(x=3.5, y=6.5, label=label), colour = "blue", size=4) +
-  geom_text(data=data_text_AnovaSt48, aes(x=3.0, y=6.5, label=label), colour = "blue", size=4) +
-  geom_text(data=data_text_AnovaSt127, aes(x=3.1, y=6, label=label), colour = "blue", size=4) +
+  geom_text(data=data_text_AnovaSt48, aes(x=3.1, y=6.5, label=label), colour = "blue", size=4) +
+  geom_text(data=data_text_AnovaSt127, aes(x=3.7, y=6, label=label), colour = "blue", size=4) +
     
   geom_text(data=data_text_AnovaExp56P, aes(x=3, y=2, label=label), colour = "blue", size=4) +
   geom_text(data=data_text_AnovaExp77P, aes(x=3.8, y=2, label=label), colour = "blue", size=4) +
@@ -1525,8 +1526,8 @@ SolFitsAllPigmentPCPE590dark %>%
     
   geom_text(data=data_text_AnovaSt56P, aes(x=2.3, y=0.5, label=label), colour = "blue", size=4) +
   geom_text(data=data_text_AnovaSt77P, aes(x=3.5, y=2.5, label=label), colour = "blue", size=4) +
-  geom_text(data=data_text_AnovaSt48P, aes(x=3.0, y=2.5, label=label), colour = "blue", size=4) +
-  geom_text(data=data_text_AnovaSt127P, aes(x=3.1, y=2.5, label=label), colour = "blue", size=4) +
+  geom_text(data=data_text_AnovaSt48P, aes(x=3.1, y=2.5, label=label), colour = "blue", size=4) +
+  geom_text(data=data_text_AnovaSt127P, aes(x=3.7, y=2.5, label=label), colour = "blue", size=4) +
   
   geom_text(data=data_text_AnovaPhase, aes(x=1.2, y=-0.4, label=label), colour = "blue", size=4) +
   
@@ -1777,68 +1778,19 @@ saveRDS(Anova_SigPig590dark_Model, file.path(TableRdsPath, paste(Project, "Anova
 ```
 
 
-
-
 # Clean the environment
 
 ```{r}
 rm(SolFitsAllPigmentfitPhycoChlalineardarkStrain, SolFitsAllPigmentfitPhycoChlalineardarkStrainGroup, SolFitsAllPigmentfitPhycoChlalinearStrain, SolFitsAllPigmentfitPhycoChlalinearStrain1s, SolFitsAllPigmentfitPhycoChlalinearStrainGroup, SolFitsAllPigmentfitPhycoChlalinearStrainGroup1s)
 ```
 
-------------------------------------------------------# Add Turner Catalog--------------------------------------------------
 
-# Load Turner catalog
-
-```{r load turner catalog, message = FALSE, warning = FALSE, echo=FALSE}
-gs4_deauth()
-Turnercatalog<- read_sheet("https://docs.google.com/spreadsheets/d/13mQm0B3siS65UuGjNdzvpHFomfuwn6aAg7dBoq1IqrM/edit#gid=0")
-
-as.data.frame(Turnercatalog)
-ChlData <- Turnercatalog 
-
-ChlData <- ChlData %>%  
-  mutate(TurChl_ugL = as.numeric(Reading_rfu) * as.numeric(Chl_slope) + as.numeric(Chl_intercept)) %>% 
-  mutate(DATE = ymd(`DATE`)) %>% 
-  rename(SampleID=CultureID) %>% 
-  rename(ObsDate=DATE) %>% 
-  select(c(SampleID, ObsDate, TurChl_ugL)) %>% 
-  filter(TurChl_ugL<212354.754) #outliers
-```
-
-```{r}
-ChlData <- ChlData %>%  
-  filter(TurChl_ugL<1500)
-```
-
-
-# Calculate Chl mean from 3 technical replica
-
-```{r}
-ChlData <- ChlData %>%
-  group_by(SampleID, ObsDate) %>%
-  summarize(SampleID, ObsDate, TurChl_ugL,
-            meanTurChl_ugL = mean(TurChl_ugL),
-            sdTurChl_ugL = sd(TurChl_ugL)) %>%
-  ungroup()
-```
-
-
-# Merge Sigma with chlorophyll Turner data 
-It is "bigger" df than SolFitsPigmentExp, b/c I have 3 replica for Turner
-
-```{r}
-SolFitsAllPigmentPCPETurner <- ChlData %>%
-  left_join(., SolFitsPigmentExp, by = c("SampleID"="SampleID", "ObsDate"="ObsDate"))
-
-SolFitsAllPigmentPCPETurner<-SolFitsAllPigmentPCPETurner %>% 
-  filter(Strain=="PC-rich_056" | Strain == "PC-rich_077" | Strain == "PE-rich_048" | Strain == "PE-rich_127")
-```
 
 
 # Create preliminary JVPSII vs Chl Turner (ug/L) plot
 
 ```{r preliminary plots, warning = FALSE}
-SolFitsAllPigmentPCPETurner %>% 
+SolFitsPigmentExp %>% 
   ggplot() +
   geom_point(aes(x = TurChl_ugL, y = JVPSII_ETRqpOxbo_aLHII_Sig, colour = as.factor(Par_ue), shape = as.factor(Photoperiod)), size = 3.5, show.legend = T) +
   scale_shape_manual(values = c(15, 16, 17,18), name="", labels = lab1) +
@@ -1846,7 +1798,7 @@ SolFitsAllPigmentPCPETurner %>%
   ggh4x::facet_nested(cols = vars(Ex_WL), rows = vars(Strain), labeller = label_parsed) +
   theme_bw()
 
-SolFitsAllPigmentPCPETurner %>% 
+SolFitsPigmentExp %>% 
   ggplot() +
   geom_point(aes(x = meanTurChl_ugL, y = JVPSII_ETRqpOxbo_aLHII_Sig, colour = as.factor(Par_ue), shape = as.factor(Photoperiod)), size = 3.5, show.legend = T) +
   scale_shape_manual(values = c(15, 16, 17,18), name="", labels = lab1) +
@@ -1854,7 +1806,7 @@ SolFitsAllPigmentPCPETurner %>%
   ggh4x::facet_nested(cols = vars(Ex_WL), rows = vars(Strain), labeller = label_parsed) +
   theme_bw()
 
-SolFitsAllPigmentPCPETurner %>%
+SolFitsPigmentExp %>%
   ggplot() +
   geom_point(aes(x = cellL_OD680, y = JVPSII_ETRqpOxbo_aLHII_Sig, colour = as.factor(Par_ue), shape = as.factor(Photoperiod)), size = 3.5, show.legend = T) +
   scale_shape_manual(values = c(15, 16, 17,18), name="", labels = lab1) +
@@ -1863,7 +1815,7 @@ SolFitsAllPigmentPCPETurner %>%
   theme_bw()
 
 
-SolFitsAllPigmentPCPETurner %>% 
+SolFitsPigmentExp %>% 
   ggplot() +
   geom_point(aes(x = E_days, y = JVPSII_ETRqpOxbo_aLHII_Sig, colour = as.factor(Par_ue), shape = as.factor(Photoperiod)), size = 3.5, show.legend = T) +
   scale_shape_manual(values = c(15, 16, 17,18), name="", labels = lab1) +
@@ -1874,8 +1826,8 @@ SolFitsAllPigmentPCPETurner %>%
 
 # Clean the environment
 
-```{r}
-rm(Turnercatalog, ChlData, SolFitsAllPigmentPCPE, SolFitsAllPigmentPCPE1s, data_text_AnovaExp56P, data_text_AnovaExp77P, data_text_AnovaExp48P, data_text_AnovaExp127P, data_text_AnovaExp56, data_text_AnovaExp77, data_text_AnovaExp48, data_text_AnovaExp127, data_text_AnovaSt56P, data_text_AnovaSt77P, data_text_AnovaSt48P, data_text_AnovaSt127P, data_text_AnovaSt56, data_text_AnovaSt77, data_text_AnovaSt48, data_text_AnovaSt127, augmented590Pig, augmented590pigment, augmented590pigmentdark, augmented590PUR, data_text_AnovaPhase, fit, SolFits48_127Exp, SolFits48_127Exp, SolFits56_127Exp, SolFits56_127St, SolFits56_48Exp, SolFits56_48St, SolFits77_48Exp, SolFits77_48St, SolFits77_127Exp, SolFits77_127St, Stats56_77Exp, Stats56_77St, Stats56_ExpSt, Stats56_ExpSt, Stats77_ExpSt, Stats48_ExpSt, Stats127_ExpSt, x, SolFitsPigmentExp, SolFitsExpFitAll, SolFitsExpFit590CleanPUR, SolFitsExpFit590CleanPig, model, MCPigmentAll, MCPigmentAllExpSt, PhycoChlaRatioChoosen, PhycoChlaRatioChoosenPUR, SigFit445Stats, SolFits48_127St, SolFitsAllPigmentfitPhycoChlalinear, SolFitsAllPigmentfitPhycoChlalineardark, SolFitsAllPigmentPCPE590, SolFitsAllPigmentPCPE590dark)
+```{r warning = FALSE}
+rm(Turnercatalog, ChlData, SolFitsAllPigmentPCPE, SolFitsAllPigmentPCPE1s, data_text_AnovaExp56P, data_text_AnovaExp77P, data_text_AnovaExp48P, data_text_AnovaExp127P, data_text_AnovaExp56, data_text_AnovaExp77, data_text_AnovaExp48, data_text_AnovaExp127, data_text_AnovaSt56P, data_text_AnovaSt77P, data_text_AnovaSt48P, data_text_AnovaSt127P, data_text_AnovaSt56, data_text_AnovaSt77, data_text_AnovaSt48, data_text_AnovaSt127, augmented590Pig, augmented590pigment, augmented590pigmentdark, augmented590PUR, data_text_AnovaPhase, fit, SolFits48_127Exp, SolFits48_127Exp, SolFits56_127Exp, SolFits56_127St, SolFits56_48Exp, SolFits56_48St, SolFits77_48Exp, SolFits77_48St, SolFits77_127Exp, SolFits77_127St, Stats56_77Exp, Stats56_77St, Stats56_ExpSt, Stats56_ExpSt, Stats77_ExpSt, Stats48_ExpSt, Stats127_ExpSt, x, SolFitsExpFitAll, SolFitsExpFit590CleanPUR, SolFitsExpFit590CleanPig, model, MCPigmentAll, MCPigmentAllExpSt, PhycoChlaRatioChoosen, PhycoChlaRatioChoosenPUR, SigFit445Stats, SolFits48_127St, SolFitsAllPigmentfitPhycoChlalinear, SolFitsAllPigmentfitPhycoChlalineardark, SolFitsAllPigmentPCPE590, SolFitsAllPigmentPCPE590dark, SigFit590Stats, MCPigmentAllExp, MCPigmentAllSt, SolFits)
 ```
 
 ```{r}
@@ -1891,13 +1843,13 @@ rm(Turnercatalog, ChlData, SolFitsAllPigmentPCPE, SolFitsAllPigmentPCPE1s, data_
 # Save rds for further analysis
 
 ```{r save rds}
-saveRDS(SolFitsAllPigmentPCPETurner, file.path(DataOut, paste(Project, "Processed_SolisensePigmentsData.Rds", sep = "_"), fsep = .Platform$file.sep), ascii = FALSE, version = NULL, compress = "xz", refhook = NULL)
+saveRDS(SolFitsPigmentExp, file.path(DataOut, paste(Project, "Processed_SolisensePigmentsData.Rds", sep = "_"), fsep = .Platform$file.sep), ascii = FALSE, version = NULL, compress = "xz", refhook = NULL)
 ```
 
 # Variable names used in Data Dictionary
 
 ```{r}
-colnames(SolFitsAllPigmentPCPETurner)
+colnames(SolFitsPigmentExp)
 ```
 
 
