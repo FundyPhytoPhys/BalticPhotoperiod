@@ -173,7 +173,7 @@ MultiCultiDataAll %>%
   scale_colour_discrete(type=c("seagreen4", "palegreen3", "brown1", "brown4"), name="") +
   scale_y_continuous(breaks=seq(0, 1, by = 0.25)) +
   coord_cartesian(ylim = c(0, 1.0)) +
-  labs(y = "Optical density ("~OD[680]~")", x = "Elapsed time (h)") +
+  labs(y = "Growth curves ( tracked as"~OD[680]~")", x = "Elapsed time (h)") +
   ggh4x::facet_nested(cols = vars(facetsPhotoperiod, Photoperiod), rows = vars(facetsPar_ue, Par_ue), labeller = label_parsed) +
   theme_bw() +
   theme(panel.grid.minor = element_blank(),
@@ -213,7 +213,7 @@ MultiCultiDataAll %>%
   scale_colour_discrete(type=c("seagreen4", "palegreen3", "brown1", "brown4"), name="") +
   scale_y_continuous(breaks=seq(0, 1, by = 0.25)) +
   coord_cartesian(ylim = c(0, 1.0)) +
-  labs(y = "Optical density ("~OD[720]~")", x = "Elapsed time (h)") +
+  labs(y = "Growth curves ( tracked as"~OD[720]~")", x = "Elapsed time (h)") +
   ggh4x::facet_nested(cols = vars(facetsPhotoperiod, Photoperiod), rows = vars(facetsPar_ue, Par_ue), labeller = label_parsed) +
   theme_bw() +
   theme(panel.grid.minor = element_blank(),
@@ -253,7 +253,9 @@ MultiCultiDataAll %>%
   scale_colour_discrete(type=c("seagreen4", "palegreen3", "brown1", "brown4"), name="") +
   # scale_y_continuous(breaks=seq(0, 1, by = 0.25)) +
   # coord_cartesian(ylim = c(0, 1.0)) +
-  labs(y = "Optical density (\u0394 OD)", x = "Elapsed time (h)") +
+  # labs(y = "Growth curves ( tracked as chlorophyll proxy"~OD[680]~"-"~OD[720]~"(\u0394 OD)", x = "Elapsed time (h)") +
+  # labs(y = "Growth curves (tracked as \u0394 OD)", x = "Elapsed time (h)") +
+  labs(y = "Growth curves ( tracked as chlorophyll proxy"~OD[680]~"-"~OD[720]~")", x = "Elapsed time (h)") +
   ggh4x::facet_nested(cols = vars(facetsPhotoperiod, Photoperiod), rows = vars(facetsPar_ue, Par_ue), labeller = label_parsed) +
   theme_bw() +
   theme(panel.grid.minor = element_blank(),
@@ -458,7 +460,7 @@ MCGrowthRateFitData %>%
 # Save plot 
 
 ```{r save plot}
-ggsave(file = file.path(FigPath, paste("SFig_GrowthCurve_FitPmax",".png",sep = "")), height=9, width= 7,  dpi = 300, limitsize = TRUE)
+# ggsave(file = file.path(FigPath, paste("SFig_GrowthCurve_FitPmax",".png",sep = "")), height=9, width= 7,  dpi = 300, limitsize = TRUE)
 ```
 
 
@@ -493,14 +495,14 @@ MCGrowthRateFitData %>%
 # Save plot 
 
 ```{r save plot}
-ggsave(file = file.path(FigPath, paste("SFig_GrowthCurve_FitLightPmax",".png",sep = "")), height=9, width= 7,  dpi = 300, limitsize = TRUE)
+# ggsave(file = file.path(FigPath, paste("SFig_GrowthCurve_FitLightPmax",".png",sep = "")), height=9, width= 7,  dpi = 300, limitsize = TRUE)
 ```
 
 
 # Cleaning df before saving as rds and removed unnecessary files from the environment
 
 ```{r cleanifng d}
-rm(tMaxAGLines_056, tMaxAGLines_077, tMaxAGLines_048, tMaxAGLines_127, tmaxAG, MultiCultiData, MCGrowthRate)
+#rm(tMaxAGLines_056, tMaxAGLines_077, tMaxAGLines_048, tMaxAGLines_127, tmaxAG, MultiCultiData, MCGrowthRate)
 ```
 
 
@@ -632,7 +634,8 @@ MCGrowthRateFitData %>%
   scale_colour_discrete(type=c("seagreen4", "palegreen3", "brown1", "brown4"), name="") +
   # scale_y_continuous(breaks=seq(0, 1, by = 0.25)) +
   # coord_cartesian(ylim = c(0, 1.0)) +
-  labs(y = "Optical density (\u0394 OD)", x = "Elapsed time (h)") +
+  # labs(y = "Logistic fits of chlorophyll proxy"~OD[680]~"-"~OD[720]~"(\u0394 OD)", x = "Elapsed time (h)") +
+    labs(y = "Logistic fits of chlorophyll proxy"~OD[680]~"-"~OD[720]~"", x = "Elapsed time (h)") +
   ggh4x::facet_nested(cols = vars(facetsPhotoperiod, Photoperiod), rows = vars(facetsPar_ue, Par_ue), labeller = label_parsed) +
   theme_bw() +
   theme(panel.grid.minor = element_blank(),
