@@ -427,8 +427,8 @@ MCImportAll %>%
  #filter(time >48) %>% 
   filter(Run != 77) %>% 
   ggplot() +
-  geom_point(aes(x = time, y = mu_deltaODwindow, colour = as.factor(Strain)), alpha = 0.2, show.legend = F) +
-  geom_line(aes(x = time, y = svr_pred, colour = as.factor(Strain)), size = 0.6, show.legend = T) +
+  geom_point(aes(x = time, y = mu_deltaODwindow), colour = "seagreen4", alpha = 0.2, show.legend = T) +
+  geom_line(aes(x = time, y = svr_pred, colour = as.factor(Strain)), size = 0.6, show.legend = F) +
     geom_vline(aes(xintercept = 1 * 24), linetype = "dotted", alpha = 0.4) + 
     geom_vline(aes(xintercept = 2 * 24), linetype = "dotted", alpha = 0.4) + 
     geom_vline(aes(xintercept = 3 * 24), linetype = "dotted", alpha = 0.4) + 
@@ -443,7 +443,7 @@ MCImportAll %>%
     geom_vline(aes(xintercept = 12 * 24), linetype = "dotted", alpha = 0.4) +
     geom_vline(aes(xintercept = 13 * 24), linetype = "dotted", alpha = 0.4) +
     geom_vline(aes(xintercept = 14 * 24), linetype = "dotted", alpha = 0.4) +
-  scale_colour_discrete(type=c("seagreen4"), name="") +
+  scale_colour_discrete(type=c("blue"), name="") +
   scale_y_continuous(breaks=seq(-0.5, 0.5, by = 0.25)) +
   coord_cartesian(ylim = c(-0.5, 0.5)) +
   #labs(y = "Optical density ("~OD[680]~")", x = "Elapsed time (h)") +
@@ -482,8 +482,8 @@ MCImportAll %>%
  #filter(time >48) %>% 
   filter(Run != 77) %>% 
   ggplot() +
-  geom_point(aes(x = time, y = mu_deltaODwindow, colour = as.factor(Strain)), alpha = 0.2, show.legend = F) +
-  geom_line(aes(x = time, y = svr_pred, colour = as.factor(Strain)), size = 0.6, show.legend = T) +
+  geom_point(aes(x = time, y = mu_deltaODwindow), colour = "palegreen3", alpha = 0.2, show.legend = T) +
+  geom_line(aes(x = time, y = svr_pred, colour = as.factor(Strain)), size = 0.6, show.legend = F) +
     geom_vline(aes(xintercept = 1 * 24), linetype = "dotted", alpha = 0.4) + 
     geom_vline(aes(xintercept = 2 * 24), linetype = "dotted", alpha = 0.4) + 
     geom_vline(aes(xintercept = 3 * 24), linetype = "dotted", alpha = 0.4) + 
@@ -498,7 +498,7 @@ MCImportAll %>%
     geom_vline(aes(xintercept = 12 * 24), linetype = "dotted", alpha = 0.4) +
     geom_vline(aes(xintercept = 13 * 24), linetype = "dotted", alpha = 0.4) +
     geom_vline(aes(xintercept = 14 * 24), linetype = "dotted", alpha = 0.4) +
-  scale_colour_discrete(type=c("palegreen3"), name="") +
+  scale_colour_discrete(type=c("blue"), name="") +
   scale_y_continuous(breaks=seq(-0.5, 0.5, by = 0.25)) +
   coord_cartesian(ylim = c(-0.5, 0.5)) +
   #labs(y = "Optical density ("~OD[680]~")", x = "Elapsed time (h)") +
@@ -536,8 +536,8 @@ MCImportAll %>%
  #filter(time >48) %>% 
   filter(Run != 77) %>% 
   ggplot() +
-  geom_point(aes(x = time, y = mu_deltaODwindow, colour = as.factor(Strain)), alpha = 0.2, show.legend = F) +
-  geom_line(aes(x = time, y = svr_pred, colour = as.factor(Strain)), size = 0.6, show.legend = T) +
+  geom_point(aes(x = time, y = mu_deltaODwindow), colour = "brown1", alpha = 0.2, show.legend = T) +
+  geom_line(aes(x = time, y = svr_pred, colour = as.factor(Strain)), size = 0.6, show.legend = F) +
     geom_vline(aes(xintercept = 1 * 24), linetype = "dotted", alpha = 0.4) + 
     geom_vline(aes(xintercept = 2 * 24), linetype = "dotted", alpha = 0.4) + 
     geom_vline(aes(xintercept = 3 * 24), linetype = "dotted", alpha = 0.4) + 
@@ -552,7 +552,7 @@ MCImportAll %>%
     geom_vline(aes(xintercept = 12 * 24), linetype = "dotted", alpha = 0.4) +
     geom_vline(aes(xintercept = 13 * 24), linetype = "dotted", alpha = 0.4) +
     geom_vline(aes(xintercept = 14 * 24), linetype = "dotted", alpha = 0.4) +
-  scale_colour_discrete(type=c("brown1"), name="") +
+  scale_colour_discrete(type=c("blue"), name="") +
   scale_y_continuous(breaks=seq(-0.5, 0.5, by = 0.25)) +
   coord_cartesian(ylim = c(-0.5, 0.5)) +
   #labs(y = "Optical density ("~OD[680]~")", x = "Elapsed time (h)") +
@@ -588,8 +588,8 @@ MCImportAll %>%
  #filter(time >48) %>% 
   filter(Run != 77) %>% 
   ggplot() +
-  geom_point(aes(x = time, y = mu_deltaODwindow, colour = as.factor(Strain)), alpha = 0.2, show.legend = F) +
-  geom_line(aes(x = time, y = svr_pred, colour = as.factor(Strain)), size = 0.6, show.legend = T) +
+  geom_point(aes(x = time, y = mu_deltaODwindow), colour = "brown4", alpha = 0.2, show.legend = T) +
+  geom_line(aes(x = time, y = svr_pred, colour = as.factor(Strain)), size = 0.6, show.legend = F) +
     geom_vline(aes(xintercept = 1 * 24), linetype = "dotted", alpha = 0.4) + 
     geom_vline(aes(xintercept = 2 * 24), linetype = "dotted", alpha = 0.4) + 
     geom_vline(aes(xintercept = 3 * 24), linetype = "dotted", alpha = 0.4) + 
@@ -604,7 +604,7 @@ MCImportAll %>%
     geom_vline(aes(xintercept = 12 * 24), linetype = "dotted", alpha = 0.4) +
     geom_vline(aes(xintercept = 13 * 24), linetype = "dotted", alpha = 0.4) +
     geom_vline(aes(xintercept = 14 * 24), linetype = "dotted", alpha = 0.4) +
-  scale_colour_discrete(type=c("brown4"), name="") +
+  scale_colour_discrete(type=c("blue"), name="") +
   scale_y_continuous(breaks=seq(-0.5, 0.5, by = 0.25)) +
   coord_cartesian(ylim = c(-0.5, 0.5)) +
   #labs(y = "Optical density ("~OD[680]~")", x = "Elapsed time (h)") +
