@@ -81,7 +81,7 @@ GrowthAmpWindow = 14 * 24 # maximum hours to determine if cultures doubled.
 
 MaxAmpHour <- 48  # used to determine if max OD was achieved within xx hours which then is used to calculate growthAmp on decline growth.
 
-DeclineWindow <- 100 #duration in hours overwhich we test for decline from max in OD720 or deltaOD
+DeclineWindow <- 12 #duration in hours overwhich we test for decline from max in OD720 or deltaOD
 
 ```
 
