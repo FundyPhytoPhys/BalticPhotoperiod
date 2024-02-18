@@ -546,16 +546,18 @@ MultiCultiGrowth<-MultiCultiGrowth %>%
         Strain=="BA56G"~"PC-rich_056",
          Strain=="BA77G"~"PC-rich_077"))
 
-MultiCultiGrowth1<-MultiCultiGrowth %>% 
-  filter(Run==77) %>% 
-  filter(Strain =="PC-rich_077")
-MultiCultiGrowth2<-MultiCultiGrowth %>% 
-  filter(Run==121) %>% 
-  filter(Strain !="PC-rich_077")
-MultiCultiGrowth3<-MultiCultiGrowth %>% 
-  filter(Run!=121 & Run!= 77) 
-MCGrowthRate<-rbind(MultiCultiGrowth1, MultiCultiGrowth2, MultiCultiGrowth3)
-  rm(MultiCultiGrowth, MultiCultiGrowth1, MultiCultiGrowth2, MultiCultiGrowth3)
+MCGrowthRate<-MultiCultiGrowth 
+
+# MultiCultiGrowth1<-MultiCultiGrowth %>% 
+#   filter(Run==77) %>% 
+#   filter(Strain =="PC-rich_077")
+# MultiCultiGrowth2<-MultiCultiGrowth %>% 
+#   filter(Run==121) %>% 
+#   filter(Strain !="PC-rich_077")
+# MultiCultiGrowth3<-MultiCultiGrowth %>% 
+#   filter(Run!=121 & Run!= 77) 
+# MCGrowthRate<-rbind(MultiCultiGrowth1, MultiCultiGrowth2, MultiCultiGrowth3)
+#   rm(MultiCultiGrowth, MultiCultiGrowth1, MultiCultiGrowth2, MultiCultiGrowth3)
 ```
 
 ```{r unnest, preparing df to preparing final plot, echo=FALSE, warning = FALSE}
