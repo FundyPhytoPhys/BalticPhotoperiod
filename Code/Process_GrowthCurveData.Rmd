@@ -33,6 +33,9 @@ Process_GrowthCurveData.Rmd separately processes and combines all .Rds from Data
 # Load Libraries and set Project Variables
 
 ```{r load libraries} 
+library(xts)
+library(signal)
+
 library(tidyverse)
 library(lubridate)
 library(stringr)
@@ -44,6 +47,7 @@ library(ggpubr)
 library(data.table)
 library(googledrive)
 library(googlesheets4)
+
 ```
 
 ```{r set project variables}
@@ -663,16 +667,16 @@ ggsave(file = file.path(FigPath, paste("SFig_GrowthCurve_FitAll",".png",sep = ""
 ---------------------------------------------------------- Code from Marta --------------------------------------------
 
 ```{r}
-library(tidyverse)
-library(lubridate)
-library(broom)
-library(knitr)
-library(zoo)
-library(xts)
-library(data.table)
-library(googledrive)
-library(googlesheets4)
-library(signal)
+# library(tidyverse)
+# library(lubridate)
+# library(broom)
+# library(knitr)
+# library(zoo)
+# library(xts)
+# library(data.table)
+# library(googledrive)
+# library(googlesheets4)
+# library(signal)
 ```
 
 
@@ -793,6 +797,29 @@ ggsave(paste0('Example_curve.png'),width=12,height=6)
 
 ```
 
+
+```{r}
+
+# MMPlot<-MultiCultiDataAll %>%
+#   dyplr::filter(Run == 39) %>%
+#   filter(Strain == "PE-rich_048") %>%
+#   filter(Par_ue == 180)
+#   
+#   
+# MultiCultiDataAll %>%
+#   
+#   geom_area(aes(x = Time_h, y = meanActinic_par_h), size = 0.1, fill = "tan1", alpha = 0.6) +
+#   geom_line(aes(x = Time_h, y = meanOD680_h, colour = as.factor(Strain)), size = 0.5, show.legend = T) +
+# 
+# 
+#   ggplot() +
+#   #geom_area(aes(x = time_h, y = meanActinic_par_h), size = 0.1, fill = "tan1", alpha = 0.6) +
+#   geom_line(aes(x = time_h, y = meanDeltaOD_h, colour = as.factor(Strain)), size = 0.3, alpha = 0.4, show.legend = F) +
+#   geom_line(aes(x = time_h, y = meanfittedDeltaOD_h, colour = as.factor(Strain)), size = 0.7, alpha = 0.9, show.legend = T) +
+#   scale_colour_discrete(type=c("seagreen4", "palegreen3", "brown1", "brown4"), name="") +
+```
+
+
 # Plot
 
 ```{r fig.height = 8, fig.width = 8, warning = FALSE}
@@ -807,9 +834,9 @@ df$par[is.na(df$par)] <- 0
 
 # plot the results
 ggplot(df,aes(x=x,y=spline)) + 
-  geom_line(colour="black")  + 
+  # geom_line(colour="black")  + 
   geom_line(aes(y=s-1),col="tan1",lwd=2) + 
-  geom_line(aes(y=yy),col="blue",lwd=1.0)  + 
+  # geom_line(aes(y=yy),col="blue",lwd=1.0)  + 
   geom_line(aes(x=x,y=der*25)) + 
   geom_area(aes(y=par/max(par)*max(spline)),fill="tan1", alpha=0.3) +
   geom_vline(xintercept = 149, col="darkgreen", lwd=1.1) + 
@@ -846,15 +873,15 @@ ggsave(file = file.path(FigPath, paste("Fig_FirstDerivative",".png",sep = "")), 
 ------------------------------------------- Hourly growth -------------------------------------------------------
 
 ```{r}
-library(tidyverse)
-library(broom)
-library(knitr)
-library(zoo)
-library(xts)
-library(data.table)
-library(googledrive)
-library(googlesheets4)
-library(signal)
+# library(tidyverse)
+# library(broom)
+# library(knitr)
+# library(zoo)
+# library(xts)
+# library(data.table)
+# library(googledrive)
+# library(googlesheets4)
+# library(signal)
 ```
 
 
