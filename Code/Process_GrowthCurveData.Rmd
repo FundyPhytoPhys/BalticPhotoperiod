@@ -812,8 +812,10 @@ MMPlot<-MultiCultiDataAll %>%
 
 ```{r fig.height = 8, fig.width = 8, warning = FALSE}
 data_textA <- data.frame(Strain  = c("PE-rich_048"), label = c('A'))
+data_textAHG <- data.frame(Strain  = c("PE-rich_048"), label = c('tMaxAHG'))
+data_textAHG <- data.frame(Strain  = c("PE-rich_048"), label = c('tMaxHG'))
 
-df$par[is.na(df$par)] <- 0
+#df$par[is.na(df$par)] <- 0
 
 MMPlot %>% 
 ggplot() + 
@@ -870,8 +872,6 @@ dfCut<-df %>%
 MMPlotCut<-MMPlot %>% 
   filter(Time_h>160) %>% 
   filter(Time_h<190)
-
-dfCut$par[is.na(dfCut$par)] <- 0
 
 
 MMPlotCut %>% 
