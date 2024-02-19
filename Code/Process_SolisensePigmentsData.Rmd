@@ -1955,7 +1955,7 @@ https://stats.stackexchange.com/questions/435644/is-there-a-method-to-look-for-s
 # print(dt)
 ```
 
-
+https://www.geeksforgeeks.org/t-test-approach-in-r-programming/
 
 
 
