@@ -778,7 +778,7 @@ dc$tmx <- tmx
 dc$mx <- mx
 ```
 
-#------------------------------------fit sigmoid curve-----------------------------------
+#--------------------------------------------------- fit sigmoid curve-----------------------------------
 
 ```{r}
 
@@ -797,55 +797,40 @@ ggsave(paste0('Example_curve.png'),width=12,height=6)
 
 ```
 
+# Create df for plot only
 
 ```{r}
 
-# MMPlot<-MultiCultiDataAll %>%
-#   dyplr::filter(Run == 39) %>%
-#   filter(Strain == "PE-rich_048") %>%
-#   filter(Par_ue == 180)
-#   
-#   
-# MultiCultiDataAll %>%
-#   
-#   geom_area(aes(x = Time_h, y = meanActinic_par_h), size = 0.1, fill = "tan1", alpha = 0.6) +
-#   geom_line(aes(x = Time_h, y = meanOD680_h, colour = as.factor(Strain)), size = 0.5, show.legend = T) +
-# 
-# 
-#   ggplot() +
-#   #geom_area(aes(x = time_h, y = meanActinic_par_h), size = 0.1, fill = "tan1", alpha = 0.6) +
-#   geom_line(aes(x = time_h, y = meanDeltaOD_h, colour = as.factor(Strain)), size = 0.3, alpha = 0.4, show.legend = F) +
-#   geom_line(aes(x = time_h, y = meanfittedDeltaOD_h, colour = as.factor(Strain)), size = 0.7, alpha = 0.9, show.legend = T) +
-#   scale_colour_discrete(type=c("seagreen4", "palegreen3", "brown1", "brown4"), name="") +
+MMPlot<-MultiCultiDataAll %>%
+  filter(Run == 39) %>%
+  filter(Strain == "PE-rich_048") %>%
+  filter(Par_ue == 180)
 ```
 
 
 # Plot
 
 ```{r fig.height = 8, fig.width = 8, warning = FALSE}
-
-#Asym/(1+exp((xmid-input)/scal))
-
-fit <- nls(y ~ SSlogis(x, Asym, xmid, scal), data = df)
-summary(fit)
-df$yy <- predict(fit)
+data_textA <- data.frame(Strain  = c("PE-rich_048"), label = c('A'))
 
 df$par[is.na(df$par)] <- 0
 
-# plot the results
-ggplot(df,aes(x=x,y=spline)) + 
+MMPlot %>% 
+ggplot() + 
+  geom_line(aes(x=x, y=der*25), df) + 
+  geom_line(aes(x=x, y=s-1),col="tan1",lwd=1, df) + 
+  geom_line(aes(x = Time_h, y = meanOD680_h, colour = as.factor(Strain)), size = 1, show.legend = F) +
   # geom_line(colour="black")  + 
-  geom_line(aes(y=s-1),col="tan1",lwd=2) + 
   # geom_line(aes(y=yy),col="blue",lwd=1.0)  + 
-  geom_line(aes(x=x,y=der*25)) + 
-  geom_area(aes(y=par/max(par)*max(spline)),fill="tan1", alpha=0.3) +
-  geom_vline(xintercept = 149, col="darkgreen", lwd=1.1) + 
-  geom_vline(xintercept = tmx, linetype="dashed", col="#a02a2a", lwd=.9) + 
-  scale_y_continuous(sec.axis = sec_axis( trans=~./25, name="1st derivative of OD680")) + 
+  geom_area(aes(x=x, y=par/max(par)*max(spline)),fill="tan1", alpha=0.3, df) +
+  geom_vline(xintercept = 149, col="blue", lwd=0.5) + 
+  geom_vline(xintercept = tmx, linetype="dashed", col="black", lwd=0.4) + 
+  
+  geom_text(data=data_textA, aes(x=336, y=0.9, label=label), size=4.5) +
+  
+  scale_y_continuous(sec.axis = sec_axis( trans=~./25, name="1"^st~"derivative of"~OD[680]~"")) + 
   scale_x_continuous(breaks=seq(0,360,24)) + 
   labs(y = "Growth curves ( tracked as"~OD[680]~")", x = "Elapsed time (h)") +
-  # theme_light() + 
-  # theme(plot.title = element_text(hjust = 0.5),text = element_text(size = 16)) 
   # ggh4x::facet_nested(cols = vars(facetsPhotoperiod, Photoperiod), rows = vars(facetsPar_ue, Par_ue), labeller = label_parsed) +
   theme_bw() +
   theme(panel.grid.minor = element_blank(),
@@ -868,6 +853,73 @@ ggplot(df,aes(x=x,y=spline)) +
 ```{r save plot}
 ggsave(file = file.path(FigPath, paste("Fig_FirstDerivative",".png",sep = "")), height=4.5, width= 7,  dpi = 300, limitsize = TRUE)
 ```
+
+```{r fig.height = 8, fig.width = 8, warning = FALSE}
+# tmx
+
+arrowdf1 <- tibble(Strain = "PE-rich_048")
+arrowdf2 <- tibble(Strain = "PE-rich_048")
+data_textAccLen <- data.frame(Strain  = c("PE-rich_048"), label = c('AccLen (h)'))
+data_textDecLen <- data.frame(Strain  = c("PE-rich_048"), label = c('DecLen (h)'))
+data_textB <- data.frame(Strain  = c("PE-rich_048"), label = c('B'))
+
+dfCut<-df %>% 
+  filter(x>160) %>% 
+  filter(x<190)
+
+MMPlotCut<-MMPlot %>% 
+  filter(Time_h>160) %>% 
+  filter(Time_h<190)
+
+dfCut$par[is.na(dfCut$par)] <- 0
+
+
+MMPlotCut %>% 
+ggplot() + 
+  geom_line(aes(x=x, y=der*25), dfCut) + 
+  geom_line(aes(x=x, y=s-1),col="tan1",lwd=1, dfCut) + 
+  geom_line(aes(x = Time_h, y = meanOD680_h, colour = as.factor(Strain)), size = 1, show.legend = F) +
+
+  geom_area(aes(x=x, y=par/max(par)*max(spline)),fill="tan1", alpha=0.3, dfCut) +
+  geom_vline(xintercept = 172.16667, linetype="dashed", col="black", lwd=0.4) +
+  
+  geom_segment(data = arrowdf1, aes(x = 165, xend = 170, y = 0.1, yend = 0),
+               colour = "black", size = 0.5, alpha=0.9, arrow = arrow(length=unit(0.2, 'cm'))) +
+  geom_segment(data = arrowdf2, aes(x = 180, xend = 175, y = 0.1, yend = 0),
+               colour = "black", size = 0.5, alpha=0.9, arrow = arrow(length=unit(0.2, 'cm'))) +
+  
+  geom_text(data=data_textAccLen, aes(x=165, y=0.12, label=label), size=3.5) +
+  geom_text(data=data_textDecLen, aes(x=182, y=0.12, label=label), size=3.5) +
+  geom_text(data=data_textB, aes(x=190, y=0.85, label=label), size=4.5) +
+  
+  scale_y_continuous(sec.axis = sec_axis( trans=~./25, name="1"^st~"derivative of"~OD[680]~"")) +
+  scale_x_continuous(breaks=seq(150, 200, by = 10)) +
+  # scale_y_continuous(breaks=seq(0, 30, by = 10)) +
+  # coord_cartesian(xlim = c(0, 80000000), ylim = c(0, 30)) +
+  
+  labs(y = "Growth curves ( tracked as"~OD[680]~")", x = "Elapsed time (h)") +
+  # ggh4x::facet_nested(cols = vars(facetsPhotoperiod, Photoperiod), rows = vars(facetsPar_ue, Par_ue), labeller = label_parsed) +
+  theme_bw() +
+  theme(panel.grid.minor = element_blank(),
+        panel.grid.major = element_blank(),
+        axis.text = element_text(size=12),
+        axis.title = element_text(size=16),
+        strip.background = element_rect(fill="white"),
+        strip.text = element_text(size=12),
+        axis.title.y = element_text(margin=margin(r=10)),
+        axis.title.x = element_text(margin=margin(t=10)),
+        legend.background = element_rect(fill="transparent"),
+        legend.position = c(0.12,0.96),
+        legend.key.height= unit(0.005, 'cm'),
+        legend.spacing.x = unit(0.01, 'cm'),
+        legend.text = element_text(size=11))
+```
+# Save plot 
+
+```{r save plot}
+ggsave(file = file.path(FigPath, paste("Fig_FirstDerivativeCut",".png",sep = "")), height=4.5, width= 7,  dpi = 300, limitsize = TRUE)
+```
+
 
 
 ------------------------------------------- Hourly growth -------------------------------------------------------
