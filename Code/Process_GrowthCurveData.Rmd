@@ -893,21 +893,21 @@ list.files(path = DataIn, pattern = Project, full.names = TRUE)
 [13] "../Data/ImportedData/ImportedMCData/20220615_PICO_MC257_RUN77_TargetDataMetaFilter.Rds" 
 [14] "../Data/ImportedData/ImportedMCData/20230816_PICO_MC257_RUN121_TargetDataMetaFilter.Rds"
 
-```{r}
+```{r echo=FALSE}
 fnameFile <- "../Data/ImportedData/ImportedMCData/20211214_PICO_MC247_RUN39_TargetDataMetaFilter.Rds"
-# fnameFile <- "../Data/ImportedData/ImportedMCData/20211223_PICO_MC257_RUN40_TargetDataMetaFilter.Rds"
-# fnameFile <- "../Data/ImportedData/ImportedMCData/20211229_PICO_MC247_RUN43_TargetDataMetaFilter.Rds"
-# fnameFile <- "../Data/ImportedData/ImportedMCData/20220107_PICO_MC257_RUN44_TargetDataMetaFilter.Rds"
-# fnameFile <- "../Data/ImportedData/ImportedMCData/20220113_PICO_MC247_RUN45_TargetDataMetaFilter.Rds"
-# fnameFile <- "../Data/ImportedData/ImportedMCData/20220122_PICO_MC257_RUN46_TargetDataMetaFilter.Rds"
-# fnameFile <- "../Data/ImportedData/ImportedMCData/20220206_PICO_MC257_RUN50_TargetDataMetaFilter.Rds"
-# fnameFile <- "../Data/ImportedData/ImportedMCData/20220405_PICO_MC247_RUN60_TargetDataMetaFilter.Rds"
-# fnameFile <- "../Data/ImportedData/ImportedMCData/20220410_PICO_MC257_RUN62_TargetDataMetaFilter.Rds"
-# fnameFile <- "../Data/ImportedData/ImportedMCData/20220420_PICO_MC257_RUN65_TargetDataMetaFilter.Rds"
-# fnameFile <- "../Data/ImportedData/ImportedMCData/20220507_PICO_MC257_RUN71_TargetDataMetaFilter.Rds"
-# fnameFile <- "../Data/ImportedData/ImportedMCData/20220607_PICO_MC257_RUN74_TargetDataMetaFilter.Rds"
-# fnameFile <- "../Data/ImportedData/ImportedMCData/20220615_PICO_MC257_RUN77_TargetDataMetaFilter.Rds"
-# fnameFile <- "../Data/ImportedData/ImportedMCData/20230816_PICO_MC257_RUN121_TargetDataMetaFilter.Rds"
+#fnameFile <- "../Data/ImportedData/ImportedMCData/20211223_PICO_MC257_RUN40_TargetDataMetaFilter.Rds"
+#fnameFile <- "../Data/ImportedData/ImportedMCData/20211229_PICO_MC247_RUN43_TargetDataMetaFilter.Rds"
+#fnameFile <- "../Data/ImportedData/ImportedMCData/20220107_PICO_MC257_RUN44_TargetDataMetaFilter.Rds"
+#fnameFile <- "../Data/ImportedData/ImportedMCData/20220113_PICO_MC247_RUN45_TargetDataMetaFilter.Rds"
+#fnameFile <- "../Data/ImportedData/ImportedMCData/20220122_PICO_MC257_RUN46_TargetDataMetaFilter.Rds"
+#fnameFile <- "../Data/ImportedData/ImportedMCData/20220206_PICO_MC257_RUN50_TargetDataMetaFilter.Rds"
+#fnameFile <- "../Data/ImportedData/ImportedMCData/20220405_PICO_MC247_RUN60_TargetDataMetaFilter.Rds"
+#fnameFile <- "../Data/ImportedData/ImportedMCData/20220410_PICO_MC257_RUN62_TargetDataMetaFilter.Rds"
+#fnameFile <- "../Data/ImportedData/ImportedMCData/20220420_PICO_MC257_RUN65_TargetDataMetaFilter.Rds"
+#fnameFile <- "../Data/ImportedData/ImportedMCData/20220507_PICO_MC257_RUN71_TargetDataMetaFilter.Rds"
+#fnameFile <- "../Data/ImportedData/ImportedMCData/20220607_PICO_MC257_RUN74_TargetDataMetaFilter.Rds"
+#fnameFile <- "../Data/ImportedData/ImportedMCData/20220615_PICO_MC257_RUN77_TargetDataMetaFilter.Rds"
+#fnameFile <- "../Data/ImportedData/ImportedMCData/20230816_PICO_MC257_RUN121_TargetDataMetaFilter.Rds"
 
 fnameFileName <- str_split(string = fnameFile, "/")[[1]][3] %>%
   str_remove(pattern = ".Rds") 
@@ -951,15 +951,25 @@ for (t in unique(data$Tube)){
 outputData <- do.call(rbind, outputList)
 
 # Assign column names to the data frame
-colnames(outputData) <- c("nn", "Strain", "Par_ue", "Photoperiod[h]", "start[step]", "end[step]", "Tstart[minutes]", "Tend[minutes]", "OD680start", "OD680end", "log10(OD680start)", "log10(OD680end)", "logDiff", "Diff")
+colnames(outputData) <- c("nn", "Strain", "Par_ue", "Photoperiod", "start[step]", "end[step]", "Tstart[minutes]", "Tend[minutes]", "OD680start", "OD680end", "log10(OD680start)", "log10(OD680end)", "logDiff", 'Diff')
 
 outputData<-as.data.frame(outputData)  
+
+outputData$Run<-121 
+outputData_121<-outputData %>% 
+  mutate(across(.cols = c(Par_ue:Diff), .fns = as.numeric)) 
 ```
+
+
+```{r}
+# outputData<-rbind(outputData_39, outputData_40, outputData_43, outputData_44, outputData_45, outputData_46, outputData_50, outputData_60, outputData_62, outputData_65, outputData_71, outputData_74, outputData_77, outputData_121)
+```
+
 
 # Save the data frame as an RDS file
 
 ```{r save rds}
- saveRDS(object = outputData, file = file.path(DataOut, paste(fnameFileName,  "20211214_PICO_MC247_RUN39_hourlyGrowth.Rds",  sep = "_")), ascii = FALSE, version = NULL, compress = "xz", refhook = NULL)
+ # saveRDS(object = outputData, file = file.path(DataOut, paste(fnameFileName, "hourlyGrowth.Rds",  sep = "_")), ascii = FALSE, version = NULL, compress = "xz", refhook = NULL)
 ```
 
 # Hourly growth - output as csv
