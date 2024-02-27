@@ -52,7 +52,7 @@ library(googlesheets4)
 
 ```{r set project variables}
 Project <- "BalticPhotoperiod"
-DataOut <- file.path("..", "Data", "ProcessedData", "ProcessedMCDielLightData")
+DataOut <- file.path("..", "Data", "ProcessedData", "ProcessedGrowthCurveData")
 
 FigPath <- file.path("..", "Output", "Figures")
 FigRdsPath <- file.path("..", "Output", "FiguresRds")
@@ -684,6 +684,7 @@ ggsave(file = file.path(FigPath, paste("SFig_GrowthCurve_FitAll",".png",sep = ""
 ```{r set project variables}
 Project <- "BalticPhotoperiod"
 #DataOut <- file.path("..", "Data", "ProcessedData", "ProcessedGrowthRateData")
+DataOut <- file.path("..", "Data", "ProcessedData", "ProcessedMCDielLightData")
 DataIn <- file.path("..", "Data", "ImportedData", "ImportedMCData", fsep = .Platform$file.sep)
 
 FigPath <- file.path("..", "Output", "Figures")
