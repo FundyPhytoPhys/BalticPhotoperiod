@@ -385,7 +385,7 @@ MCImportAll %>%
   filter(Strain == "PE-rich_048" | Strain == "PC-rich_077") %>% 
   ggplot() +
   #geom_point(aes(x = time, y = mu_deltaODwindow), alpha = 0.4) +
-  geom_point(aes(x = time, y = mu_deltaODwindow, colour = Actinic_photonsm2h), alpha = 0.9) +
+  geom_point(aes(x = time, y = mu_Averh, colour = Actinic_photonsm2h), alpha = 0.9) +
   geom_line(aes(x = time, y = svr_pred), color = 'blue', size = 0.7) +
   #geom_line(aes(x = time, y = mu_deltaODwindow)) +
   sc +
@@ -406,13 +406,60 @@ MCImportAll %>%
     geom_vline(aes(xintercept = 14 * 24), linetype = "dotted", alpha = 0.4) + 
   facet_grid(rows = vars(Strain), cols = vars (Photoperiod)) +
   theme_bw()
+
+
+MCImportAll %>%
+  filter(time>70) %>% 
+  filter(Par_ue == 300) %>% 
+  filter(Photoperiod == 12) %>% 
+  filter(Strain == "PC-rich_077") %>% 
+  ggplot() +
+  #geom_point(aes(x = time, y = mu_deltaODwindow), alpha = 0.4) +
+  geom_point(aes(x = time, y = mu_Averh, colour = Actinic_photonsm2h), alpha = 0.9) +
+  geom_line(aes(x = time, y = svr_pred), color = 'blue', size = 0.7) +
+  #geom_line(aes(x = time, y = mu_deltaODwindow)) +
+  sc +
+  #scale_colour_discrete() + 
+    geom_vline(aes(xintercept = 1 * 24), linetype = "dotted", alpha = 0.4) + 
+    geom_vline(aes(xintercept = 2 * 24), linetype = "dotted", alpha = 0.4) + 
+    geom_vline(aes(xintercept = 3 * 24), linetype = "dotted", alpha = 0.4) + 
+    geom_vline(aes(xintercept = 4 * 24), linetype = "dotted", alpha = 0.4) + 
+    geom_vline(aes(xintercept = 5 * 24), linetype = "dotted", alpha = 0.4) + 
+    geom_vline(aes(xintercept = 6 * 24), linetype = "dotted", alpha = 0.4) + 
+    geom_vline(aes(xintercept = 7 * 24), linetype = "dotted", alpha = 0.4) + 
+    geom_vline(aes(xintercept = 8 * 24), linetype = "dotted", alpha = 0.4) + 
+    geom_vline(aes(xintercept = 9 * 24), linetype = "dotted", alpha = 0.4) + 
+    geom_vline(aes(xintercept = 10 * 24), linetype = "dotted", alpha = 0.4) + 
+    geom_vline(aes(xintercept = 11 * 24), linetype = "dotted", alpha = 0.4) + 
+    geom_vline(aes(xintercept = 12 * 24), linetype = "dotted", alpha = 0.4) + 
+    geom_vline(aes(xintercept = 13 * 24), linetype = "dotted", alpha = 0.4) + 
+    geom_vline(aes(xintercept = 14 * 24), linetype = "dotted", alpha = 0.4) + 
+  facet_grid(rows = vars(Strain), cols = vars (Photoperiod)) +
+  theme_bw()
+
+
+MCImportAll %>%
+  filter(time<250) %>% 
+  filter(time>70) %>% 
+  filter(Par_ue == 300) %>% 
+  filter(Photoperiod == 12) %>% 
+  filter(Strain == "PC-rich_077") %>% 
+  ggplot() +
+  #geom_point(aes(x = time, y = mu_deltaODwindow), alpha = 0.4) +
+  geom_point(aes(x = time, y = mu_Averh, colour = Actinic_photonsm2h), alpha = 0.9) +
+  #geom_line(aes(x = time, y = svr_pred), color = 'blue', size = 0.7) +
+  geom_line(aes(x = time, y = mu_Averh)) +
+  sc +
+  facet_grid(rows = vars(Strain), cols = vars (Photoperiod)) +
+  theme_bw()
+
 ```
 
 
 # Save plot 
 
 ```{r save plot}
-ggsave(file = file.path(FigPath, paste("SFig_HourlyGrowthRateExample333",".png",sep = "")), height=9, width= 7,  dpi = 300, limitsize = TRUE)
+ggsave(file = file.path(FigPath, paste("SFig_HourlyGrowthRateExample",".png",sep = "")), height=9, width= 7,  dpi = 300, limitsize = TRUE)
 ```
 
 
@@ -427,7 +474,7 @@ MCImportAll %>%
  #filter(time >48) %>% 
   filter(Run != 77) %>% 
   ggplot() +
-  geom_point(aes(x = time, y = mu_deltaODwindow), colour = "seagreen4", alpha = 0.2, show.legend = T) +
+  geom_point(aes(x = time, y = mu_Averh), colour = "seagreen4", alpha = 0.2, show.legend = T) +
   geom_line(aes(x = time, y = svr_pred, colour = as.factor(Strain)), size = 0.6, show.legend = F) +
     geom_vline(aes(xintercept = 1 * 24), linetype = "dotted", alpha = 0.4) + 
     geom_vline(aes(xintercept = 2 * 24), linetype = "dotted", alpha = 0.4) + 
@@ -482,7 +529,7 @@ MCImportAll %>%
  #filter(time >48) %>% 
   filter(Run != 77) %>% 
   ggplot() +
-  geom_point(aes(x = time, y = mu_deltaODwindow), colour = "palegreen3", alpha = 0.2, show.legend = T) +
+  geom_point(aes(x = time, y = mu_Averh), colour = "palegreen3", alpha = 0.2, show.legend = T) +
   geom_line(aes(x = time, y = svr_pred, colour = as.factor(Strain)), size = 0.6, show.legend = F) +
     geom_vline(aes(xintercept = 1 * 24), linetype = "dotted", alpha = 0.4) + 
     geom_vline(aes(xintercept = 2 * 24), linetype = "dotted", alpha = 0.4) + 
@@ -536,7 +583,7 @@ MCImportAll %>%
  #filter(time >48) %>% 
   filter(Run != 77) %>% 
   ggplot() +
-  geom_point(aes(x = time, y = mu_deltaODwindow), colour = "brown1", alpha = 0.2, show.legend = T) +
+  geom_point(aes(x = time, y = mu_Averh), colour = "brown1", alpha = 0.2, show.legend = T) +
   geom_line(aes(x = time, y = svr_pred, colour = as.factor(Strain)), size = 0.6, show.legend = F) +
     geom_vline(aes(xintercept = 1 * 24), linetype = "dotted", alpha = 0.4) + 
     geom_vline(aes(xintercept = 2 * 24), linetype = "dotted", alpha = 0.4) + 
@@ -588,7 +635,7 @@ MCImportAll %>%
  #filter(time >48) %>% 
   filter(Run != 77) %>% 
   ggplot() +
-  geom_point(aes(x = time, y = mu_deltaODwindow), colour = "brown4", alpha = 0.2, show.legend = T) +
+  geom_point(aes(x = time, y = mu_Averh), colour = "brown4", alpha = 0.2, show.legend = T) +
   geom_line(aes(x = time, y = svr_pred, colour = as.factor(Strain)), size = 0.6, show.legend = F) +
     geom_vline(aes(xintercept = 1 * 24), linetype = "dotted", alpha = 0.4) + 
     geom_vline(aes(xintercept = 2 * 24), linetype = "dotted", alpha = 0.4) + 
