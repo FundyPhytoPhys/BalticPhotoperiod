@@ -1,5 +1,5 @@
 ---
-title: "Changing diel growth symmetries and light-capture in PhycoCyanin and PhycoErythrin-rich picocyanobacteria, across photic regimes and growth phases"
+title: "Growth vs. light-capture in PhycoCyanin and PhycoErythrin-rich picocyanobacteria, across photic regimes and growth phases"
 author:
 - Sylwia Śliwińska-Wilczewska:
     institute:
@@ -98,7 +98,7 @@ Cyanobacteria growth undergoes distinct phases, including lag phase, exponential
 
 *Synechococcus* exhibits significant phenotypic diversity across many lineages, encompassing strains rich in PhycoErythrin (PE-rich) or PhycoCyanin (PC-rich) [@haverkampColorfulMicrodiversitySynechococcus2009; @aguileraEcophysiologicalAnalysisReveals2023]. These phycobilin pigment-proteins are pivotal for light absorption during photosynthesis and confer distinctive colours to the picocyanobacteria. The disparate light preferences between PC-rich and PE-rich *Synechococcus* sp. strains influence their ecological niches. PC-rich strains thrive in environments with elevated light levels, such as surface waters and coastal regions, where blue light predominates. PE-rich strains exhibit adaptation to low-light conditions, primarily inhabiting the deeper layers of the water column where green light prevails. These differences result in PC-rich and PE-rich *Synechococcus* sp. strains predominantly occupying complementary habitats [@sixLightVariabilityIlluminates2007; @haverkampColorfulMicrodiversitySynechococcus2009; @sixMarineSynechococcusPicocyanobacteria2021].
 
-Photic regimes and growth phases of PC-rich and PE-rich *Synechococcus* sp. may drive spatial and temporal variability of *Synechococcus* biomass and community lineage composition within aquatic environments, relating to varying metabolic costs between physiological strategies. The aim of this research was to determine whether photic regimes and growth phases affect diel growth symmetries and light-capture in PC-rich and PE-rich *Synechococcus* sp. 
+Photic regimes and growth phases of PC-rich and PE-rich *Synechococcus* sp. may drive spatial and temporal variability of *Synechococcus* biomass and community lineage composition within aquatic environments, relating to varying metabolic costs between physiological strategies. The aim of this research was to determine whether photic regimes and growth phases affect both growth and light-capture in PC-rich and PE-rich *Synechococcus* sp. 
 
 # Material and Methods {.unnumbered}
 
@@ -118,7 +118,7 @@ Picocyanobacterial growth was monitored every 5 minutes by automatically recordi
 
 Based on the obtained measurements of growth we determined exponential chlorophyll specific exponential growth rate (µ) by fitting logistic growth curves to plots of the chlorophyll *a* proxy of ΔOD vs. elapsed time for each combination of strain, photoperiod, and peak PAR. We used a modified Levenberg-Marquardt fitting algorithm [@minpack.lm].
 
-## The growth symmetry analysis {.unnumbered}
+## Determination of the transition point between growth phases {.unnumbered}
 
 xxxx Add proper text here Sylwia!!!
 
