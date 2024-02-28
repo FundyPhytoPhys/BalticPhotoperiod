@@ -177,7 +177,7 @@ MultiCultiDataAll %>%
   scale_colour_discrete(type=c("seagreen4", "palegreen3", "brown1", "brown4"), name="") +
   scale_y_continuous(breaks=seq(0, 1, by = 0.25)) +
   coord_cartesian(ylim = c(0, 1.0)) +
-  labs(y = "Growth curves ( tracked as"~OD[680]~")", x = "Elapsed time (h)") +
+  labs(y = "Optical density ("~OD[680]~")", x = "Elapsed time (h)") +
   ggh4x::facet_nested(cols = vars(facetsPhotoperiod, Photoperiod), rows = vars(facetsPar_ue, Par_ue), labeller = label_parsed) +
   theme_bw() +
   theme(panel.grid.minor = element_blank(),
@@ -217,7 +217,7 @@ MultiCultiDataAll %>%
   scale_colour_discrete(type=c("seagreen4", "palegreen3", "brown1", "brown4"), name="") +
   scale_y_continuous(breaks=seq(0, 1, by = 0.25)) +
   coord_cartesian(ylim = c(0, 1.0)) +
-  labs(y = "Growth curves ( tracked as"~OD[720]~")", x = "Elapsed time (h)") +
+  labs(y = "Optical density ("~OD[720]~")", x = "Elapsed time (h)") +
   ggh4x::facet_nested(cols = vars(facetsPhotoperiod, Photoperiod), rows = vars(facetsPar_ue, Par_ue), labeller = label_parsed) +
   theme_bw() +
   theme(panel.grid.minor = element_blank(),
@@ -259,7 +259,7 @@ MultiCultiDataAll %>%
   # coord_cartesian(ylim = c(0, 1.0)) +
   # labs(y = "Growth curves ( tracked as chlorophyll proxy"~OD[680]~"-"~OD[720]~"(\u0394 OD)", x = "Elapsed time (h)") +
   # labs(y = "Growth curves (tracked as \u0394 OD)", x = "Elapsed time (h)") +
-  labs(y = "Growth curves ( tracked as chlorophyll proxy"~OD[680]~"-"~OD[720]~")", x = "Elapsed time (h)") +
+  labs(y = "Optical density (chlorophyll proxy"~OD[680]~"-"~OD[720]~")", x = "Elapsed time (h)") +
   ggh4x::facet_nested(cols = vars(facetsPhotoperiod, Photoperiod), rows = vars(facetsPar_ue, Par_ue), labeller = label_parsed) +
   theme_bw() +
   theme(panel.grid.minor = element_blank(),
@@ -660,7 +660,7 @@ MCGrowthRateFitData %>%
 # Save plot 
 
 ```{r save plot}
-ggsave(file = file.path(FigPath, paste("SFig_GrowthCurve_FitAll",".png",sep = "")), height=9, width= 7,  dpi = 300, limitsize = TRUE)
+ggsave(file = file.path(FigPath, paste("SFig_GrowthCurve_Fit",".png",sep = "")), height=9, width= 7,  dpi = 300, limitsize = TRUE)
 ```
 
 
@@ -808,15 +808,17 @@ MMPlot<-MultiCultiDataAll %>%
   filter(Par_ue == 180)
 ```
 
-
 # Plot
 
 ```{r fig.height = 8, fig.width = 8, warning = FALSE}
-data_textA <- data.frame(Strain  = c("PE-rich_048"), label = c('A'))
+data_textExp <- data.frame(Strain  = c("PE-rich_048"), label = c('Exponential'))
+data_textSt <- data.frame(Strain  = c("PE-rich_048"), label = c('Pre-stationary'))
+
 data_textAHG <- data.frame(Strain  = c("PE-rich_048"), label = c('tMaxAHG'))
 data_textAHG <- data.frame(Strain  = c("PE-rich_048"), label = c('tMaxHG'))
 
-#df$par[is.na(df$par)] <- 0
+Photoperiod.labs <- c("Phase of growth")
+names(Photoperiod.labs) <- c("12")
 
 MMPlot %>% 
 ggplot() + 
@@ -826,15 +828,16 @@ ggplot() +
   # geom_line(colour="black")  + 
   # geom_line(aes(y=yy),col="blue",lwd=1.0)  + 
   geom_area(aes(x=x, y=par/max(par)*max(spline)),fill="tan1", alpha=0.3, df) +
-  geom_vline(xintercept = 149, col="blue", lwd=0.5) + 
-  geom_vline(xintercept = tmx, linetype="dashed", col="black", lwd=0.4) + 
-  
-  geom_text(data=data_textA, aes(x=336, y=0.9, label=label), size=4.5) +
-  
+  geom_vline(xintercept = 149, linetype = "dotdash", col="brown1", lwd=0.7) + 
+  #geom_hline(yintercept = 1, linetype = "solid", col="black", lwd=0.4) + 
+  #geom_vline(xintercept = tmx, linetype="dashed", col="black", lwd=0.4) + 
+  geom_text(data=data_textExp, aes(x=72, y=1.0, label=label), size=4.3) +
+  geom_text(data=data_textSt, aes(x=240, y=1.0, label=label), size=4.3) +
   scale_y_continuous(sec.axis = sec_axis( trans=~./25, name="1"^st~"derivative of"~OD[680]~"")) + 
   scale_x_continuous(breaks=seq(0,360,24)) + 
-  labs(y = "Growth curves ( tracked as"~OD[680]~")", x = "Elapsed time (h)") +
-  # ggh4x::facet_nested(cols = vars(facetsPhotoperiod, Photoperiod), rows = vars(facetsPar_ue, Par_ue), labeller = label_parsed) +
+  coord_cartesian(ylim = c(-0.2, 1.0)) +
+  labs(y = "Optical density ("~OD[680]~")", x = "Elapsed time (h)") +
+  ggh4x::facet_nested(cols = vars(Photoperiod),labeller = labeller(WL = label_both, Photoperiod = Photoperiod.labs)) +
   theme_bw() +
   theme(panel.grid.minor = element_blank(),
         panel.grid.major = element_blank(),
@@ -857,6 +860,57 @@ ggplot() +
 ggsave(file = file.path(FigPath, paste("Fig_FirstDerivative",".png",sep = "")), height=4.5, width= 7,  dpi = 300, limitsize = TRUE)
 ```
 
+
+---------------------------------------- Growth Symmetry Paper --------------------------------------------------------------
+
+# Plot
+
+```{r fig.height = 8, fig.width = 8, warning = FALSE}
+data_textA <- data.frame(Strain  = c("PE-rich_048"), label = c('A'))
+data_textAHG <- data.frame(Strain  = c("PE-rich_048"), label = c('tMaxAHG'))
+data_textAHG <- data.frame(Strain  = c("PE-rich_048"), label = c('tMaxHG'))
+
+#df$par[is.na(df$par)] <- 0
+
+PlotA<-MMPlot %>% 
+ggplot() + 
+  geom_line(aes(x=x, y=der*25), df) + 
+  geom_line(aes(x=x, y=s-1),col="tan1",lwd=1, df) + 
+  geom_line(aes(x = Time_h, y = meanOD680_h, colour = as.factor(Strain)), size = 1, show.legend = F) +
+  # geom_line(colour="black")  + 
+  # geom_line(aes(y=yy),col="blue",lwd=1.0)  + 
+  geom_area(aes(x=x, y=par/max(par)*max(spline)),fill="tan1", alpha=0.3, df) +
+  geom_vline(xintercept = 149, col="blue", lwd=0.7) + 
+  geom_vline(xintercept = tmx, linetype="dashed", col="black", lwd=0.4) + 
+  geom_text(data=data_textA, aes(x=336, y=1, label=label), size=4.5) +
+  scale_y_continuous(sec.axis = sec_axis( trans=~./25, name="1"^st~"derivative of"~OD[680]~"")) + 
+  scale_x_continuous(breaks=seq(0,360,24)) + 
+  coord_cartesian(ylim = c(-0.2, 1.0)) +
+  labs(y = "Optical density ("~OD[680]~")", x = "Elapsed time (h)") +
+  # ggh4x::facet_nested(cols = vars(facetsPhotoperiod, Photoperiod), rows = vars(facetsPar_ue, Par_ue), labeller = label_parsed) +
+  theme_bw() +
+  theme(panel.grid.minor = element_blank(),
+        panel.grid.major = element_blank(),
+        axis.text = element_text(size=12),
+        axis.title = element_text(size=16),
+        strip.background = element_rect(fill="white"),
+        strip.text = element_text(size=12),
+        axis.title.y = element_text(margin=margin(r=10)),
+        axis.title.x = element_text(margin=margin(t=10)),
+        legend.background = element_rect(fill="transparent"),
+        legend.position = c(0.12,0.96),
+        legend.key.height= unit(0.005, 'cm'),
+        legend.spacing.x = unit(0.01, 'cm'),
+        legend.text = element_text(size=11))
+PlotA
+```
+
+# Save plot 
+
+```{r save plot}
+# ggsave(file = file.path(FigPath, paste("Fig_FirstDerivative",".png",sep = "")), height=4.5, width= 7,  dpi = 300, limitsize = TRUE)
+```
+
 ```{r fig.height = 8, fig.width = 8, warning = FALSE}
 # tmx
 
@@ -875,30 +929,26 @@ MMPlotCut<-MMPlot %>%
   filter(Time_h<190)
 
 
-MMPlotCut %>% 
+PlotB<-MMPlotCut %>% 
 ggplot() + 
   geom_line(aes(x=x, y=der*25), dfCut) + 
   geom_line(aes(x=x, y=s-1),col="tan1",lwd=1, dfCut) + 
   geom_line(aes(x = Time_h, y = meanOD680_h, colour = as.factor(Strain)), size = 1, show.legend = F) +
-
   geom_area(aes(x=x, y=par/max(par)*max(spline)),fill="tan1", alpha=0.3, dfCut) +
   geom_vline(xintercept = 172.16667, linetype="dashed", col="black", lwd=0.4) +
-  
   geom_segment(data = arrowdf1, aes(x = 165, xend = 170, y = 0.1, yend = 0),
                colour = "black", size = 0.5, alpha=0.9, arrow = arrow(length=unit(0.2, 'cm'))) +
   geom_segment(data = arrowdf2, aes(x = 180, xend = 175, y = 0.1, yend = 0),
                colour = "black", size = 0.5, alpha=0.9, arrow = arrow(length=unit(0.2, 'cm'))) +
-  
-  geom_text(data=data_textAccLen, aes(x=165, y=0.12, label=label), size=3.5) +
-  geom_text(data=data_textDecLen, aes(x=182, y=0.12, label=label), size=3.5) +
-  geom_text(data=data_textB, aes(x=190, y=0.85, label=label), size=4.5) +
-  
+  geom_text(data=data_textAccLen, aes(x=165, y=0.125, label=label), size=3.5) +
+  geom_text(data=data_textDecLen, aes(x=182, y=0.125, label=label), size=3.5) +
+  geom_text(data=data_textB, aes(x=190, y=1, label=label), size=4.5) +
   scale_y_continuous(sec.axis = sec_axis( trans=~./25, name="1"^st~"derivative of"~OD[680]~"")) +
   scale_x_continuous(breaks=seq(150, 200, by = 10)) +
+  coord_cartesian(ylim = c(-0.2, 1.0)) +
   # scale_y_continuous(breaks=seq(0, 30, by = 10)) +
   # coord_cartesian(xlim = c(0, 80000000), ylim = c(0, 30)) +
-  
-  labs(y = "Growth curves ( tracked as"~OD[680]~")", x = "Elapsed time (h)") +
+  labs(y = "Optical density ("~OD[680]~")", x = "Elapsed time (h)") +
   # ggh4x::facet_nested(cols = vars(facetsPhotoperiod, Photoperiod), rows = vars(facetsPar_ue, Par_ue), labeller = label_parsed) +
   theme_bw() +
   theme(panel.grid.minor = element_blank(),
@@ -914,12 +964,21 @@ ggplot() +
         legend.key.height= unit(0.005, 'cm'),
         legend.spacing.x = unit(0.01, 'cm'),
         legend.text = element_text(size=11))
+PlotB
 ```
+# Merge two plots into one with panel A and B
+
+```{r Final Plot arrange, warning = FALSE, fig.height = 8, fig.width = 8}
+ggarrange(PlotA,PlotB,
+          ncol = 1, nrow = 2)
+```
+
 # Save plot 
 
 ```{r save plot}
-ggsave(file = file.path(FigPath, paste("Fig_FirstDerivativeCut",".png",sep = "")), height=4.5, width= 7,  dpi = 300, limitsize = TRUE)
+ggsave(file = file.path(FigPath, paste("Fig_FirstDerivativeAB",".png",sep = "")), height=9, width= 7,  dpi = 300, limitsize = TRUE)
 ```
+
 
 
 
