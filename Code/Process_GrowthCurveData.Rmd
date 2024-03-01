@@ -869,7 +869,7 @@ ggplot() +
 # Save plot 
 
 ```{r save plot}
-ggsave(file = file.path(FigPath, paste("Fig_FirstDerivative",".png",sep = "")), height=4.5, width= 7,  dpi = 300, limitsize = TRUE)
+# ggsave(file = file.path(FigPath, paste("Fig_FirstDerivative",".png",sep = "")), height=4.5, width= 7,  dpi = 300, limitsize = TRUE)
 ```
 
 
@@ -882,15 +882,9 @@ MCGrowthRateFitData48<-MCGrowthRateFitData %>%
   filter(Photoperiod == 12) %>% 
   filter(Par_ue == 180)
 
-
-
 data_textExp <- data.frame(Strain  = c("PE-rich_048"), label = c('Exponential'))
 data_textSt <- data.frame(Strain  = c("PE-rich_048"), label = c('Pre-stationary'))
-
-data_text680 <- data.frame(Strain  = c("PE-rich_048"), label = c('OD680'))
-data_text720 <- data.frame(Strain  = c("PE-rich_048"), label = c('OD720'))
-data_textDelta <- data.frame(Strain  = c("PE-rich_048"), label = c('\u0394 OD'))
-
+#data_textDelta <- data.frame(Strain  = c("PE-rich_048"), label = c('\u0394 OD'))
 
 Photoperiod.labs <- c("Phase of growth")
 names(Photoperiod.labs) <- c("12")
@@ -909,9 +903,10 @@ ggplot() +
   geom_text(data=data_textExp, aes(x=72, y=1.0, label=label), size=4.3) +
   geom_text(data=data_textSt, aes(x=240, y=1.0, label=label), size=4.3) +
   
-  geom_text(data=data_text680, aes(x=310, y=0.75, label=label), size=3.5) +
-  geom_text(data=data_text720, aes(x=310, y=0.92, label=label), size=3.5) +
-  geom_text(data=data_textDelta, aes(x=310, y=0.23, label=label), size=3.5) +
+  #geom_text(data=data_textDelta, aes(x=310, y=0.23, label=label), size=3.5) +
+  annotate("text", x = 310, y = 0.75, label = "OD[680]", parse = TRUE) +
+  annotate("text", x = 310, y = 0.92, label = "OD[720]", parse = TRUE) +
+  annotate("text", x = 310, y = 0.23, label = 'Δ~OD', parse = TRUE) +
   
   scale_y_continuous(sec.axis = sec_axis( trans=~./25, name="1"^st~"derivative of"~OD[680]~"")) + 
   scale_x_continuous(breaks=seq(0,360,24)) + 
@@ -938,7 +933,7 @@ ggplot() +
 # Save plot 
 
 ```{r save plot}
-ggsave(file = file.path(FigPath, paste("Fig_FirstDerivative2",".png",sep = "")), height=4.5, width= 7,  dpi = 300, limitsize = TRUE)
+ggsave(file = file.path(FigPath, paste("Fig_FirstDerivative",".png",sep = "")), height=4.5, width= 7,  dpi = 300, limitsize = TRUE)
 ```
 
 
