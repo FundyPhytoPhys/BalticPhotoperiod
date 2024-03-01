@@ -128,7 +128,7 @@ Based on the obtained measurements of growth we determined exponential chlorophy
 To determine the transition point between growth phases, the 1^st^ derivative of OD~680~ taken over 1 h increments was computed. The time when the cultures reached their maximum absolute hourly growth (tMaxAHG) of the 1^st^ derivative of OD~680~, was taken as an index of transition from exponential to pre-stationary growth phases (Fig. \@ref(fig:FirstDerivative)).
 
 ```{r FirstDerivative, fig.cap = FirstDerivative_cap, fig.height = 6, fig.width = 8, echo = FALSE}
-FirstDerivative_cap<- glue("**Example of a growth curve (tracked as OD~680~; red solid line, left y-axis) of PE-rich culture of *Synechococcus* sp. (048) vs. elapsed time (h)**; 1^st^ derivative of OD~680~ taken over 1 h increments (black solid line, right y-axis). The vertical red dot dash line represents the time when the culture reached their maximum absolute hourly growth (tMaxAHG) of the 1^st^ derivative of OD~680~, taken as an index of transition from exponential to pre-stationary growth phases.", .sep = " ")
+FirstDerivative_cap<- glue("**Example of a growth curve (tracked as OD~720~, OD~680~, or ΔOD; red solid line, left y-axis) of PE-rich culture of *Synechococcus* sp. (048) vs. elapsed time (h)**; 1^st^ derivative of OD~680~ taken over 1 h increments (black solid line, right y-axis). Solid blue line shows logistic fits of chlorophyll proxy OD~680~-OD~720~ (ΔOD) vs. elapsed time. The vertical red dot dash line represents the time when the culture reached their maximum absolute hourly growth (tMaxAHG) of the 1^st^ derivative of OD~680~, taken as an index of transition from exponential to pre-stationary growth phases.", .sep = " ")
 knitr::include_graphics(file.path( FiguresFP,"Fig_FirstDerivative.png")) 
 ```
 
@@ -205,7 +205,7 @@ To examine statistical differences between models, we performed one-way ANOVA of
 
 T-test of linear fit model of pooled data across different strains for a given phase of growth and across different phase of growth for a given strain from effective absorption cross section of PSII ($\sigma$~PSII~'; nm^2^ quanta^−1^) measured under diel peak PAR growth light under Ex445 nm (blue) excitation in relation to the cumulative diel photon dose (µmol photons m^−2^d^−1^) or in relation to the total Phyco/Chl *a* ratio, as well as from effective absorption cross section of PSII ($\sigma$~PSII~'; nm^2^ quanta^−1^) measured under diel peak PAR growth light under Ex590 nm (orange) excitation in relation to the total Phyco/Chl *a* ratio was performed (Table S11, S15, S17 in Supplemental material).
 
-Statistical differences for all analyzes were determined at the level of significance $\alpha$ = 0.05. Manuscript was prepared as Rmarkdown document [@handelAndreasHandelCustom2020]. Figures were plotted using “ggplot” [@wickhamDataAnalysis2016] R package.
+Statistical differences for all analyzes were determined at the level of significance $\alpha$ = 0.05. Manuscript was prepared as a Rmarkdown document [@handelAndreasHandelCustom2020]. Figures were plotted using “ggplot” [@wickhamDataAnalysis2016] R package.
 
 
 Serway, Raymond A.; Moses, Clement J.; Moyer, Curt A. (1989), Modern Physics, Fort Worth: Harcourt Brace Jovanovich, ISBN 0-03-004844-3
