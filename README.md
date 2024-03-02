@@ -27,10 +27,7 @@ Data sources chapter provide links to any data used from external providers:
 - URL for MetaDataCatalog:
 https://docs.google.com/spreadsheets/d/1ZXpwR7Gfto-uRzVdXzMpQF4frbrvMLH_IyLqonFZRSw/edit#gid=0
 
-- URL for GS Catalog:
-https://docs.google.com/spreadsheets/d/1zqH6iYlqMPigyloLKJPeVWugmcnmgJ-eMU3gLkR6FSU/edit#gid=0
-
-- URL for tmaxAG Catalog:
+- URL for tMaxAHG Catalog:
 https://docs.google.com/spreadsheets/d/1ksY7xlg9wOsICOBRmZkHPKdd9KOislNwPDzyuJ3UIUI/edit#gid=0
 
 - URL for pigments Catalog (correlation):
