@@ -270,6 +270,10 @@ knitr::include_graphics(file.path(FiguresFP,"Fig_SigmaPig590.png"))
 
 ## Changes in PSII flux per unit volume {.unnumbered}
 
+```{r GrowthRateJVPSII, fig.cap = GrowthRateJVPSII_cap, fig.height = 8, fig.width = 6, echo = FALSE}
+GrowthRateJVPSII_cap<- glue("**Chlorophyll specific exponential growth rates (d^−1^) vs. PSII flux (*JVP*~SII~; unit) measured under diel peak PAR growth light.** Growth rates (+/- SE falling within symbols) were estimated from logistic fits of chlorophyll proxy OD~680~ - OD~720~ vs. elapsed time (Fig. S4). PSII flux (*JVP*~SII~; unit) was estimated using FRRf induction curves with excitation of chlorophyll using Ex445nm (blue) excitation, for two PhycoCyanin(PC)-rich cultures (056, 077) and two PhycoErythrin(PE)-rich cultures (048, 127) of *Synechococcus* sp. originating from the Baltic Sea. Cultures were grown at 30 (dark gray), 90 (light gray), 180 (purple), 300 (red), 600 (orange), or 900 (yellow) peak PAR µmol photons m^−2^s^−1^ (µE); and photoperiods of 8 (square), 12 (circle), 16 (triangle), or 24 (diamond) h. Solid blue line shows a fit of the pooled growth rates for each strain, with a three parameter model (Harrison and Platt, 1986). We also fit the same model separately for 30 (dark gray), 90 (light gray), 180 (purple), 300 (red), 600 together with 900 (orange) peak PAR µmol photons m^−2^s^−1^, only when they were significantly different (ANOVA, *p* < 0.05) from the fit of pooled data.", .sep = " ")
+knitr::include_graphics(file.path(FiguresFP,"Fig_GrowthRate_JVPSII.png"))
+```
 
 # Discussion {.unnumbered}
 

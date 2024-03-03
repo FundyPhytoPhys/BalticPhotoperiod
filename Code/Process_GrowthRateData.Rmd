@@ -299,24 +299,197 @@ MCGrowthExpSP %>%
 
 ```{r platt fit}
 #Harrison & Platt, 1986
+# grcplatt <- function(I, a, b, Pmax){Pmax * (1-exp(-a*I/Pmax)) * exp(-b*I/Pmax)}
+# 
+# MCGrowthExpSPFit <- MCGrowthExpSP %>%   
+#   nest(data = -c("Strain", "facetsStrain")) %>%  
+#   mutate(GRCplatt_Model = map(data, ~nlsLM(deltaOD_Lmu_corr ~ grcplatt(I = PURPhotonDose_day, a, b, Pmax),
+#          data = .x,start = list(a = 0.1/2e7, b = 0.01/2e7, Pmax = 0.2),lower = c(0, 0, 0)))) %>%    
+#   mutate(GRCplatt_Param = map(GRCplatt_Model, tidy),          
+#          GRCplatt_Predict = map(GRCplatt_Model, possibly(augment)),          
+#          GRCplatt_Glance = map(GRCplatt_Model, possibly(glance)))
+# GRCplatt_PredictGrowthExpAll <- MCGrowthExpSPFit %>% 
+#   unnest(GRCplatt_Predict)%>% 
+#   unnest(GRCplatt_Param)
+
+```
+
+# Estimated Harrison & Platt, 1986 fit - for all uE and each uE separately
+
+```{r platt fit}
+#Harrison & Platt, 1986
 grcplatt <- function(I, a, b, Pmax){Pmax * (1-exp(-a*I/Pmax)) * exp(-b*I/Pmax)}
 
-MCGrowthExpSPFit <- MCGrowthExpSP %>%   
+MCGrowthSPAllFit <- MCGrowthExpSP %>%   
   nest(data = -c("Strain", "facetsStrain")) %>%  
   mutate(GRCplatt_Model = map(data, ~nlsLM(deltaOD_Lmu_corr ~ grcplatt(I = PURPhotonDose_day, a, b, Pmax),
          data = .x,start = list(a = 0.1/2e7, b = 0.01/2e7, Pmax = 0.2),lower = c(0, 0, 0)))) %>%    
   mutate(GRCplatt_Param = map(GRCplatt_Model, tidy),          
          GRCplatt_Predict = map(GRCplatt_Model, possibly(augment)),          
          GRCplatt_Glance = map(GRCplatt_Model, possibly(glance)))
-GRCplatt_PredictGrowthExpAll <- MCGrowthExpSPFit %>% 
+GRCplatt_PredictGrowthAll <- MCGrowthSPAllFit %>% 
   unnest(GRCplatt_Predict)%>% 
   unnest(GRCplatt_Param)
 
+MCGrowthSP30Fit <- MCGrowthExpSP %>%   
+  filter(Par_ue ==30) %>% 
+  nest(data = -c("Strain", "facetsStrain")) %>%  
+  mutate(GRCplatt_Model = map(data, ~nlsLM(deltaOD_Lmu_corr ~ grcplatt(I = PURPhotonDose_day, a, b, Pmax),
+         data = .x,start = list(a = 0.1/2e7, b = 0.01/2e7, Pmax = 0.2),lower = c(0, 0, 0)))) %>%    
+  mutate(GRCplatt_Param = map(GRCplatt_Model, tidy),          
+         GRCplatt_Predict = map(GRCplatt_Model, possibly(augment)),          
+         GRCplatt_Glance = map(GRCplatt_Model, possibly(glance)))
+GRCplatt_PredictGrowth30 <- MCGrowthSP30Fit %>% 
+  unnest(GRCplatt_Predict)%>% 
+  unnest(GRCplatt_Param)
+
+
+MCGrowthSP90Fit <- MCGrowthExpSP %>%    
+  filter(Par_ue ==90) %>%  
+  nest(data = -c("Strain", "facetsStrain")) %>% 
+  mutate(GRCplatt_Model = map(data, ~nlsLM(deltaOD_Lmu_corr ~ grcplatt(I = PURPhotonDose_day, a, b, Pmax),
+         data = .x,start = list(a = 0.1/2e7, b = 0.01/2e7, Pmax = 0.2),lower = c(0, 0, 0)))) %>%     
+  mutate(GRCplatt_Param = map(GRCplatt_Model, tidy),          
+         GRCplatt_Predict = map(GRCplatt_Model, possibly(augment)),          
+         GRCplatt_Glance = map(GRCplatt_Model, possibly(glance)))
+GRCplatt_PredictGrowth90 <- MCGrowthSP90Fit %>% 
+  unnest(GRCplatt_Predict)%>% 
+  unnest(GRCplatt_Param)
+
+
+MCGrowthSP180Fit <- MCGrowthExpSP %>%    
+  filter(Par_ue ==180) %>%  
+  nest(data = -c("Strain", "facetsStrain")) %>%  
+  mutate(GRCplatt_Model = map(data, ~nlsLM(deltaOD_Lmu_corr ~ grcplatt(I = PURPhotonDose_day, a, b, Pmax),
+         data = .x,start = list(a = 0.1/2e7, b = 0.01/2e7, Pmax = 0.2),lower = c(0, 0, 0)))) %>%    
+  mutate(GRCplatt_Param = map(GRCplatt_Model, tidy),          
+         GRCplatt_Predict = map(GRCplatt_Model, possibly(augment)),          
+         GRCplatt_Glance = map(GRCplatt_Model, possibly(glance)))
+GRCplatt_PredictGrowth180 <- MCGrowthSP180Fit %>% 
+  unnest(GRCplatt_Predict)%>% 
+  unnest(GRCplatt_Param)
+
+
+MCGrowthSP300Fit <- MCGrowthExpSP %>%   
+  filter(Par_ue ==300) %>% 
+  nest(data = -c("Strain", "facetsStrain")) %>%  
+  mutate(GRCplatt_Model = map(data, ~nlsLM(deltaOD_Lmu_corr ~ grcplatt(I = PURPhotonDose_day, a, b, Pmax),
+         data = .x,start = list(a = 0.1/2e7, b = 0.01/2e7, Pmax = 0.2),lower = c(0, 0, 0)))) %>%     
+  mutate(GRCplatt_Param = map(GRCplatt_Model, tidy),          
+         GRCplatt_Predict = map(GRCplatt_Model, possibly(augment)),          
+         GRCplatt_Glance = map(GRCplatt_Model, possibly(glance)))
+GRCplatt_PredictGrowth300 <- MCGrowthSP300Fit %>% 
+  unnest(GRCplatt_Predict)%>% 
+  unnest(GRCplatt_Param)
+
+
+# MCGrowthSP600Fit <- MCGrowthSP %>%
+#   filter(Par_ue ==600) %>%
+#   nest(data = -c("Strain", "facetsStrain")) %>%
+#   mutate(GRCplatt_Model = map(data, ~nlsLM(deltaOD_Lmu_corr ~ grcplatt(I = PARPhotonDose_day, a, b, Pmax),
+#          data = .x,start = list(a = 0.1/2e7, b = 0.01/2e7, Pmax = 0.2),lower = c(0, 0, 0)))) %>%
+#   mutate(GRCplatt_Param = map(GRCplatt_Model, tidy),
+#          GRCplatt_Predict = map(GRCplatt_Model, possibly(augment)),
+#          GRCplatt_Glance = map(GRCplatt_Model, possibly(glance)))
+# GRCplatt_PredictGrowth600 <- MCGrowthSP600Fit %>%
+#   unnest(GRCplatt_Predict)%>%
+#   unnest(GRCplatt_Param)
+
+
+MCGrowthSP900Fit <- MCGrowthExpSP %>%    
+  filter(Par_ue ==900 | Par_ue == 600) %>% 
+  nest(data = -c("Strain", "facetsStrain")) %>%  
+  mutate(GRCplatt_Model = map(data, ~nlsLM(deltaOD_Lmu_corr ~ grcplatt(I = PURPhotonDose_day, a, b, Pmax),
+         data = .x,start = list(a = 0.1/2e7, b = 0.01/2e7, Pmax = 0.2),lower = c(0, 0, 0)))) %>%     
+  mutate(GRCplatt_Param = map(GRCplatt_Model, tidy),          
+         GRCplatt_Predict = map(GRCplatt_Model, possibly(augment)),          
+         GRCplatt_Glance = map(GRCplatt_Model, possibly(glance)))
+        #ANOVATEST = map(GRCplatt_Model, ~ anova(deltaOD_Lmu_corr ~ Par_ue))
+        #ANOVATEST2 = map2(GRCplatt_Model, fit30, fit90, anova)))
+GRCplatt_PredictGrowth900 <- MCGrowthSP900Fit %>% 
+  unnest(GRCplatt_Predict) %>% 
+  unnest(GRCplatt_Param)
+
+rm(MCGrowthSPAllFit, MCGrowthSP30Fit, MCGrowthSP90Fit, MCGrowthSP180Fit, MCGrowthSP300Fit, MCGrowthSP900Fit)
 ```
+
+
+# Estimated Harrison & Platt, 1986 fit - for each Photoperiod separately
+
+```{r platt fit}
+#Harrison & Platt, 1986
+grcplatt <- function(I, a, b, Pmax){Pmax * (1-exp(-a*I/Pmax)) * exp(-b*I/Pmax)}
+
+# MCGrowthSPAllFit <- MCGrowthSP %>%   
+#   nest(data = -c("Strain", "facetsStrain")) %>%  
+#   mutate(GRCplatt_Model = map(data, ~nlsLM(deltaOD_Lmu_corr ~ grcplatt(I = PARPhotonDose_day, a, b, Pmax),
+#          data = .x,start = list(a = 0.1/2e7, b = 0.01/2e7, Pmax = 0.2),lower = c(0, 0, 0)))) %>%    
+#   mutate(GRCplatt_Param = map(GRCplatt_Model, tidy),          
+#          GRCplatt_Predict = map(GRCplatt_Model, possibly(augment)),          
+#          GRCplatt_Glance = map(GRCplatt_Model, possibly(glance)))
+# GRCplatt_PredictGrowthAll <- MCGrowthSPAllFit %>% 
+#   unnest(GRCplatt_Predict)%>% 
+#   unnest(GRCplatt_Param)
+
+
+MCGrowthSP8Fit <- MCGrowthExpSP %>%   
+  filter(Photoperiod ==8) %>% 
+  nest(data = -c("Strain", "facetsStrain")) %>%  
+  mutate(GRCplatt_Model = map(data, ~nlsLM(deltaOD_Lmu_corr ~ grcplatt(I = PURPhotonDose_day, a, b, Pmax),
+         data = .x,start = list(a = 0.1/2e7, b = 0.01/2e7, Pmax = 0.2),lower = c(0, 0, 0)))) %>%    
+  mutate(GRCplatt_Param = map(GRCplatt_Model, tidy),          
+         GRCplatt_Predict = map(GRCplatt_Model, possibly(augment)),          
+         GRCplatt_Glance = map(GRCplatt_Model, possibly(glance)))
+GRCplatt_PredictGrowth8 <- MCGrowthSP8Fit %>% 
+  unnest(GRCplatt_Predict)%>% 
+  unnest(GRCplatt_Param)
+
+
+MCGrowthSP12Fit <- MCGrowthExpSP %>%    
+  filter(Photoperiod ==12) %>%  
+  nest(data = -c("Strain", "facetsStrain")) %>% 
+  mutate(GRCplatt_Model = map(data, ~nlsLM(deltaOD_Lmu_corr ~ grcplatt(I = PURPhotonDose_day, a, b, Pmax),
+         data = .x,start = list(a = 0.1/2e7, b = 0.01/2e7, Pmax = 0.2),lower = c(0, 0, 0)))) %>%     
+  mutate(GRCplatt_Param = map(GRCplatt_Model, tidy),          
+         GRCplatt_Predict = map(GRCplatt_Model, possibly(augment)),          
+         GRCplatt_Glance = map(GRCplatt_Model, possibly(glance)))
+GRCplatt_PredictGrowth12 <- MCGrowthSP12Fit %>% 
+  unnest(GRCplatt_Predict)%>% 
+  unnest(GRCplatt_Param)
+
+
+MCGrowthSP16Fit <- MCGrowthExpSP %>%    
+  filter(Photoperiod ==16) %>%  
+  nest(data = -c("Strain", "facetsStrain")) %>%  
+  mutate(GRCplatt_Model = map(data, ~nlsLM(deltaOD_Lmu_corr ~ grcplatt(I = PURPhotonDose_day, a, b, Pmax),
+         data = .x,start = list(a = 0.1/2e7, b = 0.01/2e7, Pmax = 0.2),lower = c(0, 0, 0)))) %>%    
+  mutate(GRCplatt_Param = map(GRCplatt_Model, tidy),          
+         GRCplatt_Predict = map(GRCplatt_Model, possibly(augment)),          
+         GRCplatt_Glance = map(GRCplatt_Model, possibly(glance)))
+GRCplatt_PredictGrowth16 <- MCGrowthSP16Fit %>% 
+  unnest(GRCplatt_Predict)%>% 
+  unnest(GRCplatt_Param)
+
+
+MCGrowthSP24Fit <- MCGrowthExpSP %>%   
+  filter(Photoperiod ==24) %>% 
+  nest(data = -c("Strain", "facetsStrain")) %>%  
+  mutate(GRCplatt_Model = map(data, ~nlsLM(deltaOD_Lmu_corr ~ grcplatt(I = PURPhotonDose_day, a, b, Pmax),
+         data = .x,start = list(a = 0.1/2e7, b = 0.01/2e7, Pmax = 0.2),lower = c(0, 0, 0)))) %>%     
+  mutate(GRCplatt_Param = map(GRCplatt_Model, tidy),          
+         GRCplatt_Predict = map(GRCplatt_Model, possibly(augment)),          
+         GRCplatt_Glance = map(GRCplatt_Model, possibly(glance)))
+GRCplatt_PredictGrowth24 <- MCGrowthSP24Fit %>% 
+  unnest(GRCplatt_Predict)%>% 
+  unnest(GRCplatt_Param)
+
+rm(MCGrowthSP8Fit, MCGrowthSP12Fit, MCGrowthSP16Fit, MCGrowthSP24Fit)
+```
+
 
 # Create preliminary plot - per Par_ue and photoperiod
 
-```{r create plot, fig.height = 8, fig.width = 8, warning = FALSE}
+```{r create plot}
 lab1=c(expression("8 h"), expression("12 h"), expression("16 h"), expression("24 h"))
 lab2=c(expression("30 µE"), expression("90 µE"), expression("180 µE"), expression("300 µE"), expression("600 µE"), expression("900 µE"))
 lab4=c(expression(""), expression(""), expression(""), expression(""))
@@ -325,11 +498,344 @@ scientific_10 <- function(x) {   parse(text=gsub("e\\+*", " %*% 10^", scales::sc
 ggplot(MCGrowthExpSP, aes(PURPhotonDose_day, deltaOD_Lmu_corr)) +
   geom_point(aes(PURPhotonDose_day, deltaOD_Lmu_corr, colour = as.factor(Par_ue), shape = as.factor(Photoperiod)), alpha = 0.8, size = 3.5, show.legend = T) +
   geom_errorbar(aes(x = PURPhotonDose_day, ymin = deltaOD_Lmu_corr - deltaOD_Lmu_se, ymax = deltaOD_Lmu_corr + deltaOD_Lmu_se, colour = as.factor(Par_ue)), width=0, size=0.3, data = . %>% filter(deltaOD_Lmu_se<8.057558e-03), show.legend = F) +
-  geom_line(aes(PURPhotonDose_day, .fitted), colour = "blue", linetype = "solid", size = 0.3, show.legend = F, GRCplatt_PredictGrowthExpAll) +
+  geom_line(aes(PURPhotonDose_day, .fitted), colour = "black", linetype = "dotted", show.legend = F, GRCplatt_PredictGrowthAll) +
+  geom_line(aes(PURPhotonDose_day, .fitted), colour = "darkslategray", show.legend = F, GRCplatt_PredictGrowth30) +
+  geom_line(aes(PURPhotonDose_day, .fitted), colour = "lightblue4", show.legend = F, GRCplatt_PredictGrowth90) +
+  geom_line(aes(PURPhotonDose_day, .fitted), colour = "hotpink4", show.legend = F, GRCplatt_PredictGrowth180) +
+  geom_line(aes(PURPhotonDose_day, .fitted), colour = "indianred3", show.legend = F, GRCplatt_PredictGrowth300) +
+  geom_line(aes(PURPhotonDose_day, .fitted), colour = "goldenrod2", show.legend = F, GRCplatt_PredictGrowth900) +
   scale_x_continuous(label=scientific_10) +
   scale_colour_manual(values = c("darkslategray", "lightblue4", "hotpink4", "indianred3", "goldenrod2", "khaki2"), name="", labels = lab2, breaks=c('30', "90", "180", "300", "600","900")) +
   scale_shape_manual(values = c(15, 16, 17, 18), name="", labels = lab1) +
-  labs(y = "Chlorophyll specific exponential growth rate " ~ "("~d^-1~")", x = " PUR photon dose ( µmol photons "~m^-2~""~d^-1~")") +
+  #labs(y = "Logistic growth rate " ~ "("~d^-1~")", x = "Photon dose ( µmol photons "~m^-2~""~d^-1~")") +
+  ggh4x::facet_nested(rows = vars(facetsStrain, Strain), labeller = label_parsed) +
+  theme_bw() 
+
+
+ggplot(MCGrowthExpSP, aes(PURPhotonDose_day, deltaOD_Lmu_corr)) +
+  geom_point(aes(PURPhotonDose_day, deltaOD_Lmu_corr, colour = as.factor(Par_ue), shape = as.factor(Photoperiod)), alpha = 0.8, size = 3.5, show.legend = T) +
+  geom_line(aes(PURPhotonDose_day, .fitted), colour = "black", linetype = "dotted", show.legend = F, GRCplatt_PredictGrowthAll) +
+  geom_line(aes(PURPhotonDose_day, .fitted), colour = "black", linetype = "solid",  show.legend = F, GRCplatt_PredictGrowth8) +
+  geom_line(aes(PURPhotonDose_day, .fitted), colour = "black", linetype = "longdash", show.legend = F, GRCplatt_PredictGrowth12) +
+  geom_line(aes(PURPhotonDose_day, .fitted), colour = "black", linetype = "dashed", show.legend = F, GRCplatt_PredictGrowth16) +
+  geom_line(aes(PURPhotonDose_day, .fitted), colour = "black", linetype = "dotdash", show.legend = F, GRCplatt_PredictGrowth24) +
+  geom_errorbar(aes(x = PURPhotonDose_day, ymin = deltaOD_Lmu_corr - deltaOD_Lmu_se, ymax = deltaOD_Lmu_corr + deltaOD_Lmu_se, colour = as.factor(Par_ue)), width=0, size=0.3, data = . %>% filter(deltaOD_Lmu_se<8.057558e-03), show.legend = F) +
+  scale_x_continuous(label=scientific_10) +
+  # scale_linetype_manual(values=c("longdash", "dashed", "dotdash", "twodash"),  name="", labels = lab4, breaks=c('8', "12", "16", "24")) +
+  scale_colour_manual(values = c("darkslategray", "lightblue4", "hotpink4", "indianred3", "goldenrod2", "khaki2"), name="", labels = lab2, breaks=c('30', "90", "180", "300", "600","900")) +
+  scale_shape_manual(values = c(15, 16, 17, 18), name="", labels = lab1) +
+  #labs(y = "Logistic growth rate " ~ "("~d^-1~")", x = "Photon dose ( µmol photons "~m^-2~""~d^-1~")") +
+  ggh4x::facet_nested(rows = vars(facetsStrain, Strain), labeller = label_parsed) +
+  theme_bw() 
+```
+
+# Exstracting models for each fit (for each light and all light together)
+
+```{r}
+MCGrowthSPAllModel<-GRCplatt_PredictGrowthAll %>% 
+  dplyr::select(c(Strain, GRCplatt_Model))
+  MCGrowthSPAllModel$Fit <- 'All'
+
+MCGrowthSP30Model<-GRCplatt_PredictGrowth30 %>% 
+  dplyr::select(c(Strain, GRCplatt_Model))
+  MCGrowthSP30Model$Fit <- '30'
+
+MCGrowthSP90Model<-GRCplatt_PredictGrowth90 %>% 
+  dplyr::select(c(Strain, GRCplatt_Model))
+  MCGrowthSP90Model$Fit <- '90'
+  
+MCGrowthSP180Model<-GRCplatt_PredictGrowth180 %>% 
+  dplyr::select(c(Strain, GRCplatt_Model))
+  MCGrowthSP180Model$Fit <- '180'
+  
+MCGrowthSP300Model<-GRCplatt_PredictGrowth300 %>% 
+  dplyr::select(c(Strain, GRCplatt_Model))
+  MCGrowthSP300Model$Fit <- '300'
+  
+MCGrowthSP900Model<-GRCplatt_PredictGrowth900 %>% 
+  dplyr::select(c(Strain, GRCplatt_Model))
+  MCGrowthSP900Model$Fit <- '900'
+  
+MCModelAll_Light<-rbind(MCGrowthSPAllModel, MCGrowthSP30Model, MCGrowthSP90Model, MCGrowthSP180Model, MCGrowthSP300Model, MCGrowthSP900Model)
+MCModelAll_Light<-MCModelAll_Light %>% 
+  unique()
+```
+
+# Exstracting models for each fit (for each photoperiod and all photoperiod together)
+
+```{r}
+MCGrowthSPAllModel<-GRCplatt_PredictGrowthAll %>% 
+  dplyr::select(c(Strain, GRCplatt_Model))
+  MCGrowthSPAllModel$Fit <- 'All'
+
+MCGrowthSP8Model<-GRCplatt_PredictGrowth8 %>% 
+  dplyr::select(c(Strain, GRCplatt_Model))
+  MCGrowthSP8Model$Fit <- '8'
+
+MCGrowthSP12Model<-GRCplatt_PredictGrowth12 %>% 
+  dplyr::select(c(Strain, GRCplatt_Model))
+  MCGrowthSP12Model$Fit <- '12'
+  
+MCGrowthSP16Model<-GRCplatt_PredictGrowth16 %>% 
+  dplyr::select(c(Strain, GRCplatt_Model))
+  MCGrowthSP16Model$Fit <- '16'
+  
+MCGrowthSP24Model<-GRCplatt_PredictGrowth24 %>% 
+  dplyr::select(c(Strain, GRCplatt_Model))
+  MCGrowthSP24Model$Fit <- '24'
+  
+
+MCModelAll_Photoperiod<-rbind(MCGrowthSPAllModel, MCGrowthSP30Model, MCGrowthSP90Model, MCGrowthSP180Model, MCGrowthSP300Model, MCGrowthSP900Model)
+MCModelAll_Photoperiod<-MCModelAll_Photoperiod %>% 
+  unique()
+```
+
+# Anova from the model - compare fit from all light to selected one light
+
+```{r}
+#1->All
+#2->30
+#3->90
+#4->180
+#5->300
+#6->900
+MCModelAll_BA56<-MCModelAll_Light %>% 
+  filter(Strain == "PC-rich_056") 
+  anova056_30<-anova(MCModelAll_BA56[[2]][[2]], MCModelAll_BA56[[2]][[1]])
+  anova056_30$FitComparison <- '30_All'
+  anova056_90<-anova(MCModelAll_BA56[[2]][[3]], MCModelAll_BA56[[2]][[1]])
+  anova056_90$FitComparison <- '90_All'
+  anova056_180<-anova(MCModelAll_BA56[[2]][[4]], MCModelAll_BA56[[2]][[1]])
+  anova056_180$FitComparison <- '180_All'
+  anova056_300<-anova(MCModelAll_BA56[[2]][[5]], MCModelAll_BA56[[2]][[1]])
+  anova056_300$FitComparison <- '300_All'
+  anova056_900<-anova(MCModelAll_BA56[[2]][[6]], MCModelAll_BA56[[2]][[1]])
+  anova056_900$FitComparison <- '900_All'
+  anova056<-rbind(anova056_30, anova056_90, anova056_180, anova056_300, anova056_900)
+  rm(anova056_30, anova056_90, anova056_180, anova056_300, anova056_900)
+  anova056$Strain <- 'PC-rich_056'
+#all sig different
+
+MCModelAll_BA77<-MCModelAll_Light %>% 
+  filter(Strain == "PC-rich_077") 
+  anova077_30<-anova(MCModelAll_BA77[[2]][[2]], MCModelAll_BA77[[2]][[1]])
+  anova077_30$FitComparison <- '30_All'
+  anova077_90<-anova(MCModelAll_BA77[[2]][[3]], MCModelAll_BA77[[2]][[1]])
+  anova077_90$FitComparison <- '90_All'
+  anova077_180<-anova(MCModelAll_BA77[[2]][[4]], MCModelAll_BA77[[2]][[1]])
+  anova077_180$FitComparison <- '180_All'
+  anova077_300<-anova(MCModelAll_BA77[[2]][[5]], MCModelAll_BA77[[2]][[1]])
+  anova077_300$FitComparison <- '300_All'
+  anova077_900<-anova(MCModelAll_BA77[[2]][[6]], MCModelAll_BA77[[2]][[1]])
+  anova077_900$FitComparison <- '900_All'
+  anova077<-rbind(anova077_30, anova077_90, anova077_180, anova077_300, anova077_900)
+  rm(anova077_30, anova077_90, anova077_180, anova077_300, anova077_900)
+  anova077$Strain <- 'PC-rich_077'
+#900 no sig different
+
+MCModelAll_BA48<-MCModelAll_Light %>% 
+  filter(Strain == "PE-rich_048") 
+  anova048_30<-anova(MCModelAll_BA48[[2]][[2]], MCModelAll_BA48[[2]][[1]])
+  anova048_30$FitComparison <- '30_All'
+  anova048_90<-anova(MCModelAll_BA48[[2]][[3]], MCModelAll_BA48[[2]][[1]])
+  anova048_90$FitComparison <- '90_All'
+  anova048_180<-anova(MCModelAll_BA48[[2]][[4]], MCModelAll_BA48[[2]][[1]])
+  anova048_180$FitComparison <- '180_All'
+  anova048_300<-anova(MCModelAll_BA48[[2]][[5]], MCModelAll_BA48[[2]][[1]])
+  anova048_300$FitComparison <- '300_All'
+  anova048_900<-anova(MCModelAll_BA48[[2]][[6]], MCModelAll_BA48[[2]][[1]])
+  anova048_900$FitComparison <- '900_All'
+  anova048<-rbind(anova048_30, anova048_90, anova048_180, anova048_300, anova048_900)
+  rm(anova048_30, anova048_90, anova048_180, anova048_300, anova048_900)
+  anova048$Strain <- 'PE-rich_048'
+#900 no sig different
+
+MCModelAll_BA127<-MCModelAll_Light %>% 
+  filter(Strain == "PE-rich_127") 
+  anova127_30<-anova(MCModelAll_BA127[[2]][[2]], MCModelAll_BA127[[2]][[1]])
+  anova127_30$FitComparison <- '30_All'
+  anova127_90<-anova(MCModelAll_BA127[[2]][[3]], MCModelAll_BA127[[2]][[1]])
+  anova127_90$FitComparison <- '90_All'
+  anova127_180<-anova(MCModelAll_BA127[[2]][[4]], MCModelAll_BA127[[2]][[1]])
+  anova127_180$FitComparison <- '180_All'
+  anova127_300<-anova(MCModelAll_BA127[[2]][[5]], MCModelAll_BA127[[2]][[1]])
+  anova127_300$FitComparison <- '300_All'
+  anova127_900<-anova(MCModelAll_BA127[[2]][[6]], MCModelAll_BA127[[2]][[1]])
+  anova127_900$FitComparison <- '900_All'
+  anova127<-rbind(anova127_30, anova127_90, anova127_180, anova127_300, anova127_900)
+  rm(anova127_30, anova127_90, anova127_180, anova127_300, anova127_900)
+  anova127$Strain <- 'PE-rich_127'
+#all sig different
+  
+AnovaTest_GrowthRateModel_Light_PUR<-rbind(anova056, anova077, anova048, anova127)
+
+AnovaTest_GrowthRateModel_Light_PUR <-AnovaTest_GrowthRateModel_Light_PUR %>% 
+  drop_na(Df) 
+rm(anova056, anova077, anova048, anova127, MCModelAll_BA56, MCModelAll_BA77, MCModelAll_BA48, MCModelAll_BA127)
+```
+
+# Anova from the model - compare fit from all photoperiod to selected one photoperiod
+
+```{r}
+#1->All
+#2->8
+#3->12
+#4->16
+#5->24
+
+MCModelAll_BA56<-MCModelAll_Photoperiod %>% 
+  filter(Strain == "PC-rich_056") 
+  anova056_8<-anova(MCModelAll_BA56[[2]][[2]], MCModelAll_BA56[[2]][[1]])
+  anova056_8$FitComparison <- '8_All'
+  anova056_12<-anova(MCModelAll_BA56[[2]][[3]], MCModelAll_BA56[[2]][[1]])
+  anova056_12$FitComparison <- '12_All'
+  anova056_16<-anova(MCModelAll_BA56[[2]][[4]], MCModelAll_BA56[[2]][[1]])
+  anova056_16$FitComparison <- '16_All'
+  anova056_24<-anova(MCModelAll_BA56[[2]][[5]], MCModelAll_BA56[[2]][[1]])
+  anova056_24$FitComparison <- '24_All'
+  anova056_Photoperiod<-rbind(anova056_8, anova056_12, anova056_16, anova056_24)
+  rm(anova056_8, anova056_12, anova056_16, anova056_24)
+  anova056_Photoperiod$Strain <- 'PC-rich_056'
+#all different 
+
+MCModelAll_BA77<-MCModelAll_Photoperiod %>% 
+  filter(Strain == "PC-rich_077") 
+  anova077_8<-anova(MCModelAll_BA77[[2]][[2]], MCModelAll_BA77[[2]][[1]])
+  anova077_8$FitComparison <- '8_All'
+  anova077_12<-anova(MCModelAll_BA77[[2]][[3]], MCModelAll_BA77[[2]][[1]])
+  anova077_12$FitComparison <- '12_All'
+  anova077_16<-anova(MCModelAll_BA77[[2]][[4]], MCModelAll_BA77[[2]][[1]])
+  anova077_16$FitComparison <- '16_All'
+  anova077_24<-anova(MCModelAll_BA77[[2]][[5]], MCModelAll_BA77[[2]][[1]])
+  anova077_24$FitComparison <- '24_All'
+  anova077_Photoperiod<-rbind(anova077_8, anova077_12, anova077_16, anova077_24)
+  rm(anova077_8, anova077_12, anova077_16, anova077_24)
+  anova077_Photoperiod$Strain <- 'PC-rich_077'
+#all different 
+
+MCModelAll_BA48<-MCModelAll_Photoperiod %>% 
+  filter(Strain == "PE-rich_048") 
+  anova048_8<-anova(MCModelAll_BA48[[2]][[2]], MCModelAll_BA48[[2]][[1]])
+  anova048_8$FitComparison <- '8_All'
+  anova048_12<-anova(MCModelAll_BA48[[2]][[3]], MCModelAll_BA48[[2]][[1]])
+  anova048_12$FitComparison <- '12_All'
+  anova048_16<-anova(MCModelAll_BA48[[2]][[4]], MCModelAll_BA48[[2]][[1]])
+  anova048_16$FitComparison <- '16_All'
+  anova048_24<-anova(MCModelAll_BA48[[2]][[5]], MCModelAll_BA48[[2]][[1]])
+  anova048_24$FitComparison <- '24_All'
+  anova048_Photoperiod<-rbind(anova048_8, anova048_12, anova048_16, anova048_24)
+  rm(anova048_8, anova048_12, anova048_16, anova048_24)
+  anova048_Photoperiod$Strain <- 'PE-rich_048'
+#all different 
+
+MCModelAll_BA127<-MCModelAll_Photoperiod %>% 
+  filter(Strain == "PE-rich_127") 
+  anova127_8<-anova(MCModelAll_BA127[[2]][[2]], MCModelAll_BA127[[2]][[1]])
+  anova127_8$FitComparison <- '8_All'
+  anova127_12<-anova(MCModelAll_BA127[[2]][[3]], MCModelAll_BA127[[2]][[1]])
+  anova127_12$FitComparison <- '12_All'
+  anova127_16<-anova(MCModelAll_BA127[[2]][[4]], MCModelAll_BA127[[2]][[1]])
+  anova127_16$FitComparison <- '16_All'
+  anova127_24<-anova(MCModelAll_BA127[[2]][[5]], MCModelAll_BA127[[2]][[1]])
+  anova127_24$FitComparison <- '24_All'
+  anova127_Photoperiod<-rbind(anova127_8, anova127_12, anova127_16, anova127_24)
+  rm(anova127_8, anova127_12, anova127_16, anova127_24)
+  anova127_Photoperiod$Strain <- 'PE-rich_127'
+#all different 
+  
+AnovaTest_GrowthRateModel_Photoperiod_PUR<-rbind(anova056_Photoperiod, anova077_Photoperiod, anova048_Photoperiod, anova127_Photoperiod)
+
+AnovaTest_GrowthRateModel_Photoperiod_PUR <-AnovaTest_GrowthRateModel_Photoperiod_PUR %>% 
+  drop_na(Df) 
+
+rm(anova056_Photoperiod, anova077_Photoperiod, anova048_Photoperiod, anova127_Photoperiod, MCModelAll_BA56, MCModelAll_BA77, MCModelAll_BA48, MCModelAll_BA127)
+```
+
+# Separate fits per strain - for plots only - based on statistics - Light
+
+```{r}
+GRCplatt_PredictGrowth900_BA56<-GRCplatt_PredictGrowth900 %>% 
+    filter(Strain == "PC-rich_056")
+
+GRCplatt_PredictGrowth900_BA77<-GRCplatt_PredictGrowth900 %>% 
+    filter(Strain == "PC-rich_077")
+
+GRCplatt_PredictGrowth900_BA48<-GRCplatt_PredictGrowth900 %>% 
+    filter(Strain == "PE-rich_048")
+
+GRCplatt_PredictGrowth900_BA127<-GRCplatt_PredictGrowth900 %>% 
+    filter(Strain == "PE-rich_127")
+```
+
+# Create plot - Light
+
+```{r create plot, fig.height = 8, fig.width = 8, warning = FALSE}
+lab1=c(expression("8 h"), expression("12 h"), expression("16 h"), expression("24 h"))
+lab2=c(expression("30 µE"), expression("90 µE"), expression("180 µE"), expression("300 µE"), expression("600 µE"), expression("900 µE"))
+scientific_10 <- function(x) {   parse(text=gsub("e\\+*", " %*% 10^", scales::scientific_format()(x))) }
+
+ggplot(MCGrowthExpSP, aes(PURPhotonDose_day, deltaOD_Lmu_corr)) +
+  geom_point(aes(PURPhotonDose_day, deltaOD_Lmu_corr, colour = as.factor(Par_ue), shape = as.factor(Photoperiod)), alpha = 0.8, size = 3.5, show.legend = T) +
+  geom_errorbar(aes(x = PURPhotonDose_day, ymin = deltaOD_Lmu_corr - deltaOD_Lmu_se, ymax = deltaOD_Lmu_corr + deltaOD_Lmu_se, colour = as.factor(Par_ue)), width=0, size=0.3, data = . %>% filter(deltaOD_Lmu_se<8.057558e-03), show.legend = F) +
+  geom_line(aes(PURPhotonDose_day, .fitted), colour = "blue", linetype = "solid", size = 0.3, show.legend = F, GRCplatt_PredictGrowthAll) +
+  geom_line(aes(PURPhotonDose_day, .fitted), colour = "darkslategray", linetype = "dashed", show.legend = F, GRCplatt_PredictGrowth30) +
+  geom_line(aes(PURPhotonDose_day, .fitted), colour = "lightblue4", linetype = "dashed", show.legend = F, GRCplatt_PredictGrowth90) +
+  geom_line(aes(PURPhotonDose_day, .fitted), colour = "hotpink4", linetype = "dashed", show.legend = F, GRCplatt_PredictGrowth180) +
+  geom_line(aes(PURPhotonDose_day, .fitted), colour = "indianred3", linetype = "dashed", show.legend = F, GRCplatt_PredictGrowth300) +
+  # geom_line(aes(PARPhotonDose_day, .fitted), colour = "goldenrod2", show.legend = F, GRCplatt_PredictGrowth900) +
+  geom_line(aes(PURPhotonDose_day, .fitted), colour = "goldenrod2", linetype = "dashed", show.legend = F, GRCplatt_PredictGrowth900_BA56) +
+  #geom_line(aes(PARPhotonDose_day, .fitted), colour = "goldenrod2", show.legend = F, GRCplatt_PredictGrowth900_BA77) +
+  #geom_line(aes(PARPhotonDose_day, .fitted), colour = "goldenrod2", show.legend = F, GRCplatt_PredictGrowth900_BA48) +
+  geom_line(aes(PURPhotonDose_day, .fitted), colour = "goldenrod2", linetype = "dashed", show.legend = F, GRCplatt_PredictGrowth900_BA127) +
+  scale_x_continuous(label=scientific_10) +
+  #scale_linetype_manual(values=c("equal900" = "dotted", "less900" = "solid"), breaks=c('8', '12', '16', "24", "", "")) +
+  scale_colour_manual(values = c("darkslategray", "lightblue4", "hotpink4", "indianred3", "goldenrod2", "khaki2"), name="", labels = lab2, breaks=c('30', "90", "180", "300", "600","900")) +
+  scale_shape_manual(values = c(15, 16, 17, 18), name="", labels = lab1) +
+  labs(y = "Chlorophyll specific exponential growth rate " ~ "("~d^-1~")", x = "PUR Photon dose ( µmol photons "~m^-2~""~d^-1~")") +
+  ggh4x::facet_nested(rows = vars(facetsStrain, Strain), labeller = label_parsed) +
+  theme_bw() +
+  theme(panel.grid.minor = element_blank(),
+        panel.grid.major = element_blank(),
+        axis.text = element_text(size=12),
+        axis.title = element_text(size=16),
+        strip.background = element_rect(fill="white"),
+        strip.text = element_text(size=12),
+        axis.title.y = element_text(margin=margin(r=10)),
+        axis.title.x = element_text(margin=margin(t=10)),
+        legend.background = element_rect(fill="white"),
+        legend.position = c(0.90,0.88),
+        legend.key.height= unit(0.003, 'cm'),
+        legend.spacing.y = unit(-0.1, "cm"),
+        legend.spacing.x = unit(-0.1, 'cm'),
+        legend.title = element_blank(),
+        legend.text = element_text(size=11))
+```
+# Save plot 
+
+```{r save plot}
+ggsave(file = file.path(FigPath, paste("SFig_GrowthRate_Light_PUR",".png",sep = "")), height=9, width= 7,  dpi = 300, limitsize = TRUE)
+```
+
+# Create plot - Photoperiod
+
+```{r create plot, fig.height = 8, fig.width = 8, warning = FALSE}
+lab1=c(expression("8 h"), expression("12 h"), expression("16 h"), expression("24 h"))
+lab2=c(expression("30 µE"), expression("90 µE"), expression("180 µE"), expression("300 µE"), expression("600 µE"), expression("900 µE"))
+scientific_10 <- function(x) {   parse(text=gsub("e\\+*", " %*% 10^", scales::scientific_format()(x))) }
+
+ggplot(MCGrowthExpSP, aes(PURPhotonDose_day, deltaOD_Lmu_corr)) +
+  geom_point(aes(PURPhotonDose_day, deltaOD_Lmu_corr, colour = as.factor(Par_ue), shape = as.factor(Photoperiod)), alpha = 0.8, size = 3.5, show.legend = T) +
+  geom_errorbar(aes(x = PURPhotonDose_day, ymin = deltaOD_Lmu_corr - deltaOD_Lmu_se, ymax = deltaOD_Lmu_corr + deltaOD_Lmu_se, colour = as.factor(Par_ue)), width=0, size=0.3, data = . %>% filter(deltaOD_Lmu_se<8.057558e-03), show.legend = F) +
+  geom_line(aes(PURPhotonDose_day, .fitted), colour = "blue", linetype = "solid", size = 0.3, show.legend = F, GRCplatt_PredictGrowthAll) +
+  geom_line(aes(PURPhotonDose_day, .fitted), colour = "black", linetype = "dotted",  show.legend = F, GRCplatt_PredictGrowth8) +
+  geom_line(aes(PURPhotonDose_day, .fitted), colour = "black", linetype = "longdash", show.legend = F, GRCplatt_PredictGrowth12) +
+  geom_line(aes(PURPhotonDose_day, .fitted), colour = "black", linetype = "dashed", show.legend = F, GRCplatt_PredictGrowth16) +
+  geom_line(aes(PURPhotonDose_day, .fitted), colour = "black", linetype = "dotdash", show.legend = F, GRCplatt_PredictGrowth24) +
+  scale_x_continuous(label=scientific_10) +
+  #scale_linetype_manual(values=c("equal900" = "dotted", "less900" = "solid"), breaks=c('8', '12', '16', "24", "", "")) +
+  scale_colour_manual(values = c("darkslategray", "lightblue4", "hotpink4", "indianred3", "goldenrod2", "khaki2"), name="", labels = lab2, breaks=c('30', "90", "180", "300", "600","900")) +
+  scale_shape_manual(values = c(15, 16, 17, 18), name="", labels = lab1) +
+  labs(y = "Chlorophyll specific exponential growth rate " ~ "("~d^-1~")", x = "PUR Photon dose ( µmol photons "~m^-2~""~d^-1~")") +
   ggh4x::facet_nested(rows = vars(facetsStrain, Strain), labeller = label_parsed) +
   theme_bw() +
   theme(panel.grid.minor = element_blank(),
@@ -349,18 +855,29 @@ ggplot(MCGrowthExpSP, aes(PURPhotonDose_day, deltaOD_Lmu_corr)) +
         legend.text = element_text(size=11))
 ```
 
-
 # Save plot 
 
 ```{r save plot}
-ggsave(file = file.path(FigPath, paste("SFig_GrowthRate_PUR",".png",sep = "")), height=9, width= 7,  dpi = 300, limitsize = TRUE)
+ggsave(file = file.path(FigPath, paste("SFig_GrowthRate_Photoperiod_PUR",".png",sep = "")), height=9, width= 7,  dpi = 300, limitsize = TRUE)
 ```
+
+# Save RDS that create stats and tables
+
+```{r}
+saveRDS(AnovaTest_GrowthRateModel_Light_PUR, file.path(TableRdsPath, paste(Project, "Anova_GrowthRate_Model_Light_PUR.Rds", sep = "_"), fsep = .Platform$file.sep), ascii = FALSE, version = NULL, compress = "xz", refhook = NULL)
+
+saveRDS(AnovaTest_GrowthRateModel_Photoperiod_PUR, file.path(TableRdsPath, paste(Project, "Anova_GrowthRate_Model_Photoperiod_PUR.Rds", sep = "_"), fsep = .Platform$file.sep), ascii = FALSE, version = NULL, compress = "xz", refhook = NULL)
+
+```
+
 
 # Cleaning the environment
 
 ```{r}
 rm(GRCplatt_PredictGrowthExpAll, MCGrowthExpSP, MCGrowthExpSPFit, MCGrowthRateExp)
 ```
+
+
 
 
 
