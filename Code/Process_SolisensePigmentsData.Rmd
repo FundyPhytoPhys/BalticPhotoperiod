@@ -404,10 +404,9 @@ MCPigmentAllExpStChoosen %>%
   theme_bw() 
 ```
 # Make "one big - All" mean to combine all days (divided by Exp and St) and all replica when samples were measured 
-(This give me only one value of Phyco/Chla ratio for JVPSII plot and sig plot as well)
+(This give me only one value of Phyco/Chla ratio for sig plot)
 
-# Calculate one "big" mean from Phyco/Chla ratio from all data measured on Exp or St phase 
-# AllmeanPhycoChlaRatio contains 1-7 measurements (different days)
+# AllmeanPhycoChlaRatio contains 1-6 measurements (different days)
 
 ```{r calculate Sigma mean from exp phase}
 #E_days, Time_h, caused problem
@@ -422,7 +421,8 @@ MCPigmentAllExpStChoosen<-MCPigmentAllExpStChoosen %>%
             AllsdPhycoChlaRatio = sd(PhycoChlaRatio),
             AllmeanPURPARRatio = mean(PURPARRatio),
             AllsdPURPARRatio = sd(PURPARRatio), 
-            AllmeancellL_OD680 = mean(cellL_OD680)) %>%
+            AllmeancellL_OD680 = mean(cellL_OD680),
+            AllsdcellL_OD680 = sd(cellL_OD680)) %>%
   ungroup()
 ```
 
@@ -1800,7 +1800,7 @@ SolFitsPigmentExp %>%
 
 SolFitsPigmentExp %>% 
   ggplot() +
-  geom_point(aes(x = meanTurChl_ugL, y = JVPSII_ETRqpOxbo_aLHII_Sig, colour = as.factor(Par_ue), shape = as.factor(Photoperiod)), size = 3.5, show.legend = T) +
+  geom_point(aes(x = meanTurChl_ugL, y = AllmeanJVPSII_ETRqpOxbo_aLHII_Sig, colour = as.factor(Par_ue), shape = as.factor(Photoperiod)), size = 3.5, show.legend = T) +
   scale_shape_manual(values = c(15, 16, 17,18), name="", labels = lab1) +
   scale_colour_manual(values = c("darkslategray", "lightblue4", "hotpink4", "indianred3","goldenrod2", "khaki2"), name="", labels = lab2) +
   ggh4x::facet_nested(cols = vars(Ex_WL), rows = vars(Strain), labeller = label_parsed) +
@@ -1814,6 +1814,13 @@ SolFitsPigmentExp %>%
   ggh4x::facet_nested(cols = vars(Ex_WL), rows = vars(Strain), labeller = label_parsed) +
   theme_bw()
 
+SolFitsPigmentExp %>%
+  ggplot() +
+  geom_point(aes(x = AllmeancellL_OD680, y = AllmeanJVPSII_ETRqpOxbo_aLHII_Sig, colour = as.factor(Par_ue), shape = as.factor(Photoperiod)), size = 3.5, show.legend = T) +
+  scale_shape_manual(values = c(15, 16, 17,18), name="", labels = lab1) +
+  scale_colour_manual(values = c("darkslategray", "lightblue4", "hotpink4", "indianred3","goldenrod2", "khaki2"), name="", labels = lab2) +
+  ggh4x::facet_nested(cols = vars(Ex_WL), rows = vars(Strain), labeller = label_parsed) +
+  theme_bw()
 
 SolFitsPigmentExp %>% 
   ggplot() +
