@@ -57,8 +57,10 @@ DataOut <- file.path("..", "Data", "ProcessedData", "ProcessedGrowthRateSolisens
 
 DataInGrowthRate <- file.path("..", "Data", "ProcessedData", "ProcessedGrowthRateData", fsep = .Platform$file.sep)
 DataInSolisense <- file.path("..", "Data", "ProcessedData", "ProcessedSolisensePigmentsData", fsep = .Platform$file.sep)
+#DataInGrowthRateRaw <- file.path("..", "Data", "CleanedData", "CleanedMCData", fsep = .Platform$file.sep)
 #DataInGrowthRate_h <- file.path("..", "Data", "ProcessedData", "ProcessedMCDielLightData", fsep = .Platform$file.sep)
 #DataInPigment <- file.path("..", "Data", "ImportedData", "ImportedPigmentsData", fsep = .Platform$file.sep)
+
 
 FigPath <- file.path("..", "Output", "Figures")
 FigRdsPath <- file.path("..", "Output", "FiguresRds")
@@ -74,6 +76,7 @@ HeaderRows <- 0
 ```{r Exported Rmd}
 list.files(path = DataInGrowthRate, pattern = Project, full.names = TRUE)
 list.files(path = DataInSolisense, pattern = Project, full.names = TRUE)
+#list.files(path = DataInGrowthRateRaw, pattern = Project, full.names = TRUE)
 #list.files(path = DataInGrowthRate_h, pattern = Project, full.names = TRUE)
 ```
 
@@ -86,17 +89,13 @@ GrowthRate <- readRDS(GrowthRateFile)  %>%
   ungroup()
 
 # GrowthRate<-GrowthRate %>% 
-#   rename(E_daysExpPUR=E_daysExp) %>% 
-#   rename(E_hoursExpPUR=E_hoursExp) %>% 
-#   rename(ObsDatePUR=ObsDate) %>% 
-#   rename(E_daysPUR=E_days) %>% 
-#   rename(E_hoursPUR=E_hours)  
+#   select(c(SampleID, Run, Strain, Tube, MC, ExpDate, Par_ue, Photoperiod, O2, WL, LightShape, PARPhotonDose_day, FilenameMC, ExpEndDate, OD720_Lmu_se, OD720_Lmu_corr, deltaOD_Lmu_se, deltaOD_Lmu_corr)) %>% 
+#   unique()
 
 GrowthRate<-GrowthRate %>% 
-  select(c(SampleID, Run, Strain, Tube, MC, ExpDate, Par_ue, Photoperiod, O2, WL, LightShape, PARPhotonDose_day, FilenameMC, ExpEndDate, OD720_Lmu_se, OD720_Lmu_corr, deltaOD_Lmu_se, deltaOD_Lmu_corr)) %>% 
+  select(c(Strain, Par_ue, Photoperiod, O2, WL, LightShape, PARPhotonDose_day, OD720_Lmu_se, OD720_Lmu_corr, deltaOD_Lmu_se, deltaOD_Lmu_corr)) %>% 
   unique()
 
-#E_days, ToD, Time_h - issue
 ```
 
 # Growth rate per day
@@ -134,6 +133,40 @@ GrowthRate<-GrowthRate %>%
 #   full_join(., GrowthRate, by = c("SampleID"="SampleID", "Run"="Run", "Strain"="Strain", "Tube" = "Tube",  "Par_ue"="Par_ue","Photoperiod"="Photoperiod", "O2"="O2", "WL"="WL")) 
 ```
 
+# Growth Rate - all - from Merge - to get all data points
+
+```{r read ProcessFile}
+# GrowthRateRawFile <- "../Data/CleanedData/CleanedMCData/PICO_Cleaned_MCData.Rds"
+# GrowthRateRawFileName <- str_split(string = GrowthRateRawFile, "/")[[1]][3] %>%
+#   str_remove(pattern = ".Rds")
+# 
+# GrowthRateRaw <- readRDS(GrowthRateRawFile)  %>%
+#   ungroup()
+# 
+# GrowthRateRaw<-GrowthRateRaw %>% 
+#   dplyr::select(c(Tube, ExpDate, MC, Run, SampleID, Strain, Par_ue, Photoperiod, WL, O2, LightShape, PARPhotonDose_day, OD720_Lmu_se, OD720_Lmu_corr, deltaOD_Lmu_se, deltaOD_Lmu_corr))
+#   
+# GrowthRateRaw<-GrowthRateRaw %>% 
+#   mutate(Strain=case_when(Strain=="BA127R"~"PE-rich_127",
+#          Strain=="BA48R"~"PE-rich_048",
+#         Strain=="BA56G"~"PC-rich_056",
+#          Strain=="BA77G"~"PC-rich_077"))
+# 
+# GrowthRateRaw1<-GrowthRateRaw %>% 
+#   filter(Run==77) %>% 
+#   filter(Strain =="PC-rich_077" | Strain == "PC-rich_056")
+# GrowthRateRaw2<-GrowthRateRaw %>% 
+#   filter(Run!=77) %>% 
+#   filter(Strain !="PC-rich_077" & Strain != "PC-rich_056")
+# GrowthRateRaw<-rbind(GrowthRateRaw1, GrowthRateRaw2)
+# 
+# GrowthRateRaw<-GrowthRateRaw %>%
+#   mutate(OD720_Lmu_corr = OD720_Lmu_corr*24) %>% 
+#   mutate(OD720_Lmu_se = OD720_Lmu_se*24) %>% 
+#   mutate(deltaOD_Lmu_corr = deltaOD_Lmu_corr*24) %>% 
+#   mutate(deltaOD_Lmu_se = deltaOD_Lmu_se*24) 
+```
+
 
 # Create preliminary plot 
 
@@ -145,6 +178,7 @@ GrowthRate %>%
   scale_colour_discrete(type=c("seagreen4", "palegreen3", "brown1", "brown4")) +
   ggh4x::facet_nested(rows = vars(Strain), cols = vars(Photoperiod)) +
   theme_bw()
+
 ```
 
 
@@ -177,11 +211,17 @@ Solisense %>%
 # Merge Growth rate and Solisense
 
 ```{r Joining growth rate and Solisense exp data}
-GrowthRateSoliExp <- GrowthRate %>% 
-  full_join(., Solisense, by = c("SampleID"="SampleID", "Run"="Run",  "Strain"="Strain", "ExpDate"="ExpDate", "Par_ue"="Par_ue","Photoperiod"="Photoperiod", "Tube"="Tube", "MC"="MC","LightShape"="LightShape", "FilenameMC"="FilenameMC", "O2"="O2", "WL"="WL", "ExpEndDate"="ExpEndDate","PARPhotonDose_day"="PARPhotonDose_day")) 
+# GrowthRateSoliExp <- GrowthRate %>% 
+#   full_join(., Solisense, by = c("SampleID"="SampleID", "Run"="Run",  "Strain"="Strain", "ExpDate"="ExpDate", "Par_ue"="Par_ue","Photoperiod"="Photoperiod", "Tube"="Tube", "MC"="MC","LightShape"="LightShape", "FilenameMC"="FilenameMC", "O2"="O2", "WL"="WL", "ExpEndDate"="ExpEndDate","PARPhotonDose_day"="PARPhotonDose_day")) 
 
 ```
 
+
+```{r Joining growth rate and Solisense exp data}
+GrowthRateSoliExp <- GrowthRate %>% 
+  full_join(., Solisense, by = c("Strain"="Strain", "Par_ue"="Par_ue","Photoperiod"="Photoperiod",  "LightShape"="LightShape", "O2"="O2", "WL"="WL", "PARPhotonDose_day"="PARPhotonDose_day")) 
+
+```
 
 # TurChl and cell_mL - already taken from the same day when JVPSII was measured
 
@@ -284,7 +324,8 @@ GrowthRateSoliExpClean %>%
 ```{r}
 GrowthRateSoliExpClean445<-GrowthRateSoliExpClean %>% 
   filter(Ex_WL==445) %>% 
-  filter(Phase == "Exponential")
+  filter(Phase == "Exponential") %>% 
+  filter(E_days >1)
 ```
 
 # Wierd - loosing 2 growth rate 900 PE-rich - import growth rate again - without filter run 121 and 77!!!!!
@@ -763,7 +804,7 @@ ggplot(SolFitsAllPigmentTurnerDaySmall, aes(AllmeanJVPSII_ETRqpOxbo_aLHII_Sig_ce
 
 ```
 
-# Added a Starting Point (SP) at 0
+# Added a Starting Point (SP) at 0 
 
 ```{r added starting point}
 gs4_deauth()
