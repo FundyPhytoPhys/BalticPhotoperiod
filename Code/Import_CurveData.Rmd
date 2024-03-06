@@ -1,0 +1,808 @@
+---
+title: "Import_SolisenseData"
+author:
+- Sylwia Sliwinska-Wilczewska
+- Douglas A. Campbell
+date: "`r format(Sys.Date())`"
+output:
+bookdown::html_document2:
+    code_folding: show
+    keep_md: yes
+    toc: TRUE
+    toc_float: TRUE
+    toc_depth: 6
+    fig_caption: yes
+bibliography: BalticPhotoperiod.bib
+csl: plos-one.csl
+editor_options: 
+  markdown: 
+    wrap: 72
+---
+
+# Set Chunk Options
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE)
+knitr::opts_chunk$set(fig.path='Figs/')
+```
+
+# Introduction
+
+Import_SolisenseData.Rmd imports and tidies fit data from the Solisense FRR kinetic fluorometer software from Data/RawData/SolisenseNSData.zip and SolisenseOSData.zip folders and stored them in Data/ImportedData/ImportedSolisenseData folder as: 
+BalticPhotoperiod_Imported_SolisenseDarkafterLight.Rds and BalticPhotoperiod_Imported_SolisenseLight.Rds 
+
+BalticPhotoperiod_Imported_SolisenseDarkafterLight.Rds contained data taken from corresponding light. BalticPhotoperiod_Imported_SolisenseLight.Rda contained data taken from 1s of darkness after corresponding light. Data from old software (OS) and new software (NS) are merged here. This .Rmd does not perform the underlying fits of the induction/relaxation profiles from FRRf protocols.
+
+# Load Libraries
+
+```{r load libraries, warning = FALSE, echo=FALSE} 
+library(tidyverse)
+library(lubridate)
+library(broom)
+library(knitr)
+library(OneR)
+library(zoo)
+library(googledrive)
+library(googlesheets4)
+library(readxl)
+library(Cairo) #for greek symbols
+library(data.table)
+library(purrr)
+```
+
+# Read ActPARCrossCal Rds from FluorO2Calibrations project existing on GitHub
+
+```{r read existing Rds}
+#"..", "..", takes up two levels in the directory path
+Path <- file.path("..", "..", "FluorO2Calibrations", "CalibrationData")
+
+ActPARCrossCal <- read_rds(file.path(Path, "SolisenseInformation_DCCrossParam.Rds"))
+
+ActPARCrossCal <- ActPARCrossCal %>% 
+  mutate(Slope = `estimate_LIFT_Gen_Developer.cal`,
+         Slope_SE = `std.error_LIFT_Gen_Developer.cal`) %>% 
+  select(c(DCLamp, Models, Slope, Slope_SE))
+
+#intercept set to 0 in lm in SolisenseInformation.Rproj/SolisenseCalibCompare.Rmd
+```
+
+# Set up conversions
+
+```{r conversions}
+us_s <- 1000000
+photons_umol <- 6.022E17 #Avogardo
+A2_m2 <- 1E20 #for sigma -> angstrom (Å) – a metric unit of length equal to 10^−10 m
+```
+
+# Read MetaData
+
+```{r read locally stored metadata from rds}
+CultureCatalog <- readRDS(file = file.path("..", "Data", "ImportedData", "ImportedMetaData", "CultureCatalog.Rds"))
+
+CultureCatalog<-CultureCatalog %>% 
+  select(-c(PrimaryOperator, Temp_c, ExpCul, ExpStartTime, O2_Category, Optode, OptodeCh, OptodeMeasure))
+```
+
+# Set Project Variables from old software (OS)
+
+```{r set project variables, read zipped files, list available files, warning = FALSE, echo=FALSE}
+Project <- "BalticPhotoperiod"
+DataOut <- file.path("..", "Data", "ImportedData", "ImportedSolisenseData")
+
+zip_file <- file.path("..", "Data", "RawData", "SolisenseOSData.zip")
+
+SolisenseFilesOS <- unzip(zip_file, list = TRUE)
+SolisenseFilesOS <- SolisenseFilesOS[grepl(".csv$", SolisenseFilesOS$Name), "Name"]
+print(SolisenseFilesOS)
+
+FileID <- "fit"
+FileEncode <- "UTF-8"
+Delimiter <- ","
+HeaderRows <- 0
+```
+
+# Set up delim_plus function
+
+```{r set up read_delim_plus, warning = FALSE, echo=FALSE}
+read_delim_plus <- function(flnm, delimiter, headerrows, fileencode) {
+  fread(flnm, skip = headerrows, sep = delimiter, header = TRUE, encoding = fileencode) %>%
+    mutate(Filename = flnm)
+}
+
+SolFitsOS <- SolisenseFilesOS %>%
+  map_df(~read_delim_plus(flnm = unzip(zip_file, exdir = tempdir())[which(unzip(zip_file, list = TRUE)$Name == .)], delimiter = Delimiter, headerrows = HeaderRows, fileencode = FileEncode))
+```
+
+# Import and prepare files
+
+```{r tidy SolFitsTrim}
+SolFitsTrimOS <- SolFitsOS %>%
+  filter(!grepl("----", DATE)) %>% 
+  select(-c("RFID_User_Data", "Barcode_Data", "PIF",  "Lon", "Lat", "GPS_stat", "LEDSel", "S/N_raw", "PAR_3", "PAR_4", "PAR_5", "PAR_6", "TPQ_PSI", "QBP_Size", "Alp4QA", "Tau4QA", "Alp1PQ", "Tau1PQ", "Alp2PQ", "Tau2PQ", "Alp3PQ", "Tau3PQ", "ETR", "V58")) %>% # remove superfluous columns for unfit data
+
+  mutate(Filename = str_remove(string = Filename, pattern = "/RawData/SolisenseOS.zip/"),
+         Filename = str_remove(string = Filename, pattern = "_fit.csv")
+         ) %>%
+  separate(Filename, into = c("fp1", "fp2", "fp3", "fp4", "fp5", "fp6", "fp7", "Project", "RunDateTime", "SampleID", "Ex_WL"), sep = "([\\/\\_])", remove = FALSE) %>%
+  mutate(RunDateTime = ymd_hm(RunDateTime),
+         TIME = as.character(TIME)) %>%  #time-column may be read in as factor, and as.character changes it to numeric; using lubdridate::hms would only change the format to 13H 4M 2S but does not work later to merge into one DateTime-column
+  mutate(SourceDataFile = `Source DataFile`,
+         ObsDate = DATE,
+         ObsTime = TIME) %>%
+  mutate(Ex_WL = as.factor(as.numeric(Ex_WL))) %>%
+  mutate(across(.cols = c(Light_1:fQB), .fns = as.numeric)) %>%
+  mutate(StartDateTimeSol = RunDateTime) %>%
+  mutate(nm445 = Light_1,
+         nm470 = Light_2,
+         nm505 = Light_3,
+         nm535 = Light_4,
+         nm590 = Light_5,
+         IR = Light_6) %>%
+  drop_na(StartDateTimeSol) %>%
+  mutate(ObsTime = hms(ObsTime),
+         ObsDate = ymd(ObsDate)) %>%
+  mutate(ObsDateTime = ymd_hms(paste(ObsDate, ObsTime))) %>%
+  relocate(ObsDateTime, .after = ObsTime) %>%
+  relocate(SampleID, .before = ObsDate) %>%
+  #mutate(FvFm=as.numeric(FvFm)) %>%
+  select(-c(Light_1,Light_2,Light_3,Light_4,Light_5,Light_6,`Source DataFile`,DATE,TIME,RunDateTime, fp1, fp2, fp3, fp4, fp5, fp6, fp7, Project))
+
+#for consistency add TempCont column
+SolFitsTrimOS <- SolFitsTrimOS %>%
+  mutate(TempCont = "TC") %>%
+  mutate(FvFm = Fv/Fm*1) %>%
+  select(-c("Fv/Fm"))
+```
+
+# Filter unrelated values
+
+```{r filter unrelated values}
+SolFitsTrimOS <- SolFitsTrimOS %>%
+  filter(Sig>0)
+```
+
+# Add ActPARcorr with proper correction factors for TC and no TC
+
+```{r Add ActPARcorr}
+#Intercepts for cross conversions set to 0.
+SolFitsTrimOS <- SolFitsTrimOS %>% 
+  mutate(nm445Corr = case_when(TempCont == "TC" ~ nm445 * ActPARCrossCal$Slope[ActPARCrossCal$DCLamp == "Pwr1_uE" & ActPARCrossCal$Models == "DCWaterJacketlm_tidy"],
+                                 TempCont == "noTC" ~ nm445 * ActPARCrossCal$Slope[ActPARCrossCal$DCLamp == "Pwr1_uE" & ActPARCrossCal$Models == "DCCuvettelm_tidy"]),
+         nm470Corr = case_when(TempCont == "TC" ~ nm470 * ActPARCrossCal$Slope[ActPARCrossCal$DCLamp == "Pwr2_uE" & ActPARCrossCal$Models == "DCWaterJacketlm_tidy"],
+                                 TempCont == "noTC" ~ nm470 * ActPARCrossCal$Slope[ActPARCrossCal$DCLamp == "Pwr2_uE" & ActPARCrossCal$Models == "DCCuvettelm_tidy"]),
+         nm505Corr = case_when(TempCont == "TC" ~ nm505 * ActPARCrossCal$Slope[ActPARCrossCal$DCLamp == "Pwr3_uE" & ActPARCrossCal$Models == "DCWaterJacketlm_tidy"],
+                                 TempCont == "noTC" ~ nm505 * ActPARCrossCal$Slope[ActPARCrossCal$DCLamp == "Pwr3_uE" & ActPARCrossCal$Models == "DCCuvettelm_tidy"]),
+           nm535Corr = case_when(TempCont == "TC" ~ nm535 * ActPARCrossCal$Slope[ActPARCrossCal$DCLamp == "Pwr4_uE" & ActPARCrossCal$Models == "DCWaterJacketlm_tidy"],
+                                 TempCont == "noTC" ~ nm535 * ActPARCrossCal$Slope[ActPARCrossCal$DCLamp == "Pwr4_uE" & ActPARCrossCal$Models == "DCCuvettelm_tidy"]),
+          nm590Corr = case_when(TempCont == "TC" ~ nm590 * ActPARCrossCal$Slope[ActPARCrossCal$DCLamp == "Pwr5_uE" & ActPARCrossCal$Models == "DCWaterJacketlm_tidy"],
+                                 TempCont == "noTC" ~ nm590 * ActPARCrossCal$Slope[ActPARCrossCal$DCLamp == "Pwr5_uE" & ActPARCrossCal$Models == "DCCuvettelm_tidy"]),
+          IRCorr = case_when(TempCont == "TC" ~ IR * ActPARCrossCal$Slope[ActPARCrossCal$DCLamp == "PwrIR_uE" & ActPARCrossCal$Models == "DCWaterJacketlm_tidy"],
+                                 TempCont == "noTC" ~ IR * ActPARCrossCal$Slope[ActPARCrossCal$DCLamp == "PwrIR_uE" & ActPARCrossCal$Models == "DCCuvettelm_tidy"]))
+
+SolFitsTrimOS <- SolFitsTrimOS %>%
+  mutate(ActPAR = nm445 + nm470 + nm505 + nm535 + nm590 + IR) %>%  
+  mutate(ActPARCorr = nm445Corr + nm470Corr + nm505Corr + nm535Corr + nm590Corr + IRCorr)
+```
+
+# Preparing df for further analysis
+
+```{r durations}
+#generate column with duration of light step in s
+#add a column adding Dark1s based upon any step < 5 s
+#replace NA for first dark with nominal 181;  issue will be changing durations of light steps across each run
+SolFitsTrimOS_lightsteps <- SolFitsTrimOS %>%
+  group_by(SourceDataFile, Filename, SampleID, ObsDate, Ex_WL, TempCont) %>%
+  mutate(Step_s = replace_na(as.numeric(ObsDateTime - lag(ObsDateTime)), 181), .after = ObsDateTime) %>% 
+  mutate(LR_s = as.numeric(ObsDateTime - ObsDateTime[1]), .after = Step_s) %>%
+  mutate(Dark1s = if_else(Step_s > 5, 0, 1), .after = Step_s) %>%
+  relocate(Ex_WL, .after = Dark1s) %>%
+  relocate(ActPAR, .after = Ex_WL) %>%
+  ungroup()
+```
+
+# Merge Solisense data with MetaData
+
+```{r combine Solisense and MetaData catalog, warning = FALSE, echo=FALSE}
+SolFitsTrimMetaOS <- CultureCatalog %>%
+  left_join(., SolFitsTrimOS_lightsteps, by = c("SampleID" = "SampleID")) 
+```
+
+# Estimate parameters using Oxborough & Baker 1997 for Fo'
+
+```{r estimate parameters, warning = FALSE, echo=FALSE}
+
+SolFitsTrimMetaOS_param <- SolFitsTrimMetaOS %>%
+  group_by(SourceDataFile, Filename, SampleID, ObsDate, Ex_WL, TempCont) %>%
+  mutate(Sig_m2psii = Sig/A2_m2,
+         Fodark = Fo[1],
+         Fmdark = Fm[1],
+         Sigdark = Sig[1],
+         Sigdark_m2psii = Sigdark/A2_m2,
+         ActPARCorr_photonsm2s = ActPARCorr *  photons_umol, 
+         TauAv = ((Tau1QA * Alp1QA) + (Tau2QA * Alp2QA))/(Alp1QA + Alp2QA), 
+         Ctauav = 1/(1 + (Sig_m2psii * ActPARCorr_photonsm2s * (TauAv/us_s))), 
+         aLHIIdark = (Fmdark * Fodark)/(Fmdark - Fodark),
+         Fomin = min(Fo, na.rm = TRUE),
+         Fmmax = max(Fm, na.rm = TRUE),
+         Sigmax = max(Sig, na.rm = TRUE),
+         Sigmax_m2psii = Sigmax/A2_m2,
+         FoOxbo = Fomin/(((Fmmax - Fomin)/Fmmax) + (Fomin/Fm)),
+         qpOxbo = (Fm - Fo)/(Fm - FoOxbo),
+         aLHIIOxbomax = (Fmmax * FoOxbo)/(Fmmax - FoOxbo),
+         JVPSII_aLHIIOxbomax = ActPARCorr_photonsm2s * aLHIIOxbomax * FvFm,
+         ETRCtauav = Sig_m2psii * Ctauav * ActPARCorr_photonsm2s,
+         ETRqpOxbo = Sig_m2psii * qpOxbo * ActPARCorr_photonsm2s,
+         JVPSII_ETRtauav_FoSig = ETRCtauav * Fomin/Sigmax_m2psii, #Sigmax converted A2_m2
+         JVPSII_ETRqpOxbo_FoSig = ETRqpOxbo * Fomin/Sigmax_m2psii,
+         JVPSII_ETRtauav_aLHII_Sig = ETRCtauav * aLHIIOxbomax/Sigmax_m2psii,
+         JVPSII_ETRqpOxbo_aLHII_Sig = ETRqpOxbo * aLHIIOxbomax/Sigmax_m2psii) %>%
+  ungroup()
+```
+
+# Choosen Sigma from corresponding light
+
+```{r data taken from corresponding light calibration}
+SolFitsTrimMetaClean30 <- SolFitsTrimMetaOS_param %>% 
+  filter(Dark1s == 0) %>%
+  filter(Par_ue == 30) %>% 
+  filter(ActPAR == 20) # 39.5 for 445 and 48.7 for 590
+  
+SolFitsTrimMetaClean90 <- SolFitsTrimMetaOS_param %>% 
+  filter(Dark1s == 0) %>%
+  filter(Par_ue == 90) %>% 
+  filter(ActPAR == 40) # 79.0 for 445 and 97.5 for 590
+
+SolFitsTrimMetaClean180 <- SolFitsTrimMetaOS_param %>% 
+  filter(Dark1s == 0) %>%
+  filter(Par_ue == 180) %>% 
+  filter(ActPAR == 80) # 158.1 for 445 and 195.0 for 590
+
+SolFitsTrimMetaClean300 <- SolFitsTrimMetaOS_param %>% 
+  filter(Dark1s == 0) %>%
+  filter(Par_ue == 300) %>% 
+  filter(ActPAR == 160) # 316.2 for 445 and 390.0 for 590
+
+SolFitsTrimMetaClean600 <- SolFitsTrimMetaOS_param %>% 
+  filter(Dark1s == 0) %>%
+  filter(Par_ue == 600) %>% 
+  filter(ActPAR == 320) # 632.5 for 445 and 780.1 for 590
+
+SolFitsTrimMetaClean900 <- SolFitsTrimMetaOS_param %>% 
+  filter(Dark1s == 0) %>%
+  filter(Par_ue == 900) %>% 
+  filter(ActPAR == 320) # 632.5 for 445 and 780.1 for 590
+
+SolFitsTrimMetaCleanOS<-rbind(SolFitsTrimMetaClean30, SolFitsTrimMetaClean90, SolFitsTrimMetaClean180, SolFitsTrimMetaClean300, SolFitsTrimMetaClean600, SolFitsTrimMetaClean900)
+
+rm(SolFitsTrimMetaClean30, SolFitsTrimMetaClean90, SolFitsTrimMetaClean180, SolFitsTrimMetaClean300,SolFitsTrimMetaClean900)
+```
+
+# Convert Sig_m2psii to Sig_nm2psii and Sigdark_m2psii to Sigdark_nm2psii and calculated number of days when measurements were made
+
+```{r convert Sigma}
+SolFitsTrimMetaCleanOS <- SolFitsTrimMetaCleanOS %>%
+mutate(Sig_nm2psii=Sig_m2psii*1000000000000000000) %>% 
+mutate(Sigdark_nm2psii=Sigdark_m2psii*1000000000000000000)   
+```
+
+```{r calculate E_days and Time_h}
+SolFitsTrimMetaCleanOS<- SolFitsTrimMetaCleanOS %>%
+group_by(SampleID) %>%
+  arrange(ObsDate) %>%
+  mutate(E_days = as.numeric((ObsDate - ExpDate[1]))) %>%
+ungroup()
+
+SolFitsTrimMetaCleanOS<- SolFitsTrimMetaCleanOS %>%
+  mutate(Time_h = E_days*24)
+```
+
+# Choosen Sigma measured from 1s in dark after corresponding light
+
+```{r data taken from 1s of dark after corresponding light calibration}
+SolFitsTrimMetaDarkafterLight30 <- SolFitsTrimMetaOS_param %>% 
+  filter(Dark1s == 1) %>%
+  filter(ActPAR == 0) %>% 
+  filter(Par_ue == 30) %>% 
+  filter(LR_s==13|LR_s==14|LR_s==15|LR_s==16|
+         LR_s==118|LR_s==119|LR_s==120|LR_s==112|LR_s==122)
+
+SolFitsTrimMetaDarkafterLight90 <- SolFitsTrimMetaOS_param %>% 
+  filter(Dark1s == 1) %>%
+  filter(ActPAR == 0) %>% 
+  filter(Par_ue == 90) %>% 
+  filter(LR_s==26|LR_s==27|LR_s==28|LR_s==29|
+         LR_s==105|LR_s==106|LR_s==107|LR_s==108)
+
+SolFitsTrimMetaDarkafterLight180 <- SolFitsTrimMetaOS_param %>% 
+  filter(Dark1s == 1) %>%
+  filter(ActPAR == 0) %>% 
+  filter(Par_ue == 180) %>% 
+  filter(LR_s==40|LR_s==41|LR_s==42|LR_s==43|
+         LR_s==92|LR_s==93|LR_s==94|LR_s==95)
+
+SolFitsTrimMetaDarkafterLight300 <- SolFitsTrimMetaOS_param %>% 
+  filter(Dark1s == 1) %>%
+  filter(ActPAR == 0) %>% 
+  filter(Par_ue == 300) %>% 
+  filter(LR_s==53|LR_s==54|LR_s==55|LR_s==56|
+         LR_s==79|LR_s==80|LR_s==81|LR_s==82)
+
+SolFitsTrimMetaDarkafterLight900 <- SolFitsTrimMetaOS_param %>% 
+  filter(Dark1s == 1) %>%
+  filter(ActPAR == 0) %>% 
+  filter(Par_ue == 900 | Par_ue == 600) %>% 
+  filter(LR_s==66|LR_s==67|LR_s==68|LR_s==69)
+
+SolFitsTrimMetaDarkafterLightOS <- rbind(SolFitsTrimMetaDarkafterLight30, SolFitsTrimMetaDarkafterLight90, SolFitsTrimMetaDarkafterLight180, SolFitsTrimMetaDarkafterLight300, SolFitsTrimMetaDarkafterLight900)
+
+rm(SolFitsTrimMetaDarkafterLight30, SolFitsTrimMetaDarkafterLight90, SolFitsTrimMetaDarkafterLight180, SolFitsTrimMetaDarkafterLight300, SolFitsTrimMetaDarkafterLight900)
+
+SolFitsTrimMetaDarkafterLightOS <- SolFitsTrimMetaDarkafterLightOS %>% 
+  mutate(Sig1s=Sig*1) %>% 
+  mutate(Sig1s_m2psii=Sig_m2psii*1) %>% 
+  select(-c(Sig, Sig_m2psii))
+```
+
+# Convert Sig1s_m2psii to Sig1s_nm2psii and calculated number of days when measurements were made
+
+```{r convert Sigma}
+SolFitsTrimMetaDarkafterLightOS <- SolFitsTrimMetaDarkafterLightOS %>%
+mutate(Sigdark_nm2psii=Sigdark_m2psii*1000000000000000000)  %>% 
+mutate(Sig1s_nm2psii=Sig1s_m2psii*1000000000000000000)    
+```
+
+```{r Calculate E_days and Time_h}
+SolFitsTrimMetaDarkafterLightOS<- SolFitsTrimMetaDarkafterLightOS %>%
+group_by(SampleID) %>%
+  arrange(ObsDate) %>%
+  mutate(E_days = as.numeric((ObsDate - ExpDate[1]))) %>%
+ungroup()
+
+SolFitsTrimMetaDarkafterLightOS<- SolFitsTrimMetaDarkafterLightOS %>%
+  mutate(Time_h = E_days*24)
+```
+
+
+
+# Set Project Variables from new software (NS)
+
+```{r set project variables, read zipped files, list available files, warning = FALSE, echo=FALSE}
+Project <- "BalticPhotoperiod"
+DataOut <- file.path("..", "Data", "ImportedData", "ImportedSolisenseData")
+
+zip_file <- file.path("..", "Data", "RawData", "SolisenseNSData.zip")
+
+SolisenseFilesNS <- unzip(zip_file, list = TRUE)
+SolisenseFilesNS <- SolisenseFilesNS[grepl(".csv$", SolisenseFilesNS$Name), "Name"]
+print(SolisenseFilesNS)
+
+FileID <- "fit"
+FileEncode <- "UTF-8"
+Delimiter <- ","
+HeaderRows <- 0
+```
+
+# Set up read_delim_plus function
+
+```{r set up read_delim_plus, warning = FALSE, echo=FALSE}
+read_delim_plus <- function(flnm, delimiter, headerrows, fileencode) {
+  fread(flnm, skip = headerrows, sep = delimiter, header = TRUE, encoding = fileencode) %>%
+    mutate(Filename = flnm)
+}
+
+SolFitsNS <- SolisenseFilesNS %>%
+  map_df(~read_delim_plus(flnm = unzip(zip_file, exdir = tempdir())[which(unzip(zip_file, list = TRUE)$Name == .)], delimiter = Delimiter, headerrows = HeaderRows, fileencode = FileEncode))
+```
+
+# Import and prepare files
+
+```{r tidy SolFitsTrim}
+SolFitsTrimNS <- SolFitsNS %>%
+  filter(!grepl("----", DATE)) %>% 
+  select(-c("RFID_User_Data", "Barcode_Data", "PIF",  "Lon", "Lat", "GPS_stat", "LEDSel")) %>% # remove superfluous columns for unfit data
+
+  mutate(Filename = str_remove(string = Filename, pattern = "/RawData/SolisenseNSData.zip/"),
+         Filename = str_remove(string = Filename, pattern = "_fit.csv")
+         ) %>%
+  separate(Filename, into = c("fp1", "fp2", "fp3", "fp4", "fp5", "fp6", "fp7", "Project", "RunDateTime", "SampleID", "Ex_WL"), sep = "([\\/\\_])", remove = FALSE) %>%
+  mutate(RunDateTime = ymd_hm(RunDateTime),
+         TIME = as.character(TIME)) %>%  #time-column may be read in as factor, and as.character changes it to numeric; using lubdridate::hms would only change the format to 13H 4M 2S but does not work later to merge into one DateTime-column
+  mutate(SourceDataFile = `Source DataFile`,
+         ObsDate = DATE,
+         ObsTime = TIME) %>%
+  mutate(Ex_WL = as.factor(as.numeric(Ex_WL))) %>%
+  mutate(across(.cols = c(Light_1:Fv), .fns = as.numeric)) %>%
+  mutate(StartDateTimeSol = RunDateTime) %>%
+  mutate(nm445 = Light_1,
+         nm470 = Light_2,
+         nm505 = Light_3,
+         nm535 = Light_4,
+         nm590 = Light_5,
+         IR = Light_6) %>%
+  drop_na(StartDateTimeSol) %>%
+  mutate(ObsTime = hms(ObsTime),
+         ObsDate = ymd(ObsDate)) %>%
+  mutate(ObsDateTime = ymd_hms(paste(ObsDate, ObsTime))) %>%
+  relocate(ObsDateTime, .after = ObsTime) %>%
+  relocate(SampleID, .before = ObsDate) %>%
+  #mutate(FvFm=as.numeric(FvFm)) %>%
+  select(-c(Light_1,Light_2,Light_3,Light_4,Light_5,Light_6,`Source DataFile`,DATE,TIME,RunDateTime, fp1, fp2, fp3, fp4, fp5, fp6, fp7, Project))
+
+#for consistency add TempCont column
+SolFitsTrimNS <- SolFitsTrimNS %>%
+  mutate(TempCont = "TC") %>%
+  mutate(FvFm = Fv/Fm*1) %>%
+  select(-c("Fv/Fm"))
+```
+
+# Filter unrelated values
+
+```{r filter unrelated values if any}
+SolFitsTrimNS <- SolFitsTrimNS %>%
+  filter(Sig>0)
+```
+
+# Add ActPARcorr with proper correction factors for TC and no TC
+
+```{r add ActPARcorr}
+#Intercepts for cross conversions set to 0.
+SolFitsTrimNS <- SolFitsTrimNS %>% 
+  mutate(nm445Corr = case_when(TempCont == "TC" ~ nm445 * ActPARCrossCal$Slope[ActPARCrossCal$DCLamp == "Pwr1_uE" & ActPARCrossCal$Models == "DCWaterJacketlm_tidy"],
+                                 TempCont == "noTC" ~ nm445 * ActPARCrossCal$Slope[ActPARCrossCal$DCLamp == "Pwr1_uE" & ActPARCrossCal$Models == "DCCuvettelm_tidy"]),
+         nm470Corr = case_when(TempCont == "TC" ~ nm470 * ActPARCrossCal$Slope[ActPARCrossCal$DCLamp == "Pwr2_uE" & ActPARCrossCal$Models == "DCWaterJacketlm_tidy"],
+                                 TempCont == "noTC" ~ nm470 * ActPARCrossCal$Slope[ActPARCrossCal$DCLamp == "Pwr2_uE" & ActPARCrossCal$Models == "DCCuvettelm_tidy"]),
+         nm505Corr = case_when(TempCont == "TC" ~ nm505 * ActPARCrossCal$Slope[ActPARCrossCal$DCLamp == "Pwr3_uE" & ActPARCrossCal$Models == "DCWaterJacketlm_tidy"],
+                                 TempCont == "noTC" ~ nm505 * ActPARCrossCal$Slope[ActPARCrossCal$DCLamp == "Pwr3_uE" & ActPARCrossCal$Models == "DCCuvettelm_tidy"]),
+           nm535Corr = case_when(TempCont == "TC" ~ nm535 * ActPARCrossCal$Slope[ActPARCrossCal$DCLamp == "Pwr4_uE" & ActPARCrossCal$Models == "DCWaterJacketlm_tidy"],
+                                 TempCont == "noTC" ~ nm535 * ActPARCrossCal$Slope[ActPARCrossCal$DCLamp == "Pwr4_uE" & ActPARCrossCal$Models == "DCCuvettelm_tidy"]),
+          nm590Corr = case_when(TempCont == "TC" ~ nm590 * ActPARCrossCal$Slope[ActPARCrossCal$DCLamp == "Pwr5_uE" & ActPARCrossCal$Models == "DCWaterJacketlm_tidy"],
+                                 TempCont == "noTC" ~ nm590 * ActPARCrossCal$Slope[ActPARCrossCal$DCLamp == "Pwr5_uE" & ActPARCrossCal$Models == "DCCuvettelm_tidy"]),
+          IRCorr = case_when(TempCont == "TC" ~ IR * ActPARCrossCal$Slope[ActPARCrossCal$DCLamp == "PwrIR_uE" & ActPARCrossCal$Models == "DCWaterJacketlm_tidy"],
+                                 TempCont == "noTC" ~ IR * ActPARCrossCal$Slope[ActPARCrossCal$DCLamp == "PwrIR_uE" & ActPARCrossCal$Models == "DCCuvettelm_tidy"]))
+
+SolFitsTrimNS <- SolFitsTrimNS %>%
+  mutate(ActPAR = nm445 + nm470 + nm505 + nm535 + nm590 + IR) %>%  
+  mutate(ActPARCorr = nm445Corr + nm470Corr + nm505Corr + nm535Corr + nm590Corr + IRCorr)
+```
+
+# Preparing df for further analysis
+
+```{r durations}
+#generate column with duration of light step in s
+#add a column adding Dark1s based upon any step < 5 s
+#replace NA for first dark with nominal 181;  issue will be changing durations of light steps across each run
+SolFitsTrimNS_lightsteps <- SolFitsTrimNS %>%
+  group_by(SourceDataFile, Filename, SampleID, ObsDate, Ex_WL, TempCont) %>%
+  mutate(Step_s = replace_na(as.numeric(ObsDateTime - lag(ObsDateTime)), 181), .after = ObsDateTime) %>% 
+  mutate(LR_s = as.numeric(ObsDateTime - ObsDateTime[1]), .after = Step_s) %>%
+  mutate(Dark1s = if_else(Step_s > 5, 0, 1), .after = Step_s) %>%
+  relocate(Ex_WL, .after = Dark1s) %>%
+  relocate(ActPAR, .after = Ex_WL) %>%
+  ungroup()
+```
+
+# Merge Solisense data with MetaData
+
+```{r Combine Solisense and MetaData catalog, warning = FALSE, echo=FALSE}
+SolFitsTrimMetaNS <- CultureCatalog %>%
+  left_join(., SolFitsTrimNS_lightsteps, by = c("SampleID" = "SampleID")) 
+```
+
+# Estimate parameters using Oxborough & Baker 1997 for Fo'
+
+```{r estimate parameters, warning = FALSE, echo=FALSE}
+SolFitsTrimMetaNS <- SolFitsTrimMetaNS %>%
+  group_by(SourceDataFile, Filename, SampleID, ObsDate, Ex_WL, TempCont) %>%
+  mutate(Sig_m2psii = Sig/A2_m2,
+         Fodark = Fo[1],
+         Fmdark = Fm[1],
+         Sigdark = Sig[1],
+         Sigdark_m2psii = Sigdark/A2_m2,
+         ActPARCorr_photonsm2s = ActPARCorr *  photons_umol, 
+         TauAv = ((Tau1QA * Alp1QA) + (Tau2QA * Alp2QA))/(Alp1QA + Alp2QA), 
+         Ctauav = 1/(1 + (Sig_m2psii * ActPARCorr_photonsm2s * (TauAv/us_s))), 
+         aLHIIdark = (Fmdark * Fodark)/(Fmdark - Fodark),
+         Fomin = min(Fo, na.rm = TRUE),
+         Fmmax = max(Fm, na.rm = TRUE),
+         Sigmax = max(Sig, na.rm = TRUE),
+         Sigmax_m2psii = Sigmax/A2_m2,
+         FoOxbo = Fomin/(((Fmmax - Fomin)/Fmmax) + (Fomin/Fm)),
+         qpOxbo = (Fm - Fo)/(Fm - FoOxbo),
+         aLHIIOxbomax = (Fmmax * FoOxbo)/(Fmmax - FoOxbo),
+         JVPSII_aLHIIOxbomax = ActPARCorr_photonsm2s * aLHIIOxbomax * FvFm,
+         ETRCtauav = Sig_m2psii * Ctauav * ActPARCorr_photonsm2s,
+         ETRqpOxbo = Sig_m2psii * qpOxbo * ActPARCorr_photonsm2s,
+         JVPSII_ETRtauav_FoSig = ETRCtauav * Fomin/Sigmax_m2psii, #Sigmax converted A2_m2
+         JVPSII_ETRqpOxbo_FoSig = ETRqpOxbo * Fomin/Sigmax_m2psii,
+         JVPSII_ETRtauav_aLHII_Sig = ETRCtauav * aLHIIOxbomax/Sigmax_m2psii,
+         JVPSII_ETRqpOxbo_aLHII_Sig = ETRqpOxbo * aLHIIOxbomax/Sigmax_m2psii) %>%
+  ungroup()
+```
+
+# Choosen Sigma from corresponding light
+
+```{r data taken from corresponding light calibration}
+SolFitsTrimMetaClean30 <- SolFitsTrimMetaNS %>% 
+  filter(Dark1s == 0) %>%
+  filter(Par_ue == 30) %>% 
+  filter(ActPAR == 20) # 39.5 for 445 and 48.7 for 590
+  
+SolFitsTrimMetaClean90 <- SolFitsTrimMetaNS %>% 
+  filter(Dark1s == 0) %>%
+  filter(Par_ue == 90) %>% 
+  filter(ActPAR == 40) # 79.0 for 445 and 97.5 for 590
+
+SolFitsTrimMetaClean180 <- SolFitsTrimMetaNS %>% 
+  filter(Dark1s == 0) %>%
+  filter(Par_ue == 180) %>% 
+  filter(ActPAR == 80) # 158.1 for 445 and 195.0 for 590
+
+SolFitsTrimMetaClean300 <- SolFitsTrimMetaNS %>% 
+  filter(Dark1s == 0) %>%
+  filter(Par_ue == 300) %>% 
+  filter(ActPAR == 160) # 316.2 for 445 and 390.0 for 590
+
+SolFitsTrimMetaClean600 <- SolFitsTrimMetaNS %>% 
+  filter(Dark1s == 0) %>%
+  filter(Par_ue == 600) %>% 
+  filter(ActPAR == 320) # 632.5 for 445 and 780.1 for 590
+
+SolFitsTrimMetaClean900 <- SolFitsTrimMetaNS %>% 
+  filter(Dark1s == 0) %>%
+  filter(Par_ue == 900) %>% 
+  filter(ActPAR == 320) # 632.5 for 445 and 780.1 for 590
+
+SolFitsTrimMetaCleanNS<-rbind(SolFitsTrimMetaClean30, SolFitsTrimMetaClean90, SolFitsTrimMetaClean180, SolFitsTrimMetaClean300, SolFitsTrimMetaClean600, SolFitsTrimMetaClean900)
+
+rm(SolFitsTrimMetaClean30, SolFitsTrimMetaClean90, SolFitsTrimMetaClean180, SolFitsTrimMetaClean300,  SolFitsTrimMetaClean600, SolFitsTrimMetaClean900)
+```
+
+# Convert Sig_m2psii to Sig_nm2psii and Sigdark_m2psii to Sigdark_nm2psii and calculated number of days when measurements were made
+
+```{r convert Sigma}
+SolFitsTrimMetaCleanNS <- SolFitsTrimMetaCleanNS %>%
+mutate(Sig_nm2psii=Sig_m2psii*1000000000000000000) %>% 
+mutate(Sigdark_nm2psii=Sigdark_m2psii*1000000000000000000)   
+```
+
+```{r calculate E_days and Time_h}
+SolFitsTrimMetaCleanNS<- SolFitsTrimMetaCleanNS %>%
+group_by(SampleID) %>%
+  arrange(ObsDate) %>%
+  mutate(E_days = as.numeric((ObsDate - ExpDate[1]))) %>%
+ungroup()
+
+SolFitsTrimMetaCleanNS<- SolFitsTrimMetaCleanNS %>%
+  mutate(Time_h = E_days*24)
+```
+
+# Choosen Sigma measured from 1s in dark after corresponding light
+
+```{r data taken from 1s of dark after corresponding light calibration}
+SolFitsTrimMetaDarkafterLight30 <- SolFitsTrimMetaNS %>% 
+  filter(Dark1s == 1) %>%
+  filter(ActPAR == 0) %>% 
+  filter(Par_ue == 30) %>% 
+  filter(LR_s==13|LR_s==14|LR_s==15|LR_s==16|
+         LR_s==118|LR_s==119|LR_s==120|LR_s==112|LR_s==122)
+
+SolFitsTrimMetaDarkafterLight90 <- SolFitsTrimMetaNS %>% 
+  filter(Dark1s == 1) %>%
+  filter(ActPAR == 0) %>% 
+  filter(Par_ue == 90) %>% 
+  filter(LR_s==26|LR_s==27|LR_s==28|LR_s==29|
+         LR_s==105|LR_s==106|LR_s==107|LR_s==108)
+
+SolFitsTrimMetaDarkafterLight180 <- SolFitsTrimMetaNS %>% 
+  filter(Dark1s == 1) %>%
+  filter(ActPAR == 0) %>% 
+  filter(Par_ue == 180) %>% 
+  filter(LR_s==40|LR_s==41|LR_s==42|LR_s==43|
+         LR_s==92|LR_s==93|LR_s==94|LR_s==95)
+
+SolFitsTrimMetaDarkafterLight300 <- SolFitsTrimMetaNS %>% 
+  filter(Dark1s == 1) %>%
+  filter(ActPAR == 0) %>% 
+  filter(Par_ue == 300) %>% 
+  filter(LR_s==53|LR_s==54|LR_s==55|LR_s==56|
+         LR_s==79|LR_s==80|LR_s==81|LR_s==82)
+
+SolFitsTrimMetaDarkafterLight900 <- SolFitsTrimMetaNS %>% 
+  filter(Dark1s == 1) %>%
+  filter(ActPAR == 0) %>% 
+  filter(Par_ue == 900 | Par_ue == 600) %>% 
+  filter(LR_s==66|LR_s==67|LR_s==68|LR_s==69)
+
+SolFitsTrimMetaDarkafterLightNS <- rbind(SolFitsTrimMetaDarkafterLight30, SolFitsTrimMetaDarkafterLight90, SolFitsTrimMetaDarkafterLight180, SolFitsTrimMetaDarkafterLight300, SolFitsTrimMetaDarkafterLight900)
+
+rm(SolFitsTrimMetaDarkafterLight30, SolFitsTrimMetaDarkafterLight90, SolFitsTrimMetaDarkafterLight180, SolFitsTrimMetaDarkafterLight300, SolFitsTrimMetaDarkafterLight900)
+
+SolFitsTrimMetaDarkafterLightNS <- SolFitsTrimMetaDarkafterLightNS %>% 
+  mutate(Sig1s=Sig*1) %>% 
+  mutate(Sig1s_m2psii=Sig_m2psii*1) %>% 
+  select(-c(Sig, Sig_m2psii))
+```
+
+# Convert Sig1s_m2psii to Sig1s_nm2psii and calculated number of days when measurements were made
+
+```{r convert Sigma}
+SolFitsTrimMetaDarkafterLightNS <- SolFitsTrimMetaDarkafterLightNS %>%
+mutate(Sigdark_nm2psii=Sigdark_m2psii*1000000000000000000)  %>% 
+mutate(Sig1s_nm2psii=Sig1s_m2psii*1000000000000000000)    
+```
+
+```{r calculate E_days and Tme_h}
+SolFitsTrimMetaDarkafterLightNS<- SolFitsTrimMetaDarkafterLightNS %>%
+group_by(SampleID) %>%
+  arrange(ObsDate) %>%
+  mutate(E_days = as.numeric((ObsDate - ExpDate[1]))) %>%
+ungroup()
+
+SolFitsTrimMetaDarkafterLightNS<- SolFitsTrimMetaDarkafterLightNS %>%
+  mutate(Time_h = E_days*24)
+```
+
+# Cleaning df before saving as rds and removed unnecessary files from the environment
+
+```{r Cleaning the environment}
+rm(SolFitsOS, SolFitsTrimOS, SolFitsTrimMetaOS, SolFitsTrimMetaOS_param, SolFitsTrimOS_lightsteps, SolFitsNS, SolFitsTrimNS, SolFitsTrimMetaNS, SolFitsTrimMetaNS_param, SolFitsTrimNS_lightsteps, CultureCatalog, ActPARCrossCal)
+```
+
+# Choose the same variables to merge df taken from old and new Solisense software
+
+```{r}
+SolFitsTrimMetaCleanOS<-SolFitsTrimMetaCleanOS %>% 
+  select(c(SampleID, Run, Strain, ExpDate, Par_ue, Photoperiod, MC, Tube, O2, WL, LightShape, ExpEndDate, PARPhotonDose_day, Time__mSec, Fo, Fm, Fv, FvFm, Tau1QA, Tau2QA, Tau3QA, Alp1QA, Alp2QA, Alp3QA, Alpha, Ek, Pmax, Filename, ObsDate, ObsTime, ObsDateTime, Step_s, Dark1s, Ex_WL, ActPAR, LR_s, StartDateTimeSol, nm445, nm470, nm505, nm535, nm590, IR, TempCont, nm445Corr, nm470Corr, nm505Corr, nm535Corr, nm590Corr, IRCorr, ActPARCorr, Sig, Sig_m2psii, Sig_nm2psii, Sigdark, Sigdark_m2psii, Sigdark_nm2psii, ActPARCorr_photonsm2s, TauAv, Ctauav, aLHIIdark, Fodark, Fmdark, Fomin, Fmmax, Sigmax, Sigmax_m2psii, FoOxbo, qpOxbo, aLHIIOxbomax, JVPSII_aLHIIOxbomax, ETRCtauav, ETRqpOxbo, JVPSII_ETRtauav_FoSig, JVPSII_ETRqpOxbo_FoSig, JVPSII_ETRtauav_aLHII_Sig, JVPSII_ETRqpOxbo_aLHII_Sig, E_days, Time_h))
+
+SolFitsTrimMetaCleanNS<-SolFitsTrimMetaCleanNS %>% 
+  select(c(SampleID, Run, Strain, ExpDate, Par_ue, Photoperiod, MC, Tube, O2, WL, LightShape, ExpEndDate, PARPhotonDose_day, Time__mSec, Fo, Fm, Fv, FvFm, Tau1QA, Tau2QA, Tau3QA, Alp1QA, Alp2QA, Alp3QA, Alpha, Ek, Pmax, Filename, ObsDate, ObsTime, ObsDateTime, Step_s, Dark1s, Ex_WL, ActPAR, LR_s, StartDateTimeSol, nm445, nm470, nm505, nm535, nm590, IR, TempCont, nm445Corr, nm470Corr, nm505Corr, nm535Corr, nm590Corr, IRCorr, ActPARCorr, Sig, Sig_m2psii, Sig_nm2psii, Sigdark, Sigdark_m2psii, Sigdark_nm2psii, ActPARCorr_photonsm2s, TauAv, Ctauav, aLHIIdark, Fodark, Fmdark, Fomin, Fmmax, Sigmax, Sigmax_m2psii, FoOxbo, qpOxbo, aLHIIOxbomax, JVPSII_aLHIIOxbomax, ETRCtauav, ETRqpOxbo, JVPSII_ETRtauav_FoSig, JVPSII_ETRqpOxbo_FoSig, JVPSII_ETRtauav_aLHII_Sig, JVPSII_ETRqpOxbo_aLHII_Sig, E_days, Time_h))
+
+SolFitsTrimMetaDarkafterLightOS<-SolFitsTrimMetaDarkafterLightOS %>% 
+  select(c(SampleID, Run, Strain, ExpDate, Par_ue, Photoperiod, MC, Tube, O2, WL, LightShape, ExpEndDate, PARPhotonDose_day, Time__mSec, Fo, Fm, Fv, FvFm, Tau1QA, Tau2QA, Tau3QA, Alp1QA, Alp2QA, Alp3QA, Alpha, Ek, Pmax,  Filename, ObsDate, ObsTime, ObsDateTime, Step_s, Dark1s, Ex_WL, ActPAR, LR_s, StartDateTimeSol, nm445, nm445, nm470, nm505, nm535, nm590, IR, TempCont, nm445Corr, nm470Corr, nm505Corr, nm535Corr, nm590Corr, IRCorr, ActPARCorr, Sig1s, Sig1s_m2psii, Sig1s_nm2psii, Sigdark, Sigdark_m2psii, Sigdark_nm2psii, ActPARCorr_photonsm2s, TauAv, Ctauav, aLHIIdark, Fodark, Fmdark, Fomin, Fmmax, Sigmax, Sigmax_m2psii, FoOxbo, qpOxbo, aLHIIOxbomax, JVPSII_aLHIIOxbomax, ETRCtauav, ETRqpOxbo, JVPSII_ETRtauav_FoSig, JVPSII_ETRqpOxbo_FoSig, JVPSII_ETRtauav_aLHII_Sig, JVPSII_ETRqpOxbo_aLHII_Sig, E_days, Time_h))
+  
+SolFitsTrimMetaDarkafterLightNS<-SolFitsTrimMetaDarkafterLightNS %>% 
+  select(c(SampleID, Run, Strain, ExpDate, Par_ue, Photoperiod, MC, Tube, O2, WL, LightShape, ExpEndDate, PARPhotonDose_day, Time__mSec, Fo, Fm, Fv, FvFm, Tau1QA, Tau2QA, Tau3QA, Alp1QA, Alp2QA, Alp3QA, Alpha, Ek, Pmax,  Filename, ObsDate, ObsTime, ObsDateTime, Step_s, Dark1s, Ex_WL, ActPAR, LR_s, StartDateTimeSol, nm445, nm445, nm470, nm505, nm535, nm590, IR, TempCont, nm445Corr, nm470Corr, nm505Corr, nm535Corr, nm590Corr, IRCorr, ActPARCorr, Sig1s, Sig1s_m2psii, Sig1s_nm2psii, Sigdark, Sigdark_m2psii, Sigdark_nm2psii, ActPARCorr_photonsm2s, TauAv, Ctauav, aLHIIdark, Fodark, Fmdark, Fomin, Fmmax, Sigmax, Sigmax_m2psii, FoOxbo, qpOxbo, aLHIIOxbomax, JVPSII_aLHIIOxbomax, ETRCtauav, ETRqpOxbo, JVPSII_ETRtauav_FoSig, JVPSII_ETRqpOxbo_FoSig, JVPSII_ETRtauav_aLHII_Sig, JVPSII_ETRqpOxbo_aLHII_Sig, E_days, Time_h))
+```
+
+# Merge df from old and new Software for data taken from the corresponding light and at 1s of dark after corresponding light
+
+```{r combine data from old and new Software}
+SolFitsMeta <-rbind(SolFitsTrimMetaCleanOS, SolFitsTrimMetaCleanNS)
+
+SolFitsMetaDarkafterLight <-rbind(SolFitsTrimMetaDarkafterLightOS, SolFitsTrimMetaDarkafterLightNS)
+```
+
+# Change variable names for consistency
+
+```{r}
+SolFitsMeta <- SolFitsMeta %>% 
+  rename(FilenameSolisense=Filename)
+
+SolFitsMetaDarkafterLight <-SolFitsMetaDarkafterLight %>% 
+  rename(FilenameSolisense=Filename)
+```
+
+# Create preliminary plots 
+
+```{r preliminary plot}
+lab1=c(expression("PC-rich_056"), expression("PC-rich_077"), expression("PE-rich_048"), expression("PE-rich_127"))
+lab2=c(expression("8 h"), expression("12 h"), expression("16 h"), expression("24 h"))
+lab3=c(expression("30 µE"), expression("90 µE"), expression("180 µE"), expression("300 µE"), expression("900 µE"))
+
+SolFitsMeta %>%
+  ggplot() +
+  geom_point(aes(x = Par_ue, y = Sig, colour = as.factor(Strain)), size = 3.5, show.legend = T) +
+  scale_colour_discrete(type=c("seagreen4", "palegreen3", "brown1", "brown4"), name="", labels = lab1) +
+  facet_grid(rows = vars(Ex_WL), cols = vars(Photoperiod)) +
+  theme_bw()
+# 
+# SolFitsMetaDarkafterLight %>%
+#   ggplot() +
+#   geom_point(aes(x = Par_ue, y = Sig_nm2psii, colour = as.factor(Strain)), size = 3.5, show.legend = T) +
+#   facet_grid(rows = vars(Ex_WL), cols = vars(Photoperiod)) +
+#   theme_bw()
+```
+
+# Save rds for further analysis
+
+```{r save rds}
+saveRDS(SolFitsMeta, file.path(DataOut, paste(Project, "Imported_SolisenseLight.Rds", sep = "_"), fsep = .Platform$file.sep), ascii = FALSE, version = NULL, compress = "xz", refhook = NULL)
+
+saveRDS(SolFitsMetaDarkafterLight, file.path(DataOut, paste(Project, "Imported_SolisenseDarkafterLight.Rds", sep = "_"), fsep = .Platform$file.sep), ascii = FALSE, version = NULL, compress = "xz", refhook = NULL)
+```
+
+# Variable names used in Data Dictionary
+
+```{r}
+colnames(SolFitsMeta)
+```
+
+# Variable names used in Data Dictionary
+
+```{r}
+colnames(SolFitsMetaDarkafterLight)
+```
+
+
+
+Oxborough & Baker 1997 for Fo'
+
+Oxborough, K., & Baker, N. R. (1997). Resolving chlorophyll a fluorescence images of photosynthetic efficiency into photochemical and non-photochemical components–calculation of qP and Fv-/Fm-; without measuring Fo. Photosynthesis research, 54, 135-142.
+
+Oxborough, K., & Baker, N. R. (1997). An instrument capable of imaging chlorophyll a fluorescence from intact leaves at very low irradiance and at cellular and subcellular levels of organization. Plant, Cell & Environment, 20(12), 1473-1483.
+
+Oxborough, K., Moore, C. M., Suggett, D. J., Lawson, T., Chan, H. G., & Geider, R. J. (2012). Direct estimation of functional PSII reaction center concentration and PSII electron flux on a volume basis: a new approach to the analysis of Fast Repetition Rate fluorometry (FRRf) data. Limnology and Oceanography: Methods, 10(3), 142-154.
+
+Suggett, D. J., Moore, C. M., Oxborough, K., & Geider, R. J. (2006). Fast repetition rate (FRR) chlorophyll a fluorescence induction measurements. West Molesey: Chelsea Technologies Group, 1-53.
+
+
+
+
+Berge, J., Grant, S., Bjørgum, R., Cohen, J. H., McKee, D., Johnsen, G., Zolich, A., Kopec, T. P., Vogedes, D. L., UiT The Arctic University of Norway (2021).Time series (2017) of irradiance in the PAR (photosynthetically active radiation) region measured under the dome of a light observatory in the Arctic  (Ny-Ålesund, Svalbard, Norway) derived from an USSIMO spectroradiometer [Data set]. Norstore. https://doi.org/10.11582/2021.00040
+
+https://archive.norstore.no/pages/public/datasetDetail.jsf?id=10.11582/2021.00040
+
+PAR is approximated as an integral of micromolespersec=(uirr/(h*c/(lambda*1e-9)))/microavo for wavelengths(lambda) in range from 400 to 700nm, where: uirr = USSIMO irradiance for wavelength equal to lambda, h=6.63e-34 [Js], c=3.00e+08 [m/s], microavo=6.022e17.
+
+
+
+
+
+Fast Repetition Rate fluorometry (FRRf, Kolber et al. 1998) 
+
+σPSII - Effective absorption cross section of PSII photochemistry in darkness -> A2 (quanta)-1 or m2
+ρ - Connectivity between PSII reaction centres in darkness
+
+σPSII′ - Effective absorption cross section of PSII photochemistry under actinic light -> A2 (quanta)-1 or m2
+ρ′ - Connectivity between PSII reaction centres under actinic light
+
+TauPSII - Minimum turnover time of PSII photochemistry -> s-1
+
+F0 or F0’ (Minimum fluorescence in darkness or Minimum fluorescence under actinic light)
+Fm or Fm’ (Maximum fluorescence in darkness or Maximum fluorescence under actinic light)
+F’ (or Fs; Steady state fluorescence at any point)
+Fv = Fm-F0 (Variable fluorescence in darkness)
+Fv’ = Fm’-F0’ (Variable fluorescence under actinic light)
+Fq′ = (Fm′ - F′) (Difference between Fm′ and F′)
+
+Fv/Fm = (Fm-F0)/Fm (The maximum PSII quantum yield/Maximum photochemical efficiency)
+Fv’/Fm’ = (Fm’- F0’)/Fm’ (Maximum PSII efficiency under actinic light)
+
+ΦPSII = (Fm’- F’)/Fm’ = Fq′/Fm′ (Photochemical efficiency under actinic light)
+
+qP = (Fm’- F’)/(Fm’-F0’) = (Fm′ - F′)/Fv′ = Fq′/Fv′ (PSII efficiency factor under actinic light; photochemical quenching coefficient) 
+
+NPQ =(Fm-Fm’)/Fm’ (Non-photochemical quenching coefficien)
+
+
+ETR = PPFD * aPSII * PSII photochemical efficiency (ΦPSII)
+
+ETR^RCII = PPFD * σPSII * Fq′/Fm′ (or ΦPSII) * 21.683
+
+ETR^chl = PPFD * σPSII * n PSII * Fq′/Fm′ (or ΦPSII) * 21.683
+
+
+FRR fluorescence provides a direct measure of light absorption per unit PSII reaction centres (σPSII).
+
+ETR, called the relative electron transport rate, is the product of the effective photochemical yield of
+PSII (ΦPSII) and photosynthetic photon flux density
+
+ETR^RCII(chl) - RCII (Chlorophyll a)-normalised rate of electron transfer by PSII -> mol e- g chla-1 h-1
+
+ETR^chl is the chlorophylla-specific rate of electron transfer (mol e- mol chla-1 h-1 ).
+
+PPFD (=E) - Photosynthetically active photon flux density -> μmol m-2 s-1
+
+a^chlPSII - a^chl only used for PSII photochemistry -> m2 mg chla-1
+
+(factor 21.683 converts seconds to hours, μmol e- to mol e- and A2 quanta-1 to m2 mol RCII-1)
+
+nPSII - photosynthetic unit size of PSII
+
+JVPSII - PSII flux per unit volume -> electrons m–3 s–1
+
+[RCII] - concentration of functional PS II reaction centers -> m-3
+
+aLHII - LHII (light harvesting complex II) absorption coefficient -> m-1
+
+
