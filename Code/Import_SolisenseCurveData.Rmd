@@ -1,5 +1,5 @@
 ---
-title: "Import_SolisenseData"
+title: "Import_SolisenseCurveData"
 author:
 - Sylwia Sliwinska-Wilczewska
 - Douglas A. Campbell
@@ -50,30 +50,6 @@ library(data.table)
 library(purrr)
 ```
 
-# Read ActPARCrossCal Rds from FluorO2Calibrations project existing on GitHub
-
-```{r read existing Rds}
-#"..", "..", takes up two levels in the directory path
-Path <- file.path("..", "..", "FluorO2Calibrations", "CalibrationData")
-
-ActPARCrossCal <- read_rds(file.path(Path, "SolisenseInformation_DCCrossParam.Rds"))
-
-ActPARCrossCal <- ActPARCrossCal %>% 
-  mutate(Slope = `estimate_LIFT_Gen_Developer.cal`,
-         Slope_SE = `std.error_LIFT_Gen_Developer.cal`) %>% 
-  select(c(DCLamp, Models, Slope, Slope_SE))
-
-#intercept set to 0 in lm in SolisenseInformation.Rproj/SolisenseCalibCompare.Rmd
-```
-
-# Set up conversions
-
-```{r conversions}
-us_s <- 1000000
-photons_umol <- 6.022E17 #Avogardo
-A2_m2 <- 1E20 #for sigma -> angstrom (Å) – a metric unit of length equal to 10^−10 m
-```
-
 # Read MetaData
 
 ```{r read locally stored metadata from rds}
@@ -83,13 +59,30 @@ CultureCatalog<-CultureCatalog %>%
   select(-c(PrimaryOperator, Temp_c, ExpCul, ExpStartTime, O2_Category, Optode, OptodeCh, OptodeMeasure))
 ```
 
+```{r set project variables}
+# Project <- "BalticPhotoperiod"
+# DataOut <- file.path("..", "Data", "ImportedData", "ImportedSolisenseCurveData")
+# 
+# FigPath <- file.path("..", "Output", "Figures")
+# FigRdsPath <- file.path("..", "Output", "FiguresRds")
+# TableRdsPath <- file.path("..", "Output", "TablesRDS")
+```
+
+## Read Data
+```{r data files}
+# MCFiles <- list.files(path = file.path("..", "Data", "RawData", "SolisenseCurveData"), full.names = TRUE)
+# MCFiles
+```
+
+
+
 # Set Project Variables from old software (OS)
 
 ```{r set project variables, read zipped files, list available files, warning = FALSE, echo=FALSE}
 Project <- "BalticPhotoperiod"
-DataOut <- file.path("..", "Data", "ImportedData", "ImportedSolisenseData")
+DataOut <- file.path("..", "Data", "ImportedData", "ImportedSolisenseCurveData")
 
-zip_file <- file.path("..", "Data", "RawData", "SolisenseOSData.zip")
+zip_file <- file.path("..", "Data", "RawData", "SolisenseCurveData.zip")
 
 SolisenseFilesOS <- unzip(zip_file, list = TRUE)
 SolisenseFilesOS <- SolisenseFilesOS[grepl(".csv$", SolisenseFilesOS$Name), "Name"]
