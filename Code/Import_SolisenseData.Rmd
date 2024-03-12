@@ -404,12 +404,7 @@ SolFitsTrimNS <- SolFitsNS %>%
   mutate(Filename = str_remove(string = Filename, pattern = "/RawData/SolisenseNSData.zip/"),
          Filename = str_remove(string = Filename, pattern = "_fit.csv")
          ) %>%
-  separate(Filename, into = c("fp1", "fp2", "fp3", "fp4", "fp5", "fp6", "fp7", "Project", "RunDateTime", "SampleID", "Ex_WL"), sep = "([\\/\\_])", remove = FALSE) 
-
-#C:\LIFT\DATA\PicoBaltic\90024\202308181042_PICO_SySl1316_445_data.csv
-
-
-%>%
+  separate(Filename, into = c("fp1", "fp2", "fp3", "fp4", "fp5", "fp6", "fp7", "Project", "RunDateTime", "SampleID", "Ex_WL"), sep = "([\\/\\_])", remove = FALSE) %>%
   mutate(RunDateTime = ymd_hm(RunDateTime),
          TIME = as.character(TIME)) %>%  #time-column may be read in as factor, and as.character changes it to numeric; using lubdridate::hms would only change the format to 13H 4M 2S but does not work later to merge into one DateTime-column
   mutate(SourceDataFile = `Source DataFile`,
@@ -424,7 +419,7 @@ SolFitsTrimNS <- SolFitsNS %>%
          nm535 = Light_4,
          nm590 = Light_5,
          IR = Light_6) %>%
-#  drop_na(StartDateTimeSol) |> fails on Doug MacOS
+drop_na(StartDateTimeSol) %>% 
   mutate(ObsTime = hms(ObsTime),
          ObsDate = ymd(ObsDate)) %>%
   mutate(ObsDateTime = ymd_hms(paste(ObsDate, ObsTime))) %>%
@@ -524,8 +519,18 @@ SolFitsTrimMetaNS <- SolFitsTrimMetaNS %>%
   ungroup()
 ```
 
-
 # Fit LRC for JVPSII to allow selection of specific JVPSII for different growth light levels.
+
+```{r}
+SolFitsTrimMetaLRC <- SolFitsTrimMetaNS |>
+  select(-c("Dur-Wat", "ChiSq")) |>
+  nest(data = -c("SampleID"))
+
+
+```
+
+
+
 # ```{r fit JVPSII LRC}
 # SolFitsTrimMetaLRC <- SolFitsTrimMetaNS |>
 #   select(-c("Dur-Wat", "ChiSq")) |>
