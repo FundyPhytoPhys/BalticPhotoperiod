@@ -395,16 +395,21 @@ SolFitsNS <- SolisenseFilesNS %>%
 ```
 
 # Import and prepare files
+Issue with read_delim_plus reading in files in .zip; filename different on PC and MacOS
 
 ```{r tidy SolFitsTrim}
 SolFitsTrimNS <- SolFitsNS %>%
   filter(!grepl("----", DATE)) %>% 
   select(-c("RFID_User_Data", "Barcode_Data", "PIF",  "Lon", "Lat", "GPS_stat", "LEDSel")) %>% # remove superfluous columns for unfit data
-
   mutate(Filename = str_remove(string = Filename, pattern = "/RawData/SolisenseNSData.zip/"),
          Filename = str_remove(string = Filename, pattern = "_fit.csv")
          ) %>%
-  separate(Filename, into = c("fp1", "fp2", "fp3", "fp4", "fp5", "fp6", "fp7", "Project", "RunDateTime", "SampleID", "Ex_WL"), sep = "([\\/\\_])", remove = FALSE) %>%
+  separate(Filename, into = c("fp1", "fp2", "fp3", "fp4", "fp5", "fp6", "fp7", "Project", "RunDateTime", "SampleID", "Ex_WL"), sep = "([\\/\\_])", remove = FALSE) 
+
+#C:\LIFT\DATA\PicoBaltic\90024\202308181042_PICO_SySl1316_445_data.csv
+
+
+%>%
   mutate(RunDateTime = ymd_hm(RunDateTime),
          TIME = as.character(TIME)) %>%  #time-column may be read in as factor, and as.character changes it to numeric; using lubdridate::hms would only change the format to 13H 4M 2S but does not work later to merge into one DateTime-column
   mutate(SourceDataFile = `Source DataFile`,
@@ -419,7 +424,7 @@ SolFitsTrimNS <- SolFitsNS %>%
          nm535 = Light_4,
          nm590 = Light_5,
          IR = Light_6) %>%
-  drop_na(StartDateTimeSol) %>%
+#  drop_na(StartDateTimeSol) |> fails on Doug MacOS
   mutate(ObsTime = hms(ObsTime),
          ObsDate = ymd(ObsDate)) %>%
   mutate(ObsDateTime = ymd_hms(paste(ObsDate, ObsTime))) %>%
@@ -518,6 +523,16 @@ SolFitsTrimMetaNS <- SolFitsTrimMetaNS %>%
          JVPSII_ETRqpOxbo_aLHII_Sig = ETRqpOxbo * aLHIIOxbomax/Sigmax_m2psii) %>%
   ungroup()
 ```
+
+
+# Fit LRC for JVPSII to allow selection of specific JVPSII for different growth light levels.
+# ```{r fit JVPSII LRC}
+# SolFitsTrimMetaLRC <- SolFitsTrimMetaNS |>
+#   select(-c("Dur-Wat", "ChiSq")) |>
+#   nest(data = -c("SampleID", "Run", "Strain" ,"ExpDate","Par_ue", "Photoperiod", "O2", "WL", "LightShape", "ExpEndDate", "PARPhotonDose_day"))
+#  
+# ```
+
 
 # Choosen Sigma from corresponding light
 
