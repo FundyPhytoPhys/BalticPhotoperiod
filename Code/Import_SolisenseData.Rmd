@@ -48,6 +48,7 @@ library(readxl)
 library(Cairo) #for greek symbols
 library(data.table)
 library(purrr)
+library(minpack.lm) #Standard 'nls' framework that uses 'nls.lm' for fitting
 ```
 
 # Read ActPARCrossCal Rds from FluorO2Calibrations project existing on GitHub
@@ -519,24 +520,82 @@ SolFitsTrimMetaNS <- SolFitsTrimMetaNS %>%
   ungroup()
 ```
 
-# Fit LRC for JVPSII to allow selection of specific JVPSII for different growth light levels.
+# Create smaller value to create platt model
 
 ```{r}
-SolFitsTrimMetaLRC <- SolFitsTrimMetaNS |>
-  select(-c("Dur-Wat", "ChiSq")) |>
-  nest(data = -c("SampleID"))
+SolFitsTrimMetaNS<-SolFitsTrimMetaNS %>%
+  mutate(JVPSII_aLHIIOxbomax = JVPSII_aLHIIOxbomax/1e22) %>% 
+  mutate(JVPSII_ETRtauav_FoSig = JVPSII_ETRtauav_FoSig/1e22) %>% 
+  mutate(JVPSII_ETRqpOxbo_FoSig = JVPSII_ETRqpOxbo_FoSig/1e22) %>% 
+  mutate(JVPSII_ETRtauav_aLHII_Sig = JVPSII_ETRtauav_aLHII_Sig/1e22) %>% 
+  mutate(JVPSII_ETRqpOxbo_aLHII_Sig = JVPSII_ETRqpOxbo_aLHII_Sig/1e22) 
+```
 
+
+# Create preliminary plots 
+
+```{r preliminary plot}
+lab1=c(expression("PC-rich_056"), expression("PC-rich_077"), expression("PE-rich_048"), expression("PE-rich_127"))
+lab2=c(expression("8 h"), expression("12 h"), expression("16 h"), expression("24 h"))
+lab3=c(expression("30 µE"), expression("90 µE"), expression("180 µE"), expression("300 µE"), expression("900 µE"))
+
+SolFitsTrimMetaNS %>%
+  ggplot() +
+  geom_point(aes(x = ActPARCorr, y = JVPSII_ETRqpOxbo_FoSig, colour = as.factor(Strain)), size = 3.5, show.legend = T) +
+  scale_colour_discrete(type=c("seagreen4", "palegreen3", "brown1", "brown4"), name="", labels = lab1) +
+  facet_grid(rows = vars(Ex_WL), cols = vars(Photoperiod)) +
+  theme_bw()
 
 ```
 
 
+# Fit LRC for JVPSII to allow selection of specific JVPSII for different growth light levels.
 
-# ```{r fit JVPSII LRC}
-# SolFitsTrimMetaLRC <- SolFitsTrimMetaNS |>
-#   select(-c("Dur-Wat", "ChiSq")) |>
-#   nest(data = -c("SampleID", "Run", "Strain" ,"ExpDate","Par_ue", "Photoperiod", "O2", "WL", "LightShape", "ExpEndDate", "PARPhotonDose_day"))
-#  
-# ```
+```{r}
+grcplatt <- function(I, a, b, Pmax){Pmax * (1-exp(-a*I/Pmax)) * exp(-b*I/Pmax)}
+
+
+SolFitsTrimMetaLRC <- SolFitsTrimMetaNS %>% 
+  drop_na(Sig) %>% 
+  select(-c("Dur-Wat", "ChiSq")) %>% 
+  nest(data = -c("SampleID", "Run", "Strain" ,"ExpDate","Par_ue", "Photoperiod", "O2", "WL", "Ex_WL","LightShape", "ExpEndDate", "PARPhotonDose_day")) %>% 
+  mutate(GRCplatt_Model = map(data, ~nlsLM(JVPSII_ETRqpOxbo_FoSig ~ grcplatt(I = ActPARCorr, a, b, Pmax),
+         data = .x,start = list(a = 0.1/30, b = 0.01/800, Pmax = 6),lower = c(0, 0, 0)))) %>%    
+  mutate(GRCplatt_Param = map(GRCplatt_Model, tidy),          
+         GRCplatt_Predict = map(GRCplatt_Model, possibly(augment)),          
+         GRCplatt_Glance = map(GRCplatt_Model, possibly(glance)))
+GRCplatt_PredictSolFits <- SolFitsTrimMetaLRC %>% 
+  unnest(GRCplatt_Predict)%>% 
+  unnest(GRCplatt_Param)
+  
+```
+# Create preliminary plot - per Par_ue and photoperiod
+
+```{r create plot}
+lab1=c(expression("8 h"), expression("12 h"), expression("16 h"), expression("24 h"))
+lab2=c(expression("30 µE"), expression("90 µE"), expression("180 µE"), expression("300 µE"), expression("600 µE"), expression("900 µE"))
+lab4=c(expression(""), expression(""), expression(""), expression(""))
+scientific_10 <- function(x) {   parse(text=gsub("e\\+*", " %*% 10^", scales::scientific_format()(x))) }
+
+ggplot(SolFitsTrimMetaNS, aes(ActPARCorr, JVPSII_ETRqpOxbo_FoSig)) +
+  geom_point(aes(ActPARCorr, JVPSII_ETRqpOxbo_FoSig, colour = as.factor(Par_ue), shape = as.factor(Photoperiod)), alpha = 0.8, size = 3.5, show.legend = T) +
+  # geom_errorbar(aes(x = PURPhotonDose_day, ymin = deltaOD_Lmu_corr - deltaOD_Lmu_se, ymax = deltaOD_Lmu_corr + deltaOD_Lmu_se, colour = as.factor(Par_ue)), width=0, size=0.3, data = . %>% filter(deltaOD_Lmu_se<8.057558e-03), show.legend = F) +
+  geom_line(aes(ActPARCorr, .fitted), colour = "black", linetype = "dotted", show.legend = F, GRCplatt_PredictSolFits) +
+  # geom_line(aes(PURPhotonDose_day, .fitted), colour = "darkslategray", show.legend = F, GRCplatt_PredictGrowth30) +
+  # geom_line(aes(PURPhotonDose_day, .fitted), colour = "lightblue4", show.legend = F, GRCplatt_PredictGrowth90) +
+  # geom_line(aes(PURPhotonDose_day, .fitted), colour = "hotpink4", show.legend = F, GRCplatt_PredictGrowth180) +
+  # geom_line(aes(PURPhotonDose_day, .fitted), colour = "indianred3", show.legend = F, GRCplatt_PredictGrowth300) +
+  # geom_line(aes(PURPhotonDose_day, .fitted), colour = "goldenrod2", show.legend = F, GRCplatt_PredictGrowth900) +
+  scale_x_continuous(label=scientific_10) +
+  scale_colour_manual(values = c("darkslategray", "lightblue4", "hotpink4", "indianred3", "goldenrod2", "khaki2"), name="", labels = lab2, breaks=c('30', "90", "180", "300", "600","900")) +
+  scale_shape_manual(values = c(15, 16, 17, 18), name="", labels = lab1) +
+  #labs(y = "Logistic growth rate " ~ "("~d^-1~")", x = "Photon dose ( µmol photons "~m^-2~""~d^-1~")") +
+  ggh4x::facet_nested(rows = vars(Strain), cols = vars(Ex_WL), labeller = label_parsed) +
+  theme_bw() 
+
+```
+
+
 
 
 # Choosen Sigma from corresponding light
