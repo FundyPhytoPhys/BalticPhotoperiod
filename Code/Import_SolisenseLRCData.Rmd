@@ -398,7 +398,7 @@ SolFitsMeta %>%
 
 ```
 
-# Create smaller value to create platt model
+# Create smaller value to create Platt model
 
 ```{r}
 SolFitsMeta<-SolFitsMeta %>%
@@ -445,46 +445,68 @@ SolFitsMetaLRC <- SolFitsMeta %>%
   mutate(GRCplatt_Param = map(GRCplatt_Model, tidy),
          GRCplatt_Predict = map(GRCplatt_Model, possibly(augment)),
          GRCplatt_Glance = map(GRCplatt_Model, possibly(glance)))
-GRCplatt_PredictSolFits <- SolFitsMetaLRC %>%
-  unnest(GRCplatt_Predict)%>%
-  unnest(GRCplatt_Param)
-  
+
+
+# GRCplatt_PredictSolFits <- SolFitsMetaLRC %>%
+#   unnest(GRCplatt_Predict)%>%
+#   unnest(GRCplatt_Param)
+#   
 ```
 
 # Create preliminary plot - Example
 
-```{r create plot}
-GRCplatt_PredictSolFits1<-GRCplatt_PredictSolFits %>% #only for prelim plot
+```{r prelim plot}
+SolFitsMetaLRC |> 
+  unnest(GRCplatt_Predict) |>
   filter(Strain == "BA48R") %>% 
   filter(Par_ue == 90) %>% 
-  filter(Photoperiod == 16)
-
-
-SolFitsMeta %>% 
-  filter(Strain == "BA48R") %>% 
-  filter(Par_ue == 90) %>% 
-  filter(Photoperiod == 16) %>% 
+  filter(Photoperiod == 16) |>
 ggplot() +
   geom_point(aes(ActPARCorr, JVPSII_ETRqpOxbo_FoSig, colour = as.factor(Par_ue), shape = as.factor(Photoperiod)), alpha = 0.8, size = 3.5, show.legend = T) +
-  geom_line(aes(ActPARCorr, .fitted), colour = "black", linetype = "dotted", show.legend = F, GRCplatt_PredictSolFits1) +
+  geom_line(aes(ActPARCorr, .fitted), colour = "black", linetype = "dotted") +
   ggh4x::facet_nested(cols = vars(Ex_WL), rows = vars(Strain, Par_ue, Photoperiod, E_days), labeller = label_parsed) +
   theme_bw()
 
 ```
 
+Use Peak Par_ue and 1/2 Peak Par_ue to estimate growth JVPSII for each combination
+-use 'Pluck' to reach into GRCplatt_Predict to get a, b, Pmax; or
+-unnest, pivot wider to get a, b, Pmax
+```{r growth light JVPSII}
 
+SolFitsMetaLRCGrowth <- SolFitsMetaLRC |>
+  unnest(GRCplatt_Param) |>
+  select(-c(statistic, p.value, GRCplatt_Predict, GRCplatt_Glance)) |> #remove (temporarily) to make pivot_wider easier
+  pivot_wider(names_from = term, values_from = c(estimate, std.error)) |>
+  mutate(JVPSII_Par_ue = grcplatt(I = Par_ue, a = estimate_a, estimate_b, estimate_Pmax),
+         JVPSII_HalfPar_ue = grcplatt(I = (0.5*Par_ue), a = estimate_a, estimate_b, estimate_Pmax))
 
+ 
+head(SolFitsMetaLRCGrowth) 
+```
 
+# Test plots of Growth Par_ue and 1/2 Growth Par_ue estimates for JVPSII
+```{r growth JVPSII}
+SolFitsMetaLRCGrowth |>
+  ggplot() +
+  geom_point(aes(x = E_days, y = JVPSII_Par_ue, colour = Ex_WL)) +
+  facet_grid(cols = vars(Ex_WL, Photoperiod, Strain), rows = vars(Par_ue)) +
+  theme_bw()
 
+SolFitsMetaLRCGrowth |>
+  filter(Strain == "BA48R") |>
+  ggplot() +
+  geom_point(aes(x = E_days, y = JVPSII_Par_ue, colour = Ex_WL)) +
+  facet_grid(cols = vars(Ex_WL, Photoperiod, Strain), rows = vars(Par_ue)) +
+  theme_bw()
 
-
-
-
-
-
-
-
-
+SolFitsMetaLRCGrowth |>
+  filter(Strain == "BA48R") |>
+  ggplot() +
+  geom_point(aes(x = E_days, y = JVPSII_Par_ue, colour = Ex_WL)) +
+  facet_grid(cols = vars(Ex_WL, Photoperiod, Strain), rows = vars(Par_ue)) +
+  theme_bw()
+```
 
 
 
