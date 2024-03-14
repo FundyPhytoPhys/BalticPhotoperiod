@@ -160,12 +160,6 @@ SolFitsTrimOS <- SolFitsTrimOS %>%
   select(-c("Fv/Fm"))
 ```
 
-# Filter unrelated values
-
-```{r filter unrelated values}
-# SolFitsTrimOS <- SolFitsTrimOS %>%
-#   filter(Sig>0)
-```
 
 ----------------------------------------- New Software -----------------------------------------------
 
@@ -246,10 +240,10 @@ SolFitsTrimNS <- SolFitsTrimNS %>%
 ```{r}
 
 SolFitsTrimOS<-SolFitsTrimOS %>% 
-  select(c(SampleID, Time__mSec, Fo, Fm, Fv, FvFm, Tau1QA, Tau2QA, Tau3QA, Alp1QA, Alp2QA, Alp3QA, Alpha, Ek, Pmax, Filename, ObsDate, ObsTime, ObsDateTime, Ex_WL, StartDateTimeSol, nm445, nm470, nm505, nm535, nm590, IR, TempCont, Sig))
+  select(c(SampleID, Time__mSec, Fo, Fm, Fv, FvFm, Tau1QA, Tau2QA, Tau3QA, Alp1QA, Alp2QA, Alp3QA, Alpha, Ek, Pmax, SourceDataFile, Filename, ObsDate, ObsTime, ObsDateTime, Ex_WL, StartDateTimeSol, nm445, nm470, nm505, nm535, nm590, IR, TempCont, Sig))
 
 SolFitsTrimNS<-SolFitsTrimNS %>% 
-  select(c(SampleID, Time__mSec, Fo, Fm, Fv, FvFm, Tau1QA, Tau2QA, Tau3QA, Alp1QA, Alp2QA, Alp3QA, Alpha, Ek, Pmax, Filename, ObsDate, ObsTime, ObsDateTime, Ex_WL, StartDateTimeSol, nm445, nm470, nm505, nm535, nm590, IR, TempCont, Sig))
+  select(c(SampleID, Time__mSec, Fo, Fm, Fv, FvFm, Tau1QA, Tau2QA, Tau3QA, Alp1QA, Alp2QA, Alp3QA, Alpha, Ek, Pmax, SourceDataFile, Filename, ObsDate, ObsTime, ObsDateTime, Ex_WL, StartDateTimeSol, nm445, nm470, nm505, nm535, nm590, IR, TempCont, Sig))
 
 ```
 
@@ -257,19 +251,7 @@ SolFitsTrimNS<-SolFitsTrimNS %>%
 
 ```{r combine data from old and new Software}
 SolFitsOSNS <-rbind(SolFitsTrimOS, SolFitsTrimNS)
-
-# SolFitsMetaDarkafterLight <-rbind(SolFitsTrimMetaDarkafterLightOS, SolFitsTrimMetaDarkafterLightNS)
 ```
-
-
-# Save rds for further analysis
-
-```{r save rds}
-saveRDS(SolFitsOSNS, file.path(DataOut, paste(Project, "Imported_SolisenseLightOSNS.Rds", sep = "_"), fsep = .Platform$file.sep), ascii = FALSE, version = NULL, compress = "xz", refhook = NULL)
-
-# saveRDS(SolFitsMetaDarkafterLight, file.path(DataOut, paste(Project, "Imported_SolisenseDarkafterLight.Rds", sep = "_"), fsep = .Platform$file.sep), ascii = FALSE, version = NULL, compress = "xz", refhook = NULL)
-```
-
 
 
 # Add ActPARcorr with proper correction factors for TC and no TC
@@ -350,44 +332,6 @@ SolFitsMeta <- SolFitsMeta %>%
   ungroup()
 ```
 
-# Choosen Sigma from corresponding light
-
-```{r data taken from corresponding light calibration}
-# SolFitsTrimMetaClean30 <- SolFitsTrimMetaOS_param %>% 
-#   filter(Dark1s == 0) %>%
-#   filter(Par_ue == 30) %>% 
-#   filter(ActPAR == 20) # 39.5 for 445 and 48.7 for 590
-#   
-# SolFitsTrimMetaClean90 <- SolFitsTrimMetaOS_param %>% 
-#   filter(Dark1s == 0) %>%
-#   filter(Par_ue == 90) %>% 
-#   filter(ActPAR == 40) # 79.0 for 445 and 97.5 for 590
-# 
-# SolFitsTrimMetaClean180 <- SolFitsTrimMetaOS_param %>% 
-#   filter(Dark1s == 0) %>%
-#   filter(Par_ue == 180) %>% 
-#   filter(ActPAR == 80) # 158.1 for 445 and 195.0 for 590
-# 
-# SolFitsTrimMetaClean300 <- SolFitsTrimMetaOS_param %>% 
-#   filter(Dark1s == 0) %>%
-#   filter(Par_ue == 300) %>% 
-#   filter(ActPAR == 160) # 316.2 for 445 and 390.0 for 590
-# 
-# SolFitsTrimMetaClean600 <- SolFitsTrimMetaOS_param %>% 
-#   filter(Dark1s == 0) %>%
-#   filter(Par_ue == 600) %>% 
-#   filter(ActPAR == 320) # 632.5 for 445 and 780.1 for 590
-# 
-# SolFitsTrimMetaClean900 <- SolFitsTrimMetaOS_param %>% 
-#   filter(Dark1s == 0) %>%
-#   filter(Par_ue == 900) %>% 
-#   filter(ActPAR == 320) # 632.5 for 445 and 780.1 for 590
-# 
-# SolFitsTrimMetaCleanOS<-rbind(SolFitsTrimMetaClean30, SolFitsTrimMetaClean90, SolFitsTrimMetaClean180, SolFitsTrimMetaClean300, SolFitsTrimMetaClean600, SolFitsTrimMetaClean900)
-# 
-# rm(SolFitsTrimMetaClean30, SolFitsTrimMetaClean90, SolFitsTrimMetaClean180, SolFitsTrimMetaClean300,SolFitsTrimMetaClean900)
-```
-
 # Convert Sig_m2psii to Sig_nm2psii and Sigdark_m2psii to Sigdark_nm2psii and calculated number of days when measurements were made
 
 ```{r convert Sigma}
@@ -407,6 +351,61 @@ SolFitsMeta<- SolFitsMeta %>%
   mutate(Time_h = E_days*24)
 ```
 
+```{r}
+SolFitsMeta<- SolFitsMeta %>%
+  drop_na(Sig)
+```
+
+
+
+# Create preliminary plots 
+
+```{r preliminary plot}
+lab1=c(expression("PC-rich_056"), expression("PC-rich_077"), expression("PE-rich_048"), expression("PE-rich_127"))
+lab2=c(expression("8 h"), expression("12 h"), expression("16 h"), expression("24 h"))
+lab3=c(expression("30 µE"), expression("90 µE"), expression("180 µE"), expression("300 µE"), expression("900 µE"))
+
+SolFitsMeta %>%
+  ggplot() +
+  geom_point(aes(x = Par_ue, y = Sig, colour = as.factor(Strain)), size = 3.5, show.legend = T) +
+  scale_colour_discrete(type=c("seagreen4", "palegreen3", "brown1", "brown4"), name="", labels = lab1) +
+  facet_grid(rows = vars(Ex_WL), cols = vars(Photoperiod)) +
+  theme_bw()
+
+```
+# Remove outliers
+
+```{r}
+SolFitsMeta445<- SolFitsMeta %>%
+  filter(Ex_WL == 445) %>% 
+  filter(Sig<250)
+  
+SolFitsMeta590<- SolFitsMeta %>% 
+  filter(Ex_WL == 590)
+
+SolFitsMeta<-rbind(SolFitsMeta445, SolFitsMeta590)
+
+rm(SolFitsMeta445, SolFitsMeta590)
+```
+
+
+# Save rds for further analysis
+
+```{r save rds}
+saveRDS(SolFitsMeta, file.path(DataOut, paste(Project, "Imported_SolisenseLight_LRC.Rds", sep = "_"), fsep = .Platform$file.sep), ascii = FALSE, version = NULL, compress = "xz", refhook = NULL)
+```
+
+
+------------------------------------------------------------------------------------- 
+
+# Read Importes Solisense
+
+```{r read locally stored metadata from rds}
+SolFitsMeta <- readRDS(file = file.path("..", "Data", "ImportedData", "ImportedSolisenseData", "BalticPhotoperiod_Imported_SolisenseLight_LRC.Rds"))
+
+SolFitsMeta<-SolFitsMeta 
+```
+
 # Create preliminary plots 
 
 ```{r preliminary plot}
@@ -423,37 +422,31 @@ SolFitsMeta %>%
 
 ```
 
-# Save rds for further analysis
-
-```{r save rds}
-saveRDS(SolFitsMeta, file.path(DataOut, paste(Project, "Imported_SolisenseLight_LRC.Rds", sep = "_"), fsep = .Platform$file.sep), ascii = FALSE, version = NULL, compress = "xz", refhook = NULL)
-```
-
 # Create smaller value to create platt model
 
 ```{r}
-# SolFitsMeta<-SolFitsMeta %>%
-#   mutate(JVPSII_aLHIIOxbomax = JVPSII_aLHIIOxbomax/1e22) %>% 
-#   mutate(JVPSII_ETRtauav_FoSig = JVPSII_ETRtauav_FoSig/1e22) %>% 
-#   mutate(JVPSII_ETRqpOxbo_FoSig = JVPSII_ETRqpOxbo_FoSig/1e22) %>% 
-#   mutate(JVPSII_ETRtauav_aLHII_Sig = JVPSII_ETRtauav_aLHII_Sig/1e22) %>% 
-#   mutate(JVPSII_ETRqpOxbo_aLHII_Sig = JVPSII_ETRqpOxbo_aLHII_Sig/1e22) 
+SolFitsMeta<-SolFitsMeta %>%
+  mutate(JVPSII_aLHIIOxbomax = JVPSII_aLHIIOxbomax/1e22) %>%
+  mutate(JVPSII_ETRtauav_FoSig = JVPSII_ETRtauav_FoSig/1e22) %>%
+  mutate(JVPSII_ETRqpOxbo_FoSig = JVPSII_ETRqpOxbo_FoSig/1e22) %>%
+  mutate(JVPSII_ETRtauav_aLHII_Sig = JVPSII_ETRtauav_aLHII_Sig/1e22) %>%
+  mutate(JVPSII_ETRqpOxbo_aLHII_Sig = JVPSII_ETRqpOxbo_aLHII_Sig/1e22)
 ```
 
 
 # Create preliminary plots 
 
 ```{r preliminary plot}
-# lab1=c(expression("PC-rich_056"), expression("PC-rich_077"), expression("PE-rich_048"), expression("PE-rich_127"))
-# lab2=c(expression("8 h"), expression("12 h"), expression("16 h"), expression("24 h"))
-# lab3=c(expression("30 µE"), expression("90 µE"), expression("180 µE"), expression("300 µE"), expression("900 µE"))
-# 
-# SolFitsMeta %>%
-#   ggplot() +
-#   geom_point(aes(x = ActPARCorr, y = JVPSII_ETRqpOxbo_FoSig, colour = as.factor(Strain)), size = 3.5, show.legend = T) +
-#   scale_colour_discrete(type=c("seagreen4", "palegreen3", "brown1", "brown4"), name="", labels = lab1) +
-#   facet_grid(rows = vars(Ex_WL), cols = vars(Photoperiod)) +
-#   theme_bw()
+lab1=c(expression("PC-rich_056"), expression("PC-rich_077"), expression("PE-rich_048"), expression("PE-rich_127"))
+lab2=c(expression("8 h"), expression("12 h"), expression("16 h"), expression("24 h"))
+lab3=c(expression("30 µE"), expression("90 µE"), expression("180 µE"), expression("300 µE"), expression("900 µE"))
+
+SolFitsMeta %>%
+  ggplot() +
+  geom_point(aes(x = ActPARCorr, y = JVPSII_ETRqpOxbo_FoSig, colour = as.factor(Strain)), size = 3.5, show.legend = T) +
+  scale_colour_discrete(type=c("seagreen4", "palegreen3", "brown1", "brown4"), name="", labels = lab1) +
+  facet_grid(cols = vars(Ex_WL, Photoperiod), rows = vars(Par_ue)) +
+  theme_bw()
 
 ```
 
@@ -461,46 +454,56 @@ saveRDS(SolFitsMeta, file.path(DataOut, paste(Project, "Imported_SolisenseLight_
 # Fit LRC for JVPSII to allow selection of specific JVPSII for different growth light levels.
 
 ```{r}
-# grcplatt <- function(I, a, b, Pmax){Pmax * (1-exp(-a*I/Pmax)) * exp(-b*I/Pmax)}
-# 
-# 
-# SolFitsMetaLRC <- SolFitsMeta %>% 
-#   drop_na(Sig) %>% 
-#   select(-c("Dur-Wat", "ChiSq")) %>% 
-#   nest(data = -c("SampleID", "Run", "Strain" ,"ExpDate","Par_ue", "Photoperiod", "O2", "WL", "Ex_WL","LightShape", "ExpEndDate", "PARPhotonDose_day")) %>% 
-#   mutate(GRCplatt_Model = map(data, ~nlsLM(JVPSII_ETRqpOxbo_FoSig ~ grcplatt(I = ActPARCorr, a, b, Pmax),
-#          data = .x,start = list(a = 0.1/30, b = 0.01/800, Pmax = 6),lower = c(0, 0, 0)))) %>%    
-#   mutate(GRCplatt_Param = map(GRCplatt_Model, tidy),          
-#          GRCplatt_Predict = map(GRCplatt_Model, possibly(augment)),          
-#          GRCplatt_Glance = map(GRCplatt_Model, possibly(glance)))
-# GRCplatt_PredictSolFits <- SolFitsMetaLRC %>% 
-#   unnest(GRCplatt_Predict)%>% 
-#   unnest(GRCplatt_Param)
+grcplatt <- function(I, a, b, Pmax){Pmax * (1-exp(-a*I/Pmax)) * exp(-b*I/Pmax)}
+
+#`%notin%` <- negate(`%in%`)
+
+# "ObsDate", "ObsTime","ObsDateTime","E_days", "Time_h", "StartDateTimeSol", "Time_mSec"
+
+SolFitsMetaLRC <- SolFitsMeta %>%
+  # filter(SampleID %notin% c("SySl1266") | ObsDate %notin% c("2022-06-14") | Ex_WL %notin% c(445)) %>%
+  nest(data = -c("SampleID", "Run", "Strain" ,"ExpDate","Par_ue", "Photoperiod", "O2", "WL", "MC", "Tube","Ex_WL","LightShape", "ExpEndDate", "PARPhotonDose_day", "ObsDate")) %>% #head(100) %>% 
+  mutate(GRCplatt_Model = map(data, possibly(~nlsLM(JVPSII_ETRqpOxbo_FoSig ~ grcplatt(I = ActPARCorr, a, b, Pmax),
+         data = .x,
+         control = list(maxiter = 500),
+         start = list(a = 0.1/30, b = 0.01/800, Pmax = 6),lower = c(0, 0, 0))))) %>%
+  mutate(GRCplatt_Param = map(GRCplatt_Model, tidy),
+         GRCplatt_Predict = map(GRCplatt_Model, possibly(augment)),
+         GRCplatt_Glance = map(GRCplatt_Model, possibly(glance)))
+GRCplatt_PredictSolFits <- SolFitsMetaLRC %>%
+  unnest(GRCplatt_Predict)%>%
+  unnest(GRCplatt_Param)
   
 ```
+
 # Create preliminary plot - per Par_ue and photoperiod
 
 ```{r create plot}
-# lab1=c(expression("8 h"), expression("12 h"), expression("16 h"), expression("24 h"))
-# lab2=c(expression("30 µE"), expression("90 µE"), expression("180 µE"), expression("300 µE"), expression("600 µE"), expression("900 µE"))
-# lab4=c(expression(""), expression(""), expression(""), expression(""))
-# scientific_10 <- function(x) {   parse(text=gsub("e\\+*", " %*% 10^", scales::scientific_format()(x))) }
-# 
-# ggplot(SolFitsMeta, aes(ActPARCorr, JVPSII_ETRqpOxbo_FoSig)) +
-#   geom_point(aes(ActPARCorr, JVPSII_ETRqpOxbo_FoSig, colour = as.factor(Par_ue), shape = as.factor(Photoperiod)), alpha = 0.8, size = 3.5, show.legend = T) +
-#   # geom_errorbar(aes(x = PURPhotonDose_day, ymin = deltaOD_Lmu_corr - deltaOD_Lmu_se, ymax = deltaOD_Lmu_corr + deltaOD_Lmu_se, colour = as.factor(Par_ue)), width=0, size=0.3, data = . %>% filter(deltaOD_Lmu_se<8.057558e-03), show.legend = F) +
-#   geom_line(aes(ActPARCorr, .fitted), colour = "black", linetype = "dotted", show.legend = F, GRCplatt_PredictSolFits) +
-#   # geom_line(aes(PURPhotonDose_day, .fitted), colour = "darkslategray", show.legend = F, GRCplatt_PredictGrowth30) +
-#   # geom_line(aes(PURPhotonDose_day, .fitted), colour = "lightblue4", show.legend = F, GRCplatt_PredictGrowth90) +
-#   # geom_line(aes(PURPhotonDose_day, .fitted), colour = "hotpink4", show.legend = F, GRCplatt_PredictGrowth180) +
-#   # geom_line(aes(PURPhotonDose_day, .fitted), colour = "indianred3", show.legend = F, GRCplatt_PredictGrowth300) +
-#   # geom_line(aes(PURPhotonDose_day, .fitted), colour = "goldenrod2", show.legend = F, GRCplatt_PredictGrowth900) +
-#   scale_x_continuous(label=scientific_10) +
-#   scale_colour_manual(values = c("darkslategray", "lightblue4", "hotpink4", "indianred3", "goldenrod2", "khaki2"), name="", labels = lab2, breaks=c('30', "90", "180", "300", "600","900")) +
-#   scale_shape_manual(values = c(15, 16, 17, 18), name="", labels = lab1) +
-#   #labs(y = "Logistic growth rate " ~ "("~d^-1~")", x = "Photon dose ( µmol photons "~m^-2~""~d^-1~")") +
-#   ggh4x::facet_nested(rows = vars(Strain), cols = vars(Ex_WL), labeller = label_parsed) +
-#   theme_bw() 
+lab1=c(expression("8 h"), expression("12 h"), expression("16 h"), expression("24 h"))
+lab2=c(expression("30 µE"), expression("90 µE"), expression("180 µE"), expression("300 µE"), expression("600 µE"), expression("900 µE"))
+lab4=c(expression(""), expression(""), expression(""), expression(""))
+scientific_10 <- function(x) {   parse(text=gsub("e\\+*", " %*% 10^", scales::scientific_format()(x))) }
+
+GRCplatt_PredictSolFits1<-GRCplatt_PredictSolFits %>% 
+  filter(Strain == "BA48R") %>% 
+  filter(Par_ue == 90) %>% 
+  filter(Photoperiod == 16)
+
+
+SolFitsMeta %>% 
+  filter(Strain == "BA48R") %>% 
+  filter(Par_ue == 90) %>% 
+  filter(Photoperiod == 16) %>% 
+ggplot() +
+  geom_point(aes(ActPARCorr, JVPSII_ETRqpOxbo_FoSig, colour = as.factor(Par_ue), shape = as.factor(Photoperiod)), alpha = 0.8, size = 3.5, show.legend = T) +
+  # geom_errorbar(aes(x = PURPhotonDose_day, ymin = deltaOD_Lmu_corr - deltaOD_Lmu_se, ymax = deltaOD_Lmu_corr + deltaOD_Lmu_se, colour = as.factor(Par_ue)), width=0, size=0.3, data = . %>% filter(deltaOD_Lmu_se<8.057558e-03), show.legend = F) +
+  geom_line(aes(ActPARCorr, .fitted), colour = "black", linetype = "dotted", show.legend = F, GRCplatt_PredictSolFits1) +
+  #scale_x_continuous(label=scientific_10) +
+  scale_colour_manual(values = c("darkslategray", "lightblue4", "hotpink4", "indianred3", "goldenrod2", "khaki2"), name="", labels = lab2, breaks=c('30', "90", "180", "300", "600","900")) +
+  scale_shape_manual(values = c(15, 16, 17, 18), name="", labels = lab1) +
+  #labs(y = "Logistic growth rate " ~ "("~d^-1~")", x = "Photon dose ( µmol photons "~m^-2~""~d^-1~")") +
+  ggh4x::facet_nested(cols = vars(Ex_WL), rows = vars(Strain, Par_ue, Photoperiod, ObsDate), labeller = label_parsed) +
+  theme_bw()
 
 ```
 
