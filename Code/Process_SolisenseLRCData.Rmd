@@ -565,12 +565,6 @@ ChlData <- ChlData %>%
 
 ```
 
-```{r}
-ChlData <- ChlData %>%  
-  filter(TurChl_ugL<1500)
-```
-
-
 # Calculate Chl mean from 3 technical replica
 
 ```{r}
@@ -610,6 +604,10 @@ SolFitsExpStTurner<-SolFitsExpStTurner %>%
 # Create preliminary JVPSII vs Chl Turner (ug/L) plot
 
 ```{r preliminary plots, warning = FALSE}
+# lab1=c(expression("PC-rich_056"), expression("PC-rich_077"), expression("PE-rich_048"), expression("PE-rich_127"))
+lab1=c(expression("8 h"), expression("12 h"), expression("16 h"), expression("24 h"))
+lab2=c(expression("30 µE"), expression("90 µE"), expression("180 µE"), expression("300 µE"), expression("600 µE"), expression("900 µE"))
+
 SolFitsExpStTurner %>% 
   ggplot() +
   geom_point(aes(x = E_days, y = JVPSII_Par_ue, colour = as.factor(Par_ue), shape = as.factor(Photoperiod)), size = 3.5, show.legend = T) +
@@ -640,6 +638,17 @@ SolFitsExpStTurner %>%
   scale_shape_manual(values = c(15, 16, 17,18), name="", labels = lab1) +
   scale_colour_manual(values = c("darkslategray", "lightblue4", "hotpink4", "indianred3","goldenrod2", "khaki2"), name="", labels = lab2) +
   ggh4x::facet_nested(cols = vars(Ex_WL), rows = vars(Strain), labeller = label_parsed) +
+  theme_bw()
+
+
+SolFitsExpStTurner %>% 
+  filter(Ex_WL == 445) %>% 
+  filter(Photoperiod == 24) %>% 
+  ggplot() +
+  geom_point(aes(x = meanTurChl_ugL, y = JVPSII_Par_ue, colour = as.factor(Par_ue), shape = as.factor(Photoperiod)), size = 3.5, show.legend = T) +
+  scale_shape_manual(values = c(15, 16, 17,18), name="", labels = lab1) +
+  scale_colour_manual(values = c("darkslategray", "lightblue4", "hotpink4", "indianred3","goldenrod2", "khaki2"), name="", labels = lab2) +
+  ggh4x::facet_nested(cols = vars(Photoperiod, Par_ue), rows = vars(Strain), labeller = label_parsed) +
   theme_bw()
 ```
 
@@ -705,6 +714,14 @@ SolFitsAll %>%
 SolFitsAll %>%
   filter(Ex_WL == 445) %>% 
   ggplot() +
+  geom_point(aes(x = TurChl_ugL, y = JVPSII_Par_ue, colour = as.factor(Strain)),  alpha = 0.8, size = 3, show.legend = T) +
+  scale_colour_discrete(type=c("seagreen4", "palegreen3", "brown1", "brown4"), name="", labels = lab1) +
+  ggh4x::facet_nested(cols = vars(Photoperiod), rows = vars(Par_ue), labeller = label_parsed) +
+  theme_bw() 
+
+SolFitsAll %>%
+  filter(Ex_WL == 445) %>% 
+  ggplot() +
   geom_point(aes(x = cellL_OD680, y = JVPSII_Par_ue, colour = as.factor(Strain)),  alpha = 0.8, size = 3, show.legend = T) +
   scale_colour_discrete(type=c("seagreen4", "palegreen3", "brown1", "brown4"), name="", labels = lab1) +
   ggh4x::facet_nested(cols = vars(Photoperiod), rows = vars(Par_ue), labeller = label_parsed) +
@@ -737,13 +754,13 @@ O4 <- SolFitsAll %>%
 
 O5 <- SolFitsAll %>%
   filter(Par_ue == 30) %>%
-  filter(Photoperiod == 8 | Photoperiod == 12) %>%
-  filter(E_days <=14)
+  filter(Photoperiod == 8 | Photoperiod == 12) 
+  #filter(E_days <=14)
 
 O6 <- SolFitsAll %>%
   filter(Par_ue == 90) %>%
-  filter(Photoperiod == 8) %>%
-  filter(E_days <=14)
+  filter(Photoperiod == 8) 
+  #filter(E_days <=14)
 
 O7 <- SolFitsAll %>%
   filter(Par_ue == 90) %>%
@@ -752,8 +769,8 @@ O7 <- SolFitsAll %>%
 
 O8 <- SolFitsAll %>%
   filter(Par_ue == 180 | Par_ue == 300) %>%
-  filter(Photoperiod == 8 | Photoperiod == 12) %>%
-  filter(E_days <=10)
+  filter(Photoperiod == 8 | Photoperiod == 12) 
+  #filter(E_days <=10)
 
 O9 <- SolFitsAll %>%
   filter(Par_ue == 900 | Par_ue == 600) %>%
@@ -842,21 +859,18 @@ SolFitsAllExpSt %>%
 SolFitsAllExpSt %>%
   filter(Ex_WL == 445) %>% 
   filter(Phase == "Exponential") %>% 
+  #filter(Photoperiod == 8) %>% 
   ggplot() +
-  geom_point(aes(x = cellL_OD680, y = JVPSII_Par_ue, colour = as.factor(Strain)),  alpha = 0.8, size = 3, show.legend = T) +
+  geom_point(aes(x = TurChl_ugL, y = JVPSII_Par_ue, colour = as.factor(Strain)),  alpha = 0.8, size = 3, show.legend = T) +
   scale_colour_discrete(type=c("seagreen4", "palegreen3", "brown1", "brown4"), name="", labels = lab1) +
   ggh4x::facet_nested(cols = vars(Phase, Photoperiod), rows = vars(Par_ue), labeller = label_parsed) +
   theme_bw() 
 
 SolFitsAllExpSt %>%
   filter(Ex_WL == 445) %>% 
-  #filter(Phase == "Exponential") %>% 
+  filter(Phase == "Exponential") %>% 
   ggplot() +
-  geom_point(aes(x = E_days, y = JVPSII_HalfPar_ue, colour = as.factor(Strain)),  alpha = 0.8, size = 3, show.legend = T) +
-  # geom_vline(data = tMaxAGLines_056, aes(xintercept = tMaxAG), linetype="dotdash", colour = "brown4") +
-  # geom_vline(data = tMaxAGLines_077, aes(xintercept = tMaxAG), linetype="dotdash", colour = "brown1") +
-  # geom_vline(data = tMaxAGLines_048, aes(xintercept = tMaxAG), linetype="dotdash", colour = "seagreen4") +
-  # geom_vline(data = tMaxAGLines_127, aes(xintercept = tMaxAG), linetype="dotdash", colour = "palegreen3") +
+  geom_point(aes(x = cellL_OD680, y = JVPSII_Par_ue, colour = as.factor(Strain)),  alpha = 0.8, size = 3, show.legend = T) +
   scale_colour_discrete(type=c("seagreen4", "palegreen3", "brown1", "brown4"), name="", labels = lab1) +
   ggh4x::facet_nested(cols = vars(Phase, Photoperiod), rows = vars(Par_ue), labeller = label_parsed) +
   theme_bw() 

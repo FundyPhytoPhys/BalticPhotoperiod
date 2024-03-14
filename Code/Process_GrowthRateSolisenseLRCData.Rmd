@@ -192,6 +192,11 @@ Solisense <- readRDS(SolisenseFile)  %>%
 ```
 
 
+```{r}
+# Solisense <- Solisense %>%
+#   filter(ToD==10) # When I choose 12 (peak) then I loose a few data point from 12h and 900UE, no idea why. Need to be fix.
+```
+
 # Create preliminary plot
 
 ```{r preliminary plot}
@@ -208,6 +213,14 @@ Solisense %>%
   ggh4x::facet_nested(cols = vars(Phase, Photoperiod), rows = vars(Par_ue), labeller = label_parsed) +
   theme_bw() 
 
+Solisense %>%
+  filter(Ex_WL == 445) %>% 
+  filter(Phase == "Exponential") %>% 
+  ggplot() +
+  geom_point(aes(x = TurChl_ugL, y = JVPSII_Par_ue, colour = as.factor(Strain)),  alpha = 0.8, size = 3, show.legend = T) +
+  scale_colour_discrete(type=c("seagreen4", "palegreen3", "brown1", "brown4"), name="", labels = lab1) +
+  ggh4x::facet_nested(cols = vars(Phase, Photoperiod), rows = vars(Par_ue), labeller = label_parsed) +
+  theme_bw() 
 
 Solisense %>%
   filter(Ex_WL == 445) %>% 
@@ -223,7 +236,6 @@ Solisense %>%
 ```{r Joining growth rate and Solisense exp data}
 GrowthRateSol <- GrowthRate %>% 
   full_join(., Solisense, by = c("Strain"="Strain", "Par_ue"="Par_ue","Photoperiod"="Photoperiod",  "LightShape"="LightShape", "O2"="O2", "WL"="WL", "PARPhotonDose_day"="PARPhotonDose_day")) 
-
 ```
 
 
@@ -259,35 +271,6 @@ ggplot() +
     ggh4x::facet_nested(cols = vars(Photoperiod), rows = vars(Par_ue), labeller = label_parsed) +
   theme_bw() 
 
-
-GrowthRateSol %>% 
-  filter(Ex_WL==445) %>% 
-  filter(Phase == "Exponential") %>% 
-ggplot() +
-  geom_point(aes(cellL_OD680, JVPSII_HalfPar_ue, colour=as.factor(Strain)), alpha = 0.9, size = 3.5, show.legend = T) +
-  scale_x_continuous(label=scientific_10) +
-  scale_colour_discrete(type=c("seagreen4", "palegreen3", "brown1", "brown4")) +
-  #scale_shape_manual(values = c(15, 16, 17, 18), name="", labels = lab1) +
-  #labs(y = "Logistic growth rate " ~ "("~h^-1~")", x = ""~italic(JV)~""["PSII"]*" ( µmol"~e^-~""~L^-1~""~s^-1~")") +
-    ggh4x::facet_nested(cols = vars(Photoperiod), rows = vars(Par_ue), labeller = label_parsed) +
-  theme_bw() 
-```
-
-
-# TurChl and cell_mL - already taken from the same day when JVPSII was measured
-
-# Create a mean 
-
-
-```{r}
-#colnames(GrowthRateSoliExp)
-# meanOD680_h, cellL_OD680, TurChl_ugL,
-
-# GrowthRateSoliExpClean<-GrowthRateSoliExp %>% 
-#   select(c(SampleID, Run, Strain, Tube, MC, ExpDate, Par_ue, Photoperiod, O2, WL, LightShape, PARPhotonDose_day, ExpEndDate, OD720_Lmu_se, OD720_Lmu_corr, deltaOD_Lmu_se, deltaOD_Lmu_corr, ObsDate,  meanTurChl_ugL, sdTurChl_ugL, Ex_WL, Phase, FilenameSolisense, ObsTime, ObsDateTime, ActPARCorr_photonsm2s, JVPSII_aLHIIOxbomax, JVPSII_ETRtauav_FoSig, JVPSII_ETRqpOxbo_FoSig, JVPSII_ETRtauav_aLHII_Sig, JVPSII_ETRqpOxbo_aLHII_Sig, AllmeanJVPSII_aLHIIOxbomax, AllmeanJVPSII_ETRtauav_FoSig, AllmeanJVPSII_ETRqpOxbo_FoSig, AllmeanJVPSII_ETRtauav_aLHII_Sig, AllmeanJVPSII_ETRqpOxbo_aLHII_Sig, E_days, Time_h,  AllmeancellL_OD680, AllsdcellL_OD680, AchivePreStationary, facetsPhase, facetsExcitation, facetsStrain)) %>% 
-#   drop_na(Tube) %>% 
-#   unique()
-
 ```
 
 
@@ -301,41 +284,18 @@ GrowthRateSol445<-GrowthRateSol %>%
 ```
 
 
-# Growth rate vs JVPSII
-
-```{r warning = FALSE}
-
-lab1=c(expression("8 h"), expression("12 h"), expression("16 h"), expression("24 h"))
-lab2=c(expression("30 µE"), expression("90 µE"), expression("180 µE"), expression("300 µE"), expression("600 µE"), expression("900 µE"))
-scientific_10 <- function(x) {   parse(text=gsub("e\\+*", " %*% 10^", scales::scientific_format()(x))) }
-
-GrowthRateSol445 %>% 
-ggplot() +
-  geom_point(aes(JVPSII_Par_ue, deltaOD_Lmu_corr, colour=as.factor(Strain)), alpha = 0.9, size = 3.5, show.legend = T) +
-  scale_x_continuous(label=scientific_10) +
-  scale_colour_discrete(type=c("seagreen4", "palegreen3", "brown1", "brown4")) +
-  #scale_shape_manual(values = c(15, 16, 17, 18), name="", labels = lab1) +
-  #labs(y = "Logistic growth rate " ~ "("~h^-1~")", x = ""~italic(JV)~""["PSII"]*" ( µmol"~e^-~""~L^-1~""~s^-1~")") +
-    ggh4x::facet_nested(cols = vars(Photoperiod), rows = vars(Par_ue), labeller = label_parsed) +
-  theme_bw() 
-```
 
 JVPSII per Turner Chl ug/L and per cell/L (cellL_OD680; meanTurChl_ugL)
 
-add cell/ml per MCcalibration!!!
-
 ```{r}
-#colnames(SolFitsAllPigment)
-
 # JVPSII_ETRqpOxbo_FoSig = JVPSII_Par_ue
-
 
 GrowthRateSoliExp<-GrowthRateSol445 %>% 
   #Turner
   mutate(JVPSII_Par_ue_Chl = JVPSII_Par_ue/meanTurChl_ugL) %>% 
-  mutate(JVPSII_HalfPar_ue_Chl = JVPSII_HalfPar_ue/meanTurChl_ugL) %>% 
+  mutate(JVPSII_HalfPar_ue_Chl = JVPSII_HalfPar_ue/TurChl_ugL) %>% 
 
-  #cell per L based on pamas corr
+  #cell per L based on MC OD680 and pamas corr
   mutate(JVPSII_Par_ue_cell = JVPSII_Par_ue/cellL_OD680) %>% 
   mutate(JVPSII_HalfPar_ue_cell = JVPSII_HalfPar_ue/cellL_OD680)  
 ```
@@ -348,17 +308,8 @@ lab1=c(expression("8 h"), expression("12 h"), expression("16 h"), expression("24
 lab2=c(expression("30 µE"), expression("90 µE"), expression("180 µE"), expression("300 µE"), expression("600 µE"), expression("900 µE"))
 scientific_10 <- function(x) {   parse(text=gsub("e\\+*", " %*% 10^", scales::scientific_format()(x))) }
 
-
 GrowthRateSoliExp %>% 
-ggplot() +
-  geom_point(aes(JVPSII_Par_ue_Chl, deltaOD_Lmu_corr, colour=as.factor(Strain)), alpha = 0.9, size = 3.5, show.legend = T) +
-  scale_x_continuous(label=scientific_10) +
-  scale_colour_discrete(type=c("seagreen4", "palegreen3", "brown1", "brown4")) +
-    ggh4x::facet_nested(cols = vars(Photoperiod), rows = vars(Par_ue), labeller = label_parsed) +
-  theme_bw() 
 
-
-GrowthRateSoliExp %>% 
 ggplot() +
   geom_point(aes(JVPSII_Par_ue_Chl, deltaOD_Lmu_corr, colour=as.factor(Par_ue), shape = as.factor(Photoperiod)), alpha = 0.9, size = 3.5, show.legend = T) +
   scale_x_continuous(label=scientific_10) +
@@ -369,7 +320,6 @@ ggplot() +
   theme_bw() 
 
 GrowthRateSoliExp %>% 
-  filter(Ex_WL==445) %>% 
 ggplot() +
   geom_point(aes(JVPSII_Par_ue_cell, deltaOD_Lmu_corr, colour=as.factor(Par_ue), shape = as.factor(Photoperiod)), alpha = 0.9, size = 3.5, show.legend = T) +
   scale_x_continuous(label=scientific_10) +
