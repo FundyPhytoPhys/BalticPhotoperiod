@@ -688,9 +688,9 @@ SolFitsExpFit590Clean <-SolFitsExpFitAll %>%
 fitted590 <- SolFitsExpFit590Clean %>% 
   nest(-c(Strain, Phase, O2, WL)) %>%
   mutate(
-    fit = map(data, ~nls(Sig_nm2psii ~ SSasymp(PARPhotonDose_day, yf, y0, log_alpha), data = .)),
+    fit = map(data, possibly(~nls(Sig_nm2psii ~ SSasymp(PARPhotonDose_day, yf, y0, log_alpha), data = .))),
     tidied = map(fit, tidy),
-    augmented590 = map(fit, augment))  
+    augmented590 = map(fit, augment))
 
 # Produce a table of fit parameters: y0, yf, alpha
 fitted_Param590<-fitted590 %>% 

@@ -1,0 +1,979 @@
+---
+title: "Process_GrowthRateSolisenseLRCData"
+author:
+- Sylwia Sliwinska-Wilczewska
+- Douglas A. Campbell
+date: "`r format(Sys.Date())`"
+output:
+bookdown::html_document2:
+    code_folding: show
+    keep_md: yes
+    toc: TRUE
+    toc_float: TRUE
+    toc_depth: 6
+    fig_caption: yes
+bibliography: BalticPhotoperiod.bib
+csl: plos-one.csl
+editor_options: 
+  markdown: 
+    wrap: 72
+---
+
+# Set Chunk Options
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE)
+knitr::opts_chunk$set(fig.path='Figs/')
+```
+
+# Introduction
+
+Process_GrowthRateSolisenseLRCData.Rmd processes and combines BalticPhotoperiod_Processed_GrowthRate.Rds from Data/ProcessedData/ProcessedGrowthRateData folder and BalticPhotoperiod_Processed_SolisensePigmentsExp.Rds from Data/ProcessedData/ProcessedSolisenseData folder. This .Rmd generates xxx.Rds (stored in xxxa folder) and xxx_Plot.png (stored in Output/Plots folder).
+
+# Load Libraries and set Project Variables
+
+```{r load libraries, warning = FALSE, echo=FALSE} 
+library(tidyverse)
+library(lubridate)
+library(stringr)
+library(broom)
+library(knitr)
+library(OneR)
+library(zoo)
+library(ggpubr)
+library(caret)
+library(reshape2)
+library(gcookbook)
+library(scales)
+library(Cairo) #for greek symbols
+library(minpack.lm) #Standard 'nls' framework that uses 'nls.lm' for fitting
+library(googledrive)
+library(googlesheets4)
+```
+
+```{r set project variables}
+Project <- "BalticPhotoperiod"
+DataOut <- file.path("..", "Data", "ProcessedData", "ProcessedGrowthRateSolisenseData")
+
+DataInGrowthRate <- file.path("..", "Data", "ProcessedData", "ProcessedGrowthRateData", fsep = .Platform$file.sep)
+DataInSolisense <- file.path("..", "Data", "ProcessedData", "ProcessedSolisenseData", fsep = .Platform$file.sep)
+#DataInGrowthRateRaw <- file.path("..", "Data", "CleanedData", "CleanedMCData", fsep = .Platform$file.sep)
+#DataInGrowthRate_h <- file.path("..", "Data", "ProcessedData", "ProcessedMCDielLightData", fsep = .Platform$file.sep)
+#DataInPigment <- file.path("..", "Data", "ImportedData", "ImportedPigmentsData", fsep = .Platform$file.sep)
+
+
+FigPath <- file.path("..", "Output", "Figures")
+FigRdsPath <- file.path("..", "Output", "FiguresRds")
+TableRdsPath <- file.path("..", "Output", "TablesRDS")
+
+FileEncode <- "UTF-8" 
+Delimiter <- ""
+HeaderRows <- 0
+```
+
+# List and read Imported_Solisense RDS
+
+```{r Exported Rmd}
+list.files(path = DataInGrowthRate, pattern = Project, full.names = TRUE)
+list.files(path = DataInSolisense, pattern = Project, full.names = TRUE)
+#list.files(path = DataInGrowthRateRaw, pattern = Project, full.names = TRUE)
+#list.files(path = DataInGrowthRate_h, pattern = Project, full.names = TRUE)
+```
+
+```{r read ProcessFile}
+GrowthRateFile <- "../Data/ProcessedData/ProcessedGrowthRateData/BalticPhotoperiod_Processed_GrowthRateAll.Rds"
+GrowthRateFileName <- str_split(string = GrowthRateFile, "/")[[1]][3] %>%
+  str_remove(pattern = ".Rds")
+
+GrowthRate <- readRDS(GrowthRateFile)  %>%
+  ungroup()
+
+# GrowthRate<-GrowthRate %>% 
+#   select(c(SampleID, Run, Strain, Tube, MC, ExpDate, Par_ue, Photoperiod, O2, WL, LightShape, PARPhotonDose_day, FilenameMC, ExpEndDate, OD720_Lmu_se, OD720_Lmu_corr, deltaOD_Lmu_se, deltaOD_Lmu_corr)) %>% 
+#   unique()
+
+GrowthRate<-GrowthRate %>% 
+  select(c(Strain, Par_ue, Photoperiod, O2, WL, LightShape, PARPhotonDose_day, OD720_Lmu_se, OD720_Lmu_corr, deltaOD_Lmu_se, deltaOD_Lmu_corr)) %>% 
+  unique()
+
+```
+
+# Growth rate per day
+
+```{r}
+GrowthRate<-GrowthRate %>%
+  mutate(OD720_Lmu_corr = OD720_Lmu_corr*24) %>% 
+  mutate(OD720_Lmu_se = OD720_Lmu_se*24) %>% 
+  mutate(deltaOD_Lmu_corr = deltaOD_Lmu_corr*24) %>% 
+  mutate(deltaOD_Lmu_se = deltaOD_Lmu_se*24) 
+  
+```
+
+
+```{r read ProcessFile}
+# GrowthRate_hFile <- "../Data/ProcessedData/ProcessedMCDielLightData/BalticPhotoperiod_Processed_MCDielLightData.Rds"
+# GrowthRate_hFileName <- str_split(string = GrowthRate_hFile, "/")[[1]][3] %>%
+#   str_remove(pattern = ".Rds")
+# 
+# GrowthRate_h <- readRDS(GrowthRate_hFile)  %>%
+#   ungroup()
+# 
+# GrowthRate_h <- GrowthRate_h %>% 
+#   filter(Strain == "BA127R" | Strain == "BA48R" | Strain == "BA56G" | Strain == "BA77G") %>% 
+#   mutate(Strain=case_when(Strain=="BA127R"~"PE-rich_127",
+#          Strain=="BA48R"~"PE-rich_048",
+#         Strain=="BA56G"~"PC-rich_056",
+#          Strain=="BA77G"~"PC-rich_077")) 
+```
+
+# Merge Growth rate and Growth rate_h
+
+```{r Joining growth rate and Solisense exp data}
+# GrowthRateAll <- GrowthRate_h %>% 
+#   full_join(., GrowthRate, by = c("SampleID"="SampleID", "Run"="Run", "Strain"="Strain", "Tube" = "Tube",  "Par_ue"="Par_ue","Photoperiod"="Photoperiod", "O2"="O2", "WL"="WL")) 
+```
+
+# Growth Rate - all - from Merge - to get all data points
+
+```{r read ProcessFile}
+# GrowthRateRawFile <- "../Data/CleanedData/CleanedMCData/PICO_Cleaned_MCData.Rds"
+# GrowthRateRawFileName <- str_split(string = GrowthRateRawFile, "/")[[1]][3] %>%
+#   str_remove(pattern = ".Rds")
+# 
+# GrowthRateRaw <- readRDS(GrowthRateRawFile)  %>%
+#   ungroup()
+# 
+# GrowthRateRaw<-GrowthRateRaw %>% 
+#   dplyr::select(c(Tube, ExpDate, MC, Run, SampleID, Strain, Par_ue, Photoperiod, WL, O2, LightShape, PARPhotonDose_day, OD720_Lmu_se, OD720_Lmu_corr, deltaOD_Lmu_se, deltaOD_Lmu_corr))
+#   
+# GrowthRateRaw<-GrowthRateRaw %>% 
+#   mutate(Strain=case_when(Strain=="BA127R"~"PE-rich_127",
+#          Strain=="BA48R"~"PE-rich_048",
+#         Strain=="BA56G"~"PC-rich_056",
+#          Strain=="BA77G"~"PC-rich_077"))
+# 
+# GrowthRateRaw1<-GrowthRateRaw %>% 
+#   filter(Run==77) %>% 
+#   filter(Strain =="PC-rich_077" | Strain == "PC-rich_056")
+# GrowthRateRaw2<-GrowthRateRaw %>% 
+#   filter(Run!=77) %>% 
+#   filter(Strain !="PC-rich_077" & Strain != "PC-rich_056")
+# GrowthRateRaw<-rbind(GrowthRateRaw1, GrowthRateRaw2)
+# 
+# GrowthRateRaw<-GrowthRateRaw %>%
+#   mutate(OD720_Lmu_corr = OD720_Lmu_corr*24) %>% 
+#   mutate(OD720_Lmu_se = OD720_Lmu_se*24) %>% 
+#   mutate(deltaOD_Lmu_corr = deltaOD_Lmu_corr*24) %>% 
+#   mutate(deltaOD_Lmu_se = deltaOD_Lmu_se*24) 
+```
+
+
+# Create preliminary plot 
+
+```{r preliminary plot, warning = FALSE}
+GrowthRate %>%
+  ggplot() +
+  geom_point(aes(x = Par_ue, y = deltaOD_Lmu_corr,colour=as.factor(Strain)), size = 3.5, alpha = 0.9, show.legend = T) +
+  geom_errorbar(aes(x = Par_ue, ymin = deltaOD_Lmu_corr - deltaOD_Lmu_se, ymax = deltaOD_Lmu_corr + deltaOD_Lmu_se), alpha = 0.5) +
+  scale_colour_discrete(type=c("seagreen4", "palegreen3", "brown1", "brown4")) +
+  ggh4x::facet_nested(rows = vars(Strain), cols = vars(Photoperiod)) +
+  theme_bw()
+
+```
+
+
+```{r read ProcessFile}
+SolisenseFile <- "../Data/ProcessedData/ProcessedSolisenseData/BalticPhotoperiod_Processed_SolisenseJVPSII.Rds"
+SolisenseFileName <- str_split(string = SolisenseFile, "/")[[1]][3] %>%
+  str_remove(pattern = ".Rds")
+
+Solisense <- readRDS(SolisenseFile)  %>%
+  ungroup()
+```
+
+
+# Create preliminary plot
+
+```{r preliminary plot}
+lab1=c(expression("PC-rich_056"), expression("PC-rich_077"), expression("PE-rich_048"), expression("PE-rich_127"))
+lab2=c(expression("8 h"), expression("12 h"), expression("16 h"), expression("24 h"))
+lab3=c(expression("30 µE"), expression("90 µE"), expression("180 µE"), expression("300 µE"), expression("900 µE"))
+
+Solisense %>%
+  filter(Ex_WL == 445) %>% 
+  filter(Phase == "Exponential") %>% 
+  ggplot() +
+  geom_point(aes(x = E_days, y = JVPSII_Par_ue, colour = as.factor(Strain)),  alpha = 0.8, size = 3, show.legend = T) +
+  scale_colour_discrete(type=c("seagreen4", "palegreen3", "brown1", "brown4"), name="", labels = lab1) +
+  ggh4x::facet_nested(cols = vars(Phase, Photoperiod), rows = vars(Par_ue), labeller = label_parsed) +
+  theme_bw() 
+
+
+Solisense %>%
+  filter(Ex_WL == 445) %>% 
+  filter(Phase == "Exponential") %>% 
+  ggplot() +
+  geom_point(aes(x = cellL_OD680, y = JVPSII_Par_ue, colour = as.factor(Strain)),  alpha = 0.8, size = 3, show.legend = T) +
+  scale_colour_discrete(type=c("seagreen4", "palegreen3", "brown1", "brown4"), name="", labels = lab1) +
+  ggh4x::facet_nested(cols = vars(Phase, Photoperiod), rows = vars(Par_ue), labeller = label_parsed) +
+  theme_bw() 
+```
+
+
+```{r Joining growth rate and Solisense exp data}
+GrowthRateSol <- GrowthRate %>% 
+  full_join(., Solisense, by = c("Strain"="Strain", "Par_ue"="Par_ue","Photoperiod"="Photoperiod",  "LightShape"="LightShape", "O2"="O2", "WL"="WL", "PARPhotonDose_day"="PARPhotonDose_day")) 
+
+```
+
+
+# Growth rate vs JVPSII
+
+```{r warning = FALSE}
+
+lab1=c(expression("8 h"), expression("12 h"), expression("16 h"), expression("24 h"))
+lab2=c(expression("30 µE"), expression("90 µE"), expression("180 µE"), expression("300 µE"), expression("600 µE"), expression("900 µE"))
+scientific_10 <- function(x) {   parse(text=gsub("e\\+*", " %*% 10^", scales::scientific_format()(x))) }
+
+GrowthRateSol %>% 
+  filter(Ex_WL==445) %>% 
+  filter(Phase == "Exponential") %>% 
+ggplot() +
+  geom_point(aes(JVPSII_Par_ue, deltaOD_Lmu_corr, colour=as.factor(Strain)), alpha = 0.9, size = 3.5, show.legend = T) +
+  scale_x_continuous(label=scientific_10) +
+  scale_colour_discrete(type=c("seagreen4", "palegreen3", "brown1", "brown4")) +
+  #scale_shape_manual(values = c(15, 16, 17, 18), name="", labels = lab1) +
+  #labs(y = "Logistic growth rate " ~ "("~h^-1~")", x = ""~italic(JV)~""["PSII"]*" ( µmol"~e^-~""~L^-1~""~s^-1~")") +
+    ggh4x::facet_nested(cols = vars(Photoperiod), rows = vars(Par_ue), labeller = label_parsed) +
+  theme_bw() 
+
+GrowthRateSol %>% 
+  filter(Ex_WL==445) %>% 
+  filter(Phase == "Exponential") %>% 
+ggplot() +
+  geom_point(aes(JVPSII_HalfPar_ue, deltaOD_Lmu_corr, colour=as.factor(Strain)), alpha = 0.9, size = 3.5, show.legend = T) +
+  scale_x_continuous(label=scientific_10) +
+  scale_colour_discrete(type=c("seagreen4", "palegreen3", "brown1", "brown4")) +
+  #scale_shape_manual(values = c(15, 16, 17, 18), name="", labels = lab1) +
+  #labs(y = "Logistic growth rate " ~ "("~h^-1~")", x = ""~italic(JV)~""["PSII"]*" ( µmol"~e^-~""~L^-1~""~s^-1~")") +
+    ggh4x::facet_nested(cols = vars(Photoperiod), rows = vars(Par_ue), labeller = label_parsed) +
+  theme_bw() 
+
+
+GrowthRateSol %>% 
+  filter(Ex_WL==445) %>% 
+  filter(Phase == "Exponential") %>% 
+ggplot() +
+  geom_point(aes(cellL_OD680, JVPSII_HalfPar_ue, colour=as.factor(Strain)), alpha = 0.9, size = 3.5, show.legend = T) +
+  scale_x_continuous(label=scientific_10) +
+  scale_colour_discrete(type=c("seagreen4", "palegreen3", "brown1", "brown4")) +
+  #scale_shape_manual(values = c(15, 16, 17, 18), name="", labels = lab1) +
+  #labs(y = "Logistic growth rate " ~ "("~h^-1~")", x = ""~italic(JV)~""["PSII"]*" ( µmol"~e^-~""~L^-1~""~s^-1~")") +
+    ggh4x::facet_nested(cols = vars(Photoperiod), rows = vars(Par_ue), labeller = label_parsed) +
+  theme_bw() 
+```
+
+
+# TurChl and cell_mL - already taken from the same day when JVPSII was measured
+
+# Create a mean 
+
+
+```{r}
+#colnames(GrowthRateSoliExp)
+# meanOD680_h, cellL_OD680, TurChl_ugL,
+
+# GrowthRateSoliExpClean<-GrowthRateSoliExp %>% 
+#   select(c(SampleID, Run, Strain, Tube, MC, ExpDate, Par_ue, Photoperiod, O2, WL, LightShape, PARPhotonDose_day, ExpEndDate, OD720_Lmu_se, OD720_Lmu_corr, deltaOD_Lmu_se, deltaOD_Lmu_corr, ObsDate,  meanTurChl_ugL, sdTurChl_ugL, Ex_WL, Phase, FilenameSolisense, ObsTime, ObsDateTime, ActPARCorr_photonsm2s, JVPSII_aLHIIOxbomax, JVPSII_ETRtauav_FoSig, JVPSII_ETRqpOxbo_FoSig, JVPSII_ETRtauav_aLHII_Sig, JVPSII_ETRqpOxbo_aLHII_Sig, AllmeanJVPSII_aLHIIOxbomax, AllmeanJVPSII_ETRtauav_FoSig, AllmeanJVPSII_ETRqpOxbo_FoSig, AllmeanJVPSII_ETRtauav_aLHII_Sig, AllmeanJVPSII_ETRqpOxbo_aLHII_Sig, E_days, Time_h,  AllmeancellL_OD680, AllsdcellL_OD680, AchivePreStationary, facetsPhase, facetsExcitation, facetsStrain)) %>% 
+#   drop_na(Tube) %>% 
+#   unique()
+
+```
+
+
+# Choosen only 445 and exp phase of growth
+
+```{r}
+GrowthRateSol445<-GrowthRateSol %>% 
+  filter(Ex_WL==445) %>% 
+  filter(Phase == "Exponential") %>% 
+  filter(E_days >1)
+```
+
+
+# Growth rate vs JVPSII
+
+```{r warning = FALSE}
+
+lab1=c(expression("8 h"), expression("12 h"), expression("16 h"), expression("24 h"))
+lab2=c(expression("30 µE"), expression("90 µE"), expression("180 µE"), expression("300 µE"), expression("600 µE"), expression("900 µE"))
+scientific_10 <- function(x) {   parse(text=gsub("e\\+*", " %*% 10^", scales::scientific_format()(x))) }
+
+GrowthRateSol445 %>% 
+ggplot() +
+  geom_point(aes(JVPSII_Par_ue, deltaOD_Lmu_corr, colour=as.factor(Strain)), alpha = 0.9, size = 3.5, show.legend = T) +
+  scale_x_continuous(label=scientific_10) +
+  scale_colour_discrete(type=c("seagreen4", "palegreen3", "brown1", "brown4")) +
+  #scale_shape_manual(values = c(15, 16, 17, 18), name="", labels = lab1) +
+  #labs(y = "Logistic growth rate " ~ "("~h^-1~")", x = ""~italic(JV)~""["PSII"]*" ( µmol"~e^-~""~L^-1~""~s^-1~")") +
+    ggh4x::facet_nested(cols = vars(Photoperiod), rows = vars(Par_ue), labeller = label_parsed) +
+  theme_bw() 
+```
+
+JVPSII per Turner Chl ug/L and per cell/L (cellL_OD680; meanTurChl_ugL)
+
+add cell/ml per MCcalibration!!!
+
+```{r}
+#colnames(SolFitsAllPigment)
+
+# JVPSII_ETRqpOxbo_FoSig = JVPSII_Par_ue
+
+
+GrowthRateSoliExp<-GrowthRateSol445 %>% 
+  #Turner
+  mutate(JVPSII_Par_ue_Chl = JVPSII_Par_ue/meanTurChl_ugL) %>% 
+  mutate(JVPSII_HalfPar_ue_Chl = JVPSII_HalfPar_ue/meanTurChl_ugL) %>% 
+
+  #cell per L based on pamas corr
+  mutate(JVPSII_Par_ue_cell = JVPSII_Par_ue/cellL_OD680) %>% 
+  mutate(JVPSII_HalfPar_ue_cell = JVPSII_HalfPar_ue/cellL_OD680)  
+```
+
+Growth rate vs JVPSII per Chl Turner - turner taken from the same day as JVPSII
+
+```{r warning = FALSE}
+
+lab1=c(expression("8 h"), expression("12 h"), expression("16 h"), expression("24 h"))
+lab2=c(expression("30 µE"), expression("90 µE"), expression("180 µE"), expression("300 µE"), expression("600 µE"), expression("900 µE"))
+scientific_10 <- function(x) {   parse(text=gsub("e\\+*", " %*% 10^", scales::scientific_format()(x))) }
+
+
+GrowthRateSoliExp %>% 
+ggplot() +
+  geom_point(aes(JVPSII_Par_ue_Chl, deltaOD_Lmu_corr, colour=as.factor(Strain)), alpha = 0.9, size = 3.5, show.legend = T) +
+  scale_x_continuous(label=scientific_10) +
+  scale_colour_discrete(type=c("seagreen4", "palegreen3", "brown1", "brown4")) +
+    ggh4x::facet_nested(cols = vars(Photoperiod), rows = vars(Par_ue), labeller = label_parsed) +
+  theme_bw() 
+
+
+GrowthRateSoliExp %>% 
+ggplot() +
+  geom_point(aes(JVPSII_Par_ue_Chl, deltaOD_Lmu_corr, colour=as.factor(Par_ue), shape = as.factor(Photoperiod)), alpha = 0.9, size = 3.5, show.legend = T) +
+  scale_x_continuous(label=scientific_10) +
+  scale_linetype_manual(values=c("equal900" = "dotted", "less900" = "solid"), breaks=c('8', '12', '16', "24", "", "")) +
+  scale_colour_manual(values = c("darkslategray", "lightblue4", "hotpink4", "indianred3", "goldenrod2", "khaki2"), name="", labels = lab2, breaks=c('30', "90", "180", "300", "600", "900")) +
+  scale_shape_manual(values = c(15, 16, 17, 18), name="", labels = lab1) +
+    ggh4x::facet_nested(cols = vars(Photoperiod), rows = vars(Strain), labeller = label_parsed) +
+  theme_bw() 
+
+GrowthRateSoliExp %>% 
+  filter(Ex_WL==445) %>% 
+ggplot() +
+  geom_point(aes(JVPSII_Par_ue_cell, deltaOD_Lmu_corr, colour=as.factor(Par_ue), shape = as.factor(Photoperiod)), alpha = 0.9, size = 3.5, show.legend = T) +
+  scale_x_continuous(label=scientific_10) +
+  scale_linetype_manual(values=c("equal900" = "dotted", "less900" = "solid"), breaks=c('8', '12', '16', "24", "", "")) +
+  scale_colour_manual(values = c("darkslategray", "lightblue4", "hotpink4", "indianred3", "goldenrod2", "khaki2"), name="", labels = lab2, breaks=c('30', "90", "180", "300", "600", "900")) +
+  scale_shape_manual(values = c(15, 16, 17, 18), name="", labels = lab1) +
+    ggh4x::facet_nested(cols = vars(Photoperiod), rows = vars(Strain), labeller = label_parsed) +
+  theme_bw() 
+
+```
+
+
+Growth rate vs JVPSII per cell/L based on Pamas correlation - cell taken from the same day as JVPSII
+
+Growth rate vs JVPSII per cell
+```{r warning = FALSE}
+
+# JVPSII_aLHIIOxbomax
+# JVPSII_ETRtauav_FoSig
+# JVPSII_ETRqpOxbo_FoSig
+# JVPSII_ETRtauav_aLHII_Sig
+# JVPSII_ETRqpOxbo_aLHII_Sig
+
+
+lab1=c(expression("8 h"), expression("12 h"), expression("16 h"), expression("24 h"))
+lab2=c(expression("30 µE"), expression("90 µE"), expression("180 µE"), expression("300 µE"), expression("600 µE"), expression("900 µE"))
+scientific_10 <- function(x) {   parse(text=gsub("e\\+*", " %*% 10^", scales::scientific_format()(x))) }
+
+
+GrowthRateSoliExp %>% 
+  filter(Ex_WL==445) %>% 
+ggplot() +
+  geom_point(aes(JVPSII_ETRqpOxbo_aLHII_Sig_cell, deltaOD_Lmu_corr, colour=as.factor(Strain)), alpha = 0.9, size = 3.5, show.legend = T) +
+  scale_x_continuous(label=scientific_10) +
+  scale_colour_discrete(type=c("seagreen4", "palegreen3", "brown1", "brown4")) +
+    ggh4x::facet_nested(cols = vars(Photoperiod), rows = vars(Par_ue), labeller = label_parsed) +
+  theme_bw() 
+
+
+GrowthRateSoliExp %>% 
+  filter(Ex_WL==445) %>% 
+ggplot() +
+  geom_point(aes(JVPSII_ETRqpOxbo_aLHII_Sig_cell, deltaOD_Lmu_corr, colour=as.factor(Par_ue), shape = as.factor(Photoperiod)), alpha = 0.9, size = 3.5, show.legend = T) +
+  scale_x_continuous(label=scientific_10) +
+  #scale_linetype_manual(values=c("equal900" = "dotted", "less900" = "solid"), breaks=c('8', '12', '16', "24")) +
+  scale_colour_manual(values = c("darkslategray", "lightblue4", "hotpink4", "indianred3", "goldenrod2", "khaki2"), name="", labels = lab2, breaks=c('30', "90", "180", "300", "600", "900")) +
+  #scale_colour_discrete(type=c("seagreen4", "palegreen3", "brown1", "brown4")) +
+  scale_shape_manual(values = c(15, 16, 17, 18), name="", labels = lab1) +
+    ggh4x::facet_nested(cols = vars(Photoperiod), rows = vars(Strain), labeller = label_parsed) +
+  theme_bw() 
+
+GrowthRateSoliExp %>% 
+  filter(Ex_WL==445) %>% 
+ggplot() +
+  geom_point(aes(AllmeanJVPSII_ETRqpOxbo_aLHII_Sig_cell, deltaOD_Lmu_corr, colour=as.factor(Par_ue), shape = as.factor(Photoperiod)), alpha = 0.9, size = 3.5, show.legend = T) +
+  scale_x_continuous(label=scientific_10) +
+  #scale_linetype_manual(values=c("equal900" = "dotted", "less900" = "solid"), breaks=c('8', '12', '16', "24")) +
+  scale_colour_manual(values = c("darkslategray", "lightblue4", "hotpink4", "indianred3", "goldenrod2", "khaki2"), name="", labels = lab2, breaks=c('30', "90", "180", "300", "600", "900")) +
+  #scale_colour_discrete(type=c("seagreen4", "palegreen3", "brown1", "brown4")) +
+  scale_shape_manual(values = c(15, 16, 17, 18), name="", labels = lab1) +
+    ggh4x::facet_nested(cols = vars(Photoperiod), rows = vars(Strain), labeller = label_parsed) +
+  theme_bw() 
+```
+
+
+calculate JVPSII per day
+```{r}
+# JVPSII_aLHIIOxbomax
+# JVPSII_ETRtauav_FoSig
+# JVPSII_ETRqpOxbo_FoSig
+# JVPSII_ETRtauav_aLHII_Sig
+# JVPSII_ETRqpOxbo_aLHII_Sig
+
+SolFitsAllPigmentTurnerDay81216<-GrowthRateSoliExp %>% 
+  filter(Photoperiod !=24) %>% 
+  mutate(JVPSII_aLHIIOxbomax_cell_day = JVPSII_aLHIIOxbomax_cell*3600*Photoperiod/2) %>% 
+  mutate(JVPSII_ETRtauav_FoSig_cell_day = JVPSII_ETRtauav_FoSig_cell*3600*Photoperiod/2) %>% 
+  mutate(JVPSII_ETRqpOxbo_FoSig_cell_day = JVPSII_ETRqpOxbo_FoSig_cell*3600*Photoperiod/2) %>% 
+  mutate(JVPSII_ETRtauav_aLHII_Sig_cell_day = JVPSII_ETRtauav_aLHII_Sig_cell*3600*Photoperiod/2) %>% 
+  mutate(JVPSII_ETRqpOxbo_aLHII_Sig_cell_day = JVPSII_ETRqpOxbo_aLHII_Sig_cell*3600*Photoperiod/2) %>% 
+
+  mutate(AllmeanJVPSII_aLHIIOxbomax_cell_day = AllmeanJVPSII_aLHIIOxbomax_cell*3600*Photoperiod/2) %>% 
+  mutate(AllmeanJVPSII_ETRtauav_FoSig_cell_day = AllmeanJVPSII_ETRtauav_FoSig_cell*3600*Photoperiod/2) %>% 
+  mutate(AllmeanJVPSII_ETRqpOxbo_FoSig_cell_day = AllmeanJVPSII_ETRqpOxbo_FoSig_cell*3600*Photoperiod/2) %>% 
+  mutate(AllmeanJVPSII_ETRtauav_aLHII_Sig_cell_day = AllmeanJVPSII_ETRtauav_aLHII_Sig_cell*3600*Photoperiod/2) %>% 
+  mutate(AllmeanJVPSII_ETRqpOxbo_aLHII_Sig_cell_day = AllmeanJVPSII_ETRqpOxbo_aLHII_Sig_cell*3600*Photoperiod/2) 
+
+SolFitsAllPigmentTurnerDay900<-GrowthRateSoliExp %>% 
+  filter(Photoperiod ==24) %>% 
+  mutate(JVPSII_aLHIIOxbomax_cell_day = JVPSII_aLHIIOxbomax_cell*3600*Photoperiod) %>% 
+  mutate(JVPSII_ETRtauav_FoSig_cell_day = JVPSII_ETRtauav_FoSig_cell*3600*Photoperiod) %>% 
+  mutate(JVPSII_ETRqpOxbo_FoSig_cell_day = JVPSII_ETRqpOxbo_FoSig_cell*3600*Photoperiod) %>% 
+  mutate(JVPSII_ETRtauav_aLHII_Sig_cell_day = JVPSII_ETRtauav_aLHII_Sig_cell*3600*Photoperiod) %>% 
+  mutate(JVPSII_ETRqpOxbo_aLHII_Sig_cell_day = JVPSII_ETRqpOxbo_aLHII_Sig_cell*3600*Photoperiod) %>% 
+  
+  mutate(AllmeanJVPSII_aLHIIOxbomax_cell_day = AllmeanJVPSII_aLHIIOxbomax_cell*3600*Photoperiod) %>% 
+  mutate(AllmeanJVPSII_ETRtauav_FoSig_cell_day = AllmeanJVPSII_ETRtauav_FoSig_cell*3600*Photoperiod) %>% 
+  mutate(AllmeanJVPSII_ETRqpOxbo_FoSig_cell_day = AllmeanJVPSII_ETRqpOxbo_FoSig_cell*3600*Photoperiod) %>% 
+  mutate(AllmeanJVPSII_ETRtauav_aLHII_Sig_cell_day = AllmeanJVPSII_ETRtauav_aLHII_Sig_cell*3600*Photoperiod) %>% 
+  mutate(AllmeanJVPSII_ETRqpOxbo_aLHII_Sig_cell_day = AllmeanJVPSII_ETRqpOxbo_aLHII_Sig_cell*3600*Photoperiod) 
+  
+SolFitsAllPigmentTurnerDay<-rbind(SolFitsAllPigmentTurnerDay81216, SolFitsAllPigmentTurnerDay900)
+  rm(SolFitsAllPigmentTurnerDay81216, SolFitsAllPigmentTurnerDay900)
+```
+
+
+Growth rate vs JVPSII per cell (pamas corr) per day
+```{r warning = FALSE}
+
+# JVPSII_aLHIIOxbomax
+# JVPSII_ETRtauav_FoSig
+# JVPSII_ETRqpOxbo_FoSig
+# JVPSII_ETRtauav_aLHII_Sig
+# JVPSII_ETRqpOxbo_aLHII_Sig
+
+
+lab1=c(expression("8 h"), expression("12 h"), expression("16 h"), expression("24 h"))
+lab2=c(expression("30 µE"), expression("90 µE"), expression("180 µE"), expression("300 µE"), expression("600 µE"), expression("900 µE"))
+scientific_10 <- function(x) {   parse(text=gsub("e\\+*", " %*% 10^", scales::scientific_format()(x))) }
+
+SolFitsAllPigmentTurnerDay %>% 
+  filter(Ex_WL==445) %>% 
+ggplot() +
+  geom_point(aes(AllmeanJVPSII_aLHIIOxbomax_cell_day, deltaOD_Lmu_corr, colour=as.factor(Par_ue)), alpha = 0.9, size = 3.5, show.legend = T) +
+  scale_x_continuous(label=scientific_10) +
+  #scale_linetype_manual(values=c("equal900" = "dotted", "less900" = "solid"), breaks=c('8', '12', '16', "24", "", "")) +
+  scale_colour_manual(values = c("darkslategray", "lightblue4", "hotpink4", "indianred3", "goldenrod2", "khaki2"), name="", labels = lab2, breaks=c('30', "90", "180", "300", "600", "900")) +
+  #scale_colour_discrete(type=c("seagreen4", "palegreen3", "brown1", "brown4")) +
+  scale_shape_manual(values = c(15, 16, 17, 18), name="", labels = lab1) +
+  ggh4x::facet_nested(rows = vars(Strain), labeller = label_parsed) +
+  theme_bw() 
+
+
+SolFitsAllPigmentTurnerDay %>% 
+  filter(Ex_WL==445) %>% 
+ggplot() +
+  geom_point(aes(AllmeanJVPSII_ETRtauav_FoSig_cell_day, deltaOD_Lmu_corr, colour=as.factor(Par_ue)), alpha = 0.9, size = 3.5, show.legend = T) +
+  scale_x_continuous(label=scientific_10) +
+  scale_colour_manual(values = c("darkslategray", "lightblue4", "hotpink4", "indianred3", "goldenrod2", "khaki2"), name="", labels = lab2, breaks=c('30', "90", "180", "300", "600", "900")) +
+  #scale_colour_discrete(type=c("seagreen4", "palegreen3", "brown1", "brown4")) +
+  scale_shape_manual(values = c(15, 16, 17, 18), name="", labels = lab1) +
+  ggh4x::facet_nested(rows = vars(Strain), labeller = label_parsed) +
+  theme_bw() 
+
+
+SolFitsAllPigmentTurnerDay %>% 
+  filter(Ex_WL==445) %>% 
+ggplot() +
+  geom_point(aes(AllmeanJVPSII_ETRqpOxbo_FoSig_cell_day, deltaOD_Lmu_corr, colour=as.factor(Par_ue)), alpha = 0.9, size = 3.5, show.legend = T) +
+  scale_x_continuous(label=scientific_10) +
+  scale_colour_manual(values = c("darkslategray", "lightblue4", "hotpink4", "indianred3", "goldenrod2", "khaki2"), name="", labels = lab2, breaks=c('30', "90", "180", "300", "600", "900")) +
+  #scale_colour_discrete(type=c("seagreen4", "palegreen3", "brown1", "brown4")) +
+  scale_shape_manual(values = c(15, 16, 17, 18), name="", labels = lab1) +
+  ggh4x::facet_nested(rows = vars(Strain), labeller = label_parsed) +
+  theme_bw()  
+
+SolFitsAllPigmentTurnerDay %>% 
+  filter(Ex_WL==445) %>% 
+ggplot() +
+  geom_point(aes(AllmeanJVPSII_ETRtauav_aLHII_Sig_cell_day, deltaOD_Lmu_corr, colour=as.factor(Par_ue)), alpha = 0.9, size = 3.5, show.legend = T) +
+  scale_x_continuous(label=scientific_10) +
+  scale_colour_manual(values = c("darkslategray", "lightblue4", "hotpink4", "indianred3", "goldenrod2", "khaki2"), name="", labels = lab2, breaks=c('30', "90", "180", "300", "600", "900")) +
+  #scale_colour_discrete(type=c("seagreen4", "palegreen3", "brown1", "brown4")) +
+  scale_shape_manual(values = c(15, 16, 17, 18), name="", labels = lab1) +
+  ggh4x::facet_nested(rows = vars(Strain), labeller = label_parsed) +
+  theme_bw() 
+
+
+SolFitsAllPigmentTurnerDay %>% 
+  filter(Ex_WL==445) %>% 
+ggplot() +
+  geom_point(aes(AllmeanJVPSII_ETRqpOxbo_aLHII_Sig_cell_day, deltaOD_Lmu_corr, colour=as.factor(Par_ue)), alpha = 0.9, size = 3.5, show.legend = T) +
+  scale_x_continuous(label=scientific_10) +
+  scale_colour_manual(values = c("darkslategray", "lightblue4", "hotpink4", "indianred3", "goldenrod2", "khaki2"), name="", labels = lab2, breaks=c('30', "90", "180", "300", "600", "900")) +
+  #scale_colour_discrete(type=c("seagreen4", "palegreen3", "brown1", "brown4")) +
+  scale_shape_manual(values = c(15, 16, 17, 18), name="", labels = lab1) +
+  ggh4x::facet_nested(rows = vars(Strain), labeller = label_parsed) +
+  theme_bw() 
+
+```
+
+
+
+
+# Create smaller value of JVPSII b/c otherwise fit doesnt work
+
+```{r}
+SolFitsAllPigmentTurnerDaySmall<-SolFitsAllPigmentTurnerDay %>% 
+  mutate(JVPSII_aLHIIOxbomax_cell_day1019 = JVPSII_aLHIIOxbomax_cell_day/10000000000000000000) %>%
+  mutate(JVPSII_ETRtauav_FoSig_cell_day1019 = JVPSII_ETRtauav_FoSig_cell_day/10000000000000000000) %>%
+  mutate(JVPSII_ETRqpOxbo_FoSig_cell_day1019 = JVPSII_ETRqpOxbo_FoSig_cell_day/10000000000000000000) %>%
+  mutate(JVPSII_ETRtauav_aLHII_Sig_cell_day1019 = JVPSII_ETRtauav_aLHII_Sig_cell_day/10000000000000000000) %>%
+  mutate(JVPSII_ETRqpOxbo_aLHII_Sig_cell_day1019 = JVPSII_ETRqpOxbo_aLHII_Sig_cell_day/10000000000000000000) %>%
+
+  mutate(AllmeanJVPSII_aLHIIOxbomax_cell_day1019 = AllmeanJVPSII_aLHIIOxbomax_cell_day/10000000000000000000) %>% 
+  mutate(AllmeanJVPSII_ETRtauav_FoSig_cell_day1019 = AllmeanJVPSII_ETRtauav_FoSig_cell_day/10000000000000000000) %>% 
+  mutate(AllmeanJVPSII_ETRqpOxbo_FoSig_cell_day1019 = AllmeanJVPSII_ETRqpOxbo_FoSig_cell_day/10000000000000000000) %>% 
+  mutate(AllmeanJVPSII_ETRtauav_aLHII_Sig_cell_day1019 = AllmeanJVPSII_ETRtauav_aLHII_Sig_cell_day/10000000000000000000) %>% 
+  mutate(AllmeanJVPSII_ETRqpOxbo_aLHII_Sig_cell_day1019 = AllmeanJVPSII_ETRqpOxbo_aLHII_Sig_cell_day/10000000000000000000) 
+```
+
+```{r}
+SolFitsAllPigmentTurnerDaySmall %>% 
+  filter(Ex_WL==445) %>% 
+ggplot() +
+  geom_point(aes(AllmeanJVPSII_ETRtauav_aLHII_Sig_cell_day1019, deltaOD_Lmu_corr, colour=as.factor(Par_ue)), alpha = 0.9, size = 3.5, show.legend = T) +
+  #scale_x_continuous(label=scientific_10) +
+  scale_colour_manual(values = c("darkslategray", "lightblue4", "hotpink4", "indianred3", "goldenrod2", "khaki2"), name="", labels = lab2, breaks=c('30', "90", "180", "300", "600", "900")) +
+  #scale_colour_discrete(type=c("seagreen4", "palegreen3", "brown1", "brown4")) +
+  scale_shape_manual(values = c(15, 16, 17, 18), name="", labels = lab1) +
+  ggh4x::facet_nested(rows = vars(Strain), labeller = label_parsed) +
+  theme_bw() 
+```
+
+
+# Estimated Harrison & Platt, 1986 fit - for 900uE and the rest uE
+
+```{r Added function}
+grcplatt <- function(I, a, b, Pmax){Pmax * (1-exp(-a*I/Pmax)) * exp(-b*I/Pmax)}
+```
+
+```{r Estimated Harrison & Platt, 1986 fit}
+
+SolFitsAllPigmentTurnerDayfit1 <- SolFitsAllPigmentTurnerDaySmall %>% 
+  filter(Ex_WL==445) %>% 
+  select(c(Strain, deltaOD_Lmu_corr, JVPSII_aLHIIOxbomax_cell_day1019, Par_ue, Photoperiod)) 
+JVPSII_aLHIIOxbomaxfit <- SolFitsAllPigmentTurnerDayfit1 %>%
+  nest(data = -c("Strain")) %>%  
+  mutate(GRCplatt_Model = map(data, ~nlsLM(deltaOD_Lmu_corr ~ grcplatt(I = JVPSII_aLHIIOxbomax_cell_day1019, a, b, Pmax), data = .x, start = list(a =0.01/1, b = 1/5, Pmax = 5), lower = c(0, 0, 0)))) %>%    
+  mutate(GRCplatt_Param = map(GRCplatt_Model, tidy),          
+         GRCplatt_Predict = map(GRCplatt_Model, possibly(augment)),          
+         GRCplatt_Glance = map(GRCplatt_Model, possibly(glance)))
+GRCplatt_JVPSII_aLHIIOxbomax <- JVPSII_aLHIIOxbomaxfit %>% 
+  unnest(GRCplatt_Predict)
+
+
+SolFitsAllPigmentTurnerDayfit2 <- SolFitsAllPigmentTurnerDaySmall %>% 
+  filter(Ex_WL==445) %>% 
+  select(c(Strain, deltaOD_Lmu_corr, JVPSII_ETRtauav_FoSig_cell_day1019, Par_ue, Photoperiod)) 
+JVPSII_ETRtauav_FoSigfit <- SolFitsAllPigmentTurnerDayfit2 %>%
+  nest(data = -c("Strain")) %>%  
+  mutate(GRCplatt_Model = map(data, ~nlsLM(deltaOD_Lmu_corr ~ grcplatt(I = JVPSII_ETRtauav_FoSig_cell_day1019, a, b, Pmax), data = .x, start = list(a =0.01/1, b = 1/5, Pmax = 5), lower = c(0, 0, 0)))) %>%    
+  mutate(GRCplatt_Param = map(GRCplatt_Model, tidy),          
+         GRCplatt_Predict = map(GRCplatt_Model, possibly(augment)),          
+         GRCplatt_Glance = map(GRCplatt_Model, possibly(glance)))
+GRCplatt_JVPSII_ETRtauav_FoSig <- JVPSII_ETRtauav_FoSigfit %>% 
+  unnest(GRCplatt_Predict)
+
+SolFitsAllPigmentTurnerDayfit3 <- SolFitsAllPigmentTurnerDaySmall %>% 
+  filter(Ex_WL==445) %>% 
+  select(c(Strain, deltaOD_Lmu_corr, JVPSII_ETRqpOxbo_FoSig_cell_day1019, Par_ue, Photoperiod)) 
+JVPSII_ETRqpOxbo_FoSigfit <- SolFitsAllPigmentTurnerDayfit3 %>%
+  nest(data = -c("Strain")) %>%  
+  mutate(GRCplatt_Model = map(data, ~nlsLM(deltaOD_Lmu_corr ~ grcplatt(I = JVPSII_ETRqpOxbo_FoSig_cell_day1019, a, b, Pmax), data = .x, start = list(a =0.01/1, b = 1/5, Pmax = 5), lower = c(0, 0, 0)))) %>%    
+  mutate(GRCplatt_Param = map(GRCplatt_Model, tidy),          
+         GRCplatt_Predict = map(GRCplatt_Model, possibly(augment)),          
+         GRCplatt_Glance = map(GRCplatt_Model, possibly(glance)))
+GRCplatt_JVPSII_ETRqpOxbo_FoSig <- JVPSII_ETRqpOxbo_FoSigfit %>% 
+  unnest(GRCplatt_Predict)
+
+
+SolFitsAllPigmentTurnerDayfit4 <- SolFitsAllPigmentTurnerDaySmall %>% 
+  filter(Ex_WL==445) %>% 
+  select(c(Strain, deltaOD_Lmu_corr, JVPSII_ETRtauav_aLHII_Sig_cell_day1019, Par_ue, Photoperiod)) 
+JVPSII_ETRtauav_aLHII_Sigfit <- SolFitsAllPigmentTurnerDayfit4 %>%
+  nest(data = -c("Strain")) %>%  
+  mutate(GRCplatt_Model = map(data, ~nlsLM(deltaOD_Lmu_corr ~ grcplatt(I = JVPSII_ETRtauav_aLHII_Sig_cell_day1019, a, b, Pmax), data = .x, start = list(a =0.01/1, b = 1/5, Pmax = 5), lower = c(0, 0, 0)))) %>%    
+  mutate(GRCplatt_Param = map(GRCplatt_Model, tidy),          
+         GRCplatt_Predict = map(GRCplatt_Model, possibly(augment)),          
+         GRCplatt_Glance = map(GRCplatt_Model, possibly(glance)))
+GRCplatt_JVPSII_ETRtauav_aLHII_Sig <- JVPSII_ETRtauav_aLHII_Sigfit %>% 
+  unnest(GRCplatt_Predict)
+
+
+SolFitsAllPigmentTurnerDayfit5 <- SolFitsAllPigmentTurnerDaySmall %>% 
+  filter(Ex_WL==445) %>% 
+  select(c(Strain, deltaOD_Lmu_corr, JVPSII_ETRqpOxbo_aLHII_Sig_cell_day1019, Par_ue, Photoperiod)) 
+JVPSII_ETRqpOxbo_aLHII_Sigfit <- SolFitsAllPigmentTurnerDayfit5 %>%
+  nest(data = -c("Strain")) %>%  
+  mutate(GRCplatt_Model = map(data, ~nlsLM(deltaOD_Lmu_corr ~ grcplatt(I = JVPSII_ETRqpOxbo_aLHII_Sig_cell_day1019, a, b, Pmax), data = .x, start = list(a =0.01/1, b = 1/5, Pmax = 5), lower = c(0, 0, 0)))) %>%    
+  mutate(GRCplatt_Param = map(GRCplatt_Model, tidy),          
+         GRCplatt_Predict = map(GRCplatt_Model, possibly(augment)),          
+         GRCplatt_Glance = map(GRCplatt_Model, possibly(glance)))
+GRCplatt_JVPSII_ETRqpOxbo_aLHII_Sig <- JVPSII_ETRqpOxbo_aLHII_Sigfit %>% 
+  unnest(GRCplatt_Predict)
+```
+
+# Create preliminary plot
+
+```{r preliminary plot, warning = FALSE}
+lab1=c(expression("8 h"), expression("12 h"), expression("16 h"), expression("24 h"))
+lab2=c(expression("30 µE"), expression("90 µE"), expression("180 µE"), expression("300 µE"), expression("600 µE"), expression("900 µE"))
+scientific_10 <- function(x) {   parse(text=gsub("e\\+*", " %*% 10^", scales::scientific_format()(x))) }
+
+
+
+ggplot(SolFitsAllPigmentTurnerDaySmall, aes(AllmeanJVPSII_aLHIIOxbomax_cell_day1019, deltaOD_Lmu_corr)) +
+  geom_point(aes(x=AllmeanJVPSII_aLHIIOxbomax_cell_day1019, y=deltaOD_Lmu_corr, colour=as.factor(Par_ue)), alpha = 0.9, size = 3.5, show.legend = T) +
+  geom_point(aes(x=JVPSII_aLHIIOxbomax_cell_day1019, y=deltaOD_Lmu_corr, colour=as.factor(Par_ue)), alpha = 0.9, size = 1, show.legend = F) +
+  geom_line(aes(JVPSII_aLHIIOxbomax_cell_day1019, .fitted), show.legend = F, GRCplatt_JVPSII_aLHIIOxbomax) +
+  #scale_x_continuous(label=scientific_10) +
+  scale_colour_manual(values = c("darkslategray", "lightblue4", "hotpink4", "indianred3", "goldenrod2", "khaki2"), name="", labels = lab2, breaks=c('30', "90", "180", "300","600" , "900")) +
+  scale_shape_manual(values = c(15, 16, 17, 18), name="", labels = lab1) +
+  #labs(y = "Logistic growth rate " ~ "("~h^-1~")", x = "Photon dose ( µmol photons "~m^-2~""~d^-1~")") +
+  ggh4x::facet_nested(rows = vars(Strain), labeller = label_parsed) +
+  theme_bw()
+
+ggplot(SolFitsAllPigmentTurnerDaySmall, aes(AllmeanJVPSII_ETRtauav_FoSig_cell_day1019, deltaOD_Lmu_corr)) +
+  geom_point(aes(x=AllmeanJVPSII_ETRtauav_FoSig_cell_day1019, y=deltaOD_Lmu_corr, colour=as.factor(Par_ue)), alpha = 0.9, size = 3.5, show.legend = T) +
+  geom_point(aes(x=JVPSII_ETRtauav_FoSig_cell_day1019, y=deltaOD_Lmu_corr, colour=as.factor(Par_ue)), alpha = 0.9, size = 1, show.legend = F) +
+  geom_line(aes(JVPSII_ETRtauav_FoSig_cell_day1019, .fitted), show.legend = F, GRCplatt_JVPSII_ETRtauav_FoSig) +
+  #scale_x_continuous(label=scientific_10) +
+  scale_colour_manual(values = c("darkslategray", "lightblue4", "hotpink4", "indianred3", "goldenrod2", "khaki2"), name="", labels = lab2, breaks=c('30', "90", "180", "300","600" , "900")) +
+  scale_shape_manual(values = c(15, 16, 17, 18), name="", labels = lab1) +
+  #labs(y = "Logistic growth rate " ~ "("~h^-1~")", x = "Photon dose ( µmol photons "~m^-2~""~d^-1~")") +
+  ggh4x::facet_nested(rows = vars(Strain), labeller = label_parsed) +
+  theme_bw()
+
+ggplot(SolFitsAllPigmentTurnerDaySmall, aes(AllmeanJVPSII_ETRqpOxbo_FoSig_cell_day1019, deltaOD_Lmu_corr)) +
+  geom_point(aes(x=AllmeanJVPSII_ETRqpOxbo_FoSig_cell_day1019, y=deltaOD_Lmu_corr, colour=as.factor(Par_ue)), alpha = 0.9, size = 3.5, show.legend = T) +
+  geom_point(aes(x=JVPSII_ETRqpOxbo_FoSig_cell_day1019, y=deltaOD_Lmu_corr, colour=as.factor(Par_ue)), alpha = 0.9, size = 1, show.legend = F) +
+  geom_line(aes(JVPSII_ETRqpOxbo_FoSig_cell_day1019, .fitted), show.legend = F, GRCplatt_JVPSII_ETRqpOxbo_FoSig) +
+  #scale_x_continuous(label=scientific_10) +
+  scale_colour_manual(values = c("darkslategray", "lightblue4", "hotpink4", "indianred3", "goldenrod2", "khaki2"), name="", labels = lab2, breaks=c('30', "90", "180", "300","600" , "900")) +
+  scale_shape_manual(values = c(15, 16, 17, 18), name="", labels = lab1) +
+  #labs(y = "Logistic growth rate " ~ "("~h^-1~")", x = "Photon dose ( µmol photons "~m^-2~""~d^-1~")") +
+  ggh4x::facet_nested(rows = vars(Strain), labeller = label_parsed) +
+  theme_bw()
+
+ggplot(SolFitsAllPigmentTurnerDaySmall, aes(AllmeanJVPSII_ETRtauav_aLHII_Sig_cell_day1019, deltaOD_Lmu_corr)) +
+  geom_point(aes(x=AllmeanJVPSII_ETRtauav_aLHII_Sig_cell_day1019, y=deltaOD_Lmu_corr, colour=as.factor(Par_ue)), alpha = 0.9, size = 3.5, show.legend = T) +
+  geom_point(aes(x=JVPSII_ETRtauav_aLHII_Sig_cell_day1019, y=deltaOD_Lmu_corr, colour=as.factor(Par_ue)), alpha = 0.9, size = 1, show.legend = F) +
+  geom_line(aes(JVPSII_ETRtauav_aLHII_Sig_cell_day1019, .fitted), show.legend = F, GRCplatt_JVPSII_ETRtauav_aLHII_Sig) +
+  #scale_x_continuous(label=scientific_10) +
+  scale_colour_manual(values = c("darkslategray", "lightblue4", "hotpink4", "indianred3", "goldenrod2", "khaki2"), name="", labels = lab2, breaks=c('30', "90", "180", "300","600" , "900")) +
+  scale_shape_manual(values = c(15, 16, 17, 18), name="", labels = lab1) +
+  #labs(y = "Logistic growth rate " ~ "("~h^-1~")", x = "Photon dose ( µmol photons "~m^-2~""~d^-1~")") +
+  ggh4x::facet_nested(rows = vars(Strain), labeller = label_parsed) +
+  theme_bw()
+
+ggplot(SolFitsAllPigmentTurnerDaySmall, aes(AllmeanJVPSII_ETRqpOxbo_aLHII_Sig_cell_day1019, deltaOD_Lmu_corr)) +
+  geom_point(aes(x=AllmeanJVPSII_ETRqpOxbo_aLHII_Sig_cell_day1019, y=deltaOD_Lmu_corr, colour=as.factor(Par_ue)), alpha = 0.9, size = 3.5, show.legend = T) +
+  geom_point(aes(x=JVPSII_ETRqpOxbo_aLHII_Sig_cell_day1019, y=deltaOD_Lmu_corr, colour=as.factor(Par_ue)), alpha = 0.9, size = 1, show.legend = F) +
+  geom_line(aes(JVPSII_ETRqpOxbo_aLHII_Sig_cell_day1019, .fitted), show.legend = F, GRCplatt_JVPSII_ETRqpOxbo_aLHII_Sig) +
+  #scale_x_continuous(label=scientific_10) +
+  scale_colour_manual(values = c("darkslategray", "lightblue4", "hotpink4", "indianred3", "goldenrod2", "khaki2"), name="", labels = lab2, breaks=c('30', "90", "180", "300","600" , "900")) +
+  scale_shape_manual(values = c(15, 16, 17, 18), name="", labels = lab1) +
+  #labs(y = "Logistic growth rate " ~ "("~h^-1~")", x = "Photon dose ( µmol photons "~m^-2~""~d^-1~")") +
+  ggh4x::facet_nested(rows = vars(Strain), labeller = label_parsed) +
+  theme_bw()
+
+```
+
+# Added a Starting Point (SP) at 0 
+
+```{r added starting point}
+gs4_deauth()
+# this is the URL or ID of a Sheet readable by anyone (with a link)
+StartingPointsJVPSII <- read_sheet("https://docs.google.com/spreadsheets/d/1GnGMT-DT_n0Z1wZPWY9suwyY3T5ZPn-dISjcIjpvzFU/edit#gid=0") 
+
+SolFitsAllPigmentTurnerDaySmallSP<-SolFitsAllPigmentTurnerDaySmall %>% 
+  dplyr::select(c(Strain, Par_ue, Photoperiod, O2, WL, deltaOD_Lmu_se, deltaOD_Lmu_corr, facetsStrain, JVPSII_aLHIIOxbomax_cell_day1019, AllmeanJVPSII_aLHIIOxbomax_cell_day1019, JVPSII_ETRtauav_FoSig_cell_day1019, AllmeanJVPSII_ETRtauav_FoSig_cell_day1019, JVPSII_ETRqpOxbo_FoSig_cell_day1019, AllmeanJVPSII_ETRqpOxbo_FoSig_cell_day1019, JVPSII_ETRtauav_aLHII_Sig_cell_day1019, AllmeanJVPSII_ETRtauav_aLHII_Sig_cell_day1019, JVPSII_ETRqpOxbo_aLHII_Sig_cell_day1019, AllmeanJVPSII_ETRqpOxbo_aLHII_Sig_cell_day1019)) 
+
+MCGrowthJVPSIISP<-rbind(SolFitsAllPigmentTurnerDaySmallSP, StartingPointsJVPSII)
+  
+MCGrowthJVPSIISP<-MCGrowthJVPSIISP %>% 
+  unique() %>% 
+  drop_na(deltaOD_Lmu_corr)
+
+```
+
+
+# Estimated Harrison & Platt, 1986 fit - for all uE and each uE separately
+
+```{r platt fit}
+#Harrison & Platt, 1986
+grcplatt <- function(I, a, b, Pmax){Pmax * (1-exp(-a*I/Pmax)) * exp(-b*I/Pmax)}
+
+MCGrowthJVPSIIAllFit <- MCGrowthJVPSIISP %>% 
+  nest(data = -c("Strain", "facetsStrain")) %>%  
+  mutate(GRCplatt_Model = map(data, ~nlsLM(deltaOD_Lmu_corr ~ grcplatt(I = JVPSII_ETRqpOxbo_FoSig_cell_day1019, a, b, Pmax), data = .x, start = list(a =0.01/1, b = 1/5, Pmax = 5), lower = c(0, 0, 0)))) %>%  
+  mutate(GRCplatt_Param = map(GRCplatt_Model, tidy),          
+         GRCplatt_Predict = map(GRCplatt_Model, possibly(augment)),          
+         GRCplatt_Glance = map(GRCplatt_Model, possibly(glance)))
+GRCplatt_PredictGrowthJVPSIIAll <- MCGrowthJVPSIIAllFit %>% 
+  unnest(GRCplatt_Predict)%>% 
+  unnest(GRCplatt_Param)
+
+
+MCGrowthJVPSII30Fit <- MCGrowthJVPSIISP %>% 
+  filter(Par_ue ==30) %>% 
+  nest(data = -c("Strain", "facetsStrain")) %>%  
+  mutate(GRCplatt_Model = map(data, ~nlsLM(deltaOD_Lmu_corr ~ grcplatt(I = JVPSII_ETRqpOxbo_FoSig_cell_day1019, a, b, Pmax), data = .x, start = list(a =0.01/1, b = 1/5, Pmax = 5), lower = c(0, 0, 0)))) %>%    
+  mutate(GRCplatt_Param = map(GRCplatt_Model, tidy),          
+         GRCplatt_Predict = map(GRCplatt_Model, possibly(augment)),          
+         GRCplatt_Glance = map(GRCplatt_Model, possibly(glance)))
+GRCplatt_PredictGrowthJVPSII30 <- MCGrowthJVPSII30Fit %>% 
+  unnest(GRCplatt_Predict)%>% 
+  unnest(GRCplatt_Param)
+
+
+MCGrowthJVPSII90Fit <- MCGrowthJVPSIISP %>% 
+  filter(Par_ue ==90) %>%  
+  nest(data = -c("Strain", "facetsStrain")) %>% 
+  mutate(GRCplatt_Model = map(data, ~nlsLM(deltaOD_Lmu_corr ~ grcplatt(I = JVPSII_ETRqpOxbo_FoSig_cell_day1019, a, b, Pmax), data = .x, start = list(a =0.01/1, b = 1/5, Pmax = 5), lower = c(0, 0, 0)))) %>%      
+  mutate(GRCplatt_Param = map(GRCplatt_Model, tidy),          
+         GRCplatt_Predict = map(GRCplatt_Model, possibly(augment)),          
+         GRCplatt_Glance = map(GRCplatt_Model, possibly(glance)))
+GRCplatt_PredictGrowthJVPSII90 <- MCGrowthJVPSII90Fit %>% 
+  unnest(GRCplatt_Predict)%>% 
+  unnest(GRCplatt_Param)
+
+
+MCGrowthJVPSII180Fit <- MCGrowthJVPSIISP %>% 
+  filter(Par_ue ==180) %>%  
+  nest(data = -c("Strain", "facetsStrain")) %>%  
+  mutate(GRCplatt_Model = map(data, ~nlsLM(deltaOD_Lmu_corr ~ grcplatt(I = JVPSII_ETRqpOxbo_FoSig_cell_day1019, a, b, Pmax), data = .x, start = list(a =0.01/1, b = 1/5, Pmax = 5), lower = c(0, 0, 0)))) %>%    
+  mutate(GRCplatt_Param = map(GRCplatt_Model, tidy),          
+         GRCplatt_Predict = map(GRCplatt_Model, possibly(augment)),          
+         GRCplatt_Glance = map(GRCplatt_Model, possibly(glance)))
+GRCplatt_PredictGrowthJVPSII180 <- MCGrowthJVPSII180Fit %>% 
+  unnest(GRCplatt_Predict)%>% 
+  unnest(GRCplatt_Param)
+
+
+MCGrowthJVPSII300Fit <- MCGrowthJVPSIISP %>% 
+  filter(Par_ue ==300) %>% 
+  nest(data = -c("Strain", "facetsStrain")) %>%  
+  mutate(GRCplatt_Model = map(data, ~nlsLM(deltaOD_Lmu_corr ~ grcplatt(I = JVPSII_ETRqpOxbo_FoSig_cell_day1019, a, b, Pmax), data = .x, start = list(a =0.01/1, b = 1/5, Pmax = 5), lower = c(0, 0, 0)))) %>%     
+  mutate(GRCplatt_Param = map(GRCplatt_Model, tidy),          
+         GRCplatt_Predict = map(GRCplatt_Model, possibly(augment)),          
+         GRCplatt_Glance = map(GRCplatt_Model, possibly(glance)))
+GRCplatt_PredictGrowthJVPSII300 <- MCGrowthJVPSII300Fit %>% 
+  unnest(GRCplatt_Predict)%>% 
+  unnest(GRCplatt_Param)
+
+
+# MCGrowthSP600Fit <- MCGrowthSP %>%
+#   filter(Par_ue ==600) %>%
+#   nest(data = -c("Strain", "facetsStrain")) %>%
+#   mutate(GRCplatt_Model = map(data, ~nlsLM(deltaOD_Lmu_corr ~ grcplatt(I = PARPhotonDose_day, a, b, Pmax),
+#          data = .x,start = list(a = 0.1/2e7, b = 0.01/2e7, Pmax = 0.2),lower = c(0, 0, 0)))) %>%
+#   mutate(GRCplatt_Param = map(GRCplatt_Model, tidy),
+#          GRCplatt_Predict = map(GRCplatt_Model, possibly(augment)),
+#          GRCplatt_Glance = map(GRCplatt_Model, possibly(glance)))
+# GRCplatt_PredictGrowth600 <- MCGrowthSP600Fit %>%
+#   unnest(GRCplatt_Predict)%>%
+#   unnest(GRCplatt_Param)
+
+
+MCGrowthJVPSII900Fit <- MCGrowthJVPSIISP %>% 
+  filter(Par_ue ==900 | Par_ue == 600) %>% 
+  nest(data = -c("Strain", "facetsStrain")) %>%  
+  mutate(GRCplatt_Model = map(data, ~nlsLM(deltaOD_Lmu_corr ~ grcplatt(I = JVPSII_ETRqpOxbo_FoSig_cell_day1019, a, b, Pmax), data = .x, start = list(a =0.01/1, b = 1/5, Pmax = 5), lower = c(0, 0, 0)))) %>%      
+  mutate(GRCplatt_Param = map(GRCplatt_Model, tidy),          
+         GRCplatt_Predict = map(GRCplatt_Model, possibly(augment)),          
+         GRCplatt_Glance = map(GRCplatt_Model, possibly(glance)))
+GRCplatt_PredictGrowthJVPSII900 <- MCGrowthJVPSII900Fit %>% 
+  unnest(GRCplatt_Predict) %>% 
+  unnest(GRCplatt_Param)
+
+rm(MCGrowthJVPSIIAllFit, MCGrowthJVPSII30Fit, MCGrowthJVPSII90Fit, MCGrowthJVPSII180Fit, MCGrowthJVPSII300Fit, MCGrowthJVPSII900Fit)
+```
+
+# Preliminary plot
+
+```{r fig.height = 8, fig.width = 8, warning = FALSE}
+lab1=c(expression("8 h"), expression("12 h"), expression("16 h"), expression("24 h"))
+lab2=c(expression("30 µE"), expression("90 µE"), expression("180 µE"), expression("300 µE"), expression("600 µE"), expression("900 µE"))
+lab4=c(expression(""), expression(""), expression(""), expression(""))
+scientific_10 <- function(x) {   parse(text=gsub("e\\+*", " %*% 10^", scales::scientific_format()(x))) }
+
+
+ggplot(MCGrowthJVPSIISP, aes(AllmeanJVPSII_ETRqpOxbo_FoSig_cell_day1019, deltaOD_Lmu_corr)) +
+  geom_point(aes(AllmeanJVPSII_ETRqpOxbo_FoSig_cell_day1019, deltaOD_Lmu_corr, colour = as.factor(Par_ue)), alpha = 0.8, size = 3.5, show.legend = T) +
+  geom_point(aes(JVPSII_ETRqpOxbo_FoSig_cell_day1019, deltaOD_Lmu_corr, colour = as.factor(Par_ue)), alpha = 0.8, size = 1, show.legend = F) +
+  
+  # geom_errorbar(aes(x = JVPSII_ETRtauav_aLHII_Sig_cell_day1019, ymin = deltaOD_Lmu_corr - deltaOD_Lmu_se, ymax = deltaOD_Lmu_corr + deltaOD_Lmu_se, colour = as.factor(Par_ue)), width=0, size=0.3, data = . %>% filter(deltaOD_Lmu_se<8.057558e-03), show.legend = F) +
+  geom_line(aes(JVPSII_ETRqpOxbo_FoSig_cell_day1019, .fitted), colour = "blue", size = 0.3, linetype = "solid", show.legend = F, GRCplatt_PredictGrowthJVPSIIAll) +
+  geom_line(aes(JVPSII_ETRqpOxbo_FoSig_cell_day1019, .fitted), colour = "darkslategray", linetype = "dashed", show.legend = F, GRCplatt_PredictGrowthJVPSII30) +
+  geom_line(aes(JVPSII_ETRqpOxbo_FoSig_cell_day1019, .fitted), colour = "lightblue4", linetype = "dashed", show.legend = F, GRCplatt_PredictGrowthJVPSII90) +
+  geom_line(aes(JVPSII_ETRqpOxbo_FoSig_cell_day1019, .fitted), colour = "hotpink4", linetype = "dashed", show.legend = F, GRCplatt_PredictGrowthJVPSII180) +
+  geom_line(aes(JVPSII_ETRqpOxbo_FoSig_cell_day1019, .fitted), colour = "indianred3", linetype = "dashed", show.legend = F, GRCplatt_PredictGrowthJVPSII300) +
+  geom_line(aes(JVPSII_ETRqpOxbo_FoSig_cell_day1019, .fitted), colour = "goldenrod2", linetype = "dashed", show.legend = F, GRCplatt_PredictGrowthJVPSII900) +
+  scale_x_continuous(label=scientific_10) +
+  scale_colour_manual(values = c("darkslategray", "lightblue4", "hotpink4", "indianred3", "goldenrod2", "khaki2"), name="", labels = lab2, breaks=c('30', "90", "180", "300", "600","900")) +
+  scale_shape_manual(values = c(15, 16, 17, 18), name="", labels = lab1) +
+  #labs(y = "Logistic growth rate " ~ "("~d^-1~")", x = "Photon dose ( µmol photons "~m^-2~""~d^-1~")") +
+  labs(y = "Chlorophyll specific exponential growth rate " ~ "("~d^-1~")") +
+  ggh4x::facet_nested(rows = vars(facetsStrain, Strain), labeller = label_parsed) +
+  theme_bw() +
+  theme(panel.grid.minor = element_blank(),
+        panel.grid.major = element_blank(),
+        axis.text = element_text(size=12),
+        axis.title = element_text(size=16),
+        strip.background = element_rect(fill="white"),
+        strip.text = element_text(size=12),
+        axis.title.y = element_text(margin=margin(r=10)),
+        axis.title.x = element_text(margin=margin(t=10)),
+        legend.background = element_rect(fill="white"),
+        legend.position = c(0.90,0.92),
+        legend.key.height= unit(0.003, 'cm'),
+        legend.spacing.y = unit(-0.1, "cm"),
+        legend.spacing.x = unit(-0.1, 'cm'),
+        legend.title = element_blank(),
+        legend.text = element_text(size=11))
+```
+
+# Save plot 
+
+```{r save plot}
+ggsave(file = file.path(FigPath, paste("Fig_GrowthRate_JVPSII",".png",sep = "")), height=9, width= 7,  dpi = 300, limitsize = TRUE)
+```
+
+
+# Save Rds for further analysis
+
+```{r save rds}
+saveRDS(SolFitsAllPigmentTurnerDaySmall, file.path(DataOut, paste(Project, "Processed_GrowthJVPSII.Rds", sep = "_"), fsep = .Platform$file.sep), ascii = FALSE, version = NULL, compress = "xz", refhook = NULL)
+```
+
+```{r}
+colnames(SolFitsAllPigmentTurnerDaySmall)
+```
+
+
+
+
+6.02 x 10^23 electrons per mole
+
+6.02*10e23 = 6.02e+24
+6.02e+24/1000000 = 6.02e+18 ->umol e
+
+
+
+# Save assembled spectra data set
+```{r save Olis}
+
+saveRDS(SolFitsAllPigmentTurnerDay, file.path(DataOut, paste(Project, "Processed_GrowthRateSolisense.Rds", sep = "_"), fsep = .Platform$file.sep))
+
+```
+
+# Variable names used in Data Dictionary
+
+```{r}
+# colnames(SolFitsAllPigmentTurnerDay)
+```
+
+
+
+
+Set up R codes for Greek letters
+
+\u0391  Α   Greek Capital Letter Alpha
+\u0392  Β   Greek Capital Letter Beta
+\u0393  Γ   Greek Capital Letter Gamma
+\u0394  Δ   Greek Capital Letter Delta
+\u0395  Ε   Greek Capital Letter Epsilon
+\u0396  Ζ   Greek Capital Letter Zeta
+\u0397  Η   Greek Capital Letter Eta
+\u0398  Θ   Greek Capital Letter Theta
+\u0399  Ι   Greek Capital Letter Iota
+\u039A  Κ   Greek Capital Letter Kappa
+\u039B  Λ   Greek Capital Letter Lambda
+\u039C  Μ   Greek Capital Letter Mu
+\u039D  Ν   Greek Capital Letter Nu
+\u039E  Ξ   Greek Capital Letter Xi
+\u039F  Ο   Greek Capital Letter Omicron
+\u03A0  Π   Greek Capital Letter Pi
+\u03A1  Ρ   Greek Capital Letter Rho
+\u03A3  Σ   Greek Capital Letter Sigma
+\u03A4  Τ   Greek Capital Letter Tau
+\u03A5  Υ   Greek Capital Letter Upsilon
+\u03A6  Φ   Greek Capital Letter Phi
+\u03A7  Χ   Greek Capital Letter Chi
+\u03A8  Ψ   Greek Capital Letter Psi
+\u03A9  Ω   Greek Capital Letter Omega
+\u03B1  α   Greek Small Letter alpha
+\u03B2  β   Greek Small Letter beta
+\u03B3  γ   Greek Small Letter gamma
+\u03B4  δ   Greek Small Letter delta
+\u03B5  ε   Greek Small Letter epsilon
+\u03B6  ζ   Greek Small Letter zeta
+\u03B7  η   Greek Small Letter eta
+\u03B8  θ   Greek Small Letter theta
+\u03B9  ι   Greek Small Letter iota
+\u03BA  κ   Greek Small Letter kappa
+\u03BB  λ   Greek Small Letter lambda
+\u03BC  μ   Greek Small Letter mu
+\u03BD  ν   Greek Small Letter nu
+\u03BE  ξ   Greek Small Letter xi
+\u03BF  ο   Greek Small Letter omicron
+\u03C0  π   Greek Small Letter pi
+\u03C1  ρ   Greek Small Letter rho
+\u03C2  ς   Greek Small Letter final sigma
+\u03C3  σ   Greek Small Letter sigma
+\u03C4  τ   Greek Small Letter tau
+\u03C5  υ   Greek Small Letter upsilon
+\u03C6  φ   Greek Small Letter phi
+\u03C7  χ   Greek Small Letter chi
+\u03C8  ψ   Greek Small Letter psi
+\u03C9  ω   Greek Small Letter omega
+
+
+
+
+
