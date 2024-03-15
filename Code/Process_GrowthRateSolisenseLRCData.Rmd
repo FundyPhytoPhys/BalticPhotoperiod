@@ -948,16 +948,16 @@ scientific_10 <- function(x) {   parse(text=gsub("e\\+*", " %*% 10^", scales::sc
 
 MCGrowthJVPSIISP %>% 
 ggplot() +
-  geom_point(aes(JVPSII_Par_ue_cell_day, deltaOD_Lmu_corr, colour = as.factor(Par_ue), shape = as.factor(Photoperiod)), alpha = 0.8, size = 3.5, show.legend = T) +
-  geom_line(aes(JVPSII_Par_ue_cell_day, .fitted), colour = "blue", size = 0.3, linetype = "solid", show.legend = F, GRCplatt_PredictGrowthJVPSIIAll) +
+  geom_point(aes(JVPSII_Par_ue_cell_day*1e19, deltaOD_Lmu_corr, colour = as.factor(Par_ue), shape = as.factor(Photoperiod)), alpha = 0.8, size = 3.5, show.legend = T) +
+  geom_line(aes(JVPSII_Par_ue_cell_day*1e19, .fitted), colour = "blue", size = 0.3, linetype = "solid", show.legend = F, GRCplatt_PredictGrowthJVPSIIAll) +
   
-  geom_line(aes(JVPSII_Par_ue_cell_day, .fitted), colour = "darkslategray", linetype = "dashed", show.legend = F, GRCplatt_PredictGrowth30_BA127) +
-  geom_line(aes(JVPSII_Par_ue_cell_day, .fitted), colour = "darkslategray", linetype = "dashed", show.legend = F, GRCplatt_PredictGrowth30_BA77) +
-  geom_line(aes(JVPSII_Par_ue_cell_day, .fitted), colour = "darkslategray", linetype = "dashed", show.legend = F, GRCplatt_PredictGrowth30_BA56) +
-  geom_line(aes(JVPSII_Par_ue_cell_day, .fitted), colour = "lightblue4", linetype = "dashed", show.legend = F, GRCplatt_PredictGrowth90_BA56) +
+  geom_line(aes(JVPSII_Par_ue_cell_day*1e19, .fitted), colour = "darkslategray", linetype = "dashed", show.legend = F, GRCplatt_PredictGrowth30_BA127) +
+  geom_line(aes(JVPSII_Par_ue_cell_day*1e19, .fitted), colour = "darkslategray", linetype = "dashed", show.legend = F, GRCplatt_PredictGrowth30_BA77) +
+  geom_line(aes(JVPSII_Par_ue_cell_day*1e19, .fitted), colour = "darkslategray", linetype = "dashed", show.legend = F, GRCplatt_PredictGrowth30_BA56) +
+  geom_line(aes(JVPSII_Par_ue_cell_day*1e19, .fitted), colour = "lightblue4", linetype = "dashed", show.legend = F, GRCplatt_PredictGrowth90_BA56) +
   # geom_line(aes(JVPSII_Par_ue_cell_day, .fitted), colour = "hotpink4", linetype = "dashed", show.legend = F, GRCplatt_PredictGrowthJVPSII180) +
   # geom_line(aes(JVPSII_Par_ue_cell_day, .fitted), colour = "indianred3", linetype = "dashed", show.legend = F, GRCplatt_PredictGrowthJVPSII300) +
-  geom_line(aes(JVPSII_Par_ue_cell_day, .fitted), colour = "goldenrod2", linetype = "dashed", show.legend = F, GRCplatt_PredictGrowth900_BA127) +
+  geom_line(aes(JVPSII_Par_ue_cell_day*1e19, .fitted), colour = "goldenrod2", linetype = "dashed", show.legend = F, GRCplatt_PredictGrowth900_BA127) +
   scale_x_continuous(label=scientific_10) +
   scale_colour_manual(values = c("darkslategray", "lightblue4", "hotpink4", "indianred3", "goldenrod2", "khaki2"), name="", labels = lab2, breaks=c('30', "90", "180", "300", "600","900")) +
   scale_shape_manual(values = c(15, 16, 17, 18), name="", labels = lab1) +
@@ -996,13 +996,13 @@ scientific_10 <- function(x) {   parse(text=gsub("e\\+*", " %*% 10^", scales::sc
 
 MCGrowthJVPSIISP %>% 
 ggplot() +
-  geom_point(aes(JVPSII_Par_ue_cell_day, deltaOD_Lmu_corr, colour = as.factor(Par_ue), shape = as.factor(Photoperiod)), alpha = 0.8, size = 3.5, show.legend = T) +
-  geom_line(aes(JVPSII_Par_ue_cell_day, .fitted), colour = "blue", size = 0.3, linetype = "solid", show.legend = F, GRCplatt_PredictGrowthJVPSIIAll) +
-  geom_line(aes(JVPSII_Par_ue_cell_day, .fitted), colour = "darkslategray", linetype = "dashed", show.legend = F, GRCplatt_PredictGrowthJVPSII30) +
-  geom_line(aes(JVPSII_Par_ue_cell_day, .fitted), colour = "lightblue4", linetype = "dashed", show.legend = F, GRCplatt_PredictGrowthJVPSII90) +
-  geom_line(aes(JVPSII_Par_ue_cell_day, .fitted), colour = "hotpink4", linetype = "dashed", show.legend = F, GRCplatt_PredictGrowthJVPSII180) +
-  geom_line(aes(JVPSII_Par_ue_cell_day, .fitted), colour = "indianred3", linetype = "dashed", show.legend = F, GRCplatt_PredictGrowthJVPSII300) +
-  geom_line(aes(JVPSII_Par_ue_cell_day, .fitted), colour = "goldenrod2", linetype = "dashed", show.legend = F, GRCplatt_PredictGrowthJVPSII900) +
+  geom_point(aes(JVPSII_Par_ue_cell_day*1e19, deltaOD_Lmu_corr, colour = as.factor(Par_ue), shape = as.factor(Photoperiod)), alpha = 0.8, size = 3.5, show.legend = T) +
+  geom_line(aes(JVPSII_Par_ue_cell_day*1e19, .fitted), colour = "blue", size = 0.3, linetype = "solid", show.legend = F, GRCplatt_PredictGrowthJVPSIIAll) +
+  geom_line(aes(JVPSII_Par_ue_cell_day*1e19, .fitted), colour = "darkslategray", linetype = "dashed", show.legend = F, GRCplatt_PredictGrowthJVPSII30) +
+  geom_line(aes(JVPSII_Par_ue_cell_day*1e19, .fitted), colour = "lightblue4", linetype = "dashed", show.legend = F, GRCplatt_PredictGrowthJVPSII90) +
+  geom_line(aes(JVPSII_Par_ue_cell_day*1e19, .fitted), colour = "hotpink4", linetype = "dashed", show.legend = F, GRCplatt_PredictGrowthJVPSII180) +
+  geom_line(aes(JVPSII_Par_ue_cell_day*1e19, .fitted), colour = "indianred3", linetype = "dashed", show.legend = F, GRCplatt_PredictGrowthJVPSII300) +
+  geom_line(aes(JVPSII_Par_ue_cell_day*1e19, .fitted), colour = "goldenrod2", linetype = "dashed", show.legend = F, GRCplatt_PredictGrowthJVPSII900) +
   scale_x_continuous(label=scientific_10) +
   scale_colour_manual(values = c("darkslategray", "lightblue4", "hotpink4", "indianred3", "goldenrod2", "khaki2"), name="", labels = lab2, breaks=c('30', "90", "180", "300", "600","900")) +
   scale_shape_manual(values = c(15, 16, 17, 18), name="", labels = lab1) +
@@ -1056,13 +1056,13 @@ GRCplatt_PredictGrowth8_BA127<-GRCplatt_PredictGrowthJVPSII8 %>%
 ```{r fig.height = 8, fig.width = 8, warning = FALSE, warning = FALSE}
 MCGrowthJVPSIISP %>% 
 ggplot() +
-  geom_point(aes(JVPSII_Par_ue_cell_day, deltaOD_Lmu_corr, colour = as.factor(Par_ue), shape = as.factor(Photoperiod)), alpha = 0.8, size = 3.5, show.legend = T) +
-  geom_line(aes(JVPSII_Par_ue_cell_day, .fitted), colour = "blue", size = 0.3, linetype = "solid", show.legend = F, GRCplatt_PredictGrowthJVPSIIAll) +
+  geom_point(aes(JVPSII_Par_ue_cell_day*1e19, deltaOD_Lmu_corr, colour = as.factor(Par_ue), shape = as.factor(Photoperiod)), alpha = 0.8, size = 3.5, show.legend = T) +
+  geom_line(aes(JVPSII_Par_ue_cell_day*1e19, .fitted), colour = "blue", size = 0.3, linetype = "solid", show.legend = F, GRCplatt_PredictGrowthJVPSIIAll) +
   
-  geom_line(aes(JVPSII_Par_ue_cell_day, .fitted), colour = "black", linetype = "dotted", show.legend = F, GRCplatt_PredictGrowth8_BA127) +
-  geom_line(aes(JVPSII_Par_ue_cell_day, .fitted), colour = "black", linetype = "dotted", show.legend = F, GRCplatt_PredictGrowth8_BA77) +
-  geom_line(aes(JVPSII_Par_ue_cell_day, .fitted), colour = "black", linetype = "dotted", show.legend = F, GRCplatt_PredictGrowth8_BA56) +
-  geom_line(aes(JVPSII_Par_ue_cell_day, .fitted), colour = "black", linetype = "longdash", show.legend = F,  GRCplatt_PredictGrowth12_BA56) +
+  geom_line(aes(JVPSII_Par_ue_cell_day*1e19, .fitted), colour = "black", linetype = "dotted", show.legend = F, GRCplatt_PredictGrowth8_BA127) +
+  geom_line(aes(JVPSII_Par_ue_cell_day*1e19, .fitted), colour = "black", linetype = "dotted", show.legend = F, GRCplatt_PredictGrowth8_BA77) +
+  geom_line(aes(JVPSII_Par_ue_cell_day*1e19, .fitted), colour = "black", linetype = "dotted", show.legend = F, GRCplatt_PredictGrowth8_BA56) +
+  geom_line(aes(JVPSII_Par_ue_cell_day*1e19, .fitted), colour = "black", linetype = "longdash", show.legend = F,  GRCplatt_PredictGrowth12_BA56) +
 
   scale_x_continuous(label=scientific_10) +
   scale_colour_manual(values = c("darkslategray", "lightblue4", "hotpink4", "indianred3", "goldenrod2", "khaki2"), name="", labels = lab2, breaks=c('30', "90", "180", "300", "600","900")) +
@@ -1093,14 +1093,75 @@ ggsave(file = file.path(FigPath, paste("Fig_GrowthRate_JVPSII_Photoperiod_stats"
 ```
 
 ```{r fig.height = 8, fig.width = 8, warning = FALSE, warning = FALSE}
+data_text_Anova<- data.frame(facetsStrain = c("Strain"), Strain  = c("PC-rich_056", "PC-rich_077", "PE-rich_048", "PE-rich_127"), label = c('ANOVA, \u03B1 = 0.05'))
+
+data_text_AnovaExp56<- data.frame(facetsStrain = c("Strain"), Strain  = c("PC-rich_056"), label = c('a'))
+data_text_AnovaExp77<- data.frame(facetsStrain = c("Strain"), Strain  = c("PC-rich_077"), label = c("a"))
+data_text_AnovaExp48<- data.frame(facetsStrain = c("Strain"), Strain  = c("PE-rich_048"), label = c("a"))
+data_text_AnovaExp127<- data.frame(facetsStrain = c("Strain"), Strain  = c("PE-rich_127"), label = c("a"))
+
+data_text_AnovaExp56_8<- data.frame(facetsStrain = c("Strain"), Strain  = c("PC-rich_056"), label = c('b'))
+data_text_AnovaExp77_8<- data.frame(facetsStrain = c("Strain"), Strain  = c("PC-rich_077"), label = c("b"))
+data_text_AnovaExp48_8<- data.frame(facetsStrain = c("Strain"), Strain  = c("PE-rich_048"), label = c("a"))
+data_text_AnovaExp127_8<- data.frame(facetsStrain = c("Strain"), Strain  = c("PE-rich_127"), label = c("b"))
+
+data_text_AnovaExp56_12<- data.frame(facetsStrain = c("Strain"), Strain  = c("PC-rich_056"), label = c('b'))
+data_text_AnovaExp77_12<- data.frame(facetsStrain = c("Strain"), Strain  = c("PC-rich_077"), label = c("a"))
+data_text_AnovaExp48_12<- data.frame(facetsStrain = c("Strain"), Strain  = c("PE-rich_048"), label = c("a"))
+data_text_AnovaExp127_12<- data.frame(facetsStrain = c("Strain"), Strain  = c("PE-rich_127"), label = c("a"))
+
+data_text_AnovaExp56_16<- data.frame(facetsStrain = c("Strain"), Strain  = c("PC-rich_056"), label = c('a'))
+data_text_AnovaExp77_16<- data.frame(facetsStrain = c("Strain"), Strain  = c("PC-rich_077"), label = c("a"))
+data_text_AnovaExp48_16<- data.frame(facetsStrain = c("Strain"), Strain  = c("PE-rich_048"), label = c("a"))
+data_text_AnovaExp127_16<- data.frame(facetsStrain = c("Strain"), Strain  = c("PE-rich_127"), label = c("a"))
+
+data_text_AnovaExp56_24<- data.frame(facetsStrain = c("Strain"), Strain  = c("PC-rich_056"), label = c('a'))
+data_text_AnovaExp77_24<- data.frame(facetsStrain = c("Strain"), Strain  = c("PC-rich_077"), label = c("a"))
+data_text_AnovaExp48_24<- data.frame(facetsStrain = c("Strain"), Strain  = c("PE-rich_048"), label = c("a"))
+data_text_AnovaExp127_24<- data.frame(facetsStrain = c("Strain"), Strain  = c("PE-rich_127"), label = c("a"))
+
+
+
 MCGrowthJVPSIISP %>% 
 ggplot() +
-  geom_point(aes(JVPSII_Par_ue_cell_day, deltaOD_Lmu_corr, colour = as.factor(Par_ue), shape = as.factor(Photoperiod)), alpha = 0.8, size = 3.5, show.legend = T) +
-  geom_line(aes(JVPSII_Par_ue_cell_day, .fitted), colour = "blue", size = 0.3, linetype = "solid", show.legend = F, GRCplatt_PredictGrowthJVPSIIAll) +
-  geom_line(aes(JVPSII_Par_ue_cell_day, .fitted), colour = "black", linetype = "dotted", show.legend = F, GRCplatt_PredictGrowthJVPSII8) +
-  geom_line(aes(JVPSII_Par_ue_cell_day, .fitted), colour = "black", linetype = "longdash", show.legend = F,  GRCplatt_PredictGrowthJVPSII12) +
-  geom_line(aes(JVPSII_Par_ue_cell_day, .fitted), colour = "black", linetype = "dashed", show.legend = F,  GRCplatt_PredictGrowthJVPSII16) +
-  geom_line(aes(JVPSII_Par_ue_cell_day, .fitted), colour = "black", linetype = "dotdash", show.legend = F, GRCplatt_PredictGrowthJVPSII24) +
+  geom_point(aes(JVPSII_Par_ue_cell_day*1e19, deltaOD_Lmu_corr, colour = as.factor(Par_ue), shape = as.factor(Photoperiod)), alpha = 0.8, size = 3.5, show.legend = T) +
+  geom_line(aes(JVPSII_Par_ue_cell_day*1e19, .fitted), colour = "blue", size = 0.3, linetype = "solid", show.legend = F, GRCplatt_PredictGrowthJVPSIIAll) +
+  geom_line(aes(JVPSII_Par_ue_cell_day*1e19, .fitted), colour = "black", linetype = "dotted", show.legend = F, GRCplatt_PredictGrowthJVPSII8) +
+  geom_line(aes(JVPSII_Par_ue_cell_day*1e19, .fitted), colour = "black", linetype = "longdash", show.legend = F,  GRCplatt_PredictGrowthJVPSII12) +
+  geom_line(aes(JVPSII_Par_ue_cell_day*1e19, .fitted), colour = "black", linetype = "dashed", show.legend = F,  GRCplatt_PredictGrowthJVPSII16) +
+  geom_line(aes(JVPSII_Par_ue_cell_day*1e19, .fitted), colour = "black", linetype = "dotdash", show.legend = F, GRCplatt_PredictGrowthJVPSII24) +
+
+  geom_text(data=data_text_Anova, aes(x=2.5e19, y=0.1, label=label), colour = "blue", size=4) +
+  
+  geom_text(data=data_text_AnovaExp56, aes(x=3e19, y=1.5, label=label), colour = "blue", size=4) +
+  geom_text(data=data_text_AnovaExp77, aes(x=2.15e19, y=1.3, label=label), colour = "blue", size=4) +
+  geom_text(data=data_text_AnovaExp48, aes(x=1.2e19, y=1.61, label=label), colour = "blue", size=4) +
+  geom_text(data=data_text_AnovaExp127, aes(x=1.45e19, y=1.45, label=label), colour = "blue", size=4) +
+  
+  geom_text(data=data_text_AnovaExp56_8, aes(x=0.14e19, y=0.2, label=label), colour = "blue", size=4) +
+  geom_text(data=data_text_AnovaExp77_8, aes(x=0.3e19, y=0.3, label=label), colour = "blue", size=4) +
+  geom_text(data=data_text_AnovaExp48_8, aes(x=0.1e19, y=0.5, label=label), colour = "blue", size=4) +
+  geom_text(data=data_text_AnovaExp127_8, aes(x=0.3e19, y=0.5, label=label), colour = "blue", size=4) +
+  
+  geom_text(data=data_text_AnovaExp56_12, aes(x=0.55e19, y=1.1, label=label), colour = "blue", size=4) +
+  geom_text(data=data_text_AnovaExp77_12, aes(x=0.5e19, y=0.9, label=label), colour = "blue", size=4) +
+  geom_text(data=data_text_AnovaExp48_12, aes(x=0.2e19, y=1, label=label), colour = "blue", size=4) +
+  geom_text(data=data_text_AnovaExp127_12, aes(x=0.15e19, y=1.0, label=label), colour = "blue", size=4) +
+  
+  geom_text(data=data_text_AnovaExp56_16, aes(x=0.3e19, y=1, label=label), colour = "blue", size=4) +
+  geom_text(data=data_text_AnovaExp77_16, aes(x=0.3e19, y=2.1, label=label), colour = "blue", size=4) +
+  geom_text(data=data_text_AnovaExp48_16, aes(x=0.5e19, y=1.2, label=label), colour = "blue", size=4) +
+  geom_text(data=data_text_AnovaExp127_16, aes(x=0.4e19, y=1.9, label=label), colour = "blue", size=4) +
+  
+  geom_text(data=data_text_AnovaExp56_24, aes(x=1.0e19, y=2.5, label=label), colour = "blue", size=4) +
+  geom_text(data=data_text_AnovaExp77_24, aes(x=1.0e19, y=2.4, label=label), colour = "blue", size=4) +
+  geom_text(data=data_text_AnovaExp48_24, aes(x=0.8e19, y=2.2, label=label), colour = "blue", size=4) +
+  geom_text(data=data_text_AnovaExp127_24, aes(x=1.0e19, y=2.3, label=label), colour = "blue", size=4) +
+  
+  
+  
+  # scale_y_continuous(breaks=seq(0, 4, by = 1)) +
+  # coord_cartesian(ylim = c(-1, 4.5)) +
   scale_x_continuous(label=scientific_10) +
   scale_colour_manual(values = c("darkslategray", "lightblue4", "hotpink4", "indianred3", "goldenrod2", "khaki2"), name="", labels = lab2, breaks=c('30', "90", "180", "300", "600","900")) +
   scale_shape_manual(values = c(15, 16, 17, 18), name="", labels = lab1) +
@@ -1117,12 +1178,13 @@ ggplot() +
         axis.title.y = element_text(margin=margin(r=10)),
         axis.title.x = element_text(margin=margin(t=10)),
         legend.background = element_rect(fill="white"),
-        legend.position = c(0.90,0.88),
+        legend.position = c(0.85,0.88),
         legend.key.height= unit(0.003, 'cm'),
         legend.spacing.y = unit(-0.1, "cm"),
         legend.spacing.x = unit(-0.1, 'cm'),
         legend.title = element_blank(),
         legend.text = element_text(size=11))
+
 ```
 
 # Save plot 
