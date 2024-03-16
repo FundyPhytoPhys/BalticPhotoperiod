@@ -886,6 +886,47 @@ saveRDS(SolFitsAllExpSt, file.path(DataOut, paste(Project, "Processed_SolisenseJ
 
 
 
+-------------------------------------------- LIFT example plot ----------------------------------
+
+# Set Project Variables from new software (NS)
+
+```{r set project variables, read zipped files, list available files, warning = FALSE, echo=FALSE}
+Project <- "BalticPhotoperiod"
+DataIn <- file.path("..", "Data", "RawData", "SolisenseCurveData")
+DataOut <- file.path("..", "Data", "ProcessedData", "ProcessedSolisenseData")
+
+FigPath <- file.path("..", "Output", "Figures")
+FigRdsPath <- file.path("..", "Output", "FiguresRds")
+TableRdsPath <- file.path("..", "Output", "TablesRDS")
+# FileID <- "fit"
+# FileEncode <- "UTF-8"
+# Delimiter <- ","
+# HeaderRows <- 0
+```
+
+# Read Imported Solisense
+
+```{r read locally stored metadata from rds}
+LIFT445_0 <- read.csv(file = file.path("..", "Data", "RawData", "SolisenseCurveData", "PICO_202201051339_SySl1073_445_data_dark.Rds"))
+LIFT445_80 <- read.csv(file = file.path("..", "Data", "RawData", "SolisenseCurveData", "PICO_202201051339_SySl1073_445_data_light80.Rds"))
+LIFT590_0 <- read.csv(file = file.path("..", "Data", "RawData", "SolisenseCurveData", "PICO_202201051438_SySl1073_590_data_dark.Rds"))
+LIFT590_80 <- read.csv(file = file.path("..", "Data", "RawData", "SolisenseCurveData", "PICO_202201051438_SySl1073_590_data_light80.Rds"))
+
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
