@@ -52,7 +52,7 @@ output:
 bibliography:
 - BalticPhotoperiod.bib
 - packages.bib
-csl: "plos-one.csl"
+csl: "limnology-and-oceanography.csl"
 ---
 
 ```{r, import libraries, include = FALSE}
@@ -191,7 +191,7 @@ Keller, B., Vass, I., Matsubara, S., Paul, K., Jedmowski, C., Pieruschka, R., ..
 
 
 ```{r LIFT, fig.cap = LIFT_cap, fig.height = 6, fig.width = 8, echo = FALSE}
-LIFT_cap<- glue("**Single turnover (ST) fluorescence induction techniques employed by the Fast Repetition Rate fluorometry (FRRf).** Examples of fluorescence yield vs. elapsed time (µs) are shown for PE-rich culture of *Synechococcus* sp. (048) in the dark (dark-adapted; 0) and under actinic PAR (in this example actinic PAR was 80 µmol photons m^−2^s^−1^) measured under blue LED (Ex~445nm~) and orange (Ex~590nm~) excitation (A). The ST technique delivers a series of flashlets. The LIFT/FRR instrument enables for non-intrusive, continuous monitoring of chlorophyll fluorescence parameters (including *F*~0~, *F*', *F*~m~, *F*~m~', \u03C3~PSII~, \u03C3~PSII~', \u03C3~PSII~', and \u03C3~PSII~'). Bottom panel showed single light response curve (LRC, estimated with with a three parameter model [@harrisonPhotosynthesisirradianceRelationshipsPolar1986]) for PSII flux (*JV*~PSII~; e^−^L^−1^s^−1^) vs. actinic PAR measured under blue LED (Ex~445nm~) and orange (Ex~590nm~) excitation (B).", .sep = " ")
+LIFT_cap<- glue("**Single turnover (ST) fluorescence induction techniques employed by the Fast Repetition Rate fluorometry (FRRf).** Examples of fluorescence yield vs. elapsed time (µs) are shown for PE-rich culture of *Synechococcus* sp. (048) in the dark (dark-adapted; 0) and under actinic PAR (in this example actinic PAR was 80 µmol photons m^−2^s^−1^) measured under blue LED (Ex~445nm~) or orange (Ex~590nm~) excitation (A). The ST technique delivers a series of flashlets. The LIFT/FRR instrument enables for non-intrusive, continuous monitoring of chlorophyll fluorescence parameters (including *F*~0~, *F*', *F*~m~, *F*~m~', \u03C4~1~-\u03C4~3~, \u03C4~1~'-\u03C4~3~', \u03C3~PSII~, and \u03C3~PSII~'). Bottom panel showed single rapid light curve (RLC), estimated with with a three parameter model [@harrisonPhotosynthesisirradianceRelationshipsPolar1986], for PSII flux (*JV*~PSII~; e^−^L^−1^s^−1^) vs. actinic PAR measured under blue LED (Ex~445nm~) or orange (Ex~590nm~) excitation (B).", .sep = " ")
 knitr::include_graphics(file.path( FiguresFP,"Fig_LIFT_2.png")) 
 ```
 

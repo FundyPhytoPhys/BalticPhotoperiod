@@ -1105,7 +1105,7 @@ PlotA
 # Save plot 
 
 ```{r save plot}
-ggsave(file = file.path(FigPath, paste("Fig_LIFT_1",".png",sep = "")), height=4.5, width= 7,  dpi = 300, limitsize = TRUE)
+#ggsave(file = file.path(FigPath, paste("Fig_LIFT_1",".png",sep = "")), height=4.5, width= 7,  dpi = 300, limitsize = TRUE)
 ```
 
 
@@ -1127,10 +1127,10 @@ PlotB<-SolFitsMetaLRC %>%
   filter(E_days == 7) %>% 
 ggplot() +
   geom_point(aes(ActPARCorr, JVPSII_ETRqpOxbo_FoSig*100), colour = "brown1", alpha = 0.8, size = 2, show.legend = T) +
-  geom_line(aes(ActPARCorr, .fitted*100), colour = "black", linetype = "dotted") +
+  geom_line(aes(ActPARCorr, .fitted*100), colour = "blue", linetype = "solid", size = 0.4) +
   
   geom_text(data=data_textB, aes(x=800, y=450, label=label), size=4.5) +
-  labs(y = ""~italic(JV)~""["PSII"]*" ("~e^-~""~L^-1~""~s^-1~")", x = "Actinic PAR ( µmol photons "~m^-2~""~s^-1~")") +
+  labs(y = ""~italic(JV)~""["PSII"]*" ("~10^18~""~e^-~""~L^-1~""~s^-1~")", x = "Actinic PAR ( µmol photons "~m^-2~""~s^-1~")") +
   
 
   ggh4x::facet_nested(rows = vars(facetsExcitation, Ex_WL), labeller = label_parsed) +
@@ -1155,13 +1155,13 @@ PlotB
 ```{r Final Plot arrange, warning = FALSE, fig.height = 8, fig.width = 8}
 ss<-ggarrange(PlotA,PlotB,
           ncol = 1, nrow = 2) %>% 
-  ggsave(file = file.path(FigPath, paste("Fig_LIFT_2",".png",sep = "")), height=9, width= 7,  dpi = 300, limitsize = TRUE)
+  ggsave(file = file.path(FigPath, paste("Fig_LIFT",".png",sep = "")), height=9, width= 7,  dpi = 300, limitsize = TRUE)
 ```
 
 # Save plot 
 
 ```{r save plot}
-# ggsave(file = file.path(FigPath, paste("Fig_LIFT",".png",sep = "")), height=9, width= 7,  dpi = 300, limitsize = TRUE)
+#ggsave(file = file.path(FigPath, paste("Fig_LIFT",".png",sep = "")), height=9, width= 7,  dpi = 300, limitsize = TRUE)
 ```
 
 
