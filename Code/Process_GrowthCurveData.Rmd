@@ -168,16 +168,17 @@ MultiCultiDataAll %>%
   #filter(Par_ue != 600) %>% 
   filter(Run != 77) %>% 
   ggplot() +
-  geom_area(aes(x = Time_h, y = meanActinic_par_h), size = 0.1, fill = "tan1", alpha = 0.3) +
-  geom_line(aes(x = Time_h, y = meanOD680_h, colour = as.factor(Strain)), size = 0.5, show.legend = T) +
-  geom_vline(data = tMaxAGLines_056, aes(xintercept = tMaxAG), linetype="dotdash", colour = "seagreen4", size=0.4) +
-  geom_vline(data = tMaxAGLines_077, aes(xintercept = tMaxAG), linetype="dotdash", colour = "palegreen3", size=0.4) +
-  geom_vline(data = tMaxAGLines_048, aes(xintercept = tMaxAG), linetype="dotdash", colour = "brown4", size=0.4) +
-  geom_vline(data = tMaxAGLines_127, aes(xintercept = tMaxAG), linetype="dotdash", colour = "brown1", size=0.4) +
+  geom_area(aes(x = Time_h/24, y = meanActinic_par_h), size = 0.1, fill = "tan1", alpha = 0.3) +
+  geom_line(aes(x = Time_h/24, y = meanOD680_h, colour = as.factor(Strain)), size = 0.5, show.legend = T) +
+  geom_vline(data = tMaxAGLines_056, aes(xintercept = tMaxAG/24), linetype="dotdash", colour = "seagreen4", size=0.4) +
+  geom_vline(data = tMaxAGLines_077, aes(xintercept = tMaxAG/24), linetype="dotdash", colour = "palegreen3", size=0.4) +
+  geom_vline(data = tMaxAGLines_048, aes(xintercept = tMaxAG/24), linetype="dotdash", colour = "brown4", size=0.4) +
+  geom_vline(data = tMaxAGLines_127, aes(xintercept = tMaxAG/24), linetype="dotdash", colour = "brown1", size=0.4) +
   scale_colour_discrete(type=c("seagreen4", "palegreen3", "brown1", "brown4"), name="") +
   scale_y_continuous(breaks=seq(0, 1, by = 0.25)) +
-  coord_cartesian(ylim = c(0, 1.0)) +
-  labs(y = "Optical density ("~OD[680]~")", x = "Elapsed time (h)") +
+  scale_x_continuous(breaks=seq(0, 15, by = 3)) +
+  coord_cartesian(ylim = c(0, 1.0), xlim = c(0, 14)) +
+  labs(y = "Optical density ("~OD[680]~")", x = "Elapsed time (d)") +
   ggh4x::facet_nested(cols = vars(facetsPhotoperiod, Photoperiod), rows = vars(facetsPar_ue, Par_ue), labeller = label_parsed) +
   theme_bw() +
   theme(panel.grid.minor = element_blank(),
@@ -208,16 +209,17 @@ MultiCultiDataAll %>%
   #filter(Par_ue != 600) %>% 
   filter(Run != 77) %>% 
   ggplot() +
-  geom_area(aes(x = Time_h, y = meanActinic_par_h), size = 0.1, fill = "tan1", alpha = 0.3) +
-  geom_line(aes(x = Time_h, y = meanOD720_h, colour = as.factor(Strain)), size = 0.5, show.legend = T) +
-  geom_vline(data = tMaxAGLines_056, aes(xintercept = tMaxAG), linetype="dotdash", colour = "seagreen4", size=0.4) +
-  geom_vline(data = tMaxAGLines_077, aes(xintercept = tMaxAG), linetype="dotdash", colour = "palegreen3", size=0.4) +
-  geom_vline(data = tMaxAGLines_048, aes(xintercept = tMaxAG), linetype="dotdash", colour = "brown4", size=0.4) +
-  geom_vline(data = tMaxAGLines_127, aes(xintercept = tMaxAG), linetype="dotdash", colour = "brown1", size=0.4) +
+  geom_area(aes(x = Time_h/24, y = meanActinic_par_h), size = 0.1, fill = "tan1", alpha = 0.3) +
+  geom_line(aes(x = Time_h/24, y = meanOD720_h, colour = as.factor(Strain)), size = 0.5, show.legend = T) +
+  geom_vline(data = tMaxAGLines_056, aes(xintercept = tMaxAG/24), linetype="dotdash", colour = "seagreen4", size=0.4) +
+  geom_vline(data = tMaxAGLines_077, aes(xintercept = tMaxAG/24), linetype="dotdash", colour = "palegreen3", size=0.4) +
+  geom_vline(data = tMaxAGLines_048, aes(xintercept = tMaxAG/24), linetype="dotdash", colour = "brown4", size=0.4) +
+  geom_vline(data = tMaxAGLines_127, aes(xintercept = tMaxAG/24), linetype="dotdash", colour = "brown1", size=0.4) +
   scale_colour_discrete(type=c("seagreen4", "palegreen3", "brown1", "brown4"), name="") +
   scale_y_continuous(breaks=seq(0, 1, by = 0.25)) +
-  coord_cartesian(ylim = c(0, 1.0)) +
-  labs(y = "Optical density ("~OD[720]~")", x = "Elapsed time (h)") +
+  scale_x_continuous(breaks=seq(0, 15, by = 3)) +
+  coord_cartesian(ylim = c(0, 1.0), xlim = c(0, 14)) +
+  labs(y = "Optical density ("~OD[720]~")", x = "Elapsed time (d)") +
   ggh4x::facet_nested(cols = vars(facetsPhotoperiod, Photoperiod), rows = vars(facetsPar_ue, Par_ue), labeller = label_parsed) +
   theme_bw() +
   theme(panel.grid.minor = element_blank(),
@@ -248,18 +250,17 @@ MultiCultiDataAll %>%
   #filter(Par_ue != 600) %>% 
   filter(Run != 77) %>% 
   ggplot() +
-  geom_area(aes(x = Time_h, y = meanActinic_par_h/2), size = 0.1, fill = "tan1", alpha = 0.3) +
-  geom_line(aes(x = Time_h, y = meanDeltaOD_h, colour = as.factor(Strain)), size = 0.5, show.legend = T) +
-  geom_vline(data = tMaxAGLines_056, aes(xintercept = tMaxAG), linetype="dotdash", colour = "seagreen4", size=0.4) +
-  geom_vline(data = tMaxAGLines_077, aes(xintercept = tMaxAG), linetype="dotdash", colour = "palegreen3", size=0.4) +
-  geom_vline(data = tMaxAGLines_048, aes(xintercept = tMaxAG), linetype="dotdash", colour = "brown4", size=0.4) +
-  geom_vline(data = tMaxAGLines_127, aes(xintercept = tMaxAG), linetype="dotdash", colour = "brown1", size=0.4) +
+  geom_area(aes(x = Time_h/24, y = meanActinic_par_h), size = 0.1, fill = "tan1", alpha = 0.3) +
+  geom_line(aes(x = Time_h/24, y = meanDeltaOD_h, colour = as.factor(Strain)), size = 0.5, show.legend = T) +
+  geom_vline(data = tMaxAGLines_056, aes(xintercept = tMaxAG/24), linetype="dotdash", colour = "seagreen4", size=0.4) +
+  geom_vline(data = tMaxAGLines_077, aes(xintercept = tMaxAG/24), linetype="dotdash", colour = "palegreen3", size=0.4) +
+  geom_vline(data = tMaxAGLines_048, aes(xintercept = tMaxAG/24), linetype="dotdash", colour = "brown4", size=0.4) +
+  geom_vline(data = tMaxAGLines_127, aes(xintercept = tMaxAG/24), linetype="dotdash", colour = "brown1", size=0.4) +
   scale_colour_discrete(type=c("seagreen4", "palegreen3", "brown1", "brown4"), name="") +
-  # scale_y_continuous(breaks=seq(0, 1, by = 0.25)) +
-  # coord_cartesian(ylim = c(0, 1.0)) +
-  # labs(y = "Growth curves ( tracked as chlorophyll proxy"~OD[680]~"-"~OD[720]~"(\u0394 OD)", x = "Elapsed time (h)") +
-  # labs(y = "Growth curves (tracked as \u0394 OD)", x = "Elapsed time (h)") +
-  labs(y = "Optical density (chlorophyll proxy"~OD[680]~"-"~OD[720]~")", x = "Elapsed time (h)") +
+  scale_y_continuous(breaks=seq(0, 0.4, by = 0.1)) +
+  scale_x_continuous(breaks=seq(0, 15, by = 3)) +
+  coord_cartesian(ylim = c(0, 0.4), xlim = c(0, 14)) +
+  labs(y = "Optical density (chlorophyll proxy"~OD[680]~"-"~OD[720]~")", x = "Elapsed time (d)") +
   ggh4x::facet_nested(cols = vars(facetsPhotoperiod, Photoperiod), rows = vars(facetsPar_ue, Par_ue), labeller = label_parsed) +
   theme_bw() +
   theme(panel.grid.minor = element_blank(),
@@ -406,7 +407,7 @@ MCGrowthRateFitData <- MCGrowthRateFitData %>%
   rename(time_h=time) 
   
 
-colnames(MCGrowthRateFitData)
+#colnames(MCGrowthRateFitData)
 
 MCGrowthRateFitData <- MCGrowthRateFitData %>%   
   group_by(SampleID, Day, ToD, time_h) %>% 
@@ -606,7 +607,7 @@ MCGrowthRateFitData <- MCGrowthRateFitData %>%
   rename(time_h=time) 
   
 
-colnames(MCGrowthRateFitData)
+#colnames(MCGrowthRateFitData)
 
 MCGrowthRateFitData <- MCGrowthRateFitData %>%   
   group_by(SampleID, Day, ToD, time_h) %>% 
@@ -643,14 +644,15 @@ MCGrowthRateFitData %>%
   filter(Run != 77) %>% 
   ggplot() +
   #geom_area(aes(x = time_h, y = meanActinic_par_h), size = 0.1, fill = "tan1", alpha = 0.6) +
-  geom_line(aes(x = time_h, y = meanDeltaOD_h, colour = as.factor(Strain)), size = 0.4, alpha = 0.5, show.legend = F) +
-  geom_line(aes(x = time_h, y = meanfittedDeltaOD_h, colour = as.factor(Strain)), size = 0.8, alpha = 0.9, show.legend = T) +
+  geom_line(aes(x = time_h/24, y = meanDeltaOD_h, colour = as.factor(Strain)), size = 0.4, alpha = 0.5, show.legend = F) +
+  geom_line(aes(x = time_h/24, y = meanfittedDeltaOD_h, colour = as.factor(Strain)), size = 0.8, alpha = 0.9, show.legend = T) +
   scale_colour_discrete(type=c("seagreen4", "palegreen3", "brown1", "brown4"), name="") +
   # scale_y_continuous(breaks=seq(0, 1, by = 0.25)) +
   # coord_cartesian(ylim = c(0, 1.0)) +
   # labs(y = "Logistic fits of chlorophyll proxy"~OD[680]~"-"~OD[720]~"(\u0394 OD)", x = "Elapsed time (h)") +
-  # labs(y = "Logistic fits of chlorophyll proxy"~OD[680]~"-"~OD[720]~"", x = "Elapsed time (h)") +
-  labs(y = "Optical density (chlorophyll proxy"~OD[680]~"-"~OD[720]~")", x = "Elapsed time (h)") +
+  scale_x_continuous(breaks=seq(0, 15, by = 3)) +
+  coord_cartesian(xlim = c(0, 14)) +
+  labs(y = "Optical density (chlorophyll proxy"~OD[680]~"-"~OD[720]~")", x = "Elapsed time (d)") +
   ggh4x::facet_nested(cols = vars(facetsPhotoperiod, Photoperiod), rows = vars(facetsPar_ue, Par_ue), labeller = label_parsed) +
   theme_bw() +
   theme(panel.grid.minor = element_blank(),
@@ -891,27 +893,29 @@ names(Photoperiod.labs) <- c("12")
 
 MMPlot %>% 
 ggplot() + 
-  geom_line(aes(x=x, y=der*25), df) + 
+  geom_line(aes(x=x/24, y=der*25), df) + 
   #geom_line(aes(x = Time_h, y = meanOD680_h, colour = as.factor(Strain)), alpha = 0.9, size = 1, show.legend = F) +
-  geom_area(aes(x=x, y=par/max(par)*max(spline)),fill="tan1", alpha=0.3, df) +
-  geom_vline(xintercept = 149, linetype = "dotdash", col="brown1", lwd=0.7) + 
-  geom_line(aes(x = time_h, y = meanfittedDeltaOD_h), colour = "blue", size = 0.8, alpha = 0.9, show.legend = F, MCGrowthRateFitData48) +
-  geom_line(aes(x = time_h, y = meanDeltaOD_h, colour = as.factor(Strain)), size = 0.7, alpha = 0.9, show.legend = F, MCGrowthRateFitData48) +
-  geom_line(aes(x = time_h, y = meanOD720_h, colour = as.factor(Strain)), size = 0.7, alpha = 0.9, show.legend = F, MCGrowthRateFitData48) +
-  geom_line(aes(x = time_h, y = meanOD680_h, colour = as.factor(Strain)), size = 0.7, alpha = 0.9, show.legend = F, MCGrowthRateFitData48) +
+  geom_area(aes(x = Time_h/24, y = meanActinic_par_h*5), size = 0.1, fill = "tan1", alpha = 0.3) +
+  #geom_area(aes(x=x/24, y=par/max(par)*max(spline)),fill="tan1", alpha=0.3, df) +
+  geom_vline(xintercept = 149/24, linetype = "dotdash", col="brown1", lwd=0.7) + 
+  geom_line(aes(x = time_h/24, y = meanfittedDeltaOD_h), colour = "blue", size = 0.8, alpha = 0.9, show.legend = F, MCGrowthRateFitData48) +
+  geom_line(aes(x = time_h/24, y = meanDeltaOD_h, colour = as.factor(Strain)), size = 0.7, alpha = 0.9, show.legend = F, MCGrowthRateFitData48) +
+  geom_line(aes(x = time_h/24, y = meanOD720_h, colour = as.factor(Strain)), size = 0.7, alpha = 0.9, show.legend = F, MCGrowthRateFitData48) +
+  geom_line(aes(x = time_h/24, y = meanOD680_h, colour = as.factor(Strain)), size = 0.7, alpha = 0.9, show.legend = F, MCGrowthRateFitData48) +
   
-  geom_text(data=data_textExp, aes(x=72, y=1.0, label=label), size=4.3) +
-  geom_text(data=data_textSt, aes(x=240, y=1.0, label=label), size=4.3) +
+  geom_text(data=data_textExp, aes(x=72/24, y=1.0, label=label), size=4.3) +
+  geom_text(data=data_textSt, aes(x=240/24, y=1.0, label=label), size=4.3) +
   
   #geom_text(data=data_textDelta, aes(x=310, y=0.23, label=label), size=3.5) +
-  annotate("text", x = 310, y = 0.75, label = "OD[680]", parse = TRUE) +
-  annotate("text", x = 310, y = 0.92, label = "OD[720]", parse = TRUE) +
-  annotate("text", x = 310, y = 0.23, label = 'ΔOD', parse = TRUE) +
+  annotate("text", x = 310/24, y = 0.75, label = "OD[720]", parse = TRUE) +
+  annotate("text", x = 310/24, y = 0.92, label = "OD[680]", parse = TRUE) +
+  annotate("text", x = 310/24, y = 0.23, label = 'ΔOD', parse = TRUE) +
   
   scale_y_continuous(sec.axis = sec_axis( trans=~./25, name="1"^st~"derivative of"~OD[680]~"")) + 
-  scale_x_continuous(breaks=seq(0,360,24)) + 
-  coord_cartesian(ylim = c(-0.2, 1.0)) +
-  labs(y = "Optical density (OD)", x = "Elapsed time (h)") +
+  #scale_x_continuous(breaks=seq(0,360,24)) + 
+  scale_x_continuous(breaks=seq(0, 14, by = 1)) +
+  coord_cartesian(ylim = c(-0.2, 1.0), xlim = c(0, 14)) +
+  labs(y = "Optical density (OD)", x = "Elapsed time (d)") +
   ggh4x::facet_nested(cols = vars(Photoperiod),labeller = labeller(WL = label_both, Photoperiod = Photoperiod.labs)) +
   theme_bw() +
   theme(panel.grid.minor = element_blank(),
@@ -1052,7 +1056,7 @@ ggarrange(PlotA,PlotB,
 # Save plot 
 
 ```{r save plot}
-ggsave(file = file.path(FigPath, paste("Fig_FirstDerivativeAB",".png",sep = "")), height=9, width= 7,  dpi = 300, limitsize = TRUE)
+# ggsave(file = file.path(FigPath, paste("Fig_FirstDerivativeAB",".png",sep = "")), height=9, width= 7,  dpi = 300, limitsize = TRUE)
 ```
 
 
