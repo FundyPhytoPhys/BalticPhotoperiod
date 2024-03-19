@@ -35,10 +35,7 @@ Process_SolisenseDataLRC.Rmd process BalticPhotoperiod_Imported_SolisenseLight_L
 ```{r load libraries, warning = FALSE, echo=FALSE} 
 library(ggtext)
 library(tidyverse)
-library(lubridate)
-library(stringr)
 library(broom)
-library(knitr)
 library(OneR)
 library(zoo)
 library(ggpubr)
@@ -47,11 +44,8 @@ library(googlesheets4)
 library(readxl)
 library(Cairo) #for greek symbols
 library(data.table)
-library(purrr)
 library(minpack.lm) #Standard 'nls' framework that uses 'nls.lm' for fitting
 ```
-
-
 
 # Set Project Variables 
 
@@ -75,7 +69,7 @@ TableRdsPath <- file.path("..", "Output", "TablesRDS")
 SolFitsMeta <- readRDS(file = file.path("..", "Data", "ImportedData", "ImportedSolisenseData", "BalticPhotoperiod_Imported_SolisenseLight_LRC.Rds"))
 
 SolFitsMeta <- SolFitsMeta |>
-  select(-c(JVPSII_aLHIIOxbomax, JVPSII_ETRtauav_FoSig, JVPSII_ETRtauav_aLHII_Sig, JVPSII_ETRqpOxbo_aLHII_Sig)) |>
+  select(-c(nm445,nm470,nm505,nm535,nm590,IR, nm445Corr,nm470Corr, nm505Corr,nm535Corr,nm590Corr,IRCorr,JVPSII_aLHIIOxbomax, JVPSII_ETRtauav_FoSig, JVPSII_ETRtauav_aLHII_Sig, JVPSII_ETRqpOxbo_aLHII_Sig)) |>
   rename(JVPSII_ETRqpOxbo_FoSigmax_m2psii = JVPSII_ETRqpOxbo_FoSig) |>
   rename(FilenameSolisense=Filename)
 ```
@@ -103,24 +97,10 @@ Weird bug code gives NA....
 JVPSII_eLs_ModelTerms <- read_rds(file.path("..","Data", "CleanedData", "JVPSIIO2Calib", "JVPSII_eLs_ModelTerms.Rds"))
 
 #smarter way to code this with 'which' in [] and map through Ex_WL
+SolFitsMeta <- left_join(SolFitsMeta, JVPSII_eLs_ModelTerms, by = join_by(Ex_WL)) |>
+  select(-c(Slope_P)) |>
+  mutate(JVPSII_eLs = JVPSII_ETRqpOxbo_FoSigmax_m2psii/Slope)
 
-test <- SolFitsMeta %>% 
-  mutate(Ex_WL = as.numeric(Ex_WL)) |>
-  mutate(JVPSII_eLs = JVPSII_ETRqpOxbo_FoSigmax_m2psii/100000)
-
-
-
-
-SolFitsMeta <- SolFitsMeta %>% 
-  mutate(Ex_WL = as.numeric(Ex_WL)) |>
-  mutate(JVPSII_eLs = case_when(Ex_WL == 445 ~ JVPSII_ETRqpOxbo_FoSigmax_m2psii/JVPSII_eLs_ModelTerms$Slope[JVPSII_eLs_ModelTerms$Ex_WL == 445],
-                                Ex_WL == 470 ~ JVPSII_ETRqpOxbo_FoSigmax_m2psii/JVPSII_eLs_ModelTerms$Slope[JVPSII_eLs_ModelTerms$Ex_WL == 470],
-                                 Ex_WL == 505 ~ JVPSII_ETRqpOxbo_FoSigmax_m2psii/JVPSII_eLs_ModelTerms$Slope[JVPSII_eLs_ModelTerms$Ex_WL == 505],
-                                 Ex_WL == 535 ~ JVPSII_ETRqpOxbo_FoSigmax_m2psii/JVPSII_eLs_ModelTerms$Slope[JVPSII_eLs_ModelTerms$Ex_WL == 535],
-                                 Ex_WL == 590 ~ JVPSII_ETRqpOxbo_FoSigmax_m2psii/JVPSII_eLs_ModelTerms$Slope[JVPSII_eLs_ModelTerms$Ex_WL == 590],
-                                )
-  )
-         
 ```
 
 # Create smaller value to for Platt model
@@ -163,7 +143,7 @@ grcplatt <- function(I, a, b, Pmax){Pmax * (1-exp(-a*I/Pmax)) * exp(-b*I/Pmax)}
 
 SolFitsMetaLRC <- SolFitsMeta %>%
   nest(data = -c("SampleID", "Run", "Strain" ,"ExpDate","Par_ue", "Photoperiod", "O2", "WL", "MC", "Tube","Ex_WL","LightShape", "ExpEndDate", "PARPhotonDose_day", "ObsDate", "E_days")) %>% #head(50) %>% 
-  mutate(GRCplatt_Model = map(data, possibly(~nlsLM(JVPSII_ETRqpOxbo_FoSig ~ grcplatt(I = ActPARCorr, a, b, Pmax),
+  mutate(GRCplatt_Model = map(data, possibly(~nlsLM(JVPSII_eLs ~ grcplatt(I = ActPARCorr, a, b, Pmax),
          data = .x,
          control = list(maxiter = 100),
          start = list(a = 0.1/30, b = 0.01/800, Pmax = 6),lower = c(0, 0, 0))))) %>%
