@@ -72,9 +72,12 @@ TableRdsPath <- file.path("..", "Output", "TablesRDS")
 # Read Imported Solisense
 
 ```{r read locally stored metadata from rds}
-SolFitsMetaRaw <- readRDS(file = file.path("..", "Data", "ImportedData", "ImportedSolisenseData", "BalticPhotoperiod_Imported_SolisenseLight_LRC.Rds"))
+SolFitsMeta <- readRDS(file = file.path("..", "Data", "ImportedData", "ImportedSolisenseData", "BalticPhotoperiod_Imported_SolisenseLight_LRC.Rds"))
 
-SolFitsMetaRaw<-SolFitsMetaRaw
+SolFitsMeta <- SolFitsMeta |>
+  select(-c(JVPSII_aLHIIOxbomax, JVPSII_ETRtauav_FoSig, JVPSII_ETRtauav_aLHII_Sig, JVPSII_ETRqpOxbo_aLHII_Sig)) |>
+  rename(JVPSII_ETRqpOxbo_FoSigmax_m2psii = JVPSII_ETRqpOxbo_FoSig) |>
+  rename(FilenameSolisense=Filename)
 ```
 
 # Create preliminary plots 
@@ -84,7 +87,7 @@ lab1=c(expression("PC-rich_056"), expression("PC-rich_077"), expression("PE-rich
 lab2=c(expression("8 h"), expression("12 h"), expression("16 h"), expression("24 h"))
 lab3=c(expression("30 µE"), expression("90 µE"), expression("180 µE"), expression("300 µE"), expression("900 µE"))
 
-SolFitsMetaRaw %>%
+SolFitsMeta %>%
   ggplot() +
   geom_point(aes(x = Par_ue, y = Sig, colour = as.factor(Strain)), size = 3.5, show.legend = T) +
   scale_colour_discrete(type=c("seagreen4", "palegreen3", "brown1", "brown4"), name="", labels = lab1) +
@@ -92,22 +95,43 @@ SolFitsMetaRaw %>%
   theme_bw()
 
 ```
-# Change variable names for consistency
 
-```{r}
-SolFitsMetaRaw <- SolFitsMetaRaw %>%
-  rename(FilenameSolisense=Filename)
+
+# Calibrate JVPSII to e L-1 s-1
+Weird bug code gives NA....
+```{r JVPSII calib}
+JVPSII_eLs_ModelTerms <- read_rds(file.path("..","Data", "CleanedData", "JVPSIIO2Calib", "JVPSII_eLs_ModelTerms.Rds"))
+
+#smarter way to code this with 'which' in [] and map through Ex_WL
+
+test <- SolFitsMeta %>% 
+  mutate(Ex_WL = as.numeric(Ex_WL)) |>
+  mutate(JVPSII_eLs = JVPSII_ETRqpOxbo_FoSigmax_m2psii/100000)
+
+
+
+
+SolFitsMeta <- SolFitsMeta %>% 
+  mutate(Ex_WL = as.numeric(Ex_WL)) |>
+  mutate(JVPSII_eLs = case_when(Ex_WL == 445 ~ JVPSII_ETRqpOxbo_FoSigmax_m2psii/JVPSII_eLs_ModelTerms$Slope[JVPSII_eLs_ModelTerms$Ex_WL == 445],
+                                Ex_WL == 470 ~ JVPSII_ETRqpOxbo_FoSigmax_m2psii/JVPSII_eLs_ModelTerms$Slope[JVPSII_eLs_ModelTerms$Ex_WL == 470],
+                                 Ex_WL == 505 ~ JVPSII_ETRqpOxbo_FoSigmax_m2psii/JVPSII_eLs_ModelTerms$Slope[JVPSII_eLs_ModelTerms$Ex_WL == 505],
+                                 Ex_WL == 535 ~ JVPSII_ETRqpOxbo_FoSigmax_m2psii/JVPSII_eLs_ModelTerms$Slope[JVPSII_eLs_ModelTerms$Ex_WL == 535],
+                                 Ex_WL == 590 ~ JVPSII_ETRqpOxbo_FoSigmax_m2psii/JVPSII_eLs_ModelTerms$Slope[JVPSII_eLs_ModelTerms$Ex_WL == 590],
+                                )
+  )
+         
 ```
 
 # Create smaller value to for Platt model
 
 ```{r}
-SolFitsMeta<-SolFitsMetaRaw %>%
-  mutate(JVPSII_aLHIIOxbomax = JVPSII_aLHIIOxbomax/1e22) %>%
-  mutate(JVPSII_ETRtauav_FoSig = JVPSII_ETRtauav_FoSig/1e22) %>%
-  mutate(JVPSII_ETRqpOxbo_FoSig = JVPSII_ETRqpOxbo_FoSig/1e22) %>%
-  mutate(JVPSII_ETRtauav_aLHII_Sig = JVPSII_ETRtauav_aLHII_Sig/1e22) %>%
-  mutate(JVPSII_ETRqpOxbo_aLHII_Sig = JVPSII_ETRqpOxbo_aLHII_Sig/1e22)
+# SolFitsMeta<-SolFitsMetaRaw %>%
+#   mutate(JVPSII_aLHIIOxbomax = JVPSII_aLHIIOxbomax/1e22) %>%
+#   mutate(JVPSII_ETRtauav_FoSig = JVPSII_ETRtauav_FoSig/1e22) %>%
+#   mutate(JVPSII_ETRqpOxbo_FoSig = JVPSII_ETRqpOxbo_FoSig/1e22) %>%
+#   mutate(JVPSII_ETRtauav_aLHII_Sig = JVPSII_ETRtauav_aLHII_Sig/1e22) %>%
+#   mutate(JVPSII_ETRqpOxbo_aLHII_Sig = JVPSII_ETRqpOxbo_aLHII_Sig/1e22)
 ```
 
 
@@ -120,7 +144,7 @@ lab3=c(expression("30 µE"), expression("90 µE"), expression("180 µE"), expres
 
 SolFitsMeta %>%
   ggplot() +
-  geom_point(aes(x = ActPARCorr, y = JVPSII_ETRqpOxbo_FoSig, colour = as.factor(Strain)), size = 3.5, show.legend = T) +
+  geom_point(aes(x = ActPARCorr, y = JVPSII_eLs, colour = as.factor(Strain)), size = 3.5, show.legend = T) +
   scale_colour_discrete(type=c("seagreen4", "palegreen3", "brown1", "brown4"), name="", labels = lab1) +
   facet_grid(cols = vars(Ex_WL, Photoperiod), rows = vars(Par_ue)) +
   theme_bw()
