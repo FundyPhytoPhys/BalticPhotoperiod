@@ -28,7 +28,7 @@ knitr::opts_chunk$set(fig.path='Figs/')
 
 # Introduction
 
-Process_SolisenseDataLRC.Rmd process BalticPhotoperiod_Imported_SolisenseLight_LRC.Rds from BalticPhotoperiod/Data/ImportedData/ImportedSolisenseData folder and stored in Data/ProcessedData/ProcessedSolisenseData folder as: BalticPhotoperiod_Processed_Solisense_LRC.Rds
+Process_SolisenseDataLRC.Rmd process BalticPhotoperiod_Imported_SolisenseLight_LRC.Rds from BalticPhotoperiod/Data/ImportedData/ImportedSolisenseData folder and stored in Data/ProcessedData/ProcessedSolisenseData folder as: BalticPhotoperiod_Processed_SolisenseJVPSII.Rds.
 
 # Load Libraries
 
