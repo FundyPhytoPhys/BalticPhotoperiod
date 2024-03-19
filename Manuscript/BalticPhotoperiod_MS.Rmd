@@ -115,9 +115,7 @@ Culture tubes were closed with a silicone inert silicone stopper perforated by a
 
 ## The growth curve and chlorophyll specific exponential growth rate analysis {.unnumbered}
 
-Picocyanobacterial growth was monitored every 5 minutes by automatically recording OD~680~, OD~720~, and ΔOD (ΔOD = OD~680~ – OD~720~) for 14 days, independently for each culture tube. The exceptions were experiments conducted with a photoperiod of 24 h and light of 600 or 900 µmol photons m^−2^s^−1^, which lasted 7 days (Fig S1-S3 in Supplementary materials).
-
-The exponential chlorophyll specific exponential growth rates (µ) were determined by fitting logistic growth curves to plots of the chlorophyll *a* proxy of ΔOD vs. elapsed time for each combination of strain, photoperiod, and peak PAR (Fig. S4 in Supplementary materials).
+Picocyanobacterial growth was monitored every 5 minutes by automatically recording OD~680~, OD~720~, and ΔOD (ΔOD = OD~680~ – OD~720~) for 14 days, independently for each culture tube. The exceptions were experiments conducted with a photoperiod of 24 h and light of 600 or 900 µmol photons m^−2^s^−1^, which lasted 7 days (Fig S1-S3 in Supplementary materials). The exponential chlorophyll specific exponential growth rates (µ) were determined by fitting logistic growth curves to plots of the chlorophyll *a* proxy of ΔOD vs. elapsed time for each combination of strain, photoperiod, and peak PAR (Fig. S4 in Supplementary materials).
 
 The 1^st^ derivative of OD~680~ taken over 1 h increments was computed. The time when the cultures reached their maximum absolute hourly growth (tMaxAHG) of the 1^st^ derivative of OD~680~, was taken as the time of transition from exponential to pre-stationary growth phases (Fig. \@ref(fig:FirstDerivative)).
 
@@ -132,7 +130,7 @@ The number of picocyanobacterial cells was calculated using linear regression mo
 
 ## Whole-cell absorbance spectra measurements {.unnumbered}
 
-Absorbance measurements on intact cells in suspension were conducted in an integrating cavity upgrade spectrophotometer (OLIS CLARiTY 17 UV/Vis/NIR, On-Line Instrument Systems, Inc., Bogart, GA, USA) according to [@blakeSituSpectroscopyIntact2012] with modifications. 8 mL of f/2 medium were added to both the sample and reference observation cavities of the spectrophotometer. After recording a baseline from 375 to 710 nm, 1 mL was withdrawn from the sample cavity and replaced with 1 mL of the cell suspension of tested picocyanobacteria. The pathlength corrected absorbance per cm was performed by determining the Javorfi coefficients [@javorfiQuantitativeSpectrophotometryUsing2006] as described in the equipment manual.
+Absorbance measurements on intact cells in suspension were conducted in an integrating cavity upgrade spectrophotometer (CLARiTY 17 UV/Vis/NIR, On-Line Instrument Systems, Inc., Bogart, GA, USA) according to [@blakeSituSpectroscopyIntact2012] with modifications. 8 mL of f/2 medium were added to both the sample and reference observation cavities of the spectrophotometer. After recording a baseline from 375 to 710 nm, 1 mL was withdrawn from the sample cavity and replaced with 1 mL of the cell suspension of tested picocyanobacteria. The pathlength corrected absorbance per cm was performed by determining the Javorfi coefficients [@javorfiQuantitativeSpectrophotometryUsing2006] as described in the equipment manual.
 
 ## Estimating Photosynthetically Usable Radiation (PUR) {.unnumbered}
 
