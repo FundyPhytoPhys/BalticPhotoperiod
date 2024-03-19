@@ -74,7 +74,10 @@ TableRdsPath <- file.path("..", "Output", "TablesRDS")
 ```{r read locally stored metadata from rds}
 SolFitsMetaRaw <- readRDS(file = file.path("..", "Data", "ImportedData", "ImportedSolisenseData", "BalticPhotoperiod_Imported_SolisenseLight_LRC.Rds"))
 
-SolFitsMetaRaw<-SolFitsMetaRaw
+SolFitsMetaRaw <- SolFitsMetaRaw |>
+  select(-c(JVPSII_aLHIIOxbomax, JVPSII_ETRtauav_FoSig, JVPSII_ETRtauav_aLHII_Sig, JVPSII_ETRqpOxbo_aLHII_Sig)) |>
+  rename(JVPSII_ETRqpOxbo_FoSigmax_m2psii = JVPSII_ETRqpOxbo_FoSig) |>
+  rename(FilenameSolisense=Filename)
 ```
 
 # Create preliminary plots 
@@ -92,22 +95,53 @@ SolFitsMetaRaw %>%
   theme_bw()
 
 ```
-# Change variable names for consistency
 
-```{r}
-SolFitsMetaRaw <- SolFitsMetaRaw %>%
-  rename(FilenameSolisense=Filename)
+ActPARCrossCal <- read_rds(file.path(Path, "SolisenseInformation_DCCrossParam.Rds"))
+
+ActPARCrossCal <- ActPARCrossCal %>% 
+  mutate(Slope = `estimate_LIFT_Gen_Developer.cal`,
+         Slope_SE = `std.error_LIFT_Gen_Developer.cal`) %>% 
+  select(c(DCLamp, Models, Slope, Slope_SE))
+  
+#Intercepts for cross conversions set to 0.
+SolFitsTrimOS <- SolFitsTrimOS %>% 
+  mutate(nm445Corr = case_when(TempCont == "TC" ~ nm445 * ActPARCrossCal$Slope[ActPARCrossCal$DCLamp == "Pwr1_uE" & ActPARCrossCal$Models == "DCWaterJacketlm_tidy"],
+                                 TempCont == "noTC" ~ nm445 * ActPARCrossCal$Slope[ActPARCrossCal$DCLamp == "Pwr1_uE" & ActPARCrossCal$Models == "DCCuvettelm_tidy"]),
+         nm470Corr = case_when(TempCont == "TC" ~ nm470 * ActPARCrossCal$Slope[ActPARCrossCal$DCLamp == "Pwr2_uE" & ActPARCrossCal$Models == "DCWaterJacketlm_tidy"],
+                                 TempCont == "noTC" ~ nm470 * ActPARCrossCal$Slope[ActPARCrossCal$DCLamp == "Pwr2_uE" & ActPARCrossCal$Models == "DCCuvettelm_tidy"]),
+         nm505Corr = case_when(TempCont == "TC" ~ nm505 * ActPARCrossCal$Slope[ActPARCrossCal$DCLamp == "Pwr3_uE" & ActPARCrossCal$Models == "DCWaterJacketlm_tidy"],
+                                 TempCont == "noTC" ~ nm505 * ActPARCrossCal$Slope[ActPARCrossCal$DCLamp == "Pwr3_uE" & ActPARCrossCal$Models == "DCCuvettelm_tidy"]),
+           nm535Corr = case_when(TempCont == "TC" ~ nm535 * ActPARCrossCal$Slope[ActPARCrossCal$DCLamp == "Pwr4_uE" & ActPARCrossCal$Models == "DCWaterJacketlm_tidy"],
+                                 TempCont == "noTC" ~ nm535 * ActPARCrossCal$Slope[ActPARCrossCal$DCLamp == "Pwr4_uE" & ActPARCrossCal$Models == "DCCuvettelm_tidy"]),
+          nm590Corr = case_when(TempCont == "TC" ~ nm590 * ActPARCrossCal$Slope[ActPARCrossCal$DCLamp == "Pwr5_uE" & ActPARCrossCal$Models == "DCWaterJacketlm_tidy"],
+                                 TempCont == "noTC" ~ nm590 * ActPARCrossCal$Slope[ActPARCrossCal$DCLamp == "Pwr5_uE" & ActPARCrossCal$Models == "DCCuvettelm_tidy"]),
+          IRCorr = case_when(TempCont == "TC" ~ IR * ActPARCrossCal$Slope[ActPARCrossCal$DCLamp == "PwrIR_uE" & ActPARCrossCal$Models == "DCWaterJacketlm_tidy"],
+                                 TempCont == "noTC" ~ IR * ActPARCrossCal$Slope[ActPARCrossCal$DCLamp == "PwrIR_uE" & ActPARCrossCal$Models == "DCCuvettelm_tidy"]))
+
+SolFitsTrimOS <- SolFitsTrimOS %>%
+  mutate(ActPAR = nm445 + nm470 + nm505 + nm535 + nm590 + IR) %>%  
+  mutate(ActPARCorr = nm445Corr + nm470Corr + nm505Corr + nm535Corr + nm590Corr + IRCorr)
+
+
+# Calibrate JVPSII to e L-1 s-1
+
+```{r JVPSII calib}
+JVPSII_eLs <- read_rds(file.path("..","Data", "CleanedData", "JVPSIIO2Calib", "JVPSII_eLs_ModelTerms.Rds"))
+
+#smarter way to code this with 'which' in []
+SolFitsMetaRaw <- SolFitsMetaRaw %>% 
+  mutate(JVPSII_eLs = case_when(Ex_WL == 445 ~ JVPSII_ETRqpOxbo_FoSigmax_m2psii / JVPSII_eLs$Slope[JVPSII_eLs$Ex_WL == 445 ] - JVPSII_eLs$Intercept[JVPSII_eLs$Ex_WL == 445 ]))
 ```
 
 # Create smaller value to for Platt model
 
 ```{r}
-SolFitsMeta<-SolFitsMetaRaw %>%
-  mutate(JVPSII_aLHIIOxbomax = JVPSII_aLHIIOxbomax/1e22) %>%
-  mutate(JVPSII_ETRtauav_FoSig = JVPSII_ETRtauav_FoSig/1e22) %>%
-  mutate(JVPSII_ETRqpOxbo_FoSig = JVPSII_ETRqpOxbo_FoSig/1e22) %>%
-  mutate(JVPSII_ETRtauav_aLHII_Sig = JVPSII_ETRtauav_aLHII_Sig/1e22) %>%
-  mutate(JVPSII_ETRqpOxbo_aLHII_Sig = JVPSII_ETRqpOxbo_aLHII_Sig/1e22)
+# SolFitsMeta<-SolFitsMetaRaw %>%
+#   mutate(JVPSII_aLHIIOxbomax = JVPSII_aLHIIOxbomax/1e22) %>%
+#   mutate(JVPSII_ETRtauav_FoSig = JVPSII_ETRtauav_FoSig/1e22) %>%
+#   mutate(JVPSII_ETRqpOxbo_FoSig = JVPSII_ETRqpOxbo_FoSig/1e22) %>%
+#   mutate(JVPSII_ETRtauav_aLHII_Sig = JVPSII_ETRtauav_aLHII_Sig/1e22) %>%
+#   mutate(JVPSII_ETRqpOxbo_aLHII_Sig = JVPSII_ETRqpOxbo_aLHII_Sig/1e22)
 ```
 
 
