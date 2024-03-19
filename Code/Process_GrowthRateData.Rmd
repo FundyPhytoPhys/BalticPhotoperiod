@@ -805,7 +805,7 @@ ggplot(MCGrowthExpSP, aes(PURPhotonDose_day, deltaOD_Lmu_corr)) +
   #scale_linetype_manual(values=c("equal900" = "dotted", "less900" = "solid"), breaks=c('8', '12', '16', "24", "", "")) +
   scale_colour_manual(values = c("darkslategray", "lightblue4", "hotpink4", "indianred3", "goldenrod2", "khaki2"), name="", labels = lab2, breaks=c('30', "90", "180", "300", "600","900")) +
   scale_shape_manual(values = c(15, 16, 17, 18), name="", labels = lab1) +
-  labs(y = "Chlorophyll specific exponential growth rate " ~ "("~d^-1~")", x = "PUR Photon dose ( µmol photons "~m^-2~""~d^-1~")") +
+  labs(y = "Chlorophyll specific exponential growth rate " ~ "("~d^-1~")", x = "PUR dose ( µmol photons "~m^-2~""~d^-1~")") +
   ggh4x::facet_nested(rows = vars(facetsStrain, Strain), labeller = label_parsed) +
   theme_bw() +
   theme(panel.grid.minor = element_blank(),
@@ -849,7 +849,7 @@ ggplot(MCGrowthExpSP, aes(PURPhotonDose_day, deltaOD_Lmu_corr)) +
   #scale_linetype_manual(values=c("equal900" = "dotted", "less900" = "solid"), breaks=c('8', '12', '16', "24", "", "")) +
   scale_colour_manual(values = c("darkslategray", "lightblue4", "hotpink4", "indianred3", "goldenrod2", "khaki2"), name="", labels = lab2, breaks=c('30', "90", "180", "300", "600","900")) +
   scale_shape_manual(values = c(15, 16, 17, 18), name="", labels = lab1) +
-  labs(y = "Chlorophyll specific exponential growth rate " ~ "("~d^-1~")", x = "PUR Photon dose ( µmol photons "~m^-2~""~d^-1~")") +
+  labs(y = "Chlorophyll specific exponential growth rate " ~ "("~d^-1~")", x = "PUR dose ( µmol photons "~m^-2~""~d^-1~")") +
   ggh4x::facet_nested(rows = vars(facetsStrain, Strain), labeller = label_parsed) +
   theme_bw() +
   theme(panel.grid.minor = element_blank(),
@@ -1539,7 +1539,7 @@ ggplot(MCGrowthSP, aes(PARPhotonDose_day, deltaOD_Lmu_corr)) +
   #scale_linetype_manual(values=c("equal900" = "dotted", "less900" = "solid"), breaks=c('8', '12', '16', "24", "", "")) +
   scale_colour_manual(values = c("darkslategray", "lightblue4", "hotpink4", "indianred3", "goldenrod2", "khaki2"), name="", labels = lab2, breaks=c('30', "90", "180", "300", "600","900")) +
   scale_shape_manual(values = c(15, 16, 17, 18), name="", labels = lab1) +
-  labs(y = "Chlorophyll specific exponential growth rate " ~ "("~d^-1~")", x = "PAR Photon dose ( µmol photons "~m^-2~""~d^-1~")") +
+  labs(y = "Chlorophyll specific exponential growth rate " ~ "("~d^-1~")", x = "PAR dose ( µmol photons "~m^-2~""~d^-1~")") +
   ggh4x::facet_nested(rows = vars(facetsStrain, Strain), labeller = label_parsed) +
   theme_bw() +
   theme(panel.grid.minor = element_blank(),
@@ -1584,7 +1584,7 @@ ggplot(MCGrowthSP, aes(PARPhotonDose_day, deltaOD_Lmu_corr)) +
   #scale_linetype_manual(values=c("equal900" = "dotted", "less900" = "solid"), breaks=c('8', '12', '16', "24", "", "")) +
   scale_colour_manual(values = c("darkslategray", "lightblue4", "hotpink4", "indianred3", "goldenrod2", "khaki2"), name="", labels = lab2, breaks=c('30', "90", "180", "300", "600","900")) +
   scale_shape_manual(values = c(15, 16, 17, 18), name="", labels = lab1) +
-  labs(y = "Chlorophyll specific exponential growth rate " ~ "("~d^-1~")", x = "PAR Photon dose ( µmol photons "~m^-2~""~d^-1~")") +
+  labs(y = "Chlorophyll specific exponential growth rate " ~ "("~d^-1~")", x = "PAR dose ( µmol photons "~m^-2~""~d^-1~")") +
   ggh4x::facet_nested(rows = vars(facetsStrain, Strain), labeller = label_parsed) +
   theme_bw() +
   theme(panel.grid.minor = element_blank(),
