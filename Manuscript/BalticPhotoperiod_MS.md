@@ -79,7 +79,7 @@ Cyanobacteria growth includes lag, exponential growth, stationary, and death pha
 
 *Synechococcus*, a diverse genus of picocyanobacteria, exhibits a distribution spanning diverse geographical regions [@flombaumPresentFutureGlobal2013], with strains demonstrating a remarkable range of adaptations to environmental conditions. *Synechococcus*’ capacity to thrive across diverse marine and freshwater habitats positions it as a pivotal agent in energy and nutrient transfer within food webs and serves as a link connecting the microbial loop with higher trophic levels, offering direct sustenance to grazers, including zooplankton and small fish [@liCompositionUltraphytoplanktonCentral1995]. *Synechococcus*, as one of the two dominant picocyanobacterial genera in oceanic waters, also significantly affects light attenuation and availability for other photosynthetic organisms, and influences ocean colour, allowing satellite detection of *Synechococcus*-rich communities [@bracherObtainingPhytoplanktonDiversity2017; @xiGlobalRetrievalPhytoplankton2020]. General relations among optical absorption spectra and pigment compositions have been used to determine diagnostic pigment indices of major phytoplankton functional types [@vidussiPhytoplanktonPigmentDistribution2001; @fishwickFunctionalRelationshipsBiooptical2006; @hirataSynopticRelationshipsSurface2011]. Modeling suggests that *Synechococcus* abundance and ranges will increase  due to climate warming [@flombaumPresentFutureGlobal2013]. The projected changes may vary geographically and may include shifts in the spatial distribution of the main picocyanobacteria, as well as changes in the proportions among *Synechococcus* sp. lineages [@sixMarineSynechococcusPicocyanobacteria2021]. *Synechococcus* exhibits significant phenotypic diversity across lineages, encompassing strains rich in PhycoErythrin (PE-rich) or PhycoCyanin (PC-rich) [@haverkampColorfulMicrodiversitySynechococcus2009; @aguileraEcophysiologicalAnalysisReveals2023]. These phycobilin pigment-proteins are pivotal for light absorption during photosynthesis and confer distinctive colours to the picocyanobacteria. The disparate light preferences between PC-rich and PE-rich *Synechococcus* sp. strains influence their ecological niches. PC-rich strains thrive in environments with elevated light levels, such as surface waters and coastal regions, where blue light predominates. PE-rich strains exhibit adaptation to lower-light conditions, primarily inhabiting the deeper layers of the water column where green light prevails. PC-rich and PE-rich *Synechococcus* sp. strains thus predominantly occupy complementary habitats [@sixLightVariabilityIlluminates2007; @haverkampColorfulMicrodiversitySynechococcus2009; @sixMarineSynechococcusPicocyanobacteria2021].
 
-Photic regimes and growth phases of PC-rich and PE-rich *Synechococcus* sp. may drive spatial and temporal variability of *Synechococcus* biomass and community lineage composition within aquatic environments, relating to varying metabolic costs between physiological strategies. Therefore, the aim of this research was to determine whether photic regimes and growth phases affect both growth and light-capture, and quantify the differences between impacts on PC-rich and PE-rich *Synechococcus* sp.
+Photic regimes and growth phases of PC-rich and PE-rich *Synechococcus* sp. may drive spatial and temporal variability of Synechococcus biomass and community lineage composition within aquatic environments, relating to varying metabolic costs between physiological strategies. Therefore, the aim of this research was to determine whether photic regimes and growth phases affect both growth and light-capture, and to quantify the differences between PC-rich and PE-rich *Synechococcus* sp.
 
 # Material and Methods {.unnumbered}
 
@@ -128,14 +128,14 @@ Based on the length and shape of the photoperiod (sinuisoidal wave for photoperi
 
 $$\begin{equation}
 \begin{split}
-  Cumulative~diel~PAR~(µmol~photons~m^{−2}~d^{−1})= \\ \frac{PAR~(µE)⋅60~(s~min^{−1})⋅60~(min~h^{−1})⋅photoperiod~(h~d^{−1})}{2}
+  Cumulative~diel~PAR~(µmol~photons~m^{−2}~d^{−1})= \\ \frac{PAR~(µE)×60~(s~min^{−1})×60~(min~h^{−1})×photoperiod~(h~d^{−1})}{2}
   \qquad(2)
 \end{split}
 \end{equation}$$
 
 $$\begin{equation}
 \begin{split}
-  Cumulative~diel~PAR~(µmol~photons~m^{−2}~d^{−1})= \\ PAR~(µE)⋅60~(s~min^{−1})⋅60~(min~h^{−1})⋅photoperiod~(h~d^{−1})
+  Cumulative~diel~PAR~(µmol~photons~m^{−2}~d^{−1})= \\ PAR~(µE)×60~(s~min^{−1})×60~(min~h^{−1})×photoperiod~(h~d^{−1})
   \qquad(3)
 \end{split}
 \end{equation}$$
@@ -150,20 +150,20 @@ We also estimated the pigment content: chlorophyll *a* (Chl *a*), carotenoids (C
 
 ## Estimating effective absorption cross section of PSII and PSII electron flux {.unnumbered}
 
-We harvested 2 mL of cultures for photophysiological characterizations repeatedly across the growth trajectories. We used Fast Repetition Rate fluorometry [@kolberMeasurementsVariableChlorophyll1998] (FRRf, Solisense, USA), with a lab built temperature control jacket, to apply series of flashlets to drive induction/relaxation trajectories, and used the onboard Solisense LIFT software to fit an induction/relaxation model [@falkowskiEstimationPhytoplanktonPhotosynthesis1993; @kolberMeasurementsVariableChlorophyll1998]. From the model fits we took the initial fluorescence before induction (*F*O, *F*O′ or *F*S); the maximum fluorescence (*F*M or *F*M′) once Photosystem II (PSII) was driven to closure; and the effective absorption cross section for PSII photochemistry (σPSII or σPSII′; nm2 quanta^−1^) [@tortellUserGuideApplication2021]. We used a double tap protocol [@xuConnectivityPhotosystemII2017], where FRRf induction/relaxation trajectories were collected during a rapid light curve sequence increasing in steps of 10 s at 0, 20, 40, 80, 160, and 320 µmol photons m^−2^s^−1^ PAR, delivered from LED emitters centred at 445, preferentially exciting chlorophyll, or 590 nm, preferentially exciting phycobiliproteins. Flash Power for 445 nm excitation was 60000 µmol photons m^−2^s^−1^ PAR, while for 590 nm excitation was 14000 µmol photons m^−2^s^−1^, calibrated using a quantum sensor (LI-250, LI-COR, Inc.). We applied 1 s darkness between sequential light steps, to allow re-opening of PSII. FRRf excitation flashlets were applied at the same wavebands, 445 or 590 nm, as the actinic light steps.
+We harvested 2 mL of cultures for photophysiological characterizations repeatedly across the growth trajectories. We used Fast Repetition Rate fluorometry [@kolberMeasurementsVariableChlorophyll1998] (FRRf, Solisense, USA), with a lab built temperature control jacket, to apply series of flashlets to drive induction/relaxation trajectories, and used the onboard Solisense LIFT software to fit an induction/relaxation model [@falkowskiEstimationPhytoplanktonPhotosynthesis1993; @kolberMeasurementsVariableChlorophyll1998]. From the model fits we took the initial fluorescence before induction (*F*~O~, *F*~O~′, or *F*~S~); the maximum fluorescence (*F*~M~ or *F*~M~′) once Photosystem II (PSII) was driven to closure; and the effective absorption cross section for PSII photochemistry (σPSII or σPSII′; nm2 quanta^−1^) [@tortellUserGuideApplication2021]. We used a double tap protocol [@xuConnectivityPhotosystemII2017], where FRRf induction/relaxation trajectories were collected during a rapid light curve sequence increasing in steps of 10 s at 0, 20, 40, 80, 160, and 320 µmol photons m^−2^s^−1^ PAR, delivered from LED emitters centred at 445, preferentially exciting chlorophyll, or 590 nm, preferentially exciting phycobiliproteins. Flash Power for 445 nm excitation was 60000 µmol photons m^−2^s^−1^ PAR, while for 590 nm excitation was 14000 µmol photons m^−2^s^−1^, calibrated using a quantum sensor (LI-250, LI-COR, Inc.). We applied 1 s darkness between sequential light steps, to allow re-opening of PSII. FRRf excitation flashlets were applied at the same wavebands, 445 or 590 nm, as the actinic light steps.
 
 We calculated (Eq. (4)) a fluorescence estimator for volumetric electron transport, *JV*~PSII~, (e^−^ L^−1^ s^−1^) under both 445 and 590 nm excitation bands [@oxboroughDirectEstimationFunctional2012; @boatmanImprovingAccuracySingle2019; @tortellUserGuideApplication2021].
 
 *JV*~PSII~ = $\sigma$~PSII~′ × qP × I × *F*~O~/$\sigma$~PSII~
 
 
-
 $$\begin{equation}
 \begin{split}
-  JVPSII= σPSII′×qP×I×FO/σPSII
+  JVPSII = \frac{σ_(PSII)′×qP×I×F_O}{σ_(PSII)}
   \qquad(4)
 \end{split}
 \end{equation}$$
+
 
 where $\sigma$~PSII~′ is effective absorption cross section for PSII photochemistry under the relevant actinic PAR step (nm^2^ quanta^−1^); qP is an estimate of the fraction of PSII open for photochemistry estimated according to [@oxboroughResolvingChlorophyllFluorescence1997]; I is the applied PAR (µmol photons m^−2^s^−1^); *F*~O~ is the minimum fluorescence from a given sample and excitation bandwidth (relative fluorescence) and $\sigma$~PSII~ is the maximum effective absorption cross section for PSII photochemistry from a given sample and excitation bandwidth (nm^2^ quanta^−1^). We compared several other algorithms for *JV*~PSII~ [@tortellUserGuideApplication2021] and found similar results.
 
@@ -192,7 +192,7 @@ Statistical differences for all analyzes were determined at the level of signifi
 
 ## Changes in chlorophyll specific exponential growth rate {.unnumbered}
 
-We used logistic curve fits to determine chlorophyll-specific exponential growth rates (μ; d^−1^) vs. cumulative diel photon dose (µmol photons m^−2^d^−1^), for two PhycoCyanin(PC)-rich cultures (056, 077) and two PhycoErythrin(PE)-rich cultures (048, 127) of *Synechococcus* sp. originating from the Baltic Sea grown at 30, 90, 180, 300, 600 or 900 peak PAR µmol photons m^−2^s^−1^ (µE); and photoperiods of 8, 12, 16, or 24 h (Fig. <a href="#fig:GrowthRatePhotoperiodPUR">4</a>).
+We used logistic curve fits to determine chlorophyll-specific exponential growth rates (μ; d^−1^) vs. cumulative diel photon dose (µmol photons m^−2^d^−1^), for two PhycoCyanin(PC)-rich cultures (056, 077) and two PhycoErythrin(PE)-rich cultures (048, 127) of *Synechococcus* sp. originating from the Baltic Sea grown at 30, 90, 180, 300, 600, or 900 peak PAR µmol photons m^−2^s^−1^ (µE); and photoperiods of 8, 12, 16, or 24 h (Fig. <a href="#fig:GrowthRatePhotoperiodPUR">4</a>).
 
 Three-way factorial ANOVA showed that peak PAR, photoperiod, and strain, and their interactions, significantly affected μ (ANOVA, *p* < 0.05 for all; Table S3). All tested strains, except PE-rich_048, grew even under peak PAR 900 µmol photons m^−2^s^−1^ and 24 h photoperiod. The highest growth rate was recorded for *Synechococcus* sp. PE-rich_127 (μ = 4.5 d^−1^) and PC-rich_056 (μ = 3.4 d^−1^) at 180 µmol photons m^−2^s^−1^ peak PAR and photoperiod of 24 h.
 
@@ -206,6 +206,14 @@ Growth rate saturated under increasing cumulative diel PAR for all strains howev
 
 
 ## Decreasing PUR/PAR ratio and Phycobiliprotein to Chl *a* ratio with increasing cumulative diel PAR {.unnumbered}
+
+The PUR/PAR ratio is an index of the efficacy of light capture for a culture under a given growth condition; showing the fraction of PAR captured by the absorbance of the cells. For the two PC-rich and two PE-rich cultures of *Synechococcus* sp. PUR/PAR decayed exponentially with increasing cumulative diel PAR, pooling data across different combinations of photoperiod and peak PAR. Although all strains followed a similar trend, the single phase exponential decay model fit parameters varied significantly among strains, during their exponential phase of growth (ANOVA, *p* < 0.05, Table S7), except the model fits from PE-rich_048 and PE-rich_127 (ANOVA, *p* > 0.05). Moreover, the PUR/PAR ratio was significantly higher in the PE-rich strains under low cumulative diel photon dose during their exponential phase of growth, but decayed towards a plateau close to the PC-rich strains as cumulative diel photon dose increases.
+
+During pre-stationary phase this response of PUR/PAR to increasing cumulative diel PAR dampens(ANOVA, p > 0.05, Table S7). Model fits from different phases of growth differed within a given strain, with the exception of PC-rich_056 (ANOVA; p < 0.05, Table S7). 
+
+
+
+
 
 Changes of PUR/PAR ratio vs. cumulative diel PAR (µmol photons m^−2^d^−1^) for two PC-rich cultures (056, 077) and two PE-rich (048, 127) cultures of *Synechococcus* sp. grown at 30, 90, 180, 300, 600, or 900 peak PAR µmol photons m^−2^s^−1^ (µE); and photoperiods of 8, 12, 16, or 24 h were estimated (Fig. <a href="#fig:PURPARRatio">5</a>). Three-way factorial ANOVA showed that individual factor (cumulative diel PAR, phase of growth, or strain) but not the interactions of these 3 factors, affected the PUR/PAR ratio (ANOVA, *p* < 0.05, Table S6). 
 
