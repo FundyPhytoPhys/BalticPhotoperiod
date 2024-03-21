@@ -159,7 +159,7 @@ We calculated (Eq. (4)) a fluorescence estimator for volumetric electron transpo
 
 $$\begin{equation}
 \begin{split}
-  JVPSII = \frac{σ_(PSII)′×qP×I×F_O}{σ_(PSII)}
+  JV_(PSII) = \frac{σ_(PSII)′×qP×I×F_O}{σ_(PSII)}
   \qquad(4)
 \end{split}
 \end{equation}$$
