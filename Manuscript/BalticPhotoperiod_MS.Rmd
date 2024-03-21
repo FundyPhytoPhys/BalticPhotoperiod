@@ -111,7 +111,7 @@ Cultures of each strain were grown in 8 x 80 mL round bottom cylindrical glass t
 
 Cultures grew at 22℃, with photoperiods of 8, 12, 16, or 24 h, with peak PAR of 30, 90, 180, 300, 600, or 900 µµmol photons m^−2^s^−1^ supplied from white LED lamps, independently to each culture tube. To approximate diel cycles, the photoperiods of 8 – 16 h were applied in a sinuisoidal shape, while the 24-hour photoperiod was applied continuously in a square shape. The area under the sinuisoidal  curve is 1/2 the area under a square of equal width, the 24 h square photoperiod cultures received 4 times the diel photon dose of the 12 h sinuisoidal  photoperiod cultures.
 
-Culture tubes were closed with a silicone inert silicone stopper perforated by an aeration input tube extending to the bottom of the culture tube, and a pressure outlet tube. Aeration with a total air flow rate of around ~ 140 mL min^−1^ tube^−1^ ensured mixing and provided sufficient air/CO2 supply to cultures through the entire culture volume. The pH of tested cultures did not fluctuate fiercely during the experiment and remained at approximately 8-9. Light, temperature, optical density, and aeration gas of the Multi-Cultivator system were monitored and controlled via the Photobioreactor Control Software (Photon Systems Instruments, Drásov, Czech Republic).
+Culture tubes were closed with a silicone inert silicone stopper perforated by an aeration input tube extending to the bottom of the culture tube, and a pressure outlet tube. Aeration with a total air flow rate of around ~ 140 mL min^−1^ tube^−1^ ensured mixing and provided sufficient air/CO~2~ supply to cultures through the entire culture volume. The pH of tested cultures did not fluctuate fiercely during the experiment and remained at approximately 8-9. Light, temperature, optical density, and aeration gas of the Multi-Cultivator system were monitored and controlled via the Photobioreactor Control Software (Photon Systems Instruments, Drásov, Czech Republic).
 
 ## Growth curves and chlorophyll specific exponential growth rates {.unnumbered}
 
@@ -136,7 +136,7 @@ Absorbance measurements on intact cells in suspension were conducted in an integ
 
 ## Estimating Photosynthetically Usable Radiation (PUR) {.unnumbered}
 
-Using whole-cell absorbance spectra of *Synechococcus* sp. cultures (Fig. \@ref(fig:OlisSpectra)) we estimated Photosynthetically Usable Radiation (PUR) according to [@morelAvailableUsableStored1978]. We normalized the obtained whole-cell Absorbances (A) and the Emission spectra of the white LED lamps (Em) from 400 nm to 700 nm to a reference wavelength of 440 nm. PUR is then the ratio of the sum of Absorbance Normalized to 440 nm (NormA~440~) ✕ sum of Emission spectra Normalized to 440 nm (NormEm~440~) to the sum of the Emission spectra Normalized to 440 nm (NormEm~440~), multiplied by the PAR (Eq. (1)).
+Using whole-cell absorbance spectra of *Synechococcus* sp. cultures (Fig. \@ref(fig:OlisSpectra)) we estimated Photosynthetically Usable Radiation (PUR) according to [@morelAvailableUsableStored1978]. We normalized the obtained whole-cell Absorbances (A) and the Emission spectra of the white LED lamps (Em) from 400 nm to 700 nm to a reference wavelength of 440 nm. PUR is then the ratio of the sum of Absorbance Normalized to 440 nm (NormA~440~) multiplied by the sum of Emission spectra Normalized to 440 nm (NormEm~440~) to the sum of the Emission spectra Normalized to 440 nm (NormEm~440~), multiplied by the PAR (Eq. (1)).
 
 \begin{equation}
   PUR=\frac{∑(NormA_440~✕~NormEm_440)}{∑(NormEm_440)}~✕~PAR
@@ -150,7 +150,7 @@ knitr::include_graphics(file.path( FiguresFP,"Fig_OlisSpectra.png"))
 
 ## Estimating cumulative diel PAR and PUR {.unnumbered}
 
-Based on the length and shape of the photoperiod (sinuisoidal wave for photoperiods of 8 – 16 h; square for photoperiod of 24 h) and the peak PAR (µE = µmol photons m^−2^s^−1^), we estimated the value of the cumulative diel PAR (µmol photons m^−2^d^−1^). For a photoperiod arranged in the shape of a sine wave we used Eq. \@ref(eq:PhotonDoseSine). For a continuous 24 h photoperiod we used Eq. \@ref(eq:PhotonDoseSquare).
+Based on the length and shape of the photoperiod (sinuisoidal wave for photoperiods of 8 – 16 h; square for photoperiod of 24 h) and the peak PAR (µE = µmol photons m^−2^s^−1^), we estimated the value of the cumulative diel PAR (µmol photons m^−2^d^−1^). For sinuisoidal photoperiods we used Eq. \@ref(eq:PhotonDoseSine); for the continuous 24 h photoperiod we used Eq. \@ref(eq:PhotonDoseSquare).
 
 \begin{equation}
 \begin{split}
