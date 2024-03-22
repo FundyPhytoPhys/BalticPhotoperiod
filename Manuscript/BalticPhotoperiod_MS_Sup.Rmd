@@ -183,6 +183,44 @@ knitr::include_graphics(file.path(FiguresFP,"SFig_GrowthRate_JVPSII_Light.png"))
 
 ```
 
+
+```{r echo = FALSE}
+TurnerODCorrelation <- readRDS(file = file.path("..", "Output", "TablesRds", "BalticPhotoperiod_Tab_TurnerDeltaODCorrelation.Rds"))
+TurnerODCorrelation<-TurnerODCorrelation %>% 
+  relocate(Strain, .before = Linear_regression) %>% 
+  relocate(OD, .before = Linear_regression) %>% 
+  select(-c(OD))
+
+myft <- flextable(TurnerODCorrelation)
+myft <- set_caption(myft, caption = "Linear regression, coefficient of determination (R square), Pearson correlation coefficients (R), and p-value used to calculate the Chl a (µg L-1) of two PhycoCyanin(PC)-rich cultures (056, 077) and two PhycoErythrin(PE)-rich cultures (048, 127) (Culture Collection of Baltic Algae) of Synechococcus sp. based on optical density (DeltaOD) measurements.")
+myft <- colformat_double(x = myft, big.mark = ",", digits = 3, na_str = "N/A")
+myft <- fontsize(myft, size = 12, part = "header")
+myft <- fontsize(myft, size = 10, part = "body")
+myft <- align(myft, align = "left", part = "all")
+myft <- autofit(myft)
+myft
+
+rm(TurnerODCorrelation)
+```
+
+```{r echo = FALSE}
+GrowthCorrelationMDPico <- readRDS(file = file.path("..", "Output", "TablesRds", "BalticPhotoperiod_Tab_MDPicoMCODCorrelation.Rds"))
+GrowthCorrelationMDPico<-GrowthCorrelationMDPico %>% 
+  relocate(Strain, .before = Linear_regression) %>% 
+  relocate(OD, .before = Linear_regression) 
+
+myft <- flextable(GrowthCorrelationMDPico)
+myft <- set_caption(myft, caption = "Linear regression, coefficient of determination (R square), Pearson correlation coefficients (R), and p-value used to calculate the number of cells (N mL-1) of two PhycoCyanin(PC)-rich cultures (056, 077) and two PhycoErythrin(PE)-rich cultures (048, 127) (Culture Collection of Baltic Algae) of Synechococcus sp. based on optical density (OD) measurements.")
+myft <- colformat_double(x = myft, big.mark = ",", digits = 3, na_str = "N/A")
+myft <- fontsize(myft, size = 12, part = "header")
+myft <- fontsize(myft, size = 10, part = "body")
+myft <- align(myft, align = "left", part = "all")
+myft <- autofit(myft)
+myft
+
+rm(GrowthCorrelationMDPico)
+```
+
 ```{r echo = FALSE}
 GrowthCorrelation <- readRDS(file = file.path("..", "Output", "TablesRds", "BalticPhotoperiod_Tab_GrowthCorrelation.Rds"))
 GrowthCorrelation<-GrowthCorrelation %>% 
