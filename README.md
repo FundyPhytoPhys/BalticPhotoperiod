@@ -44,7 +44,7 @@ https://docs.google.com/spreadsheets/d/1cfyxO1bFSeEMlMnx1vAyuskk3Un_bqkE9-uUSc-j
 
 ## Keywords
 
-Light intensity, PAR, PC-rich strain, PE-rich strain, Photic regime, Phase of growth, Photoperiod, picocyanobacteria, PUR
+Cumulative diel photon dose, Light intensity, PAR, Photic regime, Phase of growth, Photoperiod, picocyanobacteria, PUR
 
 ## Additional information and support
 
