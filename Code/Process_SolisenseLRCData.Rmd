@@ -63,6 +63,15 @@ TableRdsPath <- file.path("..", "Output", "TablesRDS")
 # HeaderRows <- 0
 ```
 
+# Read MetaData
+
+```{r read locally stored metadata from rds}
+CultureCatalog <- readRDS(file = file.path("..", "Data", "ImportedData", "ImportedMetaData", "CultureCatalog.Rds"))
+
+CultureCatalog<-CultureCatalog %>% 
+  select(-c(PrimaryOperator, Temp_c, ExpCul, ExpStartTime, O2_Category, Optode, OptodeCh, OptodeMeasure))
+```
+
 # Read Imported Solisense
 
 ```{r read locally stored metadata from rds}
@@ -658,7 +667,7 @@ SolFitsAllExpSt %>%
 # Save rds for further analysis
 
 ```{r save rds}
-saveRDS(SolFitsTurnerMDPico, file.path(DataOut, paste(Project, "Processed_SolisenseJVPSII_2.Rds", sep = "_"), fsep = .Platform$file.sep), ascii = FALSE, version = NULL, compress = "xz", refhook = NULL)
+saveRDS(SolFitsAllExpSt, file.path(DataOut, paste(Project, "Processed_SolisenseJVPSII_2.Rds", sep = "_"), fsep = .Platform$file.sep), ascii = FALSE, version = NULL, compress = "xz", refhook = NULL)
 
 ```
 
@@ -997,15 +1006,6 @@ LIFT<-LIFT %>%
   mutate(EX=as.double(EX)) %>% 
   mutate(EM=as.double(EM)) %>% 
   mutate(Fit=as.double(Fit)) 
-```
-
-# Read MetaData
-
-```{r read locally stored metadata from rds}
-CultureCatalog <- readRDS(file = file.path("..", "Data", "ImportedData", "ImportedMetaData", "CultureCatalog.Rds"))
-
-CultureCatalog<-CultureCatalog %>% 
-  select(-c(PrimaryOperator, Temp_c, ExpCul, ExpStartTime, O2_Category, Optode, OptodeCh, OptodeMeasure))
 ```
 
 
