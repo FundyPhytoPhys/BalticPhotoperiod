@@ -436,7 +436,7 @@ MDPicoMetaData <- read_sheet("https://docs.google.com/spreadsheets/d/1Lerp5u25kz
 ```
 
 
-# Merge Pigment and Culture catalog
+# Merge MD Pico and Culture catalog
 
 ```{r}
 MDPicoMeta <- MDPicoMetaData %>%
