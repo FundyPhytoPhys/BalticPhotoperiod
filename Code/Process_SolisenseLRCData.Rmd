@@ -1154,22 +1154,21 @@ LIFTMeta %>%
 SolFitsMetaLRC$facetsExcitation = factor(SolFitsMetaLRC$WL, labels = c("Excitation~(nm)"))
 ```
 
-
 # Plot B
 
 ```{r fig.height = 4, fig.width = 8, warning = FALSE}
 data_textB <- data.frame(facetsExcitation  = c("Excitation~(nm)"), Ex_WL = c("445"), label = c('B'))
 
-PlotB<-SolFitsMetaLRC |> 
-  unnest(GRCplatt_Predict) |>
-  filter(Strain == "BA48R") %>% 
-  filter(Par_ue == 90) %>% 
-  filter(Photoperiod == 16) |>
-  filter(E_days == 7) %>% 
+PlotB<-SolFitsMetaLRC %>%  
+  unnest(GRCplatt_Predict) %>% 
+  filter(Strain == "BA48R") %>%
+  filter(Par_ue == 90) %>%
+  filter(Photoperiod == 16) %>%
+  filter(E_days == 7) %>%
 ggplot() +
   geom_point(aes(ActPARCorr, JVPSII_umol_eLs), colour = "brown1", alpha = 0.8, size = 2, show.legend = F) +
   geom_line(aes(ActPARCorr, .fitted), colour = "blue", linetype = "solid", size = 0.4) +
-  geom_text(data=data_textB, aes(x=800, y=0.7, label=label), size=4.5) +
+  #geom_text(data=data_textB, aes(x=800, y=0.7, label=label), size=4.5) +
   #labs(y = ""~italic(JV)~""["PSII"]*" ("~10^18~""~e^-~""~L^-1~""~s^-1~")", x = "Actinic PAR ( µmol photons "~m^-2~""~s^-1~")") +
   labs(y = ""~italic(JV)~""["PSII"]*" (µmol"~e^-~""~L^-1~""~s^-1~")", x = "Actinic PAR ( µmol photons "~m^-2~""~s^-1~")") +
   ggh4x::facet_nested(rows = vars(facetsExcitation, Ex_WL), labeller = label_parsed) +
@@ -1189,6 +1188,93 @@ ggplot() +
         legend.text = element_text(size=11))
 PlotB
 ```
+
+# Trzeba zrobic Platt dla JVPSII per chl lub cell!
+wpierw podzielic jvpsii per chla lub cell potem zrobic plat!
+
+```{r}
+# colnames(SolFitsTurnerMDPico)
+
+SolFitsTurnerMDPicoPlot<-SolFitsTurnerMDPico %>% 
+  select(c(SampleID, meanTurChl_ugL, Strain, Par_ue, Photoperiod, Ex_WL, E_days, Run, meanCellmL_MDPico, JVPSII_umol_eLs_Par_ue, JVPSII_umol_eLs_HalfPar_ue)) %>% 
+  mutate(meanCellL_MDPico=meanCellmL_MDPico*1000) %>% 
+  mutate(JVPSII_umol_ecells_Par_ue=JVPSII_umol_eLs_Par_ue/meanCellL_MDPico) %>% 
+  mutate(JVPSII_umol_eChlas_Par_ue=JVPSII_umol_eLs_Par_ue/meanTurChl_ugL) %>% 
+  filter(Strain == "PE-rich_048") %>% 
+  filter(Par_ue == 90) %>% 
+  filter(Photoperiod == 16) %>% 
+  filter(E_days == 7)  
+
+
+SolFitsMetaLRCPlot<-SolFitsMetaLRC %>% 
+  mutate(Strain=case_when(Strain=="BA127R"~"PE-rich_127",
+         Strain=="BA48R"~"PE-rich_048",
+        Strain=="BA56G"~"PC-rich_056",
+         Strain=="BA77G"~"PC-rich_077")) 
+```
+
+# Merge MD Pico and Culture catalog
+
+```{r}
+MDPicoMetaPlot <- SolFitsMetaLRCPlot %>%
+  left_join(., SolFitsTurnerMDPicoPlot, by = c("SampleID" = "SampleID", "Strain"="Strain", "Par_ue"="Par_ue", "Photoperiod"="Photoperiod", "E_days"="E_days", "Run"="Run", "Ex_WL"="Ex_WL")) %>% 
+  drop_na(Strain) %>% 
+  filter(Par_ue == 90) %>% 
+  filter(Photoperiod == 16) %>% 
+  filter(E_days == 7) %>% 
+  drop_na(JVPSII_umol_ecells_Par_ue) %>% 
+  drop_na(JVPSII_umol_eChlas_Par_ue) 
+```
+
+```{r}
+Plot<-MDPicoMetaPlot %>%  
+  unnest(GRCplatt_Predict) %>% 
+  filter(Strain == "PE-rich_048") %>%
+  filter(Par_ue == 90) %>%
+  filter(Photoperiod == 16) %>%
+  filter(E_days == 7) %>% 
+  select(c(SampleID, Run, Strain, Par_ue, Photoperiod, Ex_WL, E_days, ActPARCorr, ".fitted", JVPSII_umol_eLs_Par_ue, JVPSII_umol_ecells_Par_ue, JVPSII_umol_eChlas_Par_ue, facetsExcitation)) %>% 
+  unique()
+
+# colnames(Plot)
+```
+
+
+
+# Fit LRC for JVPSII to allow selection of specific JVPSII for different growth light levels.
+
+```{r}
+grcplatt <- function(I, a, b, Pmax){Pmax * (1-exp(-a*I/Pmax)) * exp(-b*I/Pmax)}
+
+
+SolFitsMetaLRC <- SolFitsMeta %>%
+  nest(data = -c("SampleID", "Run", "Strain" ,"ExpDate","Par_ue", "Photoperiod", "O2", "WL", "MC", "Tube","Ex_WL","LightShape", "ExpEndDate", "PARPhotonDose_day", "ObsDate", "E_days")) %>% #head(50) %>% 
+  mutate(GRCplatt_Model = map(data, possibly(~nlsLM(JVPSII_umol_eLs ~ grcplatt(I = ActPARCorr, a, b, Pmax),
+         data = .x,
+         control = list(maxiter = 100),
+         start = list(a = 0.1, b = 0.01, Pmax = 3), lower = c(0, 0, 0))))) %>%
+  mutate(GRCplatt_Param = map(GRCplatt_Model, tidy),
+         GRCplatt_Predict = map(GRCplatt_Model, possibly(augment)),
+         GRCplatt_Glance = map(GRCplatt_Model, possibly(glance)))
+
+```
+
+# Create preliminary plot - Example
+
+```{r prelim plot}
+SolFitsMetaLRC |> 
+  unnest(GRCplatt_Predict) |>
+  filter(Strain == "BA48R") %>% 
+  filter(Par_ue == 90) %>% 
+  filter(Photoperiod == 16) |>
+ggplot() +
+  geom_point(aes(ActPARCorr, JVPSII_umol_eLs, colour = as.factor(Par_ue), shape = as.factor(Photoperiod)), alpha = 0.8, size = 3.5, show.legend = T) +
+  geom_line(aes(ActPARCorr, .fitted), colour = "black", linetype = "dotted") +
+  ggh4x::facet_nested(cols = vars(Ex_WL), rows = vars(Strain, Par_ue, Photoperiod, E_days), labeller = label_parsed) +
+  theme_bw()
+
+```
+
 
 
 # Merge two plots into one with panel A and B
