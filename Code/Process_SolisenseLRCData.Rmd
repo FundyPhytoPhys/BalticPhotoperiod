@@ -229,9 +229,9 @@ SolFitsMetaLRCGrowth |>
 # Save Rds for further analysis
 
 ```{r save rds}
-saveRDS(SolFitsMetaLRCGrowth, file.path(DataOut, paste(Project, "Processed_Solisense_LRC.Rds", sep = "_"), fsep = .Platform$file.sep), ascii = FALSE, version = NULL, compress = "xz", refhook = NULL)
+saveRDS(SolFitsMetaLRCGrowth, file.path(DataOut, paste(Project, "SolFitsMetaLRCGrowth.Rds", sep = "_"), fsep = .Platform$file.sep), ascii = FALSE, version = NULL, compress = "xz", refhook = NULL)
 
-saveRDS(SolFitsMetaLRC, file.path("..", "..", "PicoDiel", "Data", "CleanedData",  "Processed_Solisense_LRC.Rds", fsep = .Platform$file.sep), ascii = FALSE, version = NULL, compress = "xz", refhook = NULL)
+saveRDS(SolFitsMetaLRC, file.path("..", "..", "PicoDiel", "Data", "CleanedData",  "SolFitsMetaLRC.Rds", fsep = .Platform$file.sep), ascii = FALSE, version = NULL, compress = "xz", refhook = NULL)
 ```
 
 
