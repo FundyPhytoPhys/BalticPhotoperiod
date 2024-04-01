@@ -149,18 +149,18 @@ SolFitsMeta %>%
 # Fit LRC for JVPSII to allow selection of specific JVPSII for different growth light levels.
 
 ```{r}
-grcplatt <- function(I, a, b, Pmax){Pmax * (1-exp(-a*I/Pmax)) * exp(-b*I/Pmax)}
+lrcplatt <- function(I, a, b, Pmax){Pmax * (1-exp(-a*I/Pmax)) * exp(-b*I/Pmax)}
 
 
 SolFitsMetaLRC <- SolFitsMeta %>%
   nest(data = -c("SampleID", "Run", "Strain" ,"ExpDate","Par_ue", "Photoperiod", "O2", "WL", "MC", "Tube","Ex_WL","LightShape", "ExpEndDate", "PARPhotonDose_day", "ObsDate", "E_days")) %>% #head(50) %>% 
-  mutate(GRCplatt_Model = map(data, possibly(~nlsLM(JVPSII_umol_eLs ~ grcplatt(I = ActPARCorr, a, b, Pmax),
+  mutate(lrcplatt_Model = map(data, possibly(~nlsLM(JVPSII_umol_eLs ~ lrcplatt(I = ActPARCorr, a, b, Pmax),
          data = .x,
          control = list(maxiter = 100),
          start = list(a = 0.1, b = 0.01, Pmax = 3), lower = c(0, 0, 0))))) %>%
-  mutate(GRCplatt_Param = map(GRCplatt_Model, tidy),
-         GRCplatt_Predict = map(GRCplatt_Model, possibly(augment)),
-         GRCplatt_Glance = map(GRCplatt_Model, possibly(glance)))
+  mutate(lrcplatt_Param = map(lrcplatt_Model, tidy),
+         lrcplatt_Predict = map(lrcplatt_Model, possibly(augment)),
+         lrcplatt_Glance = map(lrcplatt_Model, possibly(glance)))
 
 ```
 
@@ -168,7 +168,7 @@ SolFitsMetaLRC <- SolFitsMeta %>%
 
 ```{r prelim plot}
 SolFitsMetaLRC |> 
-  unnest(GRCplatt_Predict) |>
+  unnest(lrcplatt_Predict) |>
   filter(Strain == "BA48R") %>% 
   filter(Par_ue == 90) %>% 
   filter(Photoperiod == 16) |>
@@ -181,17 +181,17 @@ ggplot() +
 ```
 
 Use Peak Par_ue and 1/2 Peak Par_ue to estimate growth JVPSII for each combination
--use 'Pluck' to reach into GRCplatt_Predict to get a, b, Pmax; or
+-use 'Pluck' to reach into lrcplatt_Predict to get a, b, Pmax; or
 -unnest, pivot wider to get a, b, Pmax
 
 ```{r growth light JVPSII}
 
 SolFitsMetaLRCGrowth <- SolFitsMetaLRC |>
-  unnest(GRCplatt_Param) |>
-  select(-c(statistic, p.value, GRCplatt_Predict, GRCplatt_Glance)) |> #remove (temporarily) to make pivot_wider easier
+  unnest(lrcplatt_Param) |>
+  select(-c(statistic, p.value, lrcplatt_Predict, lrcplatt_Glance)) |> #remove (temporarily) to make pivot_wider easier
   pivot_wider(names_from = term, values_from = c(estimate, std.error)) |>
-  mutate(JVPSII_umol_eLs_Par_ue = grcplatt(I = Par_ue, a = estimate_a, estimate_b, estimate_Pmax),
-         JVPSII_umol_eLs_HalfPar_ue = grcplatt(I = (0.5*Par_ue), a = estimate_a, estimate_b, estimate_Pmax))
+  mutate(JVPSII_umol_eLs_Par_ue = lrcplatt(I = Par_ue, a = estimate_a, estimate_b, estimate_Pmax),
+         JVPSII_umol_eLs_HalfPar_ue = lrcplatt(I = (0.5*Par_ue), a = estimate_a, estimate_b, estimate_Pmax))
 
  
 head(SolFitsMetaLRCGrowth) 
@@ -476,7 +476,7 @@ MDPicoAll %>%
 
 SolFitsTurnerMDPico <- SolFitsExpStTurner %>%
   full_join(., MDPicoAll, by = c("SampleID"="SampleID", "Strain"="Strain", "Run"="Run", "Tube"="Tube", "Par_ue"="Par_ue", "Photoperiod"="Photoperiod", "WL"="WL", "O2"="O2", "LightShape"="LightShape", "PARPhotonDose_day"="PARPhotonDose_day", "ExpDate"="ExpDate", "ExpEndDate"="ExpEndDate",  "E_days"="E_days")) %>% 
-  select(-c(estimate_a, estimate_b, estimate_Pmax, std.error_a, std.error_b, std.error_Pmax, GRCplatt_Model, MC)) %>% 
+  select(-c(estimate_a, estimate_b, estimate_Pmax, std.error_a, std.error_b, std.error_Pmax, lrcplatt_Model, MC)) %>% 
   unique()
 
 
@@ -1160,7 +1160,7 @@ SolFitsMetaLRC$facetsExcitation = factor(SolFitsMetaLRC$WL, labels = c("Excitati
 data_textB <- data.frame(facetsExcitation  = c("Excitation~(nm)"), Ex_WL = c("445"), label = c('B'))
 
 PlotB<-SolFitsMetaLRC %>%  
-  unnest(GRCplatt_Predict) %>% 
+  unnest(lrcplatt_Predict) %>% 
   filter(Strain == "BA48R") %>%
   filter(Par_ue == 90) %>%
   filter(Photoperiod == 16) %>%
@@ -1228,7 +1228,7 @@ MDPicoMetaPlot <- SolFitsMetaLRCPlot %>%
 
 ```{r}
 Plot<-MDPicoMetaPlot %>%  
-  unnest(GRCplatt_Predict) %>% 
+  unnest(lrcplatt_Predict) %>% 
   filter(Strain == "PE-rich_048") %>%
   filter(Par_ue == 90) %>%
   filter(Photoperiod == 16) %>%
@@ -1244,18 +1244,18 @@ Plot<-MDPicoMetaPlot %>%
 # Fit LRC for JVPSII to allow selection of specific JVPSII for different growth light levels.
 
 ```{r}
-grcplatt <- function(I, a, b, Pmax){Pmax * (1-exp(-a*I/Pmax)) * exp(-b*I/Pmax)}
+lrcplatt <- function(I, a, b, Pmax){Pmax * (1-exp(-a*I/Pmax)) * exp(-b*I/Pmax)}
 
 
 SolFitsMetaLRC <- SolFitsMeta %>%
   nest(data = -c("SampleID", "Run", "Strain" ,"ExpDate","Par_ue", "Photoperiod", "O2", "WL", "MC", "Tube","Ex_WL","LightShape", "ExpEndDate", "PARPhotonDose_day", "ObsDate", "E_days")) %>% #head(50) %>% 
-  mutate(GRCplatt_Model = map(data, possibly(~nlsLM(JVPSII_umol_eLs ~ grcplatt(I = ActPARCorr, a, b, Pmax),
+  mutate(lrcplatt_Model = map(data, possibly(~nlsLM(JVPSII_umol_eLs ~ lrcplatt(I = ActPARCorr, a, b, Pmax),
          data = .x,
          control = list(maxiter = 100),
          start = list(a = 0.1, b = 0.01, Pmax = 3), lower = c(0, 0, 0))))) %>%
-  mutate(GRCplatt_Param = map(GRCplatt_Model, tidy),
-         GRCplatt_Predict = map(GRCplatt_Model, possibly(augment)),
-         GRCplatt_Glance = map(GRCplatt_Model, possibly(glance)))
+  mutate(lrcplatt_Param = map(lrcplatt_Model, tidy),
+         lrcplatt_Predict = map(lrcplatt_Model, possibly(augment)),
+         lrcplatt_Glance = map(lrcplatt_Model, possibly(glance)))
 
 ```
 
@@ -1263,7 +1263,7 @@ SolFitsMetaLRC <- SolFitsMeta %>%
 
 ```{r prelim plot}
 SolFitsMetaLRC |> 
-  unnest(GRCplatt_Predict) |>
+  unnest(lrcplatt_Predict) |>
   filter(Strain == "BA48R") %>% 
   filter(Par_ue == 90) %>% 
   filter(Photoperiod == 16) |>
