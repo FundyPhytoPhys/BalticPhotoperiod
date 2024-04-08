@@ -1,0 +1,95 @@
+---
+title: "Salinity"
+author:
+- Sylwia Sliwinska-Wilczewska
+date: "`r format(Sys.Date())`"
+output:
+bookdown::html_document2:
+    code_folding: show
+    keep_md: yes
+    toc: TRUE
+    toc_float: TRUE
+    toc_depth: 6
+    fig_caption: yes
+bibliography: BalticPhotoperiod.bib
+csl: plos-one.csl
+editor_options: 
+  markdown: 
+    wrap: 72
+---
+
+# Set Chunk Options
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE)
+knitr::opts_chunk$set(fig.path='Figs/')
+```
+
+# Load Libraries and set Project Variables
+
+```{r load libraries, warning = FALSE, echo=FALSE}
+library(tidyverse)
+library(lubridate)
+library(knitr)
+library(data.table)
+library(googledrive)
+library(googlesheets4)
+```
+
+```{r set project variables, warning = FALSE, echo=FALSE}
+#DataOut <- file.path("..","Data", "ImportedData", "ImportedMetaData")
+```
+
+# Import MetaData 
+
+```{r load Catalog direct from googlesheet, results = "hide", warning = FALSE, echo=FALSE}
+gs4_deauth()
+# this is the URL or ID of a Sheet readable by anyone (with a link)
+CultureCatalog <- read_sheet("https://docs.google.com/spreadsheets/d/1Br9ai2owPSt8Q7MsGWS-M8-QEFw_qXadaQXf8vrdvPc/edit#gid=0")    
+```
+
+# Create E_day column
+
+```{r}
+
+Salinity <- CultureCatalog %>% 
+  mutate(StartDate = ymd(StartDate)) %>% 
+  mutate(MeasDate = ymd(MeasDate)) %>% 
+  group_by(SampleID) %>%
+  arrange(MeasDate) %>%
+  mutate(E_days = as.numeric((MeasDate - StartDate[1]))) %>%
+ungroup()
+
+```
+# Calculated Anova and Tukey test
+
+```{r calculated statistics}
+
+Salinity$`Salinity (PSU)` <- factor(Salinity$`Salinity (PSU)`)
+Salinity$Strain <- factor(Salinity$Strain)
+
+# Two way Anova with interactions
+model<-aov("Cell Count N/mL"~"Salinity (PSU)" *Strain, data=Salinity)
+AnovaTest<-data.frame(unclass(summary(model)), check.names = FALSE, stringsAsFactors = FALSE)
+TukeyHSDTest<-TukeyHSD(model, which = c("Salinity (PSU)", "Strain"))
+```
+
+# Create preliminary plot
+
+```{r preliminary plot, warning = FALSE}
+Salinity %>%
+  ggplot() +
+  geom_point(aes(x = "Salinity (PSU)", y = "Cell Count N/mL", colour=as.factor(Strain)), size = 3.5, alpha = 0.9, show.legend = T) +
+  #geom_errorbar(aes(x = Salinity, ymin = mean - sd, ymax = mean + sd), alpha = 0.5) +
+  labs(y = "Number of cells" ~ "("~10^7~")", x = "Salinity (PSU)") +
+  ggh4x::facet_nested(rows = vars(Strain)) +
+  theme_bw()
+```
+
+# Save rds for further analysis
+
+```{r save rds}
+# saveRDS(object = Salinity, file = file.path("..", "Data", "ImportedData", "ImportedMetaData", "Salinity.Rds"), compress = "xz")
+```
+
+
