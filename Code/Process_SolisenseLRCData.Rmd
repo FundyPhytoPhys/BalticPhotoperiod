@@ -97,6 +97,13 @@ SolFitsMeta %>%
   facet_grid(rows = vars(Ex_WL), cols = vars(Photoperiod)) +
   theme_bw()
 
+
+SolFitsMeta %>%
+  ggplot() +
+  geom_point(aes(x = Par_ue, y = JVPSII_ETRqpOxbo_FoSigmax_m2psii, colour = as.factor(Strain)), size = 3.5, show.legend = T) +
+  scale_colour_discrete(type=c("seagreen4", "palegreen3", "brown1", "brown4"), name="", labels = lab1) +
+  facet_grid(rows = vars(Ex_WL), cols = vars(Photoperiod)) +
+  theme_bw()
 ```
 To get the Platt fits to work I plotted:
 JVPSII_umole_eLs vs. ActPAR
@@ -117,16 +124,6 @@ SolFitsMeta <- left_join(SolFitsMeta, JVPSII_eLs_ModelTerms, by = join_by(Ex_WL)
 
 ```
 
-# Create smaller value to for Platt model
-
-```{r}
-# SolFitsMeta<-SolFitsMetaRaw %>%
-#   mutate(JVPSII_aLHIIOxbomax = JVPSII_aLHIIOxbomax/1e22) %>%
-#   mutate(JVPSII_ETRtauav_FoSig = JVPSII_ETRtauav_FoSig/1e22) %>%
-#   mutate(JVPSII_ETRqpOxbo_FoSig = JVPSII_ETRqpOxbo_FoSig/1e22) %>%
-#   mutate(JVPSII_ETRtauav_aLHII_Sig = JVPSII_ETRtauav_aLHII_Sig/1e22) %>%
-#   mutate(JVPSII_ETRqpOxbo_aLHII_Sig = JVPSII_ETRqpOxbo_aLHII_Sig/1e22)
-```
 
 
 # Create preliminary plots 
