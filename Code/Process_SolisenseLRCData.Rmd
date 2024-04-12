@@ -1395,6 +1395,44 @@ ggsave(file = file.path(FigPath, paste("Fig_LIFT",".png",sep = "")), height=9, w
 ```
 
 
+
+
+
+
+# JVPSII vs eLs
+
+```{r JVPSII calib}
+O2FRRfMetaModels <- read_rds(file.path("..","Data", "CleanedData", "JVPSIIO2Calib", "O2FRRfMetaModels.Rds"))
+
+#smarter way to code this with 'which' in [] and map through Ex_WL
+# SolFitsMeta <- left_join(SolFitsMeta, JVPSII_eLs_ModelTerms, by = join_by(Ex_WL)) |>
+#   select(-c(Slope_P)) |>
+#   mutate(JVPSII_eLs = JVPSII_ETRqpOxbo_FoSigmax_m2psii/Slope) |>
+#   mutate(JVPSII_umol_eLs = JVPSII_eLs/6.022e17)
+
+```
+
+
+```{r JVPSII_e regressions}
+
+O2FRRfMetaModels %>%
+  filter(Ex_WL == 445 | Ex_WL == 590) %>% 
+  unnest(JVPSII_ETRqpOxbo_FoSigmax_m2psii_e_predict) %>%
+  ggplot() +
+  geom_line(aes(x = e_Ls, y = .fitted), colour = "black", linetype = "dashed") +
+ #geom_line(aes(x = O2evln_O2ls, y = .fitted + .se.fit), colour = "grey", linetype = "dashed") +
+ #geom_line(aes(x = O2evln_O2ls, y = .fitted - .se.fit), colour = "grey", linetype = "dashed") +
+  geom_point(aes(x = e_Ls, y = JVPSII_ETRqpOxbo_FoSigmax_m2psii),colour = "darkgreen") +
+  geom_point(aes(x = e_Ls, y = .resid), colour = "darkred", size = 0.1) +
+  geom_hline(yintercept = 0,linetype = "dashed") +
+  facet_grid(cols = vars(Ex_WL)) +
+  theme_bw()
+
+```
+
+
+
+
 # Save rds for further analysis
 
 ```{r save rds}
