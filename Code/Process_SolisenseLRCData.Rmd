@@ -1172,7 +1172,7 @@ Plota<-LIFTMeta %>%
   filter(Time_us<1000) %>% 
   filter(Time_us>0) %>% 
   ggplot() +
-  geom_point(aes(x = Time_us, y = EM),  colour = "brown1", alpha = 0.8, size = 2, show.legend = F) +
+  geom_point(aes(x = Time_us, y = EM),  colour = "darkblue", shape = 1, alpha = 0.8, size = 2, show.legend = F) +
   geom_line(aes(x = Time_us, y = Fit),  colour = "blue", alpha = 0.7, size = 0.7, show.legend = F) +
   geom_vline(xintercept = 250, linetype="dashed", col="black", lwd=0.2) +
   
@@ -1274,10 +1274,10 @@ Plotaa<-LIFTMeta %>%
   filter(Time_us<1000) %>% 
   filter(Time_us>0) %>% 
   ggplot() +
-  geom_point(aes(x = Time_us, y = EM),  colour = "darkblue", alpha = 0.8, size = 2, show.legend = F) +
-  geom_point(aes(x = Time_us, y = EM),  colour = "orange", alpha = 0.8, size = 2, show.legend = F, LIFTMeta590) +
-  geom_line(aes(x = Time_us, y = Fit),  colour = "blue", alpha = 0.7, size = 0.7, show.legend = F, LIFTMeta445) +
-  geom_line(aes(x = Time_us, y = Fit),  colour = "blue", alpha = 0.7, size = 0.7, show.legend = F, LIFTMeta590) +
+  geom_point(aes(x = Time_us, y = EM),  colour = "darkblue", alpha = 0.8, size = 2, shape = 1, show.legend = F, LIFTMeta445) +
+  geom_point(aes(x = Time_us, y = EM),  colour = "orange", alpha = 0.8, size = 1.5, shape = 5, show.legend = F, LIFTMeta590) +
+  geom_line(aes(x = Time_us, y = Fit),  colour = "darkblue", alpha = 0.7, size = 0.7, show.legend = F, LIFTMeta445) +
+  geom_line(aes(x = Time_us, y = Fit),  colour = "orange", alpha = 0.7, size = 0.7, show.legend = F, LIFTMeta590) +
   geom_vline(xintercept = 250, linetype="dashed", col="black", lwd=0.2) +
   
   geom_text(data=data_textA, aes(x=1000, y=2000, label=label), size=4.5) +
@@ -1408,16 +1408,14 @@ SolTurner <- ChlData %>%
          Strain=="BA77G"~"PC-rich_077")) %>% 
   filter(Strain=="PC-rich_056" | Strain == "PC-rich_077" | Strain == "PE-rich_048" | Strain == "PE-rich_127")
   
-
-
-0.0011
 ```
+
 # Calculate Turner per umol chl
+
 ```{r}
 SolTurner<-SolTurner %>% 
   mutate(meanTurChl_umolL=meanTurChl_ugL*0.00112)
 ```
-
 
 
 # Again join with MDPico for plot only
@@ -1591,7 +1589,7 @@ Plotc<-SolTurnerMDPicoLRC2 %>%
   filter(Photoperiod == 16) %>%
   filter(E_days == 14) %>%
 ggplot() +
-  geom_point(aes(ActPARCorr, JVPSII_umol_eLs_umolChla), colour = "brown1", alpha = 0.8, size = 2, show.legend = F) +
+  geom_point(aes(ActPARCorr, JVPSII_umol_eLs_umolChla), colour = "darkblue", shape = 1, alpha = 0.8, size = 2, show.legend = F) +
   geom_line(aes(ActPARCorr, .fitted), colour = "blue", linetype = "solid", size = 0.4) +
   geom_text(data=data_textC, aes(x=800, y=0.4, label=label), size=4.5) +
   #labs(y = ""~italic(JV)~""["PSII"]*" ("~10^18~""~e^-~""~L^-1~""~s^-1~")", x = "Actinic PAR ( µmol photons "~m^-2~""~s^-1~")") +
@@ -1634,10 +1632,10 @@ Plotcc<-SolTurnerMDPicoLRC2 %>%
   filter(Photoperiod == 16) %>%
   filter(E_days == 14) %>%
 ggplot() +
-  geom_point(aes(ActPARCorr, JVPSII_umol_eLs_umolChla), colour = "darkblue", alpha = 0.8, size = 2, show.legend = F) +
-  geom_point(aes(ActPARCorr, JVPSII_umol_eLs_umolChla), colour = "orange", alpha = 0.8, size = 2, show.legend = F, SolTurnerMDPicoLRC2590) +
-  geom_line(aes(ActPARCorr, .fitted), colour = "blue", linetype = "solid", size = 0.4) +
-  geom_line(aes(ActPARCorr, .fitted), colour = "blue", linetype = "solid", size = 0.4, SolTurnerMDPicoLRC2590) +
+  geom_point(aes(ActPARCorr, JVPSII_umol_eLs_umolChla), colour = "darkblue", shape = 1, size = 2, alpha = 0.8, size = 2, show.legend = F) +
+  geom_point(aes(ActPARCorr, JVPSII_umol_eLs_umolChla), colour = "orange", shape = 5, size = 1.5, alpha = 0.8, size = 2, show.legend = F, SolTurnerMDPicoLRC2590) +
+  geom_line(aes(ActPARCorr, .fitted), colour = "darkblue", linetype = "solid", size = 0.4) +
+  geom_line(aes(ActPARCorr, .fitted), colour = "orange", linetype = "solid", size = 0.4, SolTurnerMDPicoLRC2590) +
   geom_text(data=data_textC, aes(x=800, y=0.8, label=label), size=4.5) +
   
   scale_y_continuous(breaks=seq(0, 0.8, by = 0.2)) +
@@ -1746,8 +1744,8 @@ Plotb<-O2FRRfMetaModels %>%
   geom_text(data=data_textB, aes(x=7.5e16, y=2.0e22, label=label), size=4.5) +
  #geom_line(aes(x = O2evln_O2ls, y = .fitted + .se.fit), colour = "grey", linetype = "dashed") +
  #geom_line(aes(x = O2evln_O2ls, y = .fitted - .se.fit), colour = "grey", linetype = "dashed") +
-  geom_point(aes(x = e_Ls, y = JVPSII_ETRqpOxbo_FoSigmax_m2psii),colour = "darkblue", alpha = 0.8, size = 2.0) +
-  geom_point(aes(x = e_Ls, y = .resid), colour = "black", size = 0.1) +
+  geom_point(aes(x = e_Ls, y = JVPSII_ETRqpOxbo_FoSigmax_m2psii),colour = "darkblue", shape = 1, alpha = 0.8, size = 2.0) +
+  #geom_point(aes(x = e_Ls, y = .resid), colour = "black", size = 0.1) +
   #geom_hline(yintercept = 0,linetype = "dashed") +
   scale_x_continuous(label=scientific_10) +
   scale_y_continuous(breaks=seq(0, 2e22, by = 1e22), label=scientific_10) +
@@ -1788,15 +1786,15 @@ Plotbb<-O2FRRfMetaModels %>%
   filter(Ex_WL == 445) %>% 
   unnest(JVPSII_ETRqpOxbo_FoSigmax_m2psii_e_predict) %>%
   ggplot() +
-  geom_line(aes(x = e_Ls, y = .fitted), colour = "blue", linetype = "solid") +
-  geom_line(aes(x = e_Ls, y = .fitted), colour = "blue", linetype = "solid", O2FRRfMetaModels590) +
+  geom_line(aes(x = e_Ls, y = .fitted), colour = "darkblue", linetype = "solid") +
+  geom_line(aes(x = e_Ls, y = .fitted), colour = "orange", linetype = "solid", O2FRRfMetaModels590) +
   geom_text(data=data_textB, aes(x=2.8e17, y=8e22, label=label), size=4.5) +
  #geom_line(aes(x = O2evln_O2ls, y = .fitted + .se.fit), colour = "grey", linetype = "dashed") +
  #geom_line(aes(x = O2evln_O2ls, y = .fitted - .se.fit), colour = "grey", linetype = "dashed") +
-  geom_point(aes(x = e_Ls, y = JVPSII_ETRqpOxbo_FoSigmax_m2psii),colour = "darkblue", alpha = 0.8, size = 2.0) +
-  geom_point(aes(x = e_Ls, y = JVPSII_ETRqpOxbo_FoSigmax_m2psii),colour = "orange", alpha = 0.8, size = 2.0, O2FRRfMetaModels590) +
-  geom_point(aes(x = e_Ls, y = .resid), colour = "darkblue", alpha = 0.8, size = 0.1) +
-  geom_point(aes(x = e_Ls, y = .resid), colour = "orange", alpha = 0.8, size = 0.1, O2FRRfMetaModels590) +
+  geom_point(aes(x = e_Ls, y = JVPSII_ETRqpOxbo_FoSigmax_m2psii),colour = "darkblue", shape =1, alpha = 0.8, size = 2.0) +
+  geom_point(aes(x = e_Ls, y = JVPSII_ETRqpOxbo_FoSigmax_m2psii),colour = "orange", shape =5, size = 1.5, alpha = 0.8, size = 2.0, O2FRRfMetaModels590) +
+  # geom_point(aes(x = e_Ls, y = .resid), colour = "darkblue", alpha = 0.8, size = 0.1) +
+  # geom_point(aes(x = e_Ls, y = .resid), colour = "orange", alpha = 0.8, size = 0.1, O2FRRfMetaModels590) +
   #geom_hline(yintercept = 0,linetype = "dashed") +
   scale_x_continuous(label=scientific_10) +
   scale_y_continuous(breaks=seq(0, 8e22, by = 2e22), label=scientific_10) +
@@ -1828,7 +1826,7 @@ ggp
 # Save plot 
 
 ```{r save plot}
-ggsave(file = file.path(FigPath, paste("Fig_LIFTABC",".png",sep = "")), height=9, width= 9.5,  dpi = 300, limitsize = TRUE)
+ggsave(file = file.path(FigPath, paste("Fig_LIFTABC4",".png",sep = "")), height=9, width= 9.5,  dpi = 300, limitsize = TRUE)
 ```
 
 
@@ -1840,7 +1838,7 @@ ggp
 # Save plot 
 
 ```{r save plot}
-ggsave(file = file.path(FigPath, paste("Fig_LIFTABC2",".png",sep = "")), height=10, width= 9.5,  dpi = 300, limitsize = TRUE)
+ggsave(file = file.path(FigPath, paste("Fig_LIFTABC3",".png",sep = "")), height=10, width= 9.5,  dpi = 300, limitsize = TRUE)
 ```
 
 
