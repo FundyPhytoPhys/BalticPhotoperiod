@@ -1826,7 +1826,7 @@ ggp
 # Save plot 
 
 ```{r save plot}
-ggsave(file = file.path(FigPath, paste("Fig_LIFTABC4",".png",sep = "")), height=9, width= 9.5,  dpi = 300, limitsize = TRUE)
+ggsave(file = file.path(FigPath, paste("Fig_LIFT2",".png",sep = "")), height=9, width= 9.5, dpi = 300, limitsize = TRUE)
 ```
 
 
@@ -1838,7 +1838,7 @@ ggp
 # Save plot 
 
 ```{r save plot}
-ggsave(file = file.path(FigPath, paste("Fig_LIFTABC3",".png",sep = "")), height=10, width= 9.5,  dpi = 300, limitsize = TRUE)
+ggsave(file = file.path(FigPath, paste("Fig_LIFT",".png",sep = "")), height=10, width= 9.5,  dpi = 300, limitsize = TRUE)
 ```
 
 
