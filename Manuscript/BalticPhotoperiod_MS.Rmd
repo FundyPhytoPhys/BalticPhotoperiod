@@ -147,26 +147,6 @@ OlisSpectra_cap<- glue("**Whole-cell absorbance spectra of PC-rich (solid green 
 knitr::include_graphics(file.path( FiguresFP,"Fig_OlisSpectra.png")) 
 ```
 
-## Estimating cumulative diel PAR and PUR {.unnumbered}
-
-Based on the length and shape of the photoperiod (sinuisoidal wave for photoperiods of 8 – 16 h; square for photoperiod of 24 h) and the peak PAR (µE = µmol photons m^−2^s^−1^), we estimated the value of the cumulative diel PAR (µmol photons m^−2^d^−1^). For sinuisoidal photoperiods we used Eq. \@ref(eq:PhotonDoseSine); for the continuous 24 h photoperiod we used Eq. \@ref(eq:PhotonDoseSquare).
-
-\begin{equation}
-\begin{split}
-  Cumulative~diel~PAR~(µmol~photons~m^{−2}~d^{−1})= \\ \frac{PAR~(µE)×60~(s~min^{−1})×60~(min~h^{−1})×photoperiod~(h~d^{−1})}{2}
-  (\#eq:PhotonDoseSine)
-\end{split}
-\end{equation}
-
-\begin{equation}
-\begin{split}
-  Cumulative~diel~PAR~(µmol~photons~m^{−2}~d^{−1})= \\ PAR~(µE)×60~(s~min^{−1})×60~(min~h^{−1})×photoperiod~(h~d^{−1})
-  (\#eq:PhotonDoseSquare)
-\end{split}
-\end{equation}
-
-Cumulative diel PUR was estimated similarly to PAR, after estimation of peak PUR from peak PAR.
-
 ## Pigment content analysis {.unnumbered}
 
 The chlorophyll *a* (Chl *a*) content (µg mL^−1^) was measured using Trilogy Laboratory Fluorometer (Turner Designs, Inc., CA, USA) equipped with Chlorophyll In-Vivo Module, previously calibrated using 20 mL ampoules with known concentration of Chl *a* in a 90% acetone solution (SKU: 10-850). Quantitative analysis of Chl *a* was obtained after adding 50 µL of culture and 2 mL of a 90% acetone/DMSO solution in a 3/2 ratio [@schragaWaterQualityMeasurements2017].
