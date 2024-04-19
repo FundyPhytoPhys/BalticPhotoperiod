@@ -1176,25 +1176,25 @@ Plota<-LIFTMeta %>%
   geom_line(aes(x = Time_us, y = Fit),  colour = "blue", alpha = 0.7, size = 0.7, show.legend = F) +
   geom_vline(xintercept = 250, linetype="dashed", col="black", lwd=0.2) +
   
-  geom_text(data=data_textA, aes(x=1000, y=500, label=label), size=4.5) +
+  geom_text(data=data_textA, aes(x=1000, y=500, label=label), size=5) +
   
-  geom_text(data=data_textSat, aes(x=100, y=100, label=label), size=3.5) +
-  geom_text(data=data_textRel, aes(x=500, y=100, label=label), size=3.5) +
-  geom_text(data=data_textSat1, aes(x=100, y=60, label=label), size=3.5) +
-  geom_text(data=data_textRel1, aes(x=500, y=60, label=label), size=3.5) +
-  geom_text(data=data_textRel2, aes(x=500, y=40, label=label), size=3.5) +
+  geom_text(data=data_textSat, aes(x=100, y=100, label=label), size=4) +
+  geom_text(data=data_textRel, aes(x=500, y=100, label=label), size=4) +
+  geom_text(data=data_textSat1, aes(x=100, y=60, label=label), size=4) +
+  geom_text(data=data_textRel1, aes(x=500, y=60, label=label), size=4) +
+  geom_text(data=data_textRel2, aes(x=500, y=40, label=label), size=4) +
   
-  geom_text(data=data_textTao, aes(x=400, y=280, label=label), size=3.5, parse = TRUE) +
-  geom_text(data=data_textTaop, aes(x=450, y=330, label=label), size=3.5, parse = TRUE) +
+  geom_text(data=data_textTao, aes(x=400, y=280, label=label), size=4, parse = TRUE) +
+  geom_text(data=data_textTaop, aes(x=450, y=330, label=label), size=4, parse = TRUE) +
   
-  geom_text(data=data_textFm, aes(x=350, y=390, label=label), size=3.5, parse = TRUE) +
-  geom_text(data=data_textFmp, aes(x=350, y=470, label=label), size=3.5, parse = TRUE) +
+  geom_text(data=data_textFm, aes(x=350, y=390, label=label), size=4, parse = TRUE) +
+  geom_text(data=data_textFmp, aes(x=350, y=470, label=label), size=4, parse = TRUE) +
   
-  geom_text(data = data_textF0, aes(x = 50, y = 180, label = label), size = 3.5, parse = TRUE) +
-  geom_text(data = data_textF, aes(x=50, y=230, label=label), size=3.5, parse = TRUE) +
+  geom_text(data = data_textF0, aes(x = 50, y = 180, label = label), size = 4, parse = TRUE) +
+  geom_text(data = data_textF, aes(x=50, y=230, label=label), size=4, parse = TRUE) +
 
-  geom_text(data=data_textSig, aes(x=100, y=390, label=label), size=3.5, parse = TRUE) +
-  geom_text(data=data_textSigp, aes(x=60, y=450, label=label), size=3.5, parse = TRUE) +
+  geom_text(data=data_textSig, aes(x=100, y=390, label=label), size=4, parse = TRUE) +
+  geom_text(data=data_textSigp, aes(x=60, y=450, label=label), size=4, parse = TRUE) +
   
   geom_segment(data = arrowdf1, aes(x = -25, xend = 150, y = 190, yend = 360),
                colour = "black", size = 0.5, alpha=0.9, arrow = arrow(ends="both", type = "closed", length=unit(0.1, 'cm'))) +
@@ -1215,7 +1215,7 @@ Plota<-LIFTMeta %>%
         axis.text = element_text(size=12),
         axis.title = element_text(size=16),
         strip.background = element_rect(fill="white"),
-        strip.text = element_text(size=12),
+        strip.text = element_text(size=14),
         axis.title.y = element_text(margin=margin(r=10)),
         axis.title.x = element_text(margin=margin(t=10)),
         legend.background = element_rect(fill="transparent"),
@@ -1280,25 +1280,25 @@ Plotaa<-LIFTMeta %>%
   geom_line(aes(x = Time_us, y = Fit),  colour = "orange", alpha = 0.7, size = 0.7, show.legend = F, LIFTMeta590) +
   geom_vline(xintercept = 250, linetype="dashed", col="black", lwd=0.2) +
   
-  geom_text(data=data_textA, aes(x=1000, y=2000, label=label), size=4.5) +
+  geom_text(data=data_textA, aes(x=1000, y=2000, label=label), size=5.5) +
   
-  geom_text(data=data_textSat, aes(x=100, y=-80, label=label), size=3.5) +
-  geom_text(data=data_textRel, aes(x=500, y=-80, label=label), size=3.5) +
-  geom_text(data=data_textSat1, aes(x=100, y=-200, label=label), size=3.5) +
-  geom_text(data=data_textRel1, aes(x=500, y=-200, label=label), size=3.5) +
+  geom_text(data=data_textSat, aes(x=100, y=-140, label=label), size=4.0) +
+  geom_text(data=data_textRel, aes(x=500, y=-140, label=label), size=4.0) +
+  geom_text(data=data_textSat1, aes(x=100, y=-280, label=label), size=4.0) +
+  geom_text(data=data_textRel1, aes(x=500, y=-280, label=label), size=4.0) +
 
   
-  geom_text(data=data_textTao, aes(x=400, y=200, label=label), size=3.5, parse = TRUE) +
-  geom_text(data=data_textTaop, aes(x=450, y=250, label=label), size=3.5, parse = TRUE) +
+  geom_text(data=data_textTao, aes(x=400, y=200, label=label), size=4.5, parse = TRUE) +
+  geom_text(data=data_textTaop, aes(x=450, y=250, label=label), size=4.5, parse = TRUE) +
   
-  geom_text(data=data_textFm, aes(x=350, y=480, label=label), size=3.5, parse = TRUE) +
-  geom_text(data=data_textFmp, aes(x=350, y=560, label=label), size=3.5, parse = TRUE) +
+  geom_text(data=data_textFm, aes(x=350, y=480, label=label), size=4.5, parse = TRUE) +
+  geom_text(data=data_textFmp, aes(x=350, y=560, label=label), size=4.5, parse = TRUE) +
   
-  geom_text(data = data_textF0, aes(x = 50, y = 80, label = label), size = 3.5, parse = TRUE) +
-  geom_text(data = data_textF, aes(x=50, y=130, label=label), size=3.5, parse = TRUE) +
+  geom_text(data = data_textF0, aes(x = 10, y = 60, label = label), size = 4.5, parse = TRUE) +
+  geom_text(data = data_textF, aes(x=10, y=110, label=label), size=4.5, parse = TRUE) +
 
-  geom_text(data=data_textSig, aes(x=30, y=420, label=label), size=3.5, parse = TRUE) +
-  geom_text(data=data_textSigp, aes(x=30, y=480, label=label), size=3.5, parse = TRUE) +
+  geom_text(data=data_textSig, aes(x=30, y=420, label=label), size=4.5, parse = TRUE) +
+  geom_text(data=data_textSigp, aes(x=30, y=480, label=label), size=4.5, parse = TRUE) +
   
   geom_segment(data = arrowdf1, aes(x = -25, xend = 120, y = 220, yend = 360),
                colour = "black", size = 0.5, alpha=0.9, arrow = arrow(ends="both", type = "closed", length=unit(0.1, 'cm'))) +
@@ -1323,7 +1323,7 @@ Plotaa<-LIFTMeta %>%
         axis.text = element_text(size=12),
         axis.title = element_text(size=16),
         strip.background = element_rect(fill="white"),
-        strip.text = element_text(size=12),
+        strip.text = element_text(size=14),
         axis.title.y = element_text(margin=margin(r=10)),
         axis.title.x = element_text(margin=margin(t=10)),
         legend.background = element_rect(fill="transparent"),
@@ -1591,7 +1591,7 @@ Plotc<-SolTurnerMDPicoLRC2 %>%
 ggplot() +
   geom_point(aes(ActPARCorr, JVPSII_umol_eLs_umolChla), colour = "darkblue", shape = 1, alpha = 0.8, size = 2, show.legend = F) +
   geom_line(aes(ActPARCorr, .fitted), colour = "blue", linetype = "solid", size = 0.4) +
-  geom_text(data=data_textC, aes(x=800, y=0.4, label=label), size=4.5) +
+  geom_text(data=data_textC, aes(x=800, y=0.4, label=label), size=5) +
   #labs(y = ""~italic(JV)~""["PSII"]*" ("~10^18~""~e^-~""~L^-1~""~s^-1~")", x = "Actinic PAR ( µmol photons "~m^-2~""~s^-1~")") +
   labs(y = ""~italic(JV)~""["PSII"]*" (µmol"~e^-~""~µmol~Chl~italic(a)~""^-1~""~s^-1~")", x = "Actinic PAR ( µmol photons "~m^-2~""~s^-1~")") +
   #ggh4x::facet_nested(rows = vars(facetsExcitation, Ex_WL), labeller = label_parsed) +
@@ -1636,7 +1636,7 @@ ggplot() +
   geom_point(aes(ActPARCorr, JVPSII_umol_eLs_umolChla), colour = "orange", shape = 5, size = 1.5, alpha = 0.8, size = 2, show.legend = F, SolTurnerMDPicoLRC2590) +
   geom_line(aes(ActPARCorr, .fitted), colour = "darkblue", linetype = "solid", size = 0.4) +
   geom_line(aes(ActPARCorr, .fitted), colour = "orange", linetype = "solid", size = 0.4, SolTurnerMDPicoLRC2590) +
-  geom_text(data=data_textC, aes(x=800, y=0.8, label=label), size=4.5) +
+  geom_text(data=data_textC, aes(x=800, y=0.8, label=label), size=5.5) +
   
   scale_y_continuous(breaks=seq(0, 0.8, by = 0.2)) +
   coord_cartesian(ylim = c(0, 0.8)) +
@@ -1741,7 +1741,7 @@ Plotb<-O2FRRfMetaModels %>%
   unnest(JVPSII_ETRqpOxbo_FoSigmax_m2psii_e_predict) %>%
   ggplot() +
   geom_line(aes(x = e_Ls, y = .fitted), colour = "blue", linetype = "solid") +
-  geom_text(data=data_textB, aes(x=7.5e16, y=2.0e22, label=label), size=4.5) +
+  geom_text(data=data_textB, aes(x=7.5e16, y=2.0e22, label=label), size=5) +
  #geom_line(aes(x = O2evln_O2ls, y = .fitted + .se.fit), colour = "grey", linetype = "dashed") +
  #geom_line(aes(x = O2evln_O2ls, y = .fitted - .se.fit), colour = "grey", linetype = "dashed") +
   geom_point(aes(x = e_Ls, y = JVPSII_ETRqpOxbo_FoSigmax_m2psii),colour = "darkblue", shape = 1, alpha = 0.8, size = 2.0) +
@@ -1788,7 +1788,7 @@ Plotbb<-O2FRRfMetaModels %>%
   ggplot() +
   geom_line(aes(x = e_Ls, y = .fitted), colour = "darkblue", linetype = "solid") +
   geom_line(aes(x = e_Ls, y = .fitted), colour = "orange", linetype = "solid", O2FRRfMetaModels590) +
-  geom_text(data=data_textB, aes(x=2.8e17, y=8e22, label=label), size=4.5) +
+  geom_text(data=data_textB, aes(x=2.8e17, y=8e22, label=label), size=5.5) +
  #geom_line(aes(x = O2evln_O2ls, y = .fitted + .se.fit), colour = "grey", linetype = "dashed") +
  #geom_line(aes(x = O2evln_O2ls, y = .fitted - .se.fit), colour = "grey", linetype = "dashed") +
   geom_point(aes(x = e_Ls, y = JVPSII_ETRqpOxbo_FoSigmax_m2psii),colour = "darkblue", shape =1, alpha = 0.8, size = 2.0) +

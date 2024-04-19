@@ -1320,7 +1320,7 @@ data_text_yfExp<- data.frame(WL = c("WW", "WW"), Phase = c("Exponential"), O2=c(
 data_text_lambdaExp<- data.frame(WL = c("WW", "WW"), Phase = c("Exponential"), O2=c(21, 21, 21, 21), Strain  = c("PC-rich_056", "PC-rich_077", "PE-rich_048", "PE-rich_127"),  label = c('    \u03BB = 3.4e-08', '    \u03BB = 2.4e-07', '    \u03BB = 5.4e-07', '    \u03BB = 4.7e-07'))
 
 data_text_y0St<- data.frame(WL = c("WW", "WW"), Phase = c("Pre-stationary"), O2=c(21, 21, 21, 21), Strain  = c("PC-rich_056", "PC-rich_077", "PE-rich_048", "PE-rich_127"),  label = c('y0 = 0.4', 'y0 = 2.6', 'y0 = 0.5', 'y0 = 5.1'))
-data_text_yfSt<- data.frame(WL = c("WW", "WW"), Phase = c("Pre-stationary"), O2=c(21, 21, 21, 21), Strain  = c("PC-rich_056", "PC-rich_077", "PE-rich_048", "PE-rich_127"),  label = c('yf = 0.4', 'yf = 0.4', 'yf = -0.9', 'yf = 0.5'))
+data_text_yfSt<- data.frame(WL = c("WW", "WW"), Phase = c("Pre-stationary"), O2=c(21, 21, 21, 21), Strain  = c("PC-rich_056", "PC-rich_077", "PE-rich_048", "PE-rich_127"),  label = c('yf = 0.4', 'yf = 0.4', 'yf = 0.0', 'yf = 0.5'))
 data_text_lambdaSt<- data.frame(WL = c("WW", "WW"), Phase = c("Pre-stationary"), O2=c(21, 21, 21, 21), Strain  = c("PC-rich_056", "PC-rich_077", "PE-rich_048", "PE-rich_127"),  label = c('    \u03BB = 3.5e-08', '    \u03BB = 1.7e-06', '    \u03BB = 1.7e-09', '    \u03BB = 2.1e-06'))
 
 # data_text_AnovaExp<- data.frame(WL = c("WW", "WW"), Phase = c("Exponential"), O2=c(21, 21, 21, 21), Strain  = c("PC-rich_056", "PC-rich_077", "PE-rich_048", "PE-rich_127"),  label = c('ANOVA, \u03B1 = 0.05, a', 'ANOVA, \u03B1 = 0.05, b', 'ANOVA, \u03B1 = 0.05, c', 'ANOVA, \u03B1 = 0.05, c'))

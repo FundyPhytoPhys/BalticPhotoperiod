@@ -1100,8 +1100,8 @@ scientific_10 <- function(x) {   parse(text=gsub("e\\+*", " %*% 10^", scales::sc
 
 MCGrowthJVPSIISP %>% 
 ggplot() +
-  geom_point(aes(meanJVPSII_umol_eLs_Par_ue_umolChl_day, deltaOD_Lmu_corr, colour = as.factor(Par_ue), shape = as.factor(Photoperiod)), alpha = 0.8, size = 3.5, show.legend = T, MCGrowthJVPSIISPmean) +
-  geom_point(aes(JVPSII_umol_eLs_Par_ue_umolChl_day, deltaOD_Lmu_corr, colour = as.factor(Par_ue), shape = as.factor(Photoperiod)), alpha = 0.8, size = 1, show.legend = F) +
+  # geom_point(aes(JVPSII_umol_eLs_Par_ue_umolChl_day, deltaOD_Lmu_corr, colour = as.factor(Par_ue), shape = as.factor(Photoperiod)), alpha = 0.8, size = 3.5, show.legend = T) +
+  geom_point(aes(JVPSII_umol_eLs_Par_ue_umolChl_day, deltaOD_Lmu_corr, colour = as.factor(Par_ue), shape = as.factor(Photoperiod)), alpha = 0.8, size = 3.5, show.legend = T) +
   
   geom_line(aes(JVPSII_umol_eLs_Par_ue_umolChl_day, .fitted), colour = "blue", size = 0.3, linetype = "solid", show.legend = F, GRCplatt_PredictGrowthJVPSIIAll) +
   
@@ -1151,15 +1151,15 @@ ggsave(file = file.path(FigPath, paste("Fig_GrowthRate_JVPSII_Light_Chla",".png"
 ```{r fig.height = 8, fig.width = 8, warning = FALSE, warning = FALSE}
 MCGrowthJVPSIISP %>% 
 ggplot() +
-  geom_point(aes(meanJVPSII_umol_eLs_Par_ue_umolChl_day, deltaOD_Lmu_corr, colour = as.factor(Par_ue), shape = as.factor(Photoperiod)), alpha = 0.8, size = 3.5, show.legend = T, MCGrowthJVPSIISPmean) +
-  geom_point(aes(JVPSII_umol_eLs_Par_ue_umolChl_day, deltaOD_Lmu_corr, colour = as.factor(Par_ue), shape = as.factor(Photoperiod)), alpha = 0.8, size = 1, show.legend = F) +
+  # geom_point(aes(meanJVPSII_umol_eLs_Par_ue_umolChl_day, deltaOD_Lmu_corr, colour = as.factor(Par_ue), shape = as.factor(Photoperiod)), alpha = 0.8, size = 3.5, show.legend = T, MCGrowthJVPSIISPmean) +
+  geom_point(aes(JVPSII_umol_eLs_Par_ue_umolChl_day, deltaOD_Lmu_corr, colour = as.factor(Par_ue), shape = as.factor(Photoperiod)), alpha = 0.8, size = 3.5, show.legend = T) +
   
   geom_line(aes(JVPSII_umol_eLs_Par_ue_umolChl_day, .fitted), colour = "blue", size = 0.3, linetype = "solid", show.legend = F, GRCplatt_PredictGrowthJVPSIIAll) +
   
-  geom_line(aes(JVPSII_umol_eLs_Par_ue_umolChl_day, .fitted), colour = "black", linetype = "dotted", show.legend = F, GRCplatt_PredictGrowth8_BA56) +
-  geom_line(aes(JVPSII_umol_eLs_Par_ue_umolChl_day, .fitted), colour = "black", linetype = "dotdash", show.legend = F,  GRCplatt_PredictGrowth24_BA56) +
+  geom_line(aes(JVPSII_umol_eLs_Par_ue_umolChl_day, .fitted), colour = "black", linetype = "dotted", size = 0.6, show.legend = F, GRCplatt_PredictGrowth8_BA56) +
+  geom_line(aes(JVPSII_umol_eLs_Par_ue_umolChl_day, .fitted), colour = "black", linetype = "dotdash", size = 0.6, show.legend = F,  GRCplatt_PredictGrowth24_BA56) +
   
-  geom_line(aes(JVPSII_umol_eLs_Par_ue_umolChl_day, .fitted), colour = "black", linetype = "dotted", show.legend = F, GRCplatt_PredictGrowth8_BA127) +
+  geom_line(aes(JVPSII_umol_eLs_Par_ue_umolChl_day, .fitted), colour = "black", linetype = "dotted", size = 0.6, show.legend = F, GRCplatt_PredictGrowth8_BA127) +
 
 
   scale_x_continuous(label=scientific_10) +
