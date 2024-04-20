@@ -444,5 +444,5 @@ Table S15: T-test of linear fit model (Fit_model) of pooled data across differen
 # myft
 ```
 
-
+`r PURPARFits %>% filter(Strain == "MED4", WL == "450", O2_uM == "250", Photoperiod == 16) %>% select(ReplicateMean_deltaOD_Lmu_corr_day) %>% max() %>% round(digits = 2)`
 
