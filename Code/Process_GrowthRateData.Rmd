@@ -201,6 +201,12 @@ MCGrowthRate %>%
   geom_tile(aes(x = ParNUM, y = PhotoNUM, alpha = deltaOD_Lmu_corr, fill = Strain),  interpolate = FALSE, show.legend = T) +
   scale_colour_discrete(type=c("seagreen4", "palegreen3", "brown1", "brown4")) +
   scale_fill_discrete(type=c("seagreen4", "palegreen3", "brown1", "brown4")) +
+  scale_x_continuous(breaks = c(1, 2, 3, 4, 5, 6),
+                     labels = c(30, 90, 180, 300, 600, 900)) +
+  scale_y_continuous(breaks = c(1, 2, 3, 4),
+                     labels = c(8, 12, 16, 24)) +
+ labs(x = "umol photons m-2 s-1",
+      y = "Photoperiod (h)") +
   facet_wrap(vars(Strain)) +
   theme_bw() +
   theme(panel.grid.major = element_blank(),
