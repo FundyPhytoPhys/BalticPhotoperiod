@@ -1196,12 +1196,30 @@ rm(GrowthRate8Param, GrowthRate12Param, GrowthRate16Param, GrowthRate24Param)
 # Create preliminary plot from parameters
 
 ```{r preliminary plot}
+# MCParamAll_Light %>% 
+#   filter(term == "a") %>% 
+#   filter(Fit!= "All") %>% 
+#   ggplot() +
+#   geom_tail(aes(x = as.numeric(Fit), y = estimate, color = Strain)) +
+#   ggh4x::facet_nested(rows = vars(Strain), labeller = label_parsed, scales = "free") +
+#   theme_bw()
+
+
 MCParamAll_Light %>% 
   filter(term == "a") %>% 
   filter(Fit!= "All") %>% 
   ggplot() +
-  geom_point(aes(x = term, y = estimate, color = Strain)) +
-  ggh4x::facet_nested(cols = vars(as.numeric(Fit)), rows = vars(Strain), labeller = label_parsed, scales = "free") +
+  geom_point(aes(x = as.numeric(Fit), y = estimate, color = Strain)) +
+  ggh4x::facet_nested(rows = vars(Strain), labeller = label_parsed, scales = "free") +
+  theme_bw()
+
+
+MCParamAll_Photoperiod %>% 
+  filter(term == "a") %>% 
+  filter(Fit!= "All") %>% 
+  ggplot() +
+  geom_point(aes(x = as.numeric(Fit), y = estimate, color = Strain)) +
+  ggh4x::facet_nested(rows = vars(Strain), labeller = label_parsed, scales = "free") +
   theme_bw()
 
 MCParamAll_Light %>% 
@@ -1212,13 +1230,6 @@ MCParamAll_Light %>%
   ggh4x::facet_nested(cols = vars(as.numeric(Fit)), rows = vars(Strain), labeller = label_parsed, scales = "free") +
   theme_bw()
 
-MCParamAll_Photoperiod %>% 
-  filter(term == "a") %>% 
-  filter(Fit!= "All") %>% 
-  ggplot() +
-  geom_point(aes(x = term, y = estimate, color = Strain)) +
-  ggh4x::facet_nested(cols = vars(as.numeric(Fit)), rows = vars(Strain), labeller = label_parsed, scales = "free") +
-  theme_bw()
 
 MCParamAll_Photoperiod %>% 
   filter(term == "Pmax") %>% 
