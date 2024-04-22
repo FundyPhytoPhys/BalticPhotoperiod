@@ -130,6 +130,42 @@ MCGrowthRate %>%
   scale_colour_discrete(type=c("seagreen4", "palegreen3", "brown1", "brown4")) +
   ggh4x::facet_nested(rows = vars(Strain), cols = vars(Photoperiod)) +
   theme_bw()
+
+MCGrowthRate %>%
+  ggplot() +
+  geom_raster(aes(x = Par_ue, y = Photoperiod, alpha = deltaOD_Lmu_corr, fill = as.factor(Strain), colour = as.factor(Strain)), interpolate = FALSE, show.legend = T) +
+  scale_colour_discrete(type=c("seagreen4", "palegreen3", "brown1", "brown4")) +
+  scale_fill_discrete(type=c("seagreen4", "palegreen3", "brown1", "brown4")) +
+  facet_wrap(vars(Strain)) +
+#  ggh4x::facet_nested(rows = vars(Strain), cols = vars(Photoperiod)) +
+  theme_bw()
+
+MCGrowthRate %>%
+  ggplot() +
+  geom_raster(aes(x = as.factor(Par_ue), y = as.factor(Photoperiod), alpha = deltaOD_Lmu_corr, fill = as.factor(Strain), colour = as.factor(Strain)), interpolate = FALSE, show.legend = T) +
+  scale_colour_discrete(type=c("seagreen4", "palegreen3", "brown1", "brown4")) +
+  scale_fill_discrete(type=c("seagreen4", "palegreen3", "brown1", "brown4")) +
+  facet_wrap(vars(Strain)) +
+#  ggh4x::facet_nested(rows = vars(Strain), cols = vars(Photoperiod)) +
+  theme_bw()
+
+MCGrowthRate %>%
+  ggplot() +
+  geom_tile(aes(x = Par_ue, y = Photoperiod, alpha = deltaOD_Lmu_corr, fill = as.factor(Strain), colour = as.factor(Strain)), height = 4, width = 200, interpolate = FALSE, show.legend = T) +
+  scale_colour_discrete(type=c("seagreen4", "palegreen3", "brown1", "brown4")) +
+  scale_fill_discrete(type=c("seagreen4", "palegreen3", "brown1", "brown4")) +
+  facet_wrap(vars(Strain)) +
+#  ggh4x::facet_nested(rows = vars(Strain), cols = vars(Photoperiod)) +
+  theme_bw()
+
+
++
+  # geom_contour_filled(aes(x = Par_ue, y = Photoperiod, z = deltaOD_Lmu_corr, fill = as.factor(Strain), colour = as.factor(Strain)), show.legend = T) +
+  # scale_colour_discrete(type=c("seagreen4", "palegreen3", "brown1", "brown4")) +
+  # scale_fill_discrete(type=c("seagreen4", "palegreen3", "brown1", "brown4")) +
+  facet_wrap(vars(Strain)) +
+#  ggh4x::facet_nested(rows = vars(Strain), cols = vars(Photoperiod)) +
+  theme_bw()
 ```
 # Calculated Anova and Tukey test
 
