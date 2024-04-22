@@ -1655,7 +1655,7 @@ saveRDS(AnovaTest_GrowthRateModel_Photoperiod, file.path(TableRdsPath, paste(Pro
 # Removed unneccessary df from the environment
 
 ```{r}
-rm(MCGrowthSPAllModel, MCGrowthSP30Model, MCGrowthSP90Model, MCGrowthSP180Model, MCGrowthSP300Model, MCGrowthSP900Model, MCGrowthSP8Model, MCGrowthSP12Model, MCGrowthSP16Model, MCGrowthSP24Model, GRCplatt_PredictGrowthAll, GRCplatt_PredictGrowth30, GRCplatt_PredictGrowth90, GRCplatt_PredictGrowth180, GRCplatt_PredictGrowth300, GRCplatt_PredictGrowth900, GRCplatt_PredictGrowth8, GRCplatt_PredictGrowth12, GRCplatt_PredictGrowth16, GRCplatt_PredictGrowth24, GRCplatt_PredictGrowth900_BA127, GRCplatt_PredictGrowth900_BA48, GRCplatt_PredictGrowth900_BA56, GRCplatt_PredictGrowth900_BA77, MCGrowthSP, GrowthRateAllParam)
+# rm(MCGrowthSPAllModel, MCGrowthSP30Model, MCGrowthSP90Model, MCGrowthSP180Model, MCGrowthSP300Model, MCGrowthSP900Model, MCGrowthSP8Model, MCGrowthSP12Model, MCGrowthSP16Model, MCGrowthSP24Model, GRCplatt_PredictGrowthAll, GRCplatt_PredictGrowth30, GRCplatt_PredictGrowth90, GRCplatt_PredictGrowth180, GRCplatt_PredictGrowth300, GRCplatt_PredictGrowth900, GRCplatt_PredictGrowth8, GRCplatt_PredictGrowth12, GRCplatt_PredictGrowth16, GRCplatt_PredictGrowth24, GRCplatt_PredictGrowth900_BA127, GRCplatt_PredictGrowth900_BA48, GRCplatt_PredictGrowth900_BA56, GRCplatt_PredictGrowth900_BA77, MCGrowthSP, GrowthRateAllParam)
 ```
 
 # Change variable order
