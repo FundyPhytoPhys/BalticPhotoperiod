@@ -106,6 +106,8 @@ SolFitsMeta %>%
   facet_grid(rows = vars(Ex_WL), cols = vars(Photoperiod)) +
   theme_bw()
 ```
+
+
 To get the Platt fits to work I plotted:
 JVPSII_umole_eLs vs. ActPAR
 
@@ -280,6 +282,8 @@ SolFitsExpStTurner <- ChlData %>%
   full_join(., SolFitsMetaLRCGrowth, by = c("SampleID"="SampleID", "ObsDate"="ObsDate")) %>% 
   drop_na(Strain)
 ```
+
+
 ```{r}
 SolFitsExpStTurner<-SolFitsExpStTurner %>%  
   mutate(Strain=case_when(Strain=="BA127R"~"PE-rich_127",
@@ -488,6 +492,7 @@ SolFitsTurnerMDPico %>%
   ggh4x::facet_nested(rows = vars(Par_ue), cols = vars(Strain, Photoperiod), labeller = labeller(Ex_WL = label_both, strain = label_value, Par_ue = label_both, WL = label_both, Photoperiod = label_value)) +
   theme_bw()
 ```
+
 # Create preliminary plot
 
 ```{r preliminary plot}
