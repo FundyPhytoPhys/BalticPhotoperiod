@@ -1018,7 +1018,10 @@ data_text_AnovaSt77P<- data.frame(WL = c("WW"), Phase = c("Pre-stationary"), O2=
 data_text_AnovaSt48P<- data.frame(WL = c("WW"), Phase = c("Pre-stationary"), O2=c(21), Strain  = c("PE-rich_048"),  label = c("B"))
 data_text_AnovaSt127P<- data.frame(WL = c("WW"), Phase = c("Pre-stationary"), O2=c(21), Strain  = c("PE-rich_127"),  label = c("B"))
 
-data_text_AnovaPhase<- data.frame(WL = c("WW", "WW"), Phase = c("Exponential"), O2=c(21, 21, 21, 21), Strain  = c("PC-rich_056", "PC-rich_077", "PE-rich_048", "PE-rich_127"),  label = c('t-test, \u03B1 = 0.05', 't-test, \u03B1 = 0.05', 't-test, \u03B1 = 0.05', 't-test, \u03B1 = 0.05'))
+# data_text_AnovaPhase<- data.frame(WL = c("WW", "WW"), Phase = c("Exponential"), O2=c(21, 21, 21, 21), Strain  = c("PC-rich_056", "PC-rich_077", "PE-rich_048", "PE-rich_127"),  label = c('t-test, \u03B1 = 0.05', 't-test, \u03B1 = 0.05', 't-test, \u03B1 = 0.05', 't-test, \u03B1 = 0.05'))
+
+data_text_AnovaPhase<- data.frame(WL = c("WW", "WW"), Phase = c("Exponential"), O2=c(21, 21, 21, 21), Strain  = c("PC-rich_056", "PC-rich_077", "PE-rich_048", "PE-rich_127"), label = c(' , \u03B1 = 0.05', ' , \u03B1 = 0.05', ' , \u03B1 = 0.05', ' , \u03B1 = 0.05'))
+data_text_AnovaPhase2<- data.frame(WL = c("WW", "WW"), Phase = c("Exponential"), O2=c(21, 21, 21, 21), Strain  = c("PC-rich_056", "PC-rich_077", "PE-rich_048", "PE-rich_127"),  label = c('italic(t)~-test', 'italic(t)~-test', 'italic(t)~-test', 'italic(t)~-test'))
 
 WL.labs <- c("Phase of growth")
 names(WL.labs) <- c("WW")
@@ -1058,7 +1061,10 @@ ggplot(SolFitsExpFitAll445, aes(x = PARPhotonDose_day, y = Sig_nm2psii)) +
   geom_text(data=data_text_AnovaSt48P, aes(x=75000000, y=0.0, label=label), colour = "blue", size=4) +
   geom_text(data=data_text_AnovaSt127P, aes(x=75000000, y=-0.5, label=label), colour = "blue", size=4) +
   
-  geom_text(data=data_text_AnovaPhase, aes(x=18000000, y=-0.8, label=label), colour = "blue", size=4) +
+  #geom_text(data=data_text_AnovaPhase, aes(x=18000000, y=-0.8, label=label), colour = "blue", size=4) +
+  
+  geom_text(data=data_text_AnovaPhase, aes(x=24500000, y=-0.8, label=label), colour = "blue", size=4) +
+  geom_text(data=data_text_AnovaPhase2, aes(x=6500000, y=-0.8, label=label), colour = "blue", size=4, parse = TRUE) +
   
   scale_shape_manual(values = c(15, 16, 17,18), name="", labels = lab1) +
   scale_colour_manual(values = c("darkslategray", "lightblue4", "hotpink4", "indianred3",  "goldenrod2", "khaki2"), name="", labels = lab2) +

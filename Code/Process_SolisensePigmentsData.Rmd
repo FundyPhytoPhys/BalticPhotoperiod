@@ -766,7 +766,8 @@ data_text_AnovaSt77P<- data.frame(facetsPhase = c("Phase~of~growth"), Phase = c(
 data_text_AnovaSt48P<- data.frame(facetsPhase = c("Phase~of~growth"), Phase = c("Pre-stationary"), facetsStrain = c("Strain"), Strain  = c("PE-rich_048"), label = c("A"))
 data_text_AnovaSt127P<- data.frame(facetsPhase = c("Phase~of~growth"), Phase = c("Pre-stationary"), facetsStrain = c("Strain"), Strain  = c("PE-rich_127"), label = c("A"))
 
-data_text_AnovaPhase<- data.frame(facetsPhase = c("Phase~of~growth"), Phase = c("Exponential"), facetsStrain = c("Strain"), Strain  = c("PC-rich_056", "PC-rich_077", "PE-rich_048", "PE-rich_127"),  label = c('t-test, \u03B1 = 0.05', 't-test, \u03B1 = 0.05', 't-test, \u03B1 = 0.05', 't-test, \u03B1 = 0.05'))
+data_text_AnovaPhase<- data.frame(facetsPhase = c("Phase~of~growth"), Phase = c("Exponential"), facetsStrain = c("Strain"), Strain  = c("PC-rich_056", "PC-rich_077", "PE-rich_048", "PE-rich_127"),  label = c(' , \u03B1 = 0.05', ' , \u03B1 = 0.05', ' , \u03B1 = 0.05', ' , \u03B1 = 0.05'))
+data_text_AnovaPhase2<- data.frame(facetsPhase = c("Phase~of~growth"), Phase = c("Exponential"), facetsStrain = c("Strain"), Strain  = c("PC-rich_056", "PC-rich_077", "PE-rich_048", "PE-rich_127"),  label = c('italic(t)~-test', 'italic(t)~-test', 'italic(t)~-test', 'italic(t)~-test'))
 
 scientific_10 <- function(x) {   parse(text=gsub("e\\+*", " %*% 10^", scales::scientific_format()(x))) }
 lab1=c(expression("8 h"), expression("12 h"), expression("16 h"), expression("24 h"))
@@ -802,7 +803,8 @@ SolFitsAllPigmentPCPE590 %>%
   geom_text(data=data_text_AnovaSt48P, aes(x=3.1, y=2.5, label=label), colour = "blue", size=4) +
   geom_text(data=data_text_AnovaSt127P, aes(x=3.7, y=3, label=label), colour = "blue", size=4) +
   
-  geom_text(data=data_text_AnovaPhase, aes(x=1.2, y=-0.2, label=label), colour = "blue", size=4) +
+  geom_text(data=data_text_AnovaPhase, aes(x=1.7, y=-0.2, label=label), colour = "blue", size=4) +
+  geom_text(data=data_text_AnovaPhase2, aes(x=0.5, y=-0.2, label=label), colour = "blue", size=4, parse = TRUE) +
   
   scale_shape_manual(values = c(15, 16, 17,18), name="", labels = lab1) +
   scale_colour_manual(values = c("darkslategray", "lightblue4", "hotpink4", "indianred3", "goldenrod2", "khaki2"), name="", labels = lab2) +
@@ -1119,7 +1121,8 @@ data_text_AnovaSt77P<- data.frame(facetsPhase = c("Phase~of~growth"), Phase = c(
 data_text_AnovaSt48P<- data.frame(facetsPhase = c("Phase~of~growth"), Phase = c("Pre-stationary"), facetsStrain = c("Strain"), Strain  = c("PE-rich_048"), label = c("B"))
 data_text_AnovaSt127P<- data.frame(facetsPhase = c("Phase~of~growth"), Phase = c("Pre-stationary"), facetsStrain = c("Strain"), Strain  = c("PE-rich_127"), label = c("A"))
 
-data_text_AnovaPhase<- data.frame(facetsPhase = c("Phase~of~growth"), Phase = c("Exponential"), facetsStrain = c("Strain"), Strain  = c("PC-rich_056", "PC-rich_077", "PE-rich_048", "PE-rich_127"), label = c('t-test, \u03B1 = 0.05', 't-test, \u03B1 = 0.05', 't-test, \u03B1 = 0.05', 't-test, \u03B1 = 0.05'))
+data_text_AnovaPhase<- data.frame(facetsPhase = c("Phase~of~growth"), Phase = c("Exponential"), facetsStrain = c("Strain"), Strain  = c("PC-rich_056", "PC-rich_077", "PE-rich_048", "PE-rich_127"),  label = c(' , \u03B1 = 0.05', ' , \u03B1 = 0.05', ' , \u03B1 = 0.05', ' , \u03B1 = 0.05'))
+data_text_AnovaPhase2<- data.frame(facetsPhase = c("Phase~of~growth"), Phase = c("Exponential"), facetsStrain = c("Strain"), Strain  = c("PC-rich_056", "PC-rich_077", "PE-rich_048", "PE-rich_127"),  label = c('italic(t)~-test', 'italic(t)~-test', 'italic(t)~-test', 'italic(t)~-test'))
 
 scientific_10 <- function(x) {   parse(text=gsub("e\\+*", " %*% 10^", scales::scientific_format()(x))) }
 lab1=c(expression("8 h"), expression("12 h"), expression("16 h"), expression("24 h"))
@@ -1153,7 +1156,8 @@ SolFitsAllPigmentPCPE590 %>%
   geom_text(data=data_text_AnovaSt48P, aes(x=3.3, y=-0.5, label=label), colour = "blue", size=4) +
   geom_text(data=data_text_AnovaSt127P, aes(x=3.7, y=-0.5, label=label), colour = "blue", size=4) +
   
-  geom_text(data=data_text_AnovaPhase, aes(x=1.2, y=-0.4, label=label), colour = "blue", size=4) +
+  geom_text(data=data_text_AnovaPhase, aes(x=1.7, y=-0.4, label=label), colour = "blue", size=4) +
+  geom_text(data=data_text_AnovaPhase2, aes(x=0.5, y=-0.4, label=label), colour = "blue", size=4, parse = TRUE) +
   
   scale_shape_manual(values = c(15, 16, 17,18), name="", labels = lab1) +
   scale_colour_manual(values = c("darkslategray", "lightblue4", "hotpink4", "indianred3", "goldenrod2", "khaki2"), name="", labels = lab2) +
@@ -1494,7 +1498,8 @@ data_text_AnovaSt77P<- data.frame(facetsPhase = c("Phase~of~growth"), Phase = c(
 data_text_AnovaSt48P<- data.frame(facetsPhase = c("Phase~of~growth"), Phase = c("Pre-stationary"), facetsStrain = c("Strain"), Strain  = c("PE-rich_048"), label = c("A"))
 data_text_AnovaSt127P<- data.frame(facetsPhase = c("Phase~of~growth"), Phase = c("Pre-stationary"), facetsStrain = c("Strain"), Strain  = c("PE-rich_127"), label = c("B"))
 
-data_text_AnovaPhase<- data.frame(facetsPhase = c("Phase~of~growth"), Phase = c("Exponential"), facetsStrain = c("Strain"), Strain  = c("PC-rich_056", "PC-rich_077", "PE-rich_048", "PE-rich_127"), label = c('t-test, \u03B1 = 0.05', 't-test, \u03B1 = 0.05', 't-test, \u03B1 = 0.05', 't-test, \u03B1 = 0.05'))
+data_text_AnovaPhase<- data.frame(facetsPhase = c("Phase~of~growth"), Phase = c("Exponential"), facetsStrain = c("Strain"), Strain  = c("PC-rich_056", "PC-rich_077", "PE-rich_048", "PE-rich_127"),  label = c(' , \u03B1 = 0.05', ' , \u03B1 = 0.05', ' , \u03B1 = 0.05', ' , \u03B1 = 0.05'))
+data_text_AnovaPhase2<- data.frame(facetsPhase = c("Phase~of~growth"), Phase = c("Exponential"), facetsStrain = c("Strain"), Strain  = c("PC-rich_056", "PC-rich_077", "PE-rich_048", "PE-rich_127"),  label = c('italic(t)~-test', 'italic(t)~-test', 'italic(t)~-test', 'italic(t)~-test'))
 
 scientific_10 <- function(x) {   parse(text=gsub("e\\+*", " %*% 10^", scales::scientific_format()(x))) }
 lab1=c(expression("8 h"), expression("12 h"), expression("16 h"), expression("24 h"))
@@ -1528,7 +1533,8 @@ SolFitsAllPigmentPCPE590dark %>%
   geom_text(data=data_text_AnovaSt48P, aes(x=3.1, y=2.5, label=label), colour = "blue", size=4) +
   geom_text(data=data_text_AnovaSt127P, aes(x=3.7, y=2.5, label=label), colour = "blue", size=4) +
   
-  geom_text(data=data_text_AnovaPhase, aes(x=1.2, y=-0.4, label=label), colour = "blue", size=4) +
+  geom_text(data=data_text_AnovaPhase, aes(x=1.7, y=-0.4, label=label), colour = "blue", size=4) +
+  geom_text(data=data_text_AnovaPhase2, aes(x=0.5, y=-0.4, label=label), colour = "blue", size=4, parse = TRUE) +
   
   scale_shape_manual(values = c(15, 16, 17,18), name="", labels = lab1) +
   scale_colour_manual(values = c("darkslategray", "lightblue4", "hotpink4", "indianred3", "goldenrod2", "khaki2"), name="", labels = lab2) +
