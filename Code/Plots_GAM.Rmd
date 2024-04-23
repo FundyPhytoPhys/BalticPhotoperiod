@@ -267,8 +267,8 @@ GamWL = c("deltaOD", "OD720") #deltaOD OD720
 Proxy= "[~Chl]" #~Chl ~Cells 
 GamParaMod = "Lmu"
 GamVar = c("WW")
-ErrorTolGrowth = 50 # defined for the growth estimates
-ErrorTol = 50 # defined for the GAM fit
+ErrorTolGrowth = 100 # defined for the growth estimates
+ErrorTol = 100 # defined for the GAM fit
 # OxyLev = 25
 
 #https://stackoverflow.com/questions/49570452/is-it-possible-to-specify-lower-bound-in-response-variable-during-smooth-with-ga 
@@ -329,8 +329,11 @@ PicoGAM_Pred <- PicoGAM %>%
 
 # "BA48R"  "BA127R" "BA56G"  "BA77G" 
 # Plot WL light GAM for BA48R
+#Think about cumulative photon isoclines
+#Think about maximum value for mu Z axis;  maybe 2?
+#
 ``` {r BA48RGAM Plot WW WL}
-GamStrain = "BA77G" 
+GamStrain = "BA56G" 
 #GamColor = "450" may use for Strain colour later
 WL_nm = "WW" 
 PlotWL <- "deltaOD"
@@ -411,8 +414,8 @@ ContourLines <- ContourLines$quantileValue
     metR::geom_contour2(aes(label = stat(level)),
                         breaks = ContourLines,
                         skip = 0) +
-    scale_x_continuous(limits = c(4, 28), breaks = c(4, 8, 12, 16, 24)) +
-    scale_y_continuous(limits = c(10, 1000)) +
+    scale_x_continuous(limits = c(8, 28), breaks = c(8, 12, 16, 24)) +
+    scale_y_continuous(limits = c(10, 900), breaks = c(30, 90, 180, 300, 600, 900)) +
     xlab(NULL)+
       ylab(NULL)+
     #https://stackoverflow.com/questions/15074127/use-expression-with-a-variable-r
