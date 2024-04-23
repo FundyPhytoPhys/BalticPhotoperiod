@@ -151,9 +151,13 @@ Cultures grew at 22℃, with photoperiods of 8, 12, 16, or 24 h, with peak PAR o
 
 Culture tubes were closed with a silicone inert silicone stopper perforated by an aeration input tube extending to the bottom of the culture tube, and a pressure outlet tube. Aeration with a total air flow rate of around ~ 140 mL min^−1^ tube^−1^ ensured mixing and provided sufficient air/CO~2~ supply to cultures through the entire culture volume. The pH of tested cultures did not fluctuate fiercely during the experiment and remained at approximately 8 – 9. Light, temperature, optical density, and aeration gas of the Multi-Cultivator system were monitored and controlled via the Photobioreactor Control Software (Photon Systems Instruments, Drásov, Czech Republic).
 
+## Genomic analyses {.unnumbered}
+
+Phylogenetic tree of tested PC-rich and PE-rich strains is presented in Fig. 1S (Supplementary materials).
+
 ## Growth curves and chlorophyll specific exponential growth rates {.unnumbered}
 
-Picocyanobacterial growth was monitored every 5 minutes by automatically recording OD~680~, OD~720~, and ΔOD (ΔOD = OD~680~ – OD~720~) for 14 days, independently for each culture tube. The exceptions were experiments conducted with a photoperiod of 24 h and light of 600 or 900 µmol photons m^−2^s^−1^, which lasted 7 days (Fig S1-S3 in Supplementary materials). The chlorophyll specific exponential growth rates (µ) were determined by fitting logistic growth curves using a modified Levenberg-Marquardt fitting algorithm [@elzhovMinpackLmInterface2023] to plots of the chlorophyll *a* proxy of ΔOD vs. elapsed time for each combination of strain, photoperiod, and peak PAR (Fig. S4 in Supplementary materials).
+Picocyanobacterial growth was monitored every 5 minutes by automatically recording OD~680~, OD~720~, and ΔOD (ΔOD = OD~680~ – OD~720~) for 14 days, independently for each culture tube. The exceptions were experiments conducted with a photoperiod of 24 h and light of 600 or 900 µmol photons m^−2^s^−1^, which lasted 7 days (Fig S2-S4 in Supplementary materials). The chlorophyll specific exponential growth rates (µ) were determined by fitting logistic growth curves using a modified Levenberg-Marquardt fitting algorithm [@elzhovMinpackLmInterface2023] to plots of the chlorophyll *a* proxy of ΔOD vs. elapsed time for each combination of strain, photoperiod, and peak PAR (Fig. S5 in Supplementary materials).
 
 The 1^st^ derivative of OD~680~ taken over 1 h increments was computed using xts: eXtensible Time Series  [@ryanXtsEXtensibleTime2024] and signal: Signal Processing [@liggesSignalSignalProcessing2024] R packages. The time when the cultures reached their maximum absolute hourly growth (tMaxAHG) of the 1^st^ derivative of OD~680~ was taken as the time of transition from exponential to pre-stationary growth phases (Fig. \@ref(fig:FirstDerivative)).
 
@@ -271,6 +275,8 @@ Strains also showed distinct growth rate responses to cumulative diel PUR, depen
 
 Growth rate saturated under increasing cumulative diel PUR for all strains, however, the achieved estimates of µ~max~ varied depending upon photoperiod and peak diel PAR. Growth rates vs. cumulative diel PAR relationships, estimated for exponential phase cultures, followed similar patterns (Fig. S5, S6 and Table S5, S6 in Supplemental material).
 
+
+
 ```{r GrowthRatePhotoperiodPUR, fig.cap = GrowthRatePhotoperiodPUR_cap, fig.height = 8, fig.width = 6, echo = FALSE}
 GrowthRatePhotoperiodPUR_cap<- glue("**Chlorophyll specific exponential growth rates (d^−1^) vs. cumulative diel Photosynthetically Usable Radiation (PUR, µmol photons m^−2^d^−1^).** Growth rates (+/- SE falling within symbols) were estimated from logistic fits of chlorophyll proxy OD~680~ - OD~720~ vs. elapsed time (Fig. 1, Fig. S4), for two PhycoCyanin(PC)-rich cultures (056, 077) and two PhycoErythrin(PE)-rich cultures (048, 127) of *Synechococcus* sp. originating from the Baltic Sea. Cultures were grown at 30 (dark gray), 90 (light gray), 180 (purple), 300 (red), 600 (orange), or 900 (yellow) peak PAR µmol photons m^−2^s^−1^ (µE); and photoperiods of 8 (square), 12 (circle), 16 (triangle), or 24 (diamond) h. Solid blue line shows a fit of the pooled growth rates for each strain, with a three parameter model [@harrisonPhotosynthesisirradianceRelationshipsPolar1986]. We also fit the same model separately for 8 (dotted line), 12 (long dash line), 16 (dashed line), or 24 (two dash line) h photoperiods, since for all strains they were each significantly different (ANOVA, *p* < 0.05) from the fit of pooled data.", .sep = " ")
 knitr::include_graphics(file.path(FiguresFP,"Fig_GrowthRate_Photoperiod_PUR.png"))
@@ -280,6 +286,12 @@ knitr::include_graphics(file.path(FiguresFP,"Fig_GrowthRate_Photoperiod_PUR.png"
 GrowthRateLightPUR_cap<- glue("**Chlorophyll specific exponential growth rates (d^−1^) vs. cumulative diel Photosynthetically Usable Radiation (PUR, µmol photons m^−2^d^−1^).** Growth rates (+/- SE falling within symbols) were estimated from logistic fits of chlorophyll proxy OD~680~-OD~720~ vs. elapsed time (Fig. 1, Fig. S4), for two PhycoCyanin(PC)-rich cultures (056, 077) and two PhycoErythrin(PE)-rich cultures (048, 127) of *Synechococcus* sp. originating from the Baltic Sea. Cultures were grown at 30 (dark gray), 90 (light gray), 180 (purple), 300 (red), 600 (orange), or 900 (yellow) peak PAR µmol photons m^−2^s^−1^ (µE); and photoperiods of 8 (square), 12 (circle), 16 (triangle), or 24 (diamond) h. Solid blue line shows a fit of the pooled growth rates for each strain, with a three parameter model (Harrison and Platt, 1986). We also fit the same model separately for 30 (dark gray), 90 (light gray), 180 (purple), 300 (red), 600 together with 900 (orange) peak PAR µmol photons m^−2^s^−1^, only when they were each significantly different (ANOVA, *p* < 0.05) from the fit of pooled data.", .sep = " ")
 knitr::include_graphics(file.path(FiguresFP,"Fig_GrowthRate_Light_PUR.png"))
 ```
+
+```{r GAM, fig.cap = GAM_cap, fig.height = 8, fig.width = 6, echo = FALSE}
+GAM_cap<- glue("**A contour plot of a Generalized Additive Model (GAM) representing the chlorophyll specific growth rate (d^−1^)** for two PhycoCyanin(PC)-rich cultures (A; 056, B; 077) and two PhycoErythrin(PE)-rich cultures (C; 048, D; 127) of *Synechococcus* sp. originating from the Baltic Sea. Cultures were grown at 30, 90, 180, 300, 600, or 900 peak PAR µmol photons m^−2^s^−1^; and photoperiods of 8, 12, 16, or 24 h. Legends represent a colour gradient of growth rate (µ; d^−1^) from no growth (white) to 3 d^−1^ (dark green for PC-rich_056, light green for PC-rich_077, light red for PE-rich_048 or dark red for PE-rich_127 strains). Labeled contour lines indicate the 90%, 50%, and 10% quantiles for achieved growth rate. Labeled dashed contour lines indicate areas where the cumulative diel photon dose (µmol photons m^−2^d^−1^) remains the same.", .sep = " ")
+knitr::include_graphics(file.path(FiguresFP,"Fig_GAM_Colour.png"))
+```
+
 
 ## Decreasing PUR/PAR ratio with increasing cumulative diel PAR {.unnumbered}
 
