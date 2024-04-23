@@ -25,16 +25,15 @@ This .Rmd produces a Generalized Additive Model (GAM) to examine the relationshi
 # Set variables for project
 ```{r project data}
 FP1 <- ".."
-Project <- "PICO"
+Project <- "BalticPhotoperiod"
 FileID <- "GAM"
-Expert <- "MiSa" #MiSa SySl
-GamFit <- "PICO_Merged_GrowthFitsPURPAR.Rds"
+Expert <- "SySl"
+GamFit <- "PICO_Cleaned_MCData.Rds"
 
 #"..", takes up a level in the directory path
-DataIn <- file.path("..","Data", "CleanData")
-DataOut <- file.path("..","Data", "CleanData")
+DataIn <- file.path("..","Data", "CleanedData", "CleanedMCData")
+DataOut <- file.path("..","Data", "CleanedData")
 PlotsOut <- file.path("..","Output", "Figures")
-PlotsOutPLOS <- file.path("..", "OutPut", "PLOSFiguresRound1")
 
 
 is_all_numeric <- function(x) { 
@@ -85,7 +84,7 @@ library(Rcpp) #'Rcpp' package provides R functions as well as C++ classes which 
 GrowthFits <- readRDS(file = file.path(DataIn, GamFit))  
 
 GrowthFits <- GrowthFits %>% 
- dplyr::select(c(Filename, PrimaryOperator, Tube, SampleID, Run, Photoperiod, Strain, WL, O2_Category, O2_uM, LightShape, Pur_ue, Par_ue, PURPhotonDose_day, PARPhotonDose_day, OD720_Lmu_corr, OD720_Lmax, OD720_Lintercept, OD720_Lmu_se, OD720_Lmax_se, OD720_Lintercept_se, deltaOD_Lmu_corr, deltaOD_Lmax, deltaOD_Lintercept,  deltaOD_Lmu_se, deltaOD_Lmax_se, deltaOD_Lintercept_se))
+  dplyr::select(c(Filename, PrimaryOperator, Tube, SampleID, Run, Photoperiod, Strain, WL, O2_Category, O2_uM, LightShape, Par_ue, PARPhotonDose_day, OD720_Lmu_corr, OD720_Lmax, OD720_Lintercept, OD720_Lmu_se, OD720_Lmax_se, OD720_Lintercept_se, deltaOD_Lmu_corr, deltaOD_Lmax, deltaOD_Lintercept,  deltaOD_Lmu_se, deltaOD_Lmax_se, deltaOD_Lintercept_se))
 
 
 ReplNo <- GrowthFits %>%
@@ -132,8 +131,8 @@ remove(Pivot_Longer_deltaOD_est, Pivot_Longer_deltaOD_se)
 #Join OD720 and deltaOD fits data
 ComGrowthFits <- rbind(Longer_OD720_Joined, Longer_deltaOD_Joined) %>%
   mutate_if(is.numeric, round, digits = 3) %>% 
-  filter(Strain %in% c("MED4", "SS120", "MIT9313"),
-         WL %in% c(450, 660, "WW"))
+  filter(Strain %in% c("BA48R", "BA127R", "BA56G", "BA77G"),
+         WL %in% c("WW"))
 
 remove(Longer_OD720_Joined, Longer_deltaOD_Joined)
   
@@ -143,65 +142,94 @@ glimpse(ComGrowthFits)
 
 
 
-```{r DF preparation Prochloroccus}
+```{r DF preparation}
 GamWL = "deltaOD"
-GamVar = "450"
+GamVar = "WW"
+
+# "BA48R"  "BA127R" "BA56G"  "BA77G" 
 
 
-#DummyDF for MED4; MED4 is a high light strain, based on literature it can grow up to 800 uE; we never exposed it to such high light levels and will not impose an upper end, but only a lower, i.e. Par_ue = 0, Lmu = 0, there are no reliable points for low O2 in shorter photoperiods
-Strain <- c("MED4")
-Photoperiod <- c(4, 8, 12, 16)
-Par_ue<- c(0)
-O2_uM <- c(2.5, 25.0, 250.0)
-WL <- c(450, 530, 660, "WW")
+#DummyDF for BA48R; 
+
+Strain <- c("BA48R")
+Photoperiod <- c(8, 12, 16, 24)
+Par_ue <- c(0)
+O2_uM <- c(250)
+WL <- c("WW")
 estimate <- c(0)
 term <- GamPara
 Wavelength <- c("deltaOD", "OD720")
 Tube <- c(9)
 
-DummyDF_MED4 <- expand_grid(
+DummyDF_BA48R <- expand_grid(
   Strain, Photoperiod, Par_ue, O2_uM, WL, estimate, Wavelength, term, Tube
   ) %>%
   mutate(Lmu_seFlag = 1) 
-DummyDF_Expand_MED4 <- rbind(DummyDF_MED4, DummyDF_MED4, DummyDF_MED4)
 
-#DummyDF for MIT9313; MIT9313 is a low light strain, based on literature it can only grow up to 300 uE WW; MIT9313 consistently died at various light colors and oxygen levels latest at ~PAR 400; it can safely be assumed it dies at par_ue = 0
-Strain <- c("MIT9313")
-Photoperiod <- c(4, 8, 12, 16)
-Par_ue<- c(0)
-O2_uM <- c(2.5, 25.0, 250.0)
-WL <- c(450, 530, 660, "WW")
+DummyDF_Expand_BA48R <- rbind(DummyDF_BA48R, DummyDF_BA48R, DummyDF_BA48R)
+
+#DummyDF for BA127R; 
+
+Strain <- c("BA127R")
+Photoperiod <- c(8, 12, 16, 24)
+Par_ue <- c(0)
+O2_uM <- c(250)
+WL <- c("WW")
 estimate <- c(0)
 term <- GamPara
 Wavelength <- c("deltaOD", "OD720")
 Tube <- c(9)
 
-DummyDF_MIT9313 <- expand_grid(
+DummyDF_BA127R <- expand_grid(
   Strain, Photoperiod, Par_ue, O2_uM, WL, estimate, Wavelength, term, Tube
   ) %>%
   mutate(Lmu_seFlag = 1) 
-DummyDF_Expand_MIT9313 <- rbind(DummyDF_MIT9313, DummyDF_MIT9313, DummyDF_MIT9313)
 
-#DummyDF for SS120; SS120 is a low light strain, based on literature it can only grow up to 300 uE WW; SS120 consistently died at various light colors and oxygen levels latest at ~PAR 400; it can safely be assumed it dies at par_ue = 0
-Strain <- c("SS120")
-Photoperiod <- c(4, 8, 12, 16)
-Par_ue<- c(0, 400)
-O2_uM <- c(2.5, 25.0, 250.0)
-WL <- c(450, 530, 660, "WW")
+DummyDF_Expand_BA127R <- rbind(DummyDF_BA127R, DummyDF_BA127R, DummyDF_BA127R)
+
+
+#DummyDF for BA56G;
+
+Strain <- c("BA56G")
+Photoperiod <- c(8, 12, 16, 24)
+Par_ue <- c(0)
+O2_uM <- c(250)
+WL <- c("WW")
 estimate <- c(0)
 term <- GamPara
 Wavelength <- c("deltaOD", "OD720")
 Tube <- c(9)
 
-DummyDF_SS120 <- expand_grid(
+DummyDF_BA56G <- expand_grid(
   Strain, Photoperiod, Par_ue, O2_uM, WL, estimate, Wavelength, term, Tube
   ) %>%
   mutate(Lmu_seFlag = 1) 
-DummyDF_Expand_SS120 <- rbind(DummyDF_SS120, DummyDF_SS120, DummyDF_SS120)
 
-DummyDF_Expand <- rbind(DummyDF_Expand_SS120, DummyDF_Expand_MIT9313, DummyDF_Expand_MED4)
+DummyDF_Expand_BA56G <- rbind(DummyDF_BA56G, DummyDF_BA56G, DummyDF_BA56G)
 
-PicoGrowthFits <-    ComGrowthFits # full_join(ComGrowthFits, DummyDF_Expand) 
+#DummyDF for "BA77G" 
+
+Strain <- c("BA77G")
+Photoperiod <- c(8, 12, 16, 24)
+Par_ue <- c(0)
+O2_uM <- c(250)
+WL <- c("WW")
+estimate <- c(0)
+term <- GamPara
+Wavelength <- c("deltaOD", "OD720")
+Tube <- c(9)
+
+DummyDF_BA77G <- expand_grid(
+  Strain, Photoperiod, Par_ue, O2_uM, WL, estimate, Wavelength, term, Tube
+  ) %>%
+  mutate(Lmu_seFlag = 1) 
+
+DummyDF_Expand_BA77G <- rbind(DummyDF_BA77G, DummyDF_BA77G, DummyDF_BA77G)
+
+
+DummyDF_Expand <- rbind(DummyDF_Expand_BA48R, DummyDF_Expand_BA127R, DummyDF_Expand_BA56G, DummyDF_Expand_BA77G)
+
+PicoGrowthFits <-  ComGrowthFits # full_join(ComGrowthFits, DummyDF_Expand) 
 
 PicoLmuAb <- PicoGrowthFits %>%
   filter(term %in% GamPara) %>%
@@ -210,6 +238,7 @@ PicoLmuAb <- PicoGrowthFits %>%
   mutate(Strain = as.factor(Strain))
 
 PicoLogGamAb <-  gam(estimate ~ s(Par_ue,  by = Strain, k = 3) + s(Photoperiod,  by = Strain, k = 3) + ti(Photoperiod, Par_ue, by = Strain, k = 3), data = PicoLmuAb, method = "REML")
+
 summary(PicoLogGamAb)
 
 
@@ -232,12 +261,12 @@ plot(PicoLogGamAb, residuals = TRUE, pch = 1, all.terms = TRUE)
 
 ```
 
-# Generate GAM for red light conditions for all strains using chlorophyll proxy logistic growth rate. 
-```{r GAM separate niches hypervolume for red light}
+# Generate GAM for WL conditions for all strains using chlorophyll proxy logistic growth rate. 
+```{r GAM separate niches hypervolume for WL}
 GamWL = c("deltaOD", "OD720") #deltaOD OD720
 Proxy= "[~Chl]" #~Chl ~Cells 
 GamParaMod = "Lmu"
-GamVar = c("660")
+GamVar = c("WW")
 ErrorTolGrowth = 30 # defined for the growth estimates
 ErrorTol = 30 # defined for the GAM fit
 # OxyLev = 25
@@ -248,10 +277,10 @@ possibPRED = possibly(.f = mgcv::predict.gam, otherwise = NULL)
 
 PAR_Photoperiod_Model_predi <- expand_grid(
   Par_ue = seq(from=min(10), 
-              to=max(200), 
+              to=max(900), 
               length.out = 100),
   Photoperiod = seq(from=min(2), 
-              to=max(18), 
+              to=max(24), 
               length.out = 100)
 )
 
@@ -285,7 +314,7 @@ PicoGAM_Pred <- PicoGAM %>%
   dplyr::select(-predicted) %>%
   unnest(col = db) %>%
   group_by(Strain, Wavelength, WL, O2_uM) %>%
-  dplyr::filter(fit < 1.2) %>% #with two exceptions, growth rates were never higher than 1.2; GAM model creates some unrealistic high growth rates due to low data availability
+  dplyr::filter(fit < 5.5) %>% #GAM model creates some unrealistic high growth rates due to low data availability
   mutate(
     IsFitGood = case_when(se.fit/fit*100 < ErrorTol ~ 1, #flags faulty data where Standarderror larger +/- Errortolerance
                          se.fit/fit*100 > ErrorTol ~ 0
@@ -298,77 +327,13 @@ PicoGAM_Pred <- PicoGAM %>%
 
 ```
 
-# Generate GAM for blue light conditions for all strains using chlorophyll proxy logistic growth rate. 
-```{r GAM separate niches hypervolume for blue light}
-GamWL = c("deltaOD", "OD720") #deltaOD OD720
-Proxy= "[~Chl]" #~Chl ~Cells 
-GamParaMod = "Lmu"
-GamVar = c("450")
-ErrorTolGrowth = 30 # defined for the growth estimates
-ErrorTol = 30 # defined for the GAM fit
-# OxyLev = 25
 
-#https://stackoverflow.com/questions/49570452/is-it-possible-to-specify-lower-bound-in-response-variable-during-smooth-with-ga 
-possibGAM = possibly(.f = mgcv::gam, otherwise = NULL)
-possibPRED = possibly(.f = mgcv::predict.gam, otherwise = NULL)
-
-PAR_Photoperiod_Model_predi <- expand_grid(
-  Par_ue = seq(from=min(10), 
-              to=max(200), 
-              length.out = 100),
-  Photoperiod = seq(from=min(2), 
-              to=max(18), 
-              length.out = 100)
-)
-
-PicoGAM <- PicoGrowthFits %>%
-  ungroup() %>%
-  dplyr::mutate(Lmu_seFlag = case_when(se/estimate*100 < ErrorTolGrowth ~ 1, #filters faulty data where Standarderror larger +/- Errortolerance
-                         FALSE ~ 0)) %>%
-  dplyr::filter(
-                estimate == 0 |
-                estimate != 0 & Lmu_seFlag == 1,
-                term %in% GamParaMod, 
-                Wavelength %in% GamWL
-                ) %>%
-  mutate(estimate = estimate*24, #to convert growth from per hour to per day
-         se = se*24) %>%
-  group_by(Strain, Wavelength, WL, O2_uM) %>%
-  nest() %>%
-  dplyr::arrange(Strain, Wavelength, WL, O2_uM) %>%
-  mutate(GamModel = map(data, ~possibGAM(estimate ~ s(Par_ue, k = 3) + s(Photoperiod, k = 3) + ti(Photoperiod, Par_ue, k = 3),  data = .x,
-                                    family = "gaussian"(link = "log"), 
-                                    method = "REML")),
-         predicted = map(GamModel, ~possibPRED(.x, newdata = PAR_Photoperiod_Model_predi, type = 'response', se.fit=TRUE)),
-         augmented = map(GamModel, ~augment(.x))
-         )
-
-PicoGAM_Pred <- PicoGAM %>%
-  dplyr::select(Strain, Wavelength, WL, O2_uM, predicted) %>%
-  dplyr::filter(predicted != "NULL") %>%
-  rowwise() %>%
-  mutate(db = list(cbind(predicted, PAR_Photoperiod_Model_predi))) %>%
-  dplyr::select(-predicted) %>%
-  unnest(col = db) %>%
-  group_by(Strain, Wavelength, WL, O2_uM) %>%
-  dplyr::filter(fit < 1.2) %>% #with two exceptions, growth rates were never higher than 1.2; GAM model creates some unrealistic high growth rates due to low data availability
-  mutate(
-    IsFitGood = case_when(se.fit/fit*100 < ErrorTol ~ 1, #flags faulty data where Standarderror larger +/- Errortolerance
-                         se.fit/fit*100 > ErrorTol ~ 0
-                    )
-    #se_erro_per = se.fit/fit*100
-  # ,fit = case_when(fit >= quantile(fit, 0.75, na.rm = TRUE) ~ fit*1, #leaves only top-10%, that means fastest growth rates in the dataframe
-  #                 FALSE ~ fit)
-  ) %>% 
-  dplyr::filter(IsFitGood == 1) 
-
-```
-
-# Plot red light GAM for MED4
-``` {r MED4GAM Plot Red WL}
-GamStrain = "MED4" 
-GamColor = "Red" 
-WL_nm = 660 
+# "BA48R"  "BA127R" "BA56G"  "BA77G" 
+# Plot WL light GAM for BA48R
+``` {r BA48RGAM Plot WW WL}
+GamStrain = "BA48R" 
+GamColor = "450" 
+WL_nm = "WW" 
 PlotWL <- "deltaOD"
   
 
@@ -390,26 +355,17 @@ PicoGAM_Plot_Prep <- PicoGAM_Pred %>%
   filter(Wavelength %in% PlotWL,
          Strain %in% GamStrain,
          WL %in% WL_nm) %>%
-  mutate(
-         OxygenLabel = "Oxygen concentration (uM)",
-         O2_level = case_when(O2_uM == 2.5 ~ "low",
-                              O2_uM == 25 ~ "intermediate",
-                              O2_uM == 250 ~ "high"),
-         Color_name = case_when(WL == "450" ~ 'Blue',
-                                WL == "530" ~ 'Green',
-                                WL == "660" ~ 'Red',
-                                WL == "WW" ~ 'White')) %>%
-  unite(WL_O2, Color_name, O2_level, sep = "_", remove = FALSE)
+  mutate(Color_name = case_when(WL == "WW" ~ 'White'))
 
+# 
+# WL_O2_Colors = c(Blue = w_length2rgb(450), green = w_length2rgb(530), red = w_length2rgb(660), white= "#FFCC00")
 
-WL_O2_Colors = c(Blue = w_length2rgb(450), green = w_length2rgb(530), red = w_length2rgb(660), white= "#FFCC00")
-
-ColourDF <- data.frame(
-  ColorName = c('Blue', 'Green', 'Red', 'White'),
-  WL_O2_Colors = c( w_length2rgb(450), w_length2rgb(530), w_length2rgb(660), "#FFCC00")
-) %>%
-  filter(ColorName %in% GamColor) %>%
-  dplyr::select(WL_O2_Colors)
+# ColourDF <- data.frame(
+#   ColorName = c('Blue', 'Green', 'Red', 'White'),
+#   WL_O2_Colors = c( w_length2rgb(450), w_length2rgb(530), w_length2rgb(660), "#FFCC00")
+# ) %>%
+#   filter(ColorName %in% GamColor) %>%
+#   dplyr::select(WL_O2_Colors)
 
 
 ContourBreaks <- PicoGAM_Plot_Prep %>%
@@ -417,7 +373,7 @@ ContourBreaks <- PicoGAM_Plot_Prep %>%
          Strain %in% GamStrain,
          Wavelength %in% PlotWL
   ) %>%
-  group_by(O2_uM) %>%
+  group_by(O2_uM) %>% #not needed
   mutate(upper10 = quantile(fit, 0.9, na.rm = TRUE),
          median50 = quantile(fit, 0.5, na.rm = TRUE),
          lower10 = quantile(fit, 0.1, na.rm = TRUE)) %>%
@@ -438,54 +394,6 @@ ContourBreaks <- PicoGAM_Plot_Prep %>%
 #https://stackoverflow.com/questions/22945651/remove-space-between-plotted-data-and-the-axes
 #https://stackoverflow.com/questions/5293715/how-to-use-greek-symbols-in-ggplot2
 
-HyperChlPlotLow <- PicoGAM_Plot_Prep %>%
-  filter(
-         Strain %in% GamStrain,
-         Wavelength %in% PlotWL,
-         O2_uM == "2.5"
-  )
-ContourLines <- ContourBreaks %>%
-  filter(O2_uM == "2.5") 
-ContourLines <- ContourLines$quantileValue 
-
-(ContourLowO2 <- ggplot(na.omit(HyperChlPlotLow), aes(Photoperiod, Par_ue, z = fit, fill = fit)) + geom_tile() +
-  scale_fill_gradientn(name = bquote("µ ("~ d^-1~")"), colours=c("white", ColourDF), limits  = range(minMu, maxMu), na.value = "white") +
-    metR::geom_contour2(aes(label = stat(level)),
-                        breaks = ContourLines,
-                        skip = 0) +
-    scale_x_continuous(limits = c(4, 16), breaks = c(4, 8, 12, 16)) +
-    scale_y_continuous(limits = c(10, 200)) +
-     xlab(NULL)+
-      ylab(NULL)+
-    theme_classic() +
-    theme(axis.text=element_text(size=15),
-          axis.title.x = element_text(size=20),
-           axis.title.y = element_text(size=35)))
-
-
-HyperChlPlotInt <- PicoGAM_Plot_Prep %>%
-  filter(
-         Strain %in% GamStrain,
-         Wavelength %in% PlotWL,
-         O2_uM == "25"
-  )
-ContourLines <- ContourBreaks %>%
-  filter(O2_uM == "25") 
-ContourLines <- ContourLines$quantileValue 
-
-(ContourIntO2 <- ggplot(na.omit(HyperChlPlotInt), aes(Photoperiod, Par_ue, z = fit, fill = fit)) + geom_tile() +
-  scale_fill_gradientn(name = bquote("µ ("~ d^-1~")"), colours=c("white", ColourDF), limits  = range(minMu, maxMu), na.value = "white") +
-    metR::geom_contour2(aes(label = stat(level)),
-                        breaks = ContourLines,
-                        skip = 0) +
-    scale_x_continuous(limits = c(4, 16), breaks = c(4, 8, 12, 16)) +
-    scale_y_continuous(limits = c(10, 200)) +
-    xlab(NULL)+
-      ylab(NULL)+
-   theme_classic() +
-  theme(axis.text=element_text(size=15),
-          axis.title.x = element_text(size=20),
-           axis.title.y = element_text(size=23)))
 
 HyperChlPlotHigh <- PicoGAM_Plot_Prep %>%
   filter(
@@ -494,16 +402,16 @@ HyperChlPlotHigh <- PicoGAM_Plot_Prep %>%
          O2_uM == "250"
   )
 ContourLines <- ContourBreaks %>%
-  filter(O2_uM == "250") 
-ContourLines <- ContourLines$quantileValue 
+  filter(O2_uM == "250")
+ContourLines <- ContourLines$quantileValue
 
 (ContourHighO2 <- ggplot(na.omit(HyperChlPlotHigh), aes(Photoperiod, Par_ue, z = fit, fill = fit)) + geom_tile() +
-    scale_fill_gradientn(name = bquote("µ ("~ d^-1~")"), colours=c("white", ColourDF), limits  = range(minMu, maxMu), na.value = "white") +
+   # scale_fill_gradientn(name = bquote("µ ("~ d^-1~")"), #colours=c("white"), limits  = range(minMu, maxMu), na.value = "white") +
     metR::geom_contour2(aes(label = stat(level)),
                         breaks = ContourLines,
                         skip = 0) +
-    scale_x_continuous(limits = c(4, 16), breaks = c(4, 8, 12, 16)) +
-    scale_y_continuous(limits = c(10, 200)) +
+    scale_x_continuous(limits = c(8, 24), breaks = c(8, 12, 16, 24)) +
+    scale_y_continuous(limits = c(10, 900)) +
     xlab(NULL)+
       ylab(NULL)+
     #https://stackoverflow.com/questions/15074127/use-expression-with-a-variable-r
@@ -512,6 +420,13 @@ ContourLines <- ContourLines$quantileValue
           axis.title.x = element_text(size=20),
            axis.title.y = element_text(size=35)))
 
+```
+
+
+
+
+
+```{r other stuff}
 g_legend<-function(a.gplot){
   tmp <- ggplot_gtable(ggplot_build(a.gplot))
   leg <- which(sapply(tmp$grobs, function(x) x$name) == "guide-box")
@@ -520,17 +435,17 @@ g_legend<-function(a.gplot){
 }
 
 
-(g_dummy1 <- ggplot(subset(HyperChlPlotLow, Color_name == w_length2rgb(WL_nm)), aes(Photoperiod, Par_ue, fill=fit)) + geom_tile()
-+ scale_fill_gradientn(name = bquote("µ ("~ d^-1~")"), colours=c("white", w_length2rgb(WL_nm)),
-  limits  = range(minMu, 1.0), na.value = "white") + theme_classic())
+(g_dummy1 <- ggplot(subset(HyperChlPlotLow, Color_name == w_length2rgb(WL_nm)), aes(Photoperiod, Par_ue, fill=fit)) + geom_tile() + 
+    #scale_fill_gradientn(name = bquote("µ ("~ d^-1~")"), colours=c("white", w_length2rgb(WL_nm)),
+ # limits  = range(minMu, 1.0), na.value = "white") + theme_classic())
 legend1 <- g_legend(g_dummy1)
-(g_dummy2 <- ggplot(subset(HyperChlPlotInt, Color_name == w_length2rgb(WL_nm)), aes(Photoperiod, Par_ue, fill=fit)) + geom_tile()
-+ scale_fill_gradientn(name = bquote("µ ("~ d^-1~")"), colours=c("white", w_length2rgb(WL_nm)),
-  limits  = range(minMu, 1.0), na.value = "white") + theme_classic())
+(g_dummy2 <- ggplot(subset(HyperChlPlotInt, Color_name == w_length2rgb(WL_nm)), aes(Photoperiod, Par_ue, fill=fit)) + geom_tile() +
+   # scale_fill_gradientn(name = bquote("µ ("~ d^-1~")"), colours=c("white", w_length2rgb(WL_nm)),
+ # limits  = range(minMu, 1.0), na.value = "white") + theme_classic())
 legend2 <- g_legend(g_dummy2)
-(g_dummy3 <- ggplot(subset(HyperChlPlotHigh, Color_name == w_length2rgb(WL_nm)), aes(Photoperiod, Par_ue, fill=fit)) + geom_tile()
-+ scale_fill_gradientn(name = bquote("µ ("~ d^-1~")"), colours=c("white", w_length2rgb(WL_nm)),
-  limits  = range(minMu, 1.0), na.value = "white") + theme_classic())
+(g_dummy3 <- ggplot(subset(HyperChlPlotHigh, Color_name == w_length2rgb(WL_nm)), aes(Photoperiod, Par_ue, fill=fit)) + geom_tile() +
+    #scale_fill_gradientn(name = bquote("µ ("~ d^-1~")"), colours=c("white", w_length2rgb(WL_nm)),
+  #limits  = range(minMu, 1.0), na.value = "white") + theme_classic())
 legend3 <- g_legend(g_dummy3)
 
 # comment rows that are not included in grid arrange 
