@@ -1246,7 +1246,7 @@ LIFTMeta445<-LIFTMeta %>%
   filter(Time_us<1000) %>% 
   filter(Time_us>0) 
 
-data_textA <- data.frame(facetsActinicPAR  = c("Actinic~PAR~(µmol~photons~m^{-2}~s^{-1})"), facetsExcitation  = c("Excitation~(nm)"), PAR  = c(80), Ex_WL  = c(445), Strain  = c("PE-rich_048"), label = c('A'))
+data_textA <- data.frame(facetsActinicPAR  = c("Actinic~PAR~(µmol~photons~m^{-2}~s^{-1})"), facetsExcitation  = c("Excitation~(nm)"), PAR  = c(0), Ex_WL  = c(445), Strain  = c("PE-rich_048"), label = c('A'))
 
 arrowdf1 <- tibble(facetsActinicPAR  = c("Actinic~PAR~(µmol~photons~m^{-2}~s^{-1})"), facetsExcitation  = c("Excitation~(nm)"), PAR  = c(0), Ex_WL  = c(445), Strain = "PE-rich_048")
 arrowdf2 <- tibble(facetsActinicPAR  = c("Actinic~PAR~(µmol~photons~m^{-2}~s^{-1})"), facetsExcitation  = c("Excitation~(nm)"), PAR  = c(80), Ex_WL  = c(445), Strain = "PE-rich_048")
@@ -1285,7 +1285,7 @@ Plotaa<-LIFTMeta %>%
   geom_line(aes(x = Time_us, y = Fit),  colour = "orange", alpha = 0.7, size = 0.7, show.legend = F, LIFTMeta590) +
   geom_vline(xintercept = 250, linetype="dashed", col="black", lwd=0.2) +
   
-  geom_text(data=data_textA, aes(x=1000, y=2000, label=label), size=5.5) +
+  geom_text(data=data_textA, aes(x=-25, y=2000, label=label), size=5.5) +
   
   geom_text(data=data_textSat, aes(x=100, y=-140, label=label), size=4.0) +
   geom_text(data=data_textRel, aes(x=500, y=-140, label=label), size=4.0) +
@@ -1641,7 +1641,7 @@ ggplot() +
   geom_point(aes(ActPARCorr, JVPSII_umol_eLs_umolChla), colour = "orange", shape = 5, size = 1.5, alpha = 0.8, size = 2, show.legend = F, SolTurnerMDPicoLRC2590) +
   geom_line(aes(ActPARCorr, .fitted), colour = "darkblue", linetype = "solid", size = 0.4) +
   geom_line(aes(ActPARCorr, .fitted), colour = "orange", linetype = "solid", size = 0.4, SolTurnerMDPicoLRC2590) +
-  geom_text(data=data_textC, aes(x=800, y=0.8, label=label), size=5.5) +
+  geom_text(data=data_textC, aes(x=0, y=0.8, label=label), size=5.5) +
   
   scale_y_continuous(breaks=seq(0, 0.8, by = 0.2)) +
   coord_cartesian(ylim = c(0, 0.8)) +
@@ -1778,6 +1778,8 @@ Plotb
 
 ```{r JVPSII_e regressions, fig.height = 4.5, fig.width = 8, warning = FALSE}
 data_textB <- data.frame(facetsExcitation  = c("Excitation~(nm)"), Ex_WL = c("445"), label = c('B'))
+data_textSlope445 <- data.frame(facetsExcitation  = c("Excitation~(nm)"), Ex_WL = c("445"), label = c('Calibration slope = 108832'))
+data_textSlope590 <- data.frame(facetsExcitation  = c("Excitation~(nm)"), Ex_WL = c("445"), label = c('Calibration slope = 254327'))
 
 scientific_10 <- function(x) {   parse(text=gsub("e\\+*", " %*% 10^", scales::scientific_format()(x))) }
 scientific_10 <- function(y) {   parse(text=gsub("e\\+*", " %*% 10^", scales::scientific_format()(y))) }
@@ -1793,7 +1795,9 @@ Plotbb<-O2FRRfMetaModels %>%
   ggplot() +
   geom_line(aes(x = e_Ls, y = .fitted), colour = "darkblue", linetype = "solid") +
   geom_line(aes(x = e_Ls, y = .fitted), colour = "orange", linetype = "solid", O2FRRfMetaModels590) +
-  geom_text(data=data_textB, aes(x=2.8e17, y=8e22, label=label), size=5.5) +
+  geom_text(data=data_textB, aes(x=1000000000000, y=8e22, label=label), size=5.5) +
+  geom_text(data=data_textSlope445, aes(x=1.6e17, y=0.7e22, label=label), size=4, colour = "darkblue") +
+  geom_text(data=data_textSlope590, aes(x=7.5e16, y=6e22, label=label), size=4, colour = "orange") +
  #geom_line(aes(x = O2evln_O2ls, y = .fitted + .se.fit), colour = "grey", linetype = "dashed") +
  #geom_line(aes(x = O2evln_O2ls, y = .fitted - .se.fit), colour = "grey", linetype = "dashed") +
   geom_point(aes(x = e_Ls, y = JVPSII_ETRqpOxbo_FoSigmax_m2psii),colour = "darkblue", shape =1, alpha = 0.8, size = 2.0) +
