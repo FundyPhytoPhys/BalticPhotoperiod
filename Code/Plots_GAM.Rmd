@@ -31,10 +31,12 @@ Expert <- "SySl"
 GamFit <- "PICO_Cleaned_MCData.Rds"
 
 #"..", takes up a level in the directory path
-DataIn <- file.path("..","Data", "CleanedData", "CleanedMCData")
-DataOut <- file.path("..","Data", "CleanedData")
-PlotsOut <- file.path("..","Output", "Figures")
-
+# DataIn <- file.path("..","Data", "CleanedData", "CleanedMCData")
+# DataOut <- file.path("..","Data", "CleanedData")
+# PlotsOut <- file.path("..","Output", "Figures")
+FigPath <- file.path("..", "Output", "Figures")
+FigRdsPath <- file.path("..", "Output", "FiguresRds")
+TableRdsPath <- file.path("..", "Output", "TablesRDS")
 
 is_all_numeric <- function(x) { 
   !any(is.na(suppressWarnings(as.numeric(na.omit(x))))) & is.character(x) 
@@ -55,7 +57,7 @@ library(knitr)
 library(minpack.lm)
 library(nlstools)
 library(nlsMicrobio)
-library(plotly)
+#library(plotly)
 library(mgcv)
 library(tidymv)
 library(CCA)
@@ -74,7 +76,7 @@ library(photobiologyWavebands)
 # library(photobiology)
 library(metR)
 library(Rcpp) #'Rcpp' package provides R functions as well as C++ classes which offer a seamless integration of R and C++. 
-
+library("patchwork") # merging plots
 ```
 
 
@@ -99,12 +101,16 @@ MCGrowthRate<-rbind(MultiCultiGrowth1, MultiCultiGrowth2, MultiCultiGrowth3)
   
 
 ReplNo <- MCGrowthRate %>%
-  distinct(Photoperiod, Strain, O2_uM, WL, Par_ue) 
+  distinct(Photoperiod, Strain, O2_uM, WL, Par_ue)  
+    # mutate(Strain=case_when(Strain=="BA127R"~"PE-rich_127",
+    #      Strain=="BA48R"~"PE-rich_048",
+    #     Strain=="BA56G"~"PC-rich_056",
+    #      Strain=="BA77G"~"PC-rich_077")) 
 
 ```
 
 # make df longer for GAM
-```{r set up df for GAM}
+```{r set up df for GAM, warning=FALSE}
  Pivot_Longer_OD720_est <- MCGrowthRate %>% 
   dplyr::select(-c(OD720_Lmu_se, OD720_Lmax_se, OD720_Lintercept_se, deltaOD_Lmu_corr, deltaOD_Lmax, deltaOD_Lintercept,  deltaOD_Lmu_se, deltaOD_Lmax_se, deltaOD_Lintercept_se)) %>%
    pivot_longer(c(OD720_Lmu_corr, OD720_Lmax, OD720_Lintercept), names_to = c("Wavelength", "term"), values_to = c("estimate"), names_sep = '\\_')
@@ -147,7 +153,7 @@ ComGrowthFits <- rbind(Longer_OD720_Joined, Longer_deltaOD_Joined) %>%
 
 remove(Longer_OD720_Joined, Longer_deltaOD_Joined)
   
-glimpse(ComGrowthFits)
+#glimpse(ComGrowthFits)
 
 ```
 
@@ -201,7 +207,7 @@ DummyDF_Expand_BA127R <- rbind(DummyDF_BA127R, DummyDF_BA127R, DummyDF_BA127R)
 
 #DummyDF for BA56G;
 
-Strain <- c("BA56G")
+Strain <- c("BA056G")
 Photoperiod <- c(8, 12, 16, 24)
 Par_ue <- c(0)
 O2_uM <- c(250)
@@ -220,7 +226,7 @@ DummyDF_Expand_BA56G <- rbind(DummyDF_BA56G, DummyDF_BA56G, DummyDF_BA56G)
 
 #DummyDF for "BA77G" 
 
-Strain <- c("BA77G")
+Strain <- c("BA077G")
 Photoperiod <- c(8, 12, 16, 24)
 Par_ue <- c(0)
 O2_uM <- c(250)
@@ -420,24 +426,626 @@ HyperChlPlotHigh <- PicoGAM_Plot_Prep %>%
           axis.title.y = element_text(size=35)))
 
 ```
+SySl
+
+``` {r GAM Plot WW WL, warning = FALSE, fig.height = 5, fig.width = 5}
+data_textA <- data.frame(label = c('A'))
+GamStrain = "BA56G" 
+WL_nm = "WW" 
+PlotWL <- "deltaOD"
+  
+
+maxMu <- PicoGAM_Pred %>%
+  ungroup() %>%
+  filter(Wavelength %in% PlotWL) %>%
+  slice(which.max(fit)) #base::max does not work with package photobiology loaded simultaneously 
+maxMu <- maxMu$fit
+
+minMu <- PicoGAM_Pred %>%
+  ungroup() %>%
+  filter(Wavelength %in% PlotWL) %>%
+  slice(which.min(fit)) #base::max does not work with package photobiology loaded simultaneously 
+  #        fit == min(fit, na.rm = TRUE)) %>%
+  # distinct(fit)
+minMu <- minMu$fit
+
+PicoGAM_Plot_Prep <- PicoGAM_Pred %>%
+  filter(Wavelength %in% PlotWL,
+         Strain %in% GamStrain,
+         WL %in% WL_nm) %>%
+  mutate(Color_name = case_when(WL == "WW" ~ 'white'))
+
+
+ContourLines <- PicoGAM_Plot_Prep %>%
+  filter(Strain %in% GamStrain,
+         Wavelength %in% PlotWL) %>%
+  mutate(upper10 = quantile(fit, 0.9, na.rm = TRUE),
+         median50 = quantile(fit, 0.5, na.rm = TRUE),
+         lower10 = quantile(fit, 0.1, na.rm = TRUE)) %>%
+  ungroup() %>%
+  dplyr::select(O2_uM, upper10, median50, lower10) %>%
+  distinct() %>%
+  pivot_longer(cols = c(upper10, median50, lower10), names_to = 'quantile', values_to = 'quantileValue') %>%
+  mutate(quantileValue = round(quantileValue, digits = 2))
+
+
+HyperChlPlotHigh <- PicoGAM_Plot_Prep %>%
+  filter(Strain %in% GamStrain,
+         Wavelength %in% PlotWL)
+
+(ContourGAM_BA56G <- ggplot(data = na.omit(HyperChlPlotHigh)) + 
+    geom_tile(aes(Photoperiod, Par_ue, z = fit, fill = fit)) +
+    scale_fill_gradientn(name = bquote("µ ("~ d^-1~")"), colours=c("white", "black"), limits  = range(minMu, maxMu)) +
+    metR::geom_contour2(aes(Photoperiod, Par_ue, z = fit, fill = fit, label = stat(level)),
+                        breaks = ContourLines$quantileValue,
+                        skip = 0) +
+    metR::geom_contour2(data = PicoGrowthFits, aes(x = Photoperiod, y = Par_ue, z = PARPhotonDose_day), breaks = c(100000,500000,1000000,2000000,4000000,8000000,16000000, 32000000), linetype = "dashed") + 
+    scale_x_continuous(limits = c(8, 24), breaks = c(8, 12, 16, 24)) +
+    scale_y_continuous(limits = c(10, 900), breaks = c(30, 90, 180, 300, 600, 900)) +
+    geom_text(data=data_textA, aes(x=9, y=860, label=label), size=5) +
+    labs(x = "Photoperiod (h)", y = "PAR ( µmol photons "~m^-2~""~s^-1~")") +
+  theme_bw() +
+  theme(panel.grid.minor = element_blank(),
+        panel.grid.major = element_blank(),
+        axis.text = element_text(size=12),
+        axis.title = element_text(size=16),
+        strip.background = element_rect(fill="white"),
+        strip.text = element_text(size=14),
+        axis.title.y = element_text(margin=margin(r=10)),
+        # axis.title.x = element_text(margin=margin(t=10)),
+        axis.title.x = element_blank(),
+        legend.background = element_rect(fill="transparent"),
+        legend.position = c(0.15,0.65),
+        legend.text = element_text(size=11)))
+
+```
+
+``` {r GAM Plot WW WL, warning = FALSE, fig.height = 5, fig.width = 5}
+data_textB <- data.frame(label = c('B'))
+GamStrain = "BA77G" 
+WL_nm = "WW" 
+PlotWL <- "deltaOD"
+  
+
+maxMu <- PicoGAM_Pred %>%
+  ungroup() %>%
+  filter(Wavelength %in% PlotWL) %>%
+  slice(which.max(fit)) #base::max does not work with package photobiology loaded simultaneously 
+maxMu <- maxMu$fit
+
+minMu <- PicoGAM_Pred %>%
+  ungroup() %>%
+  filter(Wavelength %in% PlotWL) %>%
+  slice(which.min(fit)) #base::max does not work with package photobiology loaded simultaneously 
+  #        fit == min(fit, na.rm = TRUE)) %>%
+  # distinct(fit)
+minMu <- minMu$fit
+
+PicoGAM_Plot_Prep <- PicoGAM_Pred %>%
+  filter(Wavelength %in% PlotWL,
+         Strain %in% GamStrain,
+         WL %in% WL_nm) %>%
+  mutate(Color_name = case_when(WL == "WW" ~ 'white'))
+
+
+ContourLines <- PicoGAM_Plot_Prep %>%
+  filter(Strain %in% GamStrain,
+         Wavelength %in% PlotWL) %>%
+  mutate(upper10 = quantile(fit, 0.9, na.rm = TRUE),
+         median50 = quantile(fit, 0.5, na.rm = TRUE),
+         lower10 = quantile(fit, 0.1, na.rm = TRUE)) %>%
+  ungroup() %>%
+  dplyr::select(O2_uM, upper10, median50, lower10) %>%
+  distinct() %>%
+  pivot_longer(cols = c(upper10, median50, lower10), names_to = 'quantile', values_to = 'quantileValue') %>%
+  mutate(quantileValue = round(quantileValue, digits = 2))
+
+
+HyperChlPlotHigh <- PicoGAM_Plot_Prep %>%
+  filter(Strain %in% GamStrain,
+         Wavelength %in% PlotWL)
+
+(ContourGAM_BA77G <- ggplot(data = na.omit(HyperChlPlotHigh)) + 
+    geom_tile(aes(Photoperiod, Par_ue, z = fit, fill = fit)) +
+    scale_fill_gradientn(name = bquote("µ ("~ d^-1~")"), colours=c("white", "black"), limits  = range(minMu, maxMu)) +
+    metR::geom_contour2(aes(Photoperiod, Par_ue, z = fit, fill = fit, label = stat(level)),
+                        breaks = ContourLines$quantileValue,
+                        skip = 0) +
+    metR::geom_contour2(data = PicoGrowthFits, aes(x = Photoperiod, y = Par_ue, z = PARPhotonDose_day), breaks = c(100000,500000,1000000,2000000,4000000,8000000,16000000, 32000000), linetype = "dashed") + 
+    scale_x_continuous(limits = c(8, 24), breaks = c(8, 12, 16, 24)) +
+    scale_y_continuous(limits = c(10, 900), breaks = c(30, 90, 180, 300, 600, 900)) +
+    geom_text(data=data_textB, aes(x=9, y=860, label=label), size=5) +
+    labs(x = "Photoperiod (h)", y = "PAR ( µmol photons "~m^-2~""~s^-1~")") +
+  theme_bw() +
+  theme(panel.grid.minor = element_blank(),
+        panel.grid.major = element_blank(),
+        axis.text = element_text(size=12),
+        axis.title = element_text(size=16),
+        strip.background = element_rect(fill="white"),
+        strip.text = element_text(size=14),
+        # axis.title.y = element_text(margin=margin(r=10)),
+        axis.title.y = element_blank(),
+        # axis.title.x = element_text(margin=margin(t=10)),
+        axis.title.x = element_blank(),
+        legend.background = element_rect(fill="transparent"),
+        legend.position = c(0.15,0.65),
+        legend.text = element_text(size=11)))
+
+```
+
+``` {r GAM Plot WW WL, warning = FALSE, fig.height = 5, fig.width = 5}
+data_textC <- data.frame(label = c('C'))
+GamStrain = "BA48R" 
+WL_nm = "WW" 
+PlotWL <- "deltaOD"
+  
+
+maxMu <- PicoGAM_Pred %>%
+  ungroup() %>%
+  filter(Wavelength %in% PlotWL) %>%
+  slice(which.max(fit)) #base::max does not work with package photobiology loaded simultaneously 
+maxMu <- maxMu$fit
+
+minMu <- PicoGAM_Pred %>%
+  ungroup() %>%
+  filter(Wavelength %in% PlotWL) %>%
+  slice(which.min(fit)) #base::max does not work with package photobiology loaded simultaneously 
+  #        fit == min(fit, na.rm = TRUE)) %>%
+  # distinct(fit)
+minMu <- minMu$fit
+
+PicoGAM_Plot_Prep <- PicoGAM_Pred %>%
+  filter(Wavelength %in% PlotWL,
+         Strain %in% GamStrain,
+         WL %in% WL_nm) %>%
+  mutate(Color_name = case_when(WL == "WW" ~ 'white'))
+
+
+ContourLines <- PicoGAM_Plot_Prep %>%
+  filter(Strain %in% GamStrain,
+         Wavelength %in% PlotWL) %>%
+  mutate(upper10 = quantile(fit, 0.9, na.rm = TRUE),
+         median50 = quantile(fit, 0.5, na.rm = TRUE),
+         lower10 = quantile(fit, 0.1, na.rm = TRUE)) %>%
+  ungroup() %>%
+  dplyr::select(O2_uM, upper10, median50, lower10) %>%
+  distinct() %>%
+  pivot_longer(cols = c(upper10, median50, lower10), names_to = 'quantile', values_to = 'quantileValue') %>%
+  mutate(quantileValue = round(quantileValue, digits = 2))
+
+
+HyperChlPlotHigh <- PicoGAM_Plot_Prep %>%
+  filter(Strain %in% GamStrain,
+         Wavelength %in% PlotWL)
+
+(ContourGAM_BA48R <- ggplot(data = na.omit(HyperChlPlotHigh)) + 
+    geom_tile(aes(Photoperiod, Par_ue, z = fit, fill = fit)) +
+    scale_fill_gradientn(name = bquote("µ ("~ d^-1~")"), colours=c("white", "black"), limits  = range(minMu, maxMu)) +
+    metR::geom_contour2(aes(Photoperiod, Par_ue, z = fit, fill = fit, label = stat(level)),
+                        breaks = ContourLines$quantileValue,
+                        skip = 0) +
+    metR::geom_contour2(data = PicoGrowthFits, aes(x = Photoperiod, y = Par_ue, z = PARPhotonDose_day), breaks = c(100000,500000,1000000,2000000,4000000,8000000,16000000, 32000000), linetype = "dashed") + 
+    scale_x_continuous(limits = c(8, 24), breaks = c(8, 12, 16, 24)) +
+    scale_y_continuous(limits = c(10, 900), breaks = c(30, 90, 180, 300, 600, 900)) +
+    geom_text(data=data_textC, aes(x=9, y=860, label=label), size=5) +
+    labs(x = "Photoperiod (h)", y = "PAR ( µmol photons "~m^-2~""~s^-1~")") +
+  theme_bw() +
+  theme(panel.grid.minor = element_blank(),
+        panel.grid.major = element_blank(),
+        axis.text = element_text(size=12),
+        axis.title = element_text(size=16),
+        strip.background = element_rect(fill="white"),
+        strip.text = element_text(size=14),
+        axis.title.y = element_text(margin=margin(r=10)),
+        axis.title.x = element_text(margin=margin(t=10)),
+        legend.background = element_rect(fill="transparent"),
+        legend.position = c(0.15,0.65),
+        legend.text = element_text(size=11)))
+
+```
+
+``` {r GAM Plot WW WL, warning = FALSE, fig.height = 5, fig.width = 5}
+data_textD <- data.frame(label = c('D'))
+GamStrain = "BA127R" 
+WL_nm = "WW" 
+PlotWL <- "deltaOD"
+ 
+
+maxMu <- PicoGAM_Pred %>%
+  ungroup() %>%
+  filter(Wavelength %in% PlotWL) %>%
+  slice(which.max(fit)) #base::max does not work with package photobiology loaded simultaneously 
+maxMu <- maxMu$fit
+
+minMu <- PicoGAM_Pred %>%
+  ungroup() %>%
+  filter(Wavelength %in% PlotWL) %>%
+  slice(which.min(fit)) #base::max does not work with package photobiology loaded simultaneously 
+  #        fit == min(fit, na.rm = TRUE)) %>%
+  # distinct(fit)
+minMu <- minMu$fit
+
+PicoGAM_Plot_Prep <- PicoGAM_Pred %>%
+  filter(Wavelength %in% PlotWL,
+         Strain %in% GamStrain,
+         WL %in% WL_nm) %>%
+  mutate(Color_name = case_when(WL == "WW" ~ 'white'))
+
+
+ContourLines <- PicoGAM_Plot_Prep %>%
+  filter(Strain %in% GamStrain,
+         Wavelength %in% PlotWL) %>%
+  mutate(upper10 = quantile(fit, 0.9, na.rm = TRUE),
+         median50 = quantile(fit, 0.5, na.rm = TRUE),
+         lower10 = quantile(fit, 0.1, na.rm = TRUE)) %>%
+  ungroup() %>%
+  dplyr::select(O2_uM, upper10, median50, lower10) %>%
+  distinct() %>%
+  pivot_longer(cols = c(upper10, median50, lower10), names_to = 'quantile', values_to = 'quantileValue') %>%
+  mutate(quantileValue = round(quantileValue, digits = 2))
+
+
+HyperChlPlotHigh <- PicoGAM_Plot_Prep %>%
+  filter(Strain %in% GamStrain,
+         Wavelength %in% PlotWL)
+
+(ContourGAM_BA127R <- ggplot(data = na.omit(HyperChlPlotHigh)) + 
+    geom_tile(aes(Photoperiod, Par_ue, z = fit, fill = fit)) +
+    scale_fill_gradientn(name = bquote("µ ("~ d^-1~")"), colours=c("white", "black"), limits  = range(minMu, maxMu)) +
+    metR::geom_contour2(aes(Photoperiod, Par_ue, z = fit, fill = fit, label = stat(level)),
+                        breaks = ContourLines$quantileValue,
+                        skip = 0) +
+    metR::geom_contour2(data = PicoGrowthFits, aes(x = Photoperiod, y = Par_ue, z = PARPhotonDose_day), breaks = c(100000,500000,1000000,2000000,4000000,8000000,16000000, 32000000), linetype = "dashed") + 
+    scale_x_continuous(limits = c(8, 24), breaks = c(8, 12, 16, 24)) +
+    scale_y_continuous(limits = c(10, 900), breaks = c(30, 90, 180, 300, 600, 900)) +
+    geom_text(data=data_textD, aes(x=9, y=860, label=label), size=5) +
+    labs(x = "Photoperiod (h)", y = "PAR ( µmol photons "~m^-2~""~s^-1~")") +
+  theme_bw() +
+  theme(panel.grid.minor = element_blank(),
+        panel.grid.major = element_blank(),
+        axis.text = element_text(size=12),
+        axis.title = element_text(size=16),
+        strip.background = element_rect(fill="white"),
+        strip.text = element_text(size=14),
+        # axis.title.y = element_text(margin=margin(r=10)),
+        axis.title.y = element_blank(),
+        axis.title.x = element_text(margin=margin(t=10)),
+        legend.background = element_rect(fill="transparent"),
+        legend.position = c(0.15,0.65),
+        legend.text = element_text(size=11)))
+
+```
+
+
+```{r, warning = FALSE, fig.height = 9, fig.width = 10}
+ggp<- (ContourGAM_BA56G+ContourGAM_BA77G)/(ContourGAM_BA48R+ContourGAM_BA127R)
+ggp                           
+```
+
+# Save plot 
+
+```{r save plot}
+ggsave(file = file.path(FigPath, paste("Fig_GAM",".png",sep = "")), height=9, width= 9.5, dpi = 300, limitsize = TRUE)
+```
+
+-------------------------- COLOUR ------------------------------
+
+
+``` {r GAM Plot WW WL, warning = FALSE, fig.height = 5, fig.width = 5}
+data_textA <- data.frame(label = c('A'))
+GamStrain = "BA56G" 
+WL_nm = "WW" 
+PlotWL <- "deltaOD"
+  
+
+maxMu <- PicoGAM_Pred %>%
+  ungroup() %>%
+  filter(Wavelength %in% PlotWL) %>%
+  slice(which.max(fit)) #base::max does not work with package photobiology loaded simultaneously 
+maxMu <- maxMu$fit
+
+minMu <- PicoGAM_Pred %>%
+  ungroup() %>%
+  filter(Wavelength %in% PlotWL) %>%
+  slice(which.min(fit)) #base::max does not work with package photobiology loaded simultaneously 
+  #        fit == min(fit, na.rm = TRUE)) %>%
+  # distinct(fit)
+minMu <- minMu$fit
+
+PicoGAM_Plot_Prep <- PicoGAM_Pred %>%
+  filter(Wavelength %in% PlotWL,
+         Strain %in% GamStrain,
+         WL %in% WL_nm) %>%
+  mutate(Color_name = case_when(WL == "WW" ~ 'white'))
+
+
+ContourLines <- PicoGAM_Plot_Prep %>%
+  filter(Strain %in% GamStrain,
+         Wavelength %in% PlotWL) %>%
+  mutate(upper10 = quantile(fit, 0.9, na.rm = TRUE),
+         median50 = quantile(fit, 0.5, na.rm = TRUE),
+         lower10 = quantile(fit, 0.1, na.rm = TRUE)) %>%
+  ungroup() %>%
+  dplyr::select(O2_uM, upper10, median50, lower10) %>%
+  distinct() %>%
+  pivot_longer(cols = c(upper10, median50, lower10), names_to = 'quantile', values_to = 'quantileValue') %>%
+  mutate(quantileValue = round(quantileValue, digits = 2))
+
+
+HyperChlPlotHigh <- PicoGAM_Plot_Prep %>%
+  filter(Strain %in% GamStrain,
+         Wavelength %in% PlotWL)
+
+(ContourGAM_BA56Gc <- ggplot(data = na.omit(HyperChlPlotHigh)) + 
+    geom_tile(aes(Photoperiod, Par_ue, z = fit, fill = fit)) +
+    scale_fill_gradientn(name = bquote("µ ("~ d^-1~")"), colours=c("white", "seagreen4"), limits  = range(minMu, maxMu)) +
+    metR::geom_contour2(aes(Photoperiod, Par_ue, z = fit, fill = fit, label = stat(level)),
+                        breaks = ContourLines$quantileValue,
+                        skip = 0) +
+    metR::geom_contour2(data = PicoGrowthFits, aes(x = Photoperiod, y = Par_ue, z = PARPhotonDose_day), breaks = c(100000,500000,1000000,2000000,4000000,8000000,16000000, 32000000), linetype = "dashed") + 
+    scale_x_continuous(limits = c(8, 24), breaks = c(8, 12, 16, 24)) +
+    scale_y_continuous(limits = c(10, 900), breaks = c(30, 90, 180, 300, 600, 900)) +
+    geom_text(data=data_textA, aes(x=9, y=860, label=label), size=5) +
+    labs(x = "Photoperiod (h)", y = "PAR ( µmol photons "~m^-2~""~s^-1~")") +
+  theme_bw() +
+  theme(panel.grid.minor = element_blank(),
+        panel.grid.major = element_blank(),
+        axis.text = element_text(size=12),
+        axis.title = element_text(size=16),
+        strip.background = element_rect(fill="white"),
+        strip.text = element_text(size=14),
+        axis.title.y = element_text(margin=margin(r=10)),
+        # axis.title.x = element_text(margin=margin(t=10)),
+        axis.title.x = element_blank(),
+        legend.background = element_rect(fill="transparent"),
+        legend.position = c(0.15,0.65),
+        legend.text = element_text(size=11)))
+
+```
+
+``` {r GAM Plot WW WL, warning = FALSE, fig.height = 5, fig.width = 5}
+data_textB <- data.frame(label = c('B'))
+GamStrain = "BA77G" 
+WL_nm = "WW" 
+PlotWL <- "deltaOD"
+  
+
+maxMu <- PicoGAM_Pred %>%
+  ungroup() %>%
+  filter(Wavelength %in% PlotWL) %>%
+  slice(which.max(fit)) #base::max does not work with package photobiology loaded simultaneously 
+maxMu <- maxMu$fit
+
+minMu <- PicoGAM_Pred %>%
+  ungroup() %>%
+  filter(Wavelength %in% PlotWL) %>%
+  slice(which.min(fit)) #base::max does not work with package photobiology loaded simultaneously 
+  #        fit == min(fit, na.rm = TRUE)) %>%
+  # distinct(fit)
+minMu <- minMu$fit
+
+PicoGAM_Plot_Prep <- PicoGAM_Pred %>%
+  filter(Wavelength %in% PlotWL,
+         Strain %in% GamStrain,
+         WL %in% WL_nm) %>%
+  mutate(Color_name = case_when(WL == "WW" ~ 'white'))
+
+
+ContourLines <- PicoGAM_Plot_Prep %>%
+  filter(Strain %in% GamStrain,
+         Wavelength %in% PlotWL) %>%
+  mutate(upper10 = quantile(fit, 0.9, na.rm = TRUE),
+         median50 = quantile(fit, 0.5, na.rm = TRUE),
+         lower10 = quantile(fit, 0.1, na.rm = TRUE)) %>%
+  ungroup() %>%
+  dplyr::select(O2_uM, upper10, median50, lower10) %>%
+  distinct() %>%
+  pivot_longer(cols = c(upper10, median50, lower10), names_to = 'quantile', values_to = 'quantileValue') %>%
+  mutate(quantileValue = round(quantileValue, digits = 2))
+
+
+HyperChlPlotHigh <- PicoGAM_Plot_Prep %>%
+  filter(Strain %in% GamStrain,
+         Wavelength %in% PlotWL)
+
+(ContourGAM_BA77Gc <- ggplot(data = na.omit(HyperChlPlotHigh)) + 
+    geom_tile(aes(Photoperiod, Par_ue, z = fit, fill = fit)) +
+    scale_fill_gradientn(name = bquote("µ ("~ d^-1~")"), colours=c("white", "palegreen3"), limits  = range(minMu, maxMu)) +
+    metR::geom_contour2(aes(Photoperiod, Par_ue, z = fit, fill = fit, label = stat(level)),
+                        breaks = ContourLines$quantileValue,
+                        skip = 0) +
+    metR::geom_contour2(data = PicoGrowthFits, aes(x = Photoperiod, y = Par_ue, z = PARPhotonDose_day), breaks = c(100000,500000,1000000,2000000,4000000,8000000,16000000, 32000000), linetype = "dashed") + 
+    scale_x_continuous(limits = c(8, 24), breaks = c(8, 12, 16, 24)) +
+    scale_y_continuous(limits = c(10, 900), breaks = c(30, 90, 180, 300, 600, 900)) +
+    geom_text(data=data_textB, aes(x=9, y=860, label=label), size=5) +
+    labs(x = "Photoperiod (h)", y = "PAR ( µmol photons "~m^-2~""~s^-1~")") +
+  theme_bw() +
+  theme(panel.grid.minor = element_blank(),
+        panel.grid.major = element_blank(),
+        axis.text = element_text(size=12),
+        axis.title = element_text(size=16),
+        strip.background = element_rect(fill="white"),
+        strip.text = element_text(size=14),
+        # axis.title.y = element_text(margin=margin(r=10)),
+        axis.title.y = element_blank(),
+        # axis.title.x = element_text(margin=margin(t=10)),
+        axis.title.x = element_blank(),
+        legend.background = element_rect(fill="transparent"),
+        legend.position = c(0.15,0.65),
+        legend.text = element_text(size=11)))
+
+```
+
+``` {r GAM Plot WW WL, warning = FALSE, fig.height = 5, fig.width = 5}
+data_textC <- data.frame(label = c('C'))
+GamStrain = "BA48R" 
+WL_nm = "WW" 
+PlotWL <- "deltaOD"
+  
+
+maxMu <- PicoGAM_Pred %>%
+  ungroup() %>%
+  filter(Wavelength %in% PlotWL) %>%
+  slice(which.max(fit)) #base::max does not work with package photobiology loaded simultaneously 
+maxMu <- maxMu$fit
+
+minMu <- PicoGAM_Pred %>%
+  ungroup() %>%
+  filter(Wavelength %in% PlotWL) %>%
+  slice(which.min(fit)) #base::max does not work with package photobiology loaded simultaneously 
+  #        fit == min(fit, na.rm = TRUE)) %>%
+  # distinct(fit)
+minMu <- minMu$fit
+
+PicoGAM_Plot_Prep <- PicoGAM_Pred %>%
+  filter(Wavelength %in% PlotWL,
+         Strain %in% GamStrain,
+         WL %in% WL_nm) %>%
+  mutate(Color_name = case_when(WL == "WW" ~ 'white'))
+
+
+ContourLines <- PicoGAM_Plot_Prep %>%
+  filter(Strain %in% GamStrain,
+         Wavelength %in% PlotWL) %>%
+  mutate(upper10 = quantile(fit, 0.9, na.rm = TRUE),
+         median50 = quantile(fit, 0.5, na.rm = TRUE),
+         lower10 = quantile(fit, 0.1, na.rm = TRUE)) %>%
+  ungroup() %>%
+  dplyr::select(O2_uM, upper10, median50, lower10) %>%
+  distinct() %>%
+  pivot_longer(cols = c(upper10, median50, lower10), names_to = 'quantile', values_to = 'quantileValue') %>%
+  mutate(quantileValue = round(quantileValue, digits = 2))
+
+
+HyperChlPlotHigh <- PicoGAM_Plot_Prep %>%
+  filter(Strain %in% GamStrain,
+         Wavelength %in% PlotWL)
+
+(ContourGAM_BA48Rc <- ggplot(data = na.omit(HyperChlPlotHigh)) + 
+    geom_tile(aes(Photoperiod, Par_ue, z = fit, fill = fit)) +
+    scale_fill_gradientn(name = bquote("µ ("~ d^-1~")"), colours=c("white", "brown1"), limits  = range(minMu, maxMu)) +
+    metR::geom_contour2(aes(Photoperiod, Par_ue, z = fit, fill = fit, label = stat(level)),
+                        breaks = ContourLines$quantileValue,
+                        skip = 0) +
+    metR::geom_contour2(data = PicoGrowthFits, aes(x = Photoperiod, y = Par_ue, z = PARPhotonDose_day), breaks = c(100000,500000,1000000,2000000,4000000,8000000,16000000, 32000000), linetype = "dashed") + 
+    scale_x_continuous(limits = c(8, 24), breaks = c(8, 12, 16, 24)) +
+    scale_y_continuous(limits = c(10, 900), breaks = c(30, 90, 180, 300, 600, 900)) +
+    geom_text(data=data_textC, aes(x=9, y=860, label=label), size=5) +
+    labs(x = "Photoperiod (h)", y = "PAR ( µmol photons "~m^-2~""~s^-1~")") +
+  theme_bw() +
+  theme(panel.grid.minor = element_blank(),
+        panel.grid.major = element_blank(),
+        axis.text = element_text(size=12),
+        axis.title = element_text(size=16),
+        strip.background = element_rect(fill="white"),
+        strip.text = element_text(size=14),
+        axis.title.y = element_text(margin=margin(r=10)),
+        axis.title.x = element_text(margin=margin(t=10)),
+        legend.background = element_rect(fill="transparent"),
+        legend.position = c(0.15,0.65),
+        legend.text = element_text(size=11)))
+
+```
 
 
 
+``` {r GAM Plot WW WL, warning = FALSE, fig.height = 5, fig.width = 5}
+data_textD <- data.frame(label = c('D'))
+GamStrain = "BA127R" 
+WL_nm = "WW" 
+PlotWL <- "deltaOD"
+ 
+
+maxMu <- PicoGAM_Pred %>%
+  ungroup() %>%
+  filter(Wavelength %in% PlotWL) %>%
+  slice(which.max(fit)) #base::max does not work with package photobiology loaded simultaneously 
+maxMu <- maxMu$fit
+
+minMu <- PicoGAM_Pred %>%
+  ungroup() %>%
+  filter(Wavelength %in% PlotWL) %>%
+  slice(which.min(fit)) #base::max does not work with package photobiology loaded simultaneously 
+  #        fit == min(fit, na.rm = TRUE)) %>%
+  # distinct(fit)
+minMu <- minMu$fit
+
+PicoGAM_Plot_Prep <- PicoGAM_Pred %>%
+  filter(Wavelength %in% PlotWL,
+         Strain %in% GamStrain,
+         WL %in% WL_nm) %>%
+  mutate(Color_name = case_when(WL == "WW" ~ 'white'))
+
+
+ContourLines <- PicoGAM_Plot_Prep %>%
+  filter(Strain %in% GamStrain,
+         Wavelength %in% PlotWL) %>%
+  mutate(upper10 = quantile(fit, 0.9, na.rm = TRUE),
+         median50 = quantile(fit, 0.5, na.rm = TRUE),
+         lower10 = quantile(fit, 0.1, na.rm = TRUE)) %>%
+  ungroup() %>%
+  dplyr::select(O2_uM, upper10, median50, lower10) %>%
+  distinct() %>%
+  pivot_longer(cols = c(upper10, median50, lower10), names_to = 'quantile', values_to = 'quantileValue') %>%
+  mutate(quantileValue = round(quantileValue, digits = 2))
+
+
+HyperChlPlotHigh <- PicoGAM_Plot_Prep %>%
+  filter(Strain %in% GamStrain,
+         Wavelength %in% PlotWL)
+
+(ContourGAM_BA127Rc <- ggplot(data = na.omit(HyperChlPlotHigh)) + 
+    geom_tile(aes(Photoperiod, Par_ue, z = fit, fill = fit)) +
+    scale_fill_gradientn(name = bquote("µ ("~ d^-1~")"), colours=c("white", "brown4"), limits  = range(minMu, maxMu)) +
+    metR::geom_contour2(aes(Photoperiod, Par_ue, z = fit, fill = fit, label = stat(level)),
+                        breaks = ContourLines$quantileValue,
+                        skip = 0) +
+    metR::geom_contour2(data = PicoGrowthFits, aes(x = Photoperiod, y = Par_ue, z = PARPhotonDose_day), breaks = c(100000,500000,1000000,2000000,4000000,8000000,16000000, 32000000), linetype = "dashed") + 
+    scale_x_continuous(limits = c(8, 24), breaks = c(8, 12, 16, 24)) +
+    scale_y_continuous(limits = c(10, 900), breaks = c(30, 90, 180, 300, 600, 900)) +
+    geom_text(data=data_textD, aes(x=9, y=860, label=label), size=5) +
+    labs(x = "Photoperiod (h)", y = "PAR ( µmol photons "~m^-2~""~s^-1~")") +
+  theme_bw() +
+  theme(panel.grid.minor = element_blank(),
+        panel.grid.major = element_blank(),
+        axis.text = element_text(size=12),
+        axis.title = element_text(size=16),
+        strip.background = element_rect(fill="white"),
+        strip.text = element_text(size=14),
+        # axis.title.y = element_text(margin=margin(r=10)),
+        axis.title.y = element_blank(),
+        axis.title.x = element_text(margin=margin(t=10)),
+        legend.background = element_rect(fill="transparent"),
+        legend.position = c(0.15,0.65),
+        legend.text = element_text(size=11)))
+
+```
+
+```{r, warning = FALSE, fig.height = 9, fig.width = 10}
+ggp<- (ContourGAM_BA56Gc+ContourGAM_BA77Gc)/(ContourGAM_BA48Rc+ContourGAM_BA127Rc)
+ggp                           
+```
+
+# Save plot 
+
+```{r save plot}
+ggsave(file = file.path(FigPath, paste("Fig_GAM_Colour",".png",sep = "")), height=9, width= 9.5, dpi = 300, limitsize = TRUE)
+```
 
 ```{r combine plots}
 
-#combine red and blue GAM plots
-CombinedGAM <- plot_grid(ContourGAM_BA56G, ContourGAM_BA77G, ContourGAM_BA127R, ContourGAM_BA48R, nrow = 2, align = "v") 
-
-# common x-axis title
-x.grob <- textGrob("Photoperiod (h)", 
-                   gp = gpar(fontsize = 15))
-# common y-axis title
-y.grob <- textGrob("PAR (µmol photons"~ m^-2~ ~s^-1~ ")", 
-                   gp = gpar(fontface="bold", fontsize = 20), rot = 90)
-
-# add titles to plot
-LabelledCombinedGam <- grid.arrange(arrangeGrob(CombinedGAM, left = y.grob, bottom = x.grob))
+# #combine red and blue GAM plots
+# CombinedGAM <- plot_grid(ContourGAM_BA56G, ContourGAM_BA77G, ContourGAM_BA127R, ContourGAM_BA48R, nrow = 2, align = "v") 
+# 
+# # common x-axis title
+# x.grob <- textGrob("Photoperiod (h)", 
+#                    gp = gpar(fontsize = 15))
+# # common y-axis title
+# y.grob <- textGrob("PAR (µmol photons"~ m^-2~ ~s^-1~ ")", 
+#                    gp = gpar(fontface="bold", fontsize = 20), rot = 90)
+# 
+# # add titles to plot
+# LabelledCombinedGam <- grid.arrange(arrangeGrob(CombinedGAM, left = y.grob, bottom = x.grob))
 
 ```
 
