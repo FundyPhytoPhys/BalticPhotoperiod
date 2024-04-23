@@ -230,6 +230,8 @@ AnovaTest_GrowthRate<-data.frame(unclass(summary(model)), check.names = FALSE, s
 TukeyHSDTest_GrowthRate<-TukeyHSD(model, which = c("Par_ue", "Photoperiod", "Strain"))
 ```
 
+
+
 # Save RDS that create stats and tables
 
 ```{r}
@@ -1306,23 +1308,16 @@ MCParamAll_Photoperiod %>%
   ggh4x::facet_nested(rows = vars(Strain), labeller = label_parsed, scales = "free") +
   theme_bw()
 
-MCParamAll_Light %>% 
-  filter(term == "Pmax") %>% 
-  filter(Fit!= "All") %>% 
-  ggplot() +
-  geom_point(aes(x = term, y = estimate, color = Strain)) +
-  ggh4x::facet_nested(cols = vars(as.numeric(Fit)), rows = vars(Strain), labeller = label_parsed, scales = "free") +
-  theme_bw()
 
-
-MCParamAll_Photoperiod %>% 
-  filter(term == "Pmax") %>% 
-  filter(Fit!= "All") %>% 
-  ggplot() +
-  geom_point(aes(x = term, y = estimate, color = Strain)) +
-  ggh4x::facet_nested(cols = vars(as.numeric(Fit)), rows = vars(Strain), labeller = label_parsed, scales = "free") +
-  theme_bw()
 ```
+# Save RDS that create stats and tables
+
+```{r}
+saveRDS(MCParamAll_Light, file.path(TableRdsPath, paste(Project, "Tab_GrowthRate_FitParam_Light.Rds", sep = "_"), fsep = .Platform$file.sep), ascii = FALSE, version = NULL, compress = "xz", refhook = NULL)
+
+saveRDS(MCParamAll_Photoperiod, file.path(TableRdsPath, paste(Project, "Tab_GrowthRate_FitParam_Photoperiod.Rds", sep = "_"), fsep = .Platform$file.sep), ascii = FALSE, version = NULL, compress = "xz", refhook = NULL)
+```
+
 
 # Calculated Anova and Tukey test from fit param - for light
 
@@ -1360,6 +1355,7 @@ TukeyHSDTest_GrowthRateFitParam_Photoperiod<-TukeyHSD(model, which = c("Fit", "S
 rm(model, MCParamAllStats)
 ```
 
+
 # Save RDS that create stats and tables
 
 ```{r}
@@ -1368,7 +1364,7 @@ rm(model, MCParamAllStats)
 # saveRDS(TukeyHSDTest_GrowthRateFitParam_Light, file.path(TableRdsPath, paste(Project, "HSD_GrowthRateFitParam_Light.Rds", sep = "_"), fsep = .Platform$file.sep), ascii = FALSE, version = NULL, compress = "xz", refhook = NULL)
 
 # saveRDS(AnovaTest_GrowthRateFitParam_Photoperiod, file.path(TableRdsPath, paste(Project, "Anova_GrowthRateFitParam_Photoperiod.Rds", sep = "_"), fsep = .Platform$file.sep), ascii = FALSE, version = NULL, compress = "xz", refhook = NULL)
-
+# 
 # saveRDS(TukeyHSDTest_GrowthRateFitParam_Photoperiod, file.path(TableRdsPath, paste(Project, "HSD_GrowthRateFitParam_Photoperiod.Rds", sep = "_"), fsep = .Platform$file.sep), ascii = FALSE, version = NULL, compress = "xz", refhook = NULL)
 ```
 

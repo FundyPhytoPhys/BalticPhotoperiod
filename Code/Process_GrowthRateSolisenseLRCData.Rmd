@@ -1196,99 +1196,109 @@ ggsave(file = file.path(FigPath, paste("Fig_GrowthRate_JVPSII_Photoperiod_Chla",
 # Exstracting parameters from each fit (for each light and all light together)
 
 ```{r}
-# GrowthRateAllParam<-GRCplatt_PredictGrowthJVPSIIAll %>%
-#   dplyr::select(c(Strain, term, estimate, std.error, statistic, p.value)) %>%
-#   unique()
-#   GrowthRateAllParam$Fit <- 'All'
-# 
-# GrowthRate30Param<-GRCplatt_PredictGrowthJVPSII30 %>% 
-#   dplyr::select(c(Strain, term, estimate, std.error, statistic, p.value)) %>% 
-#   unique()
-#   GrowthRate30Param$Fit <- '30'
-# 
-# GrowthRate90Param<-GRCplatt_PredictGrowthJVPSII90 %>% 
-#   dplyr::select(c(Strain, term, estimate, std.error, statistic, p.value)) %>% 
-#   unique()
-#   GrowthRate90Param$Fit <- '90'
-#   
-# GrowthRate180Param<-GRCplatt_PredictGrowthJVPSII180 %>% 
-#   dplyr::select(c(Strain, term, estimate, std.error, statistic, p.value)) %>% 
-#   unique()
-#   GrowthRate180Param$Fit <- '180'
-#   
-# GrowthRate300Param<-GRCplatt_PredictGrowthJVPSII300 %>% 
-#   dplyr::select(c(Strain, term, estimate, std.error, statistic, p.value)) %>% 
-#   unique()
-#   GrowthRate300Param$Fit <- '300'
-#   
-# GrowthRate900Param<-GRCplatt_PredictGrowthJVPSII900 %>% 
-#   dplyr::select(c(Strain, term, estimate, std.error, statistic, p.value)) %>% 
-#   unique()
-#   GrowthRate900Param$Fit <- '900'
-#   
-# JVPSIIParamAll_Light<-rbind(GrowthRateAllParam, GrowthRate30Param, GrowthRate90Param, GrowthRate180Param, GrowthRate300Param, GrowthRate900Param)
-# 
-# JVPSIIParamAll_Light<-JVPSIIParamAll_Light %>% 
-#   unique()
-# 
-# rm(GrowthRate30Param, GrowthRate90Param, GrowthRate180Param, GrowthRate300Param, GrowthRate900Param)
+GrowthRateAllParam<-GRCplatt_PredictGrowthJVPSIIAll %>%
+  dplyr::select(c(Strain, term, estimate, std.error, statistic, p.value)) %>%
+  unique()
+  GrowthRateAllParam$Fit <- 'All'
+
+GrowthRate30Param<-GRCplatt_PredictGrowthJVPSII30 %>%
+  dplyr::select(c(Strain, term, estimate, std.error, statistic, p.value)) %>%
+  unique()
+  GrowthRate30Param$Fit <- '30'
+
+GrowthRate90Param<-GRCplatt_PredictGrowthJVPSII90 %>%
+  dplyr::select(c(Strain, term, estimate, std.error, statistic, p.value)) %>%
+  unique()
+  GrowthRate90Param$Fit <- '90'
+
+GrowthRate180Param<-GRCplatt_PredictGrowthJVPSII180 %>%
+  dplyr::select(c(Strain, term, estimate, std.error, statistic, p.value)) %>%
+  unique()
+  GrowthRate180Param$Fit <- '180'
+
+GrowthRate300Param<-GRCplatt_PredictGrowthJVPSII300 %>%
+  dplyr::select(c(Strain, term, estimate, std.error, statistic, p.value)) %>%
+  unique()
+  GrowthRate300Param$Fit <- '300'
+
+GrowthRate900Param<-GRCplatt_PredictGrowthJVPSII900 %>%
+  dplyr::select(c(Strain, term, estimate, std.error, statistic, p.value)) %>%
+  unique()
+  GrowthRate900Param$Fit <- '900'
+
+JVPSIIParamAll_Light<-rbind(GrowthRateAllParam, GrowthRate30Param, GrowthRate90Param, GrowthRate180Param, GrowthRate300Param, GrowthRate900Param)
+
+JVPSIIParamAll_Light<-JVPSIIParamAll_Light %>%
+  unique()
+
+rm(GrowthRate30Param, GrowthRate90Param, GrowthRate180Param, GrowthRate300Param, GrowthRate900Param)
 ```
 
 # Exstracting parameters from each fit (for each photoperiod and all photoperiod together)
 
 ```{r}
-# GrowthRateAllParam<-GRCplatt_PredictGrowthAll %>% 
-#   dplyr::select(c(Strain, term, estimate, std.error, statistic, p.value)) %>% 
+# GrowthRateAllParam<-GRCplatt_PredictGrowthAll %>%
+#   dplyr::select(c(Strain, term, estimate, std.error, statistic, p.value)) %>%
 #   unique()
 #   GrowthRateAllParam$Fit <- 'All'
 
-# GrowthRate8Param<-GRCplatt_PredictGrowthJVPSII8 %>% 
-#   dplyr::select(c(Strain, term, estimate, std.error, statistic, p.value)) %>% 
-#   unique()
-#   GrowthRate8Param$Fit <- '8'
-# 
-# GrowthRate12Param<-GRCplatt_PredictGrowthJVPSII12 %>% 
-#   dplyr::select(c(Strain, term, estimate, std.error, statistic, p.value)) %>% 
-#   unique()
-#   GrowthRate12Param$Fit <- '12'
-#   
-# GrowthRate16Param<-GRCplatt_PredictGrowthJVPSII16 %>% 
-#   dplyr::select(c(Strain, term, estimate, std.error, statistic, p.value)) %>% 
-#   unique()
-#   GrowthRate16Param$Fit <- '16'
-#   
-# GrowthRate24Param<-GRCplatt_PredictGrowthJVPSII24 %>% 
-#   dplyr::select(c(Strain, term, estimate, std.error, statistic, p.value)) %>% 
-#   unique()
-#   GrowthRate24Param$Fit <- '24'
-#   
-# 
-# JVPSIIParamAll_Photoperiod<-rbind(GrowthRateAllParam, GrowthRate8Param, GrowthRate12Param, GrowthRate16Param, GrowthRate24Param)
-# 
-# JVPSIIParamAll_Photoperiod<-JVPSIIParamAll_Photoperiod %>% 
-#   unique()
-# 
-# rm(GrowthRate8Param, GrowthRate12Param, GrowthRate16Param, GrowthRate24Param)
+GrowthRate8Param<-GRCplatt_PredictGrowthJVPSII8 %>%
+  dplyr::select(c(Strain, term, estimate, std.error, statistic, p.value)) %>%
+  unique()
+  GrowthRate8Param$Fit <- '8'
+
+GrowthRate12Param<-GRCplatt_PredictGrowthJVPSII12 %>%
+  dplyr::select(c(Strain, term, estimate, std.error, statistic, p.value)) %>%
+  unique()
+  GrowthRate12Param$Fit <- '12'
+
+GrowthRate16Param<-GRCplatt_PredictGrowthJVPSII16 %>%
+  dplyr::select(c(Strain, term, estimate, std.error, statistic, p.value)) %>%
+  unique()
+  GrowthRate16Param$Fit <- '16'
+
+GrowthRate24Param<-GRCplatt_PredictGrowthJVPSII24 %>%
+  dplyr::select(c(Strain, term, estimate, std.error, statistic, p.value)) %>%
+  unique()
+  GrowthRate24Param$Fit <- '24'
+
+
+JVPSIIParamAll_Photoperiod<-rbind(GrowthRateAllParam, GrowthRate8Param, GrowthRate12Param, GrowthRate16Param, GrowthRate24Param)
+
+JVPSIIParamAll_Photoperiod<-JVPSIIParamAll_Photoperiod %>%
+  unique()
+
+rm(GrowthRate8Param, GrowthRate12Param, GrowthRate16Param, GrowthRate24Param)
 ```
 
 # Create preliminary plot from parameters
 
 ```{r preliminary plot}
-# JVPSIIParamAll_Light %>% 
-#   filter(term == "a") %>% 
-#   filter(Fit!= "All") %>% 
-#   ggplot() +
-#   geom_point(aes(x = term, y = estimate, color = Strain)) +
-#   ggh4x::facet_nested(cols = vars(as.numeric(Fit)), rows = vars(Strain), labeller = label_parsed, scales = "free") +
-#   theme_bw()
-# 
-# JVPSIIParamAll_Light %>% 
-#   filter(term == "Pmax") %>% 
-#   filter(Fit!= "All") %>% 
-#   ggplot() +
-#   geom_point(aes(x = term, y = estimate, color = Strain)) +
-#   ggh4x::facet_nested(cols = vars(as.numeric(Fit)), rows = vars(Strain), labeller = label_parsed, scales = "free") +
-#   theme_bw()
+
+JVPSIIParamAll_Light %>% 
+  filter(term == "a") %>% 
+  filter(Fit!= "All") %>% 
+  ggplot() +
+  geom_point(aes(x = as.numeric(Fit), y = estimate, color = Strain)) +
+  ggh4x::facet_nested(rows = vars(Strain), labeller = label_parsed, scales = "free") +
+  theme_bw()
+
+JVPSIIParamAll_Photoperiod %>% 
+  filter(term == "a") %>% 
+  filter(Fit!= "All") %>% 
+  ggplot() +
+  geom_point(aes(x = as.numeric(Fit), y = estimate, color = Strain)) +
+  ggh4x::facet_nested(rows = vars(Strain), labeller = label_parsed, scales = "free") +
+  theme_bw()
+
+```
+
+# Save RDS that create stats and tables
+
+```{r}
+saveRDS(JVPSIIParamAll_Light, file.path(TableRdsPath, paste(Project, "Tab_GrowthRateJVPSII_FitParam_Light.Rds", sep = "_"), fsep = .Platform$file.sep), ascii = FALSE, version = NULL, compress = "xz", refhook = NULL)
+
+saveRDS(JVPSIIParamAll_Photoperiod, file.path(TableRdsPath, paste(Project, "Tab_GrowthRateJVPSII_FitParam_Photoperiod.Rds", sep = "_"), fsep = .Platform$file.sep), ascii = FALSE, version = NULL, compress = "xz", refhook = NULL)
 ```
 
 # Save RDS that create stats and tables
