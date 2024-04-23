@@ -328,13 +328,11 @@ PicoGAM_Pred <- PicoGAM %>%
 
 
 # "BA48R"  "BA127R" "BA56G"  "BA77G" 
-# Plot WL light GAM for BA48R
-#Think about cumulative photon isoclines
+# Plot WL light GAM
 #Think about maximum value for mu Z axis;  maybe 2?
-#
-``` {r BA48RGAM Plot WW WL}
-GamStrain = "BA56G" 
-#GamColor = "450" may use for Strain colour later
+
+``` {r GAM Plot WW WL}
+GamStrain = "BA48R" 
 WL_nm = "WW" 
 PlotWL <- "deltaOD"
   
@@ -360,17 +358,7 @@ PicoGAM_Plot_Prep <- PicoGAM_Pred %>%
   mutate(Color_name = case_when(WL == "WW" ~ 'white'))
 
 
- # WL_O2_Colors = c(Blue = w_length2rgb(450), green = w_length2rgb(530), red = w_length2rgb(660), white = "#FFCC00")
- # 
- # ColourDF <- data.frame(
- #   ColorName = c('Blue', 'Green', 'Red', 'White'),
- #   WL_O2_Colors = c( w_length2rgb(450), w_length2rgb(530), w_length2rgb(660), "#FFCC00")
- # ) %>%
- #   filter(ColorName %in% GamColor) %>%
- #   dplyr::select(WL_O2_Colors)
-
-
-ContourBreaks <- PicoGAM_Plot_Prep %>%
+ContourLines <- PicoGAM_Plot_Prep %>%
   filter(
          Strain %in% GamStrain,
          Wavelength %in% PlotWL
@@ -403,17 +391,31 @@ HyperChlPlotHigh <- PicoGAM_Plot_Prep %>%
          Wavelength %in% PlotWL,
          O2_uM == "250"
   )
-ContourLines <- ContourBreaks
- # filter(O2_uM == "250")
 
-ContourLines <- ContourLines$quantileValue
 
-(ContourGAM <- ggplot(na.omit(HyperChlPlotHigh), aes(Photoperiod, Par_ue, z = fit, fill = fit)) + 
+(ContourGAM_BA48R <- ggplot(na.omit(HyperChlPlotHigh), aes(Photoperiod, Par_ue, z = fit, fill = fit)) + 
     geom_tile() +
     scale_fill_gradientn(name = bquote("µ ("~ d^-1~")"), colours=c("white", "black"), limits  = range(minMu, maxMu)) +
     metR::geom_contour2(aes(label = stat(level)),
-                        breaks = ContourLines,
+                        breaks = ContourLines$quantileValue,
                         skip = 0) +
+    scale_x_continuous(limits = c(8, 28), breaks = c(8, 12, 16, 24)) +
+    scale_y_continuous(limits = c(10, 900), breaks = c(30, 90, 180, 300, 600, 900)) +
+    xlab(NULL)+
+      ylab(NULL)+
+    #https://stackoverflow.com/questions/15074127/use-expression-with-a-variable-r
+    theme_classic() +
+   theme(axis.text=element_text(size=15),
+          axis.title.x = element_text(size=20),
+           axis.title.y = element_text(size=35)))
+
+(ContourGAM_BA48R <- ggplot(data = na.omit(HyperChlPlotHigh)) + 
+    geom_tile(aes(Photoperiod, Par_ue, z = fit, fill = fit)) +
+    scale_fill_gradientn(name = bquote("µ ("~ d^-1~")"), colours=c("white", "black"), limits  = range(minMu, 3)) +
+    metR::geom_contour2(aes(Photoperiod, Par_ue, z = fit, fill = fit, label = stat(level)),
+                        breaks = ContourLines$quantileValue,
+                        skip = 0) +
+    metR::geom_contour2(data = PicoGrowthFits, aes(x = Photoperiod, y = Par_ue, z = PARPhotonDose_day), breaks = c(100000,500000,1000000,2000000,4000000,8000000,16000000, 32000000), linetype = "dashed") + 
     scale_x_continuous(limits = c(8, 28), breaks = c(8, 12, 16, 24)) +
     scale_y_continuous(limits = c(10, 900), breaks = c(30, 90, 180, 300, 600, 900)) +
     xlab(NULL)+
