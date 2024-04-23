@@ -15,6 +15,9 @@ author:
 - Mireille Savoie:
     institute: MTA
     email: msavoie@mta.ca
+- Anabella Aguilera:
+    institute: SW
+    email: anabella.aguilera@lnu.se
 - Naaman Omar:
     institute: MTA
     email: nomar@mta.ca
@@ -29,6 +32,7 @@ institute:
     Gdynia, Poland"
 - VU: Department of Geography, University of Victoria, Victoria, BC V8P 5C2, Canada
 - IOPAN: "Institute of Oceanology, Polish Academy of Sciences, 81-712 Sopot, Poland"
+- SW: Sweden
 output:
   bookdown::word_document2:
     reference_docx: Template.docx
@@ -139,7 +143,7 @@ Picocyanobacteria are the most abundant phytoplankters in aquatic ecosystems and
 
 ## Culture condition and experimental setup {.unnumbered}
 
-Two non-axenic PhycoCyanin(PC)-rich (CCBA_056 or CCBA_077) strains and two PhycoErythrin(PE)-rich (CCBA_048 or CCBA_127) strains of *Synechococcus* were obtained from the Culture Collection of Baltic Algae (CCBA; https://ccba.ug.edu.pl/pages/en/home.php). Pre-cultures of picocyanobacteria strains were kept in Tissue Culture Flasks (VWR International, Cat. No. 10062-872, PA, USA) and were transferred to fresh f/2 media [@guillardCulturePhytoplanktonFeeding1975] at salinity of 8 PSU (which corresponds to their natural habitat) every two weeks, under a photoperiod of 12 h and Photosynthetically Active Radiation (PAR) of 10 µmol photons m^−2^s^−1^ supplied from cool white fluorescent tubes, at 22℃.
+Two non-axenic PhycoCyanin(PC)-rich (CCBA_056 or CCBA_077) strains and two PhycoErythrin(PE)-rich (CCBA_048 or CCBA_127) strains of *Synechococcus* belonging to different clades were obtained from the Culture Collection of Baltic Algae (CCBA; https://ccba.ug.edu.pl/pages/en/home.php). Pre-cultures of picocyanobacteria strains were kept in Tissue Culture Flasks (VWR International, Cat. No. 10062-872, PA, USA) and were transferred to fresh f/2 media [@guillardCulturePhytoplanktonFeeding1975] at salinity of 8 PSU (which corresponds to their natural habitat) every two weeks, under a photoperiod of 12 h and Photosynthetically Active Radiation (PAR) of 10 µmol photons m^−2^s^−1^ supplied from cool white fluorescent tubes, at 22℃.
 
 Cultures of each strain were grown in 8 x 80 mL round bottom cylindrical glass tubes in a Multi-Cultivator MC 1000-OD (Photon Systems Instruments, Drásov, Czech Republic). Each culture tube contained 75 mL of f/2 medium inoculated with 5 mL of growing pre-culture, to achieve exponential growth from the beginning of the experiment, with little to no lag phase upon inoculation. Culture tubes were inoculated in the afternoon while the photoregime of a sinuisoidal photoperiod commenced the following morning such that peak PAR occurred at noon each day.
 
@@ -319,7 +323,7 @@ knitr::include_graphics(file.path(FiguresFP,"Fig_GrowthRate_JVPSII_Photoperiod_C
 
 # Discussion {.unnumbered}
 
-## Photic regime significance for picocyanobacteria growth and global occurrence {.unnumbered}
+## Influences of photic regime on picocyanobacteria growth and implications for distribution {.unnumbered}
 
 Light regimes, including peak level and photoperiod, are major factors affecting the distribution and seasonality of phytoplankters [@ergaEcologicalStudiesPhytoplankton1984]. We found that cumulative diel PUR consistently explain achieved growth rates (µ; d^−1^) of PC-rich and PE-rich strains of *Synechococcus*, across a matrix of 4 photoperiods (8 – 24 h) and 6 peak PAR (30 – 900 µmol photons m^−2^s^−1^). All four strains showed saturation of growth rate under increasing cumulative diel PUR, although the achieved estimates of µ~max~, and the onset of photoinhibition of growth, varied depending upon strain, photoperiod and peak PAR (Fig. 4-5). Tested strains were generally opportunistic in exploiting higher diel light doses to achieve faster µ, although PE-rich strains suffered strong photoinhibition of growth under peak PAR above 600 µmol photons m^−2^s^−1^ and 24 h photoperiod. Plots of growth rates vs. cumulative diel PAR, estimated for exponential phase cultures, show similar patterns (Fig. S5-S6).
 
@@ -335,7 +339,7 @@ Light level is another key driver of picocyanobacteria productivity [@pickAbunda
 
 Large numbers of *Synechococcus* sp. are recorded in various geographical regions around the world [@sliwinska-wilczewskaAllelopathicBloomFormingPicocyanobacteria2018] and characterized by different photic regimes. Our work indicates that *Synechococcus* can persist under extreme light conditions and adapt to fluctuating photoperiods. Thus, in regions and periods with a longer photoperiod, both PC-rich and PE-rich *Synechococcus* sp. may become dominant species in the surface waters, but suffer when the photoperiod is shorter.
 
-## Photic regime and growth phase influence picocyanobacteria light capture efficacy {.unnumbered}
+## Photic regime and growth phase influences on picocyanobacteria light capture {.unnumbered}
 
 Phytoplankton, as primary producers, use PUR for photosynthesis. PUR is always smaller than PAR (PUR < PAR), and depends on the spectral composition of the PAR, versus the phytoplankton pigment composition determining spectral absorption [@morelAvailableUsableStored1978]. The spatial and temporal distribution of PAR within aquatic ecosystems is influenced by solar angle, water depth, water clarity, and the presence of light-absorbing substances such as dissolved organic matter [@morelAvailableUsableStored1978; @morelOpticalModelingUpper1988] and phytoplankton cells. PUR, in turn, is also determined by pigment content of phytoplankton cells, which changes depending upon growth conditions and the phase of growth.
 
