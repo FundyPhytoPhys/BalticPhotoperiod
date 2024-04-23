@@ -81,26 +81,37 @@ library(Rcpp) #'Rcpp' package provides R functions as well as C++ classes which 
 # Read data nad select relevant columns
 ```{r read data and select relevant columns}
 
-GrowthFits <- readRDS(file = file.path(DataIn, GamFit))  
+MultiCultiGrowth <- readRDS(file = file.path(DataIn, GamFit))  
 
-GrowthFits <- GrowthFits %>% 
+MultiCultiGrowth <- MultiCultiGrowth %>% 
   dplyr::select(c(Filename, PrimaryOperator, Tube, SampleID, Run, Photoperiod, Strain, WL, O2_Category, O2_uM, LightShape, Par_ue, PARPhotonDose_day, OD720_Lmu_corr, OD720_Lmax, OD720_Lintercept, OD720_Lmu_se, OD720_Lmax_se, OD720_Lintercept_se, deltaOD_Lmu_corr, deltaOD_Lmax, deltaOD_Lintercept,  deltaOD_Lmu_se, deltaOD_Lmax_se, deltaOD_Lintercept_se))
 
+MultiCultiGrowth1<- MultiCultiGrowth %>%
+  filter(Run==77) %>%
+  filter(Strain =="BA77G")
+MultiCultiGrowth2<-MultiCultiGrowth %>%
+  filter(Run==121) %>%
+  filter(Strain !="BA77G")
+MultiCultiGrowth3<-MultiCultiGrowth %>%
+  filter(Run!=121 & Run!= 77)
+MCGrowthRate<-rbind(MultiCultiGrowth1, MultiCultiGrowth2, MultiCultiGrowth3)
+  rm(MultiCultiGrowth, MultiCultiGrowth1, MultiCultiGrowth2, MultiCultiGrowth3)
+  
 
-ReplNo <- GrowthFits %>%
+ReplNo <- MCGrowthRate %>%
   distinct(Photoperiod, Strain, O2_uM, WL, Par_ue) 
 
 ```
 
 # make df longer for GAM
 ```{r set up df for GAM}
- Pivot_Longer_OD720_est <- GrowthFits %>% 
+ Pivot_Longer_OD720_est <- MCGrowthRate %>% 
   dplyr::select(-c(OD720_Lmu_se, OD720_Lmax_se, OD720_Lintercept_se, deltaOD_Lmu_corr, deltaOD_Lmax, deltaOD_Lintercept,  deltaOD_Lmu_se, deltaOD_Lmax_se, deltaOD_Lintercept_se)) %>%
    pivot_longer(c(OD720_Lmu_corr, OD720_Lmax, OD720_Lintercept), names_to = c("Wavelength", "term"), values_to = c("estimate"), names_sep = '\\_')
 
 
 # OD720 pivot longer Gmax, Gmu, Glag , Lmu, Lmax and Lintercept standard error
-Pivot_Longer_OD720_se <- GrowthFits %>%
+Pivot_Longer_OD720_se <- MCGrowthRate %>%
   dplyr::select(-c(OD720_Lmu_corr, OD720_Lmax, OD720_Lintercept, deltaOD_Lmu_corr, deltaOD_Lmax, deltaOD_Lintercept,  deltaOD_Lmu_se, deltaOD_Lmax_se, deltaOD_Lintercept_se)) %>%
    pivot_longer(c(OD720_Lmu_se, OD720_Lmax_se, OD720_Lintercept_se), names_to = c("Wavelength", "term"), values_to = c("se"), names_sep = '\\_') 
 
@@ -112,12 +123,12 @@ remove(Pivot_Longer_OD720_est, Pivot_Longer_OD720_se)
 
 
 # deltaOD pivot longer Gmax, Gmu, Glag, Lmu, Lmax and Lintercept estimates
-Pivot_Longer_deltaOD_est <- GrowthFits %>%
+Pivot_Longer_deltaOD_est <- MCGrowthRate %>%
   dplyr::select(-c(OD720_Lmu_corr, OD720_Lmax, OD720_Lintercept, OD720_Lmu_se, OD720_Lmax_se, OD720_Lintercept_se,  deltaOD_Lmu_se, deltaOD_Lmax_se, deltaOD_Lintercept_se)) %>%
    pivot_longer(c(deltaOD_Lmu_corr, deltaOD_Lmax, deltaOD_Lintercept), names_to = c("Wavelength", "term"), values_to = c("estimate"), names_sep = '\\_') 
 
 # deltaOD pivot longer Gmax, Gmu, Glag , Lmu, Lmax and Lintercept standard error
-Pivot_Longer_deltaOD_se <- GrowthFits %>%
+Pivot_Longer_deltaOD_se <- MCGrowthRate %>%
   dplyr::select(-c(OD720_Lmu_corr, OD720_Lmax, OD720_Lintercept, OD720_Lmu_se, OD720_Lmax_se, OD720_Lintercept_se, deltaOD_Lmu_corr, deltaOD_Lmax, deltaOD_Lintercept)) %>%
    pivot_longer(c(deltaOD_Lmu_se, deltaOD_Lmax_se, deltaOD_Lintercept_se), names_to = c("Wavelength", "term"), values_to = c("se"), names_sep = '\\_') 
 
@@ -393,38 +404,20 @@ HyperChlPlotHigh <- PicoGAM_Plot_Prep %>%
   )
 
 
-# (ContourGAM_BA127R <- ggplot(na.omit(HyperChlPlotHigh), aes(Photoperiod, Par_ue, z = fit, fill = fit)) + 
-#     geom_tile() +
-#     scale_fill_gradientn(name = bquote("µ ("~ d^-1~")"), colours=c("white", "black"), limits  = range(minMu, maxMu)) +
-#     metR::geom_contour2(aes(label = stat(level)),
-#                         breaks = ContourLines$quantileValue,
-#                         skip = 0) +
-#     scale_x_continuous(limits = c(8, 28), breaks = c(8, 12, 16, 24)) +
-#     scale_y_continuous(limits = c(10, 900), breaks = c(30, 90, 180, 300, 600, 900)) +
-#     xlab(NULL)+
-#       ylab(NULL)+
-#     #https://stackoverflow.com/questions/15074127/use-expression-with-a-variable-r
-#     theme_classic() +
-#    theme(axis.text=element_text(size=15),
-#           axis.title.x = element_text(size=20),
-#            axis.title.y = element_text(size=35)))
-
 (ContourGAM_BA77G <- ggplot(data = na.omit(HyperChlPlotHigh)) + 
     geom_tile(aes(Photoperiod, Par_ue, z = fit, fill = fit)) +
-    scale_fill_gradientn(name = bquote("µ ("~ d^-1~")"), colours=c("white", "black"), limits  = range(minMu, 3)) +
+    scale_fill_gradientn(name = bquote("µ ("~ d^-1~")"), colours=c("white", "black"), limits  = range(minMu, maxMu)) +
     metR::geom_contour2(aes(Photoperiod, Par_ue, z = fit, fill = fit, label = stat(level)),
                         breaks = ContourLines$quantileValue,
                         skip = 0) +
     metR::geom_contour2(data = PicoGrowthFits, aes(x = Photoperiod, y = Par_ue, z = PARPhotonDose_day), breaks = c(100000,500000,1000000,2000000,4000000,8000000,16000000, 32000000), linetype = "dashed") + 
     scale_x_continuous(limits = c(8, 28), breaks = c(8, 12, 16, 24)) +
     scale_y_continuous(limits = c(10, 900), breaks = c(30, 90, 180, 300, 600, 900)) +
-    xlab(NULL)+
-      ylab(NULL)+
-    #https://stackoverflow.com/questions/15074127/use-expression-with-a-variable-r
-    theme_classic() +
-   theme(axis.text=element_text(size=15),
+       #https://stackoverflow.com/questions/15074127/use-expression-with-a-variable-r
+   theme_classic() +
+    theme(axis.text=element_text(size=15),
           axis.title.x = element_text(size=20),
-           axis.title.y = element_text(size=35)))
+          axis.title.y = element_text(size=35)))
 
 ```
 
@@ -438,7 +431,7 @@ CombinedGAM <- plot_grid(ContourGAM_BA56G, ContourGAM_BA77G, ContourGAM_BA127R, 
 
 # common x-axis title
 x.grob <- textGrob("Photoperiod (h)", 
-                   gp = gpar(fontsize = 20))
+                   gp = gpar(fontsize = 15))
 # common y-axis title
 y.grob <- textGrob("PAR (µmol photons"~ m^-2~ ~s^-1~ ")", 
                    gp = gpar(fontface="bold", fontsize = 20), rot = 90)
