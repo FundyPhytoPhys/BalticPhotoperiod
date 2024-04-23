@@ -332,7 +332,7 @@ PicoGAM_Pred <- PicoGAM %>%
 #Think about maximum value for mu Z axis;  maybe 2?
 
 ``` {r GAM Plot WW WL}
-GamStrain = "BA48R" 
+GamStrain = "BA77G" 
 WL_nm = "WW" 
 PlotWL <- "deltaOD"
   
@@ -393,23 +393,23 @@ HyperChlPlotHigh <- PicoGAM_Plot_Prep %>%
   )
 
 
-(ContourGAM_BA48R <- ggplot(na.omit(HyperChlPlotHigh), aes(Photoperiod, Par_ue, z = fit, fill = fit)) + 
-    geom_tile() +
-    scale_fill_gradientn(name = bquote("µ ("~ d^-1~")"), colours=c("white", "black"), limits  = range(minMu, maxMu)) +
-    metR::geom_contour2(aes(label = stat(level)),
-                        breaks = ContourLines$quantileValue,
-                        skip = 0) +
-    scale_x_continuous(limits = c(8, 28), breaks = c(8, 12, 16, 24)) +
-    scale_y_continuous(limits = c(10, 900), breaks = c(30, 90, 180, 300, 600, 900)) +
-    xlab(NULL)+
-      ylab(NULL)+
-    #https://stackoverflow.com/questions/15074127/use-expression-with-a-variable-r
-    theme_classic() +
-   theme(axis.text=element_text(size=15),
-          axis.title.x = element_text(size=20),
-           axis.title.y = element_text(size=35)))
+# (ContourGAM_BA127R <- ggplot(na.omit(HyperChlPlotHigh), aes(Photoperiod, Par_ue, z = fit, fill = fit)) + 
+#     geom_tile() +
+#     scale_fill_gradientn(name = bquote("µ ("~ d^-1~")"), colours=c("white", "black"), limits  = range(minMu, maxMu)) +
+#     metR::geom_contour2(aes(label = stat(level)),
+#                         breaks = ContourLines$quantileValue,
+#                         skip = 0) +
+#     scale_x_continuous(limits = c(8, 28), breaks = c(8, 12, 16, 24)) +
+#     scale_y_continuous(limits = c(10, 900), breaks = c(30, 90, 180, 300, 600, 900)) +
+#     xlab(NULL)+
+#       ylab(NULL)+
+#     #https://stackoverflow.com/questions/15074127/use-expression-with-a-variable-r
+#     theme_classic() +
+#    theme(axis.text=element_text(size=15),
+#           axis.title.x = element_text(size=20),
+#            axis.title.y = element_text(size=35)))
 
-(ContourGAM_BA48R <- ggplot(data = na.omit(HyperChlPlotHigh)) + 
+(ContourGAM_BA77G <- ggplot(data = na.omit(HyperChlPlotHigh)) + 
     geom_tile(aes(Photoperiod, Par_ue, z = fit, fill = fit)) +
     scale_fill_gradientn(name = bquote("µ ("~ d^-1~")"), colours=c("white", "black"), limits  = range(minMu, 3)) +
     metR::geom_contour2(aes(Photoperiod, Par_ue, z = fit, fill = fit, label = stat(level)),
@@ -434,7 +434,7 @@ HyperChlPlotHigh <- PicoGAM_Plot_Prep %>%
 ```{r combine plots}
 
 #combine red and blue GAM plots
-CombinedGAM <- plot_grid(p3_Red, p3_Blue, nrow = 1, align = "v") 
+CombinedGAM <- plot_grid(ContourGAM_BA56G, ContourGAM_BA77G, ContourGAM_BA127R, ContourGAM_BA48R, nrow = 2, align = "v") 
 
 # common x-axis title
 x.grob <- textGrob("Photoperiod (h)", 
@@ -451,11 +451,11 @@ LabelledCombinedGam <- grid.arrange(arrangeGrob(CombinedGAM, left = y.grob, bott
 
 ```{r save plots}
 
-# SS120GAM.png for manuscript
- ggsave(file = file.path(paste(PlotsOut, sep = "/"), paste(GamStrain, "GAM", ".png", sep = ""), fsep = .Platform$file.sep), plot = LabelledCombinedGam,  height = 10, width = 10)
-
-# SS120GAM is Fig6.tiff for PLOSONE submission
- ggsave(file = file.path(PlotsOutPLOS, "Fig6.tiff", fsep = .Platform$file.sep), plot = LabelledCombinedGam, device = NULL, scale = 1,  height = 10, width = 10, compression = "lzw")
+# # SS120GAM.png for manuscript
+#  ggsave(file = file.path(paste(PlotsOut, sep = "/"), paste(GamStrain, "GAM", ".png", sep = ""), fsep = .Platform$file.sep), plot = LabelledCombinedGam,  height = 10, width = 10)
+# 
+# # SS120GAM is Fig6.tiff for PLOSONE submission
+#  ggsave(file = file.path(PlotsOutPLOS, "Fig6.tiff", fsep = .Platform$file.sep), plot = LabelledCombinedGam, device = NULL, scale = 1,  height = 10, width = 10, compression = "lzw")
  
 ```
 
