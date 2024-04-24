@@ -1130,7 +1130,7 @@ ggplot() +
         axis.title = element_text(size=16),
         # strip.background = element_rect(fill="white"),
         strip.background = element_blank(),
-        # strip.text = element_text(size=12),
+        #strip.text = element_text(size=12),
         strip.text = element_blank(),
         axis.title.y = element_text(margin=margin(r=10)),
         axis.title.x = element_text(margin=margin(t=10)),
@@ -1142,12 +1142,23 @@ ggplot() +
         legend.title = element_blank(),
         legend.text = element_text(size=11))
 PlotALightJVPSII
+
+# g <- ggplot_gtable(ggplot_build(PlotALightJVPSII))
+# stripr <- which(grepl('strip-r', g$layout$name))
+# fills <- c("seagreen4","palegreen3","brown1", "brown4")
+# k <- 1
+# for (i in stripr) {
+# j <- which(grepl('rect', g$grobs[[i]]$grobs[[1]]$childrenOrder))
+# g$grobs[[i]]$grobs[[1]]$children[[j]]$gp$fill <- fills[k]
+# k <- k+1
+# }
+# grid.draw(g)
 ```
 
 # Save plot 
 
 ```{r save plot}
-ggsave(file = file.path(FigPath, paste("Fig_GrowthRate_JVPSII_Light_Chla",".png",sep = "")), height=9, width= 7,  dpi = 300, limitsize = TRUE)
+# ggsave(file = file.path(FigPath, paste("Fig_GrowthRate_JVPSII_Light_Chla",".png",sep = "")), height=9, width= 7,  dpi = 300, limitsize = TRUE)
 ```
 
 
@@ -1182,15 +1193,15 @@ ggplot() +
   coord_cartesian(ylim = c(0, 4.5)) +
   
   
-  ggh4x::facet_nested(rows = vars(facetsStrain, Strain), labeller = label_parsed) +
+  ggh4x::facet_nested(rows = vars(Strain), labeller = label_parsed) +
   theme_bw() +
   theme(panel.grid.minor = element_blank(),
         panel.grid.major = element_blank(),
         axis.text = element_text(size=12),
         axis.title = element_text(size=16),
-        # strip.background = element_rect(fill="white"),
+        #strip.background = element_rect(fill="white"),
         strip.background = element_blank(),
-        # strip.text = element_text(size=12),
+        #strip.text = element_text(size=12),
         strip.text = element_blank(),
         axis.title.y = element_text(margin=margin(r=10)),
         axis.title.x = element_text(margin=margin(t=10)),
@@ -1204,11 +1215,21 @@ ggplot() +
         legend.text = element_text(size=11))
 PlotAPhotoperiodJVPSII
 
+# g <- ggplot_gtable(ggplot_build(PlotAPhotoperiodJVPSII))
+# stripr <- which(grepl('strip-r', g$layout$name))
+# fills <- c("seagreen4","palegreen3","brown1", "brown4")
+# k <- 1
+# for (i in stripr) {
+# j <- which(grepl('rect', g$grobs[[i]]$grobs[[1]]$childrenOrder))
+# g$grobs[[i]]$grobs[[1]]$children[[j]]$gp$fill <- fills[k]
+# k <- k+1
+# }
+# grid.draw(g)
 ```
 # Save plot 
 
 ```{r save plot}
-ggsave(file = file.path(FigPath, paste("Fig_GrowthRate_JVPSII_Photoperiod_Chla",".png",sep = "")), height=9, width= 7,  dpi = 300, limitsize = TRUE)
+# ggsave(file = file.path(FigPath, paste("Fig_GrowthRate_JVPSII_Photoperiod_Chla",".png",sep = "")), height=9, width= 7,  dpi = 300, limitsize = TRUE)
 ```
 
 
@@ -1256,7 +1277,7 @@ rm(GrowthRate30Param, GrowthRate90Param, GrowthRate180Param, GrowthRate300Param,
 # Exstracting parameters from each fit (for each photoperiod and all photoperiod together)
 
 ```{r}
-# GrowthRateAllParam<-GRCplatt_PredictGrowthAll %>%
+# GrowthRateAllParam<-GRCplatt_PredictGrowthJVPSIIAll %>%
 #   dplyr::select(c(Strain, term, estimate, std.error, statistic, p.value)) %>%
 #   unique()
 #   GrowthRateAllParam$Fit <- 'All'
@@ -1320,7 +1341,7 @@ JVPSIIParamAll_Photoperiod$facetsStrain <- 'Strain'
 JVPSIIParamAll_PhotoperiodAll<-JVPSIIParamAll_Photoperiod %>% 
   filter(term == "a") %>% 
   filter(Fit== "All") %>% 
-  rename(SE="std.error")
+  rename(SE="std.error") 
 
 
 PlotB<-JVPSIIParamAll_Photoperiod %>% 
@@ -1331,10 +1352,14 @@ PlotB<-JVPSIIParamAll_Photoperiod %>%
   geom_point(aes(x = as.numeric(Fit), y = estimate), data = . %>% filter(estimate<0.02), size = 2.5, alpha = 0.8, show.legend = F) +
   geom_line(aes(x = as.numeric(Fit), y = estimate), data = . %>% filter(estimate<0.02), linetype = "dashed", size = 0.5, alpha = 0.8, show.legend = F) +
   geom_errorbar(aes(x = as.numeric(Fit), ymin = estimate - SE, ymax = estimate + SE), width=0, size=0.3, data = . %>% filter(SE<0.02), show.legend = F) +
+  #geom_ribbon(aes(x = as.numeric(Fit), ymin = estimate - SE, ymax = estimate + SE), show.legend = F, alpha = 0.1) +
+  
   
   geom_hline(data = JVPSIIParamAll_PhotoperiodAll, aes(yintercept = estimate), linetype="solid", colour = "blue", size=0.4) +
-
-  geom_ribbon(aes(x = as.numeric(Fit), ymin = estimate - SE, ymax = estimate + SE), alpha = 0.1, width=0, size=0.3, data = . %>% filter(estimate<0.02), show.legend = F) +
+  
+  # geom_errorbar(aes(x = as.numeric(Fit), ymin = estimate - SE, ymax = estimate + SE), width=0, size=0.3, show.legend = F, data = JVPSIIParamAll_PhotoperiodAll) +
+  
+  geom_rect(xmin=-Inf, xmax=Inf, aes(ymin = estimate - SE, ymax = estimate + SE), show.legend = F, data = JVPSIIParamAll_PhotoperiodAll, fill = "blue", alpha = 0.1) +
   
   geom_text(data=data_textB, aes(x=8, y=0.0019, label=label), size=5) +
   scale_colour_discrete(type=c("seagreen4", "palegreen3", "brown1", "brown4"), name="") +
@@ -1375,7 +1400,7 @@ PlotB
 ```
 
 ```{r, warning = FALSE, fig.height = 9, fig.width = 12}
-ggp<- PlotAPhotoperiodJVPSII+PlotB  
+ggp<- (PlotAPhotoperiodJVPSII+PlotB)
 ggp                           
 ```
 

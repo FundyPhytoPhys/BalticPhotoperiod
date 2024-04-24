@@ -1090,7 +1090,11 @@ PlotB<-MCParamAll_Photoperiod %>%
   
   geom_hline(data = MCParamAll_PhotoperiodAll, aes(yintercept = estimate), linetype="solid", colour = "blue", size=0.4) +
   
-  geom_ribbon(aes(x = as.numeric(Fit), ymin = estimate - SE, ymax = estimate + SE), alpha = 0.1, width=0, size=0.3, data = . %>% filter(SE<2.997371e+01), show.legend = F) +
+  # geom_ribbon(aes(x = as.numeric(Fit), ymin = estimate - SE, ymax = estimate + SE), alpha = 0.1, width=0, size=0.3, data = . %>% filter(SE<2.997371e+01), show.legend = F) +
+  
+  
+    geom_rect(xmin=-Inf, xmax=Inf, aes(ymin = estimate - SE, ymax = estimate + SE), show.legend = F, data = MCParamAll_PhotoperiodAll, fill = "blue", alpha = 0.1) +
+  
   
   geom_text(data=data_textB, aes(x=8, y=1.5e-06, label=label), size=5) +
   scale_colour_discrete(type=c("seagreen4", "palegreen3", "brown1", "brown4"), name="") +
@@ -1160,7 +1164,9 @@ PlotB<-MCParamAll_Light %>%
   geom_text(data=data_textB, aes(x=30, y=1.4e-06, label=label), size=5) +
   
   geom_hline(data = MCParamAll_LightAll, aes(yintercept = estimate), linetype="solid", colour = "blue", size=0.4) +
-  geom_ribbon(aes(x = as.numeric(Fit), ymin = estimate - SE, ymax = estimate + SE), alpha = 0.1, width=0, size=0.3, data = . %>% filter(SE<2.997371e+01), show.legend = F) +
+  # geom_ribbon(aes(x = as.numeric(Fit), ymin = estimate - SE, ymax = estimate + SE), alpha = 0.1, width=0, size=0.3, data = . %>% filter(SE<2.997371e+01), show.legend = F) +
+  
+      geom_rect(xmin=-Inf, xmax=Inf, aes(ymin = estimate - SE, ymax = estimate + SE), show.legend = F, data = MCParamAll_LightAll, fill = "blue", alpha = 0.1) +
   
   scale_colour_discrete(type=c("seagreen4", "palegreen3", "brown1", "brown4"), name="") +
   scale_y_continuous(breaks=seq(0, 1.5e-06, by = 0.5e-06), label=scientific_10) +
