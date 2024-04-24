@@ -1093,12 +1093,14 @@ GRCplatt_PredictGrowth8_BA127<-GRCplatt_PredictGrowthJVPSII8 %>%
 # Create plot and change the unit of JVPSII - umol
 
 ```{r fig.height = 8, fig.width = 8, warning = FALSE, warning = FALSE}
+data_textA <- data.frame(facetsStrain  = c("Strain"), Strain  = c("PC-rich_056"), label = c('A'))
+
 lab1=c(expression("8 h"), expression("12 h"), expression("16 h"), expression("24 h"))
 lab2=c(expression("30 µE"), expression("90 µE"), expression("180 µE"), expression("300 µE"), expression("600 µE"), expression("900 µE"))
 lab4=c(expression(""), expression(""), expression(""), expression(""))
 scientific_10 <- function(x) {   parse(text=gsub("e\\+*", " %*% 10^", scales::scientific_format()(x))) }
 
-MCGrowthJVPSIISP %>% 
+PlotALightJVPSII<-MCGrowthJVPSIISP %>% 
 ggplot() +
   # geom_point(aes(JVPSII_umol_eLs_Par_ue_umolChl_day, deltaOD_Lmu_corr, colour = as.factor(Par_ue), shape = as.factor(Photoperiod)), alpha = 0.8, size = 3.5, show.legend = T) +
   geom_point(aes(JVPSII_umol_eLs_Par_ue_umolChl_day, deltaOD_Lmu_corr, colour = as.factor(Par_ue), shape = as.factor(Photoperiod)), alpha = 0.8, size = 3.5, show.legend = T) +
@@ -1113,7 +1115,7 @@ ggplot() +
   
   geom_line(aes(JVPSII_umol_eLs_Par_ue_umolChl_day, .fitted), colour = "darkslategray", linetype = "dashed", show.legend = F, GRCplatt_PredictGrowth30_BA127) +
   geom_line(aes(JVPSII_umol_eLs_Par_ue_umolChl_day, .fitted), colour = "goldenrod2", linetype = "dashed", show.legend = F, GRCplatt_PredictGrowth900_BA127) +
-  
+  geom_text(data=data_textA, aes(x=0, y=4.3, label=label), size=5) +
   scale_x_continuous(label=scientific_10) +
   scale_colour_manual(values = c("darkslategray", "lightblue4", "hotpink4", "indianred3", "goldenrod2", "khaki2"), name="", labels = lab2, breaks=c('30', "90", "180", "300", "600","900")) +
   scale_shape_manual(values = c(15, 16, 17, 18), name="", labels = lab1) +
@@ -1126,8 +1128,10 @@ ggplot() +
         panel.grid.major = element_blank(),
         axis.text = element_text(size=12),
         axis.title = element_text(size=16),
-        strip.background = element_rect(fill="white"),
-        strip.text = element_text(size=12),
+        # strip.background = element_rect(fill="white"),
+        strip.background = element_blank(),
+        # strip.text = element_text(size=12),
+        strip.text = element_blank(),
         axis.title.y = element_text(margin=margin(r=10)),
         axis.title.x = element_text(margin=margin(t=10)),
         legend.background = element_rect(fill="white"),
@@ -1137,6 +1141,7 @@ ggplot() +
         legend.spacing.x = unit(-0.1, 'cm'),
         legend.title = element_blank(),
         legend.text = element_text(size=11))
+PlotALightJVPSII
 ```
 
 # Save plot 
@@ -1149,7 +1154,12 @@ ggsave(file = file.path(FigPath, paste("Fig_GrowthRate_JVPSII_Light_Chla",".png"
 
 
 ```{r fig.height = 8, fig.width = 8, warning = FALSE, warning = FALSE}
-MCGrowthJVPSIISP %>% 
+scientific_10 <- function(y) {   parse(text=gsub("e\\+*", " %*% 10^", scales::scientific_format()(y))) }
+scientific_10 <- function(x) {   parse(text=gsub("e\\+*", " %*% 10^", scales::scientific_format()(x))) }
+
+data_textA <- data.frame(facetsStrain  = c("Strain"), Strain  = c("PC-rich_056"), label = c('A'))
+
+PlotAPhotoperiodJVPSII<-MCGrowthJVPSIISP %>% 
 ggplot() +
   # geom_point(aes(meanJVPSII_umol_eLs_Par_ue_umolChl_day, deltaOD_Lmu_corr, colour = as.factor(Par_ue), shape = as.factor(Photoperiod)), alpha = 0.8, size = 3.5, show.legend = T, MCGrowthJVPSIISPmean) +
   geom_point(aes(JVPSII_umol_eLs_Par_ue_umolChl_day, deltaOD_Lmu_corr, colour = as.factor(Par_ue), shape = as.factor(Photoperiod)), alpha = 0.8, size = 3.5, show.legend = T) +
@@ -1160,22 +1170,28 @@ ggplot() +
   geom_line(aes(JVPSII_umol_eLs_Par_ue_umolChl_day, .fitted), colour = "black", linetype = "dotdash", size = 0.6, show.legend = F,  GRCplatt_PredictGrowth24_BA56) +
   
   geom_line(aes(JVPSII_umol_eLs_Par_ue_umolChl_day, .fitted), colour = "black", linetype = "dotted", size = 0.6, show.legend = F, GRCplatt_PredictGrowth8_BA127) +
+  geom_text(data=data_textA, aes(x=0, y=4.3, label=label), size=5) +
 
-
-  scale_x_continuous(label=scientific_10) +
   scale_colour_manual(values = c("darkslategray", "lightblue4", "hotpink4", "indianred3", "goldenrod2", "khaki2"), name="", labels = lab2, breaks=c('30', "90", "180", "300", "600","900")) +
   scale_shape_manual(values = c(15, 16, 17, 18), name="", labels = lab1) +
   # labs(y = "Chlorophyll specific exponential growth rate " ~ "("~d^-1~")", x = ""~italic(JV)~""["PSII"]*" ("~e^-~""~Chla^-1~""~d^-1~")") +
     # labs(y = "Chlorophyll specific exponential growth rate " ~ "("~d^-1~")", x = ""~italic(JV)~""["PSII"]*" ("~e^-~""~Chl~italic(a)~""^-1~""~d^-1~")") +
     labs(y = "Chlorophyll specific exponential growth rate " ~ "("~d^-1~")", x = ""~italic(JV)~""["PSII"]*" (µmol"~e^-~""~µmol~Chl~italic(a)~""^-1~""~d^-1~")") +
+  scale_x_continuous(label=scientific_10) +
+  scale_y_continuous(breaks=seq(0, 4.5, by = 1)) +
+  coord_cartesian(ylim = c(0, 4.5)) +
+  
+  
   ggh4x::facet_nested(rows = vars(facetsStrain, Strain), labeller = label_parsed) +
   theme_bw() +
   theme(panel.grid.minor = element_blank(),
         panel.grid.major = element_blank(),
         axis.text = element_text(size=12),
         axis.title = element_text(size=16),
-        strip.background = element_rect(fill="white"),
-        strip.text = element_text(size=12),
+        # strip.background = element_rect(fill="white"),
+        strip.background = element_blank(),
+        # strip.text = element_text(size=12),
+        strip.text = element_blank(),
         axis.title.y = element_text(margin=margin(r=10)),
         axis.title.x = element_text(margin=margin(t=10)),
         legend.background = element_rect(fill="white"),
@@ -1184,7 +1200,10 @@ ggplot() +
         legend.spacing.y = unit(-0.1, "cm"),
         legend.spacing.x = unit(-0.1, 'cm'),
         legend.title = element_blank(),
+        #panel.spacing.y = unit(0.4, 'cm'),
         legend.text = element_text(size=11))
+PlotAPhotoperiodJVPSII
+
 ```
 # Save plot 
 
@@ -1292,6 +1311,139 @@ JVPSIIParamAll_Photoperiod %>%
   theme_bw()
 
 ```
+```{r preliminary plot, fig.height = 8, fig.width = 8, warning = FALSE}
+scientific_10 <- function(y) {   parse(text=gsub("e\\+*", " %*% 10^", scales::scientific_format()(y))) }
+data_textB <- data.frame(facetsStrain  = c("Strain"), Strain  = c("PC-rich_056"), label = c('B'))
+
+JVPSIIParamAll_Photoperiod$facetsStrain <- 'Strain'
+
+JVPSIIParamAll_PhotoperiodAll<-JVPSIIParamAll_Photoperiod %>% 
+  filter(term == "a") %>% 
+  filter(Fit== "All") %>% 
+  rename(SE="std.error")
+
+
+PlotB<-JVPSIIParamAll_Photoperiod %>% 
+  filter(term == "a") %>% 
+  filter(Fit!= "All") %>% 
+  rename(SE="std.error") %>% 
+  ggplot() +
+  geom_point(aes(x = as.numeric(Fit), y = estimate), data = . %>% filter(estimate<0.02), size = 2.5, alpha = 0.8, show.legend = F) +
+  geom_line(aes(x = as.numeric(Fit), y = estimate), data = . %>% filter(estimate<0.02), linetype = "dashed", size = 0.5, alpha = 0.8, show.legend = F) +
+  geom_errorbar(aes(x = as.numeric(Fit), ymin = estimate - SE, ymax = estimate + SE), width=0, size=0.3, data = . %>% filter(SE<0.02), show.legend = F) +
+  
+  geom_hline(data = JVPSIIParamAll_PhotoperiodAll, aes(yintercept = estimate), linetype="solid", colour = "blue", size=0.4) +
+
+  geom_ribbon(aes(x = as.numeric(Fit), ymin = estimate - SE, ymax = estimate + SE), alpha = 0.1, width=0, size=0.3, data = . %>% filter(estimate<0.02), show.legend = F) +
+  
+  geom_text(data=data_textB, aes(x=8, y=0.0019, label=label), size=5) +
+  scale_colour_discrete(type=c("seagreen4", "palegreen3", "brown1", "brown4"), name="") +
+  scale_y_continuous(breaks=seq(0, 0.0020, by = 0.0005), label=scientific_10) +
+  scale_x_continuous(limits = c(8, 24), breaks = c(8, 12, 16, 24)) +
+  coord_cartesian(ylim = c(0, 0.0020)) +
+  labs(y = "Alpha", x = "Photoperiod (h)") +
+  ggh4x::facet_nested(rows = vars(facetsStrain, Strain), labeller = label_parsed) +
+  theme_bw() +
+  theme(panel.grid.minor = element_blank(),
+        panel.grid.major = element_blank(),
+        axis.text = element_text(size=12),
+        axis.title = element_text(size=16),
+        strip.background = element_rect(fill="white"),
+        strip.text = element_text(size=12),
+        axis.title.y = element_text(margin=margin(r=10)),
+        axis.title.x = element_text(margin=margin(t=10)),
+        legend.background = element_rect(fill="white"),
+        legend.position = c(0.8,0.9),
+        legend.key.height= unit(0.003, 'cm'),
+        legend.spacing.y = unit(-0.1, "cm"),
+        legend.spacing.x = unit(-0.1, 'cm'),
+        legend.title = element_blank(),
+        #panel.spacing.y = unit(0.4, 'cm'),
+        legend.text = element_text(size=11))
+PlotB
+
+# g <- ggplot_gtable(ggplot_build(PlotB))
+# stripr <- which(grepl('strip-r', g$layout$name))
+# fills <- c("white","seagreen4","palegreen3","brown1", "brown4")
+# k <- 1
+# for (i in stripr) {
+# j <- which(grepl('rect', g$grobs[[i]]$grobs[[1]]$childrenOrder))
+# g$grobs[[i]]$grobs[[1]]$children[[j]]$gp$fill <- fills[k]
+# k <- k+1
+# }
+# grid.draw(g)
+```
+
+```{r, warning = FALSE, fig.height = 9, fig.width = 12}
+ggp<- PlotAPhotoperiodJVPSII+PlotB  
+ggp                           
+```
+
+# Save plot 
+
+```{r save plot}
+# ggsave(file = file.path(FigPath, paste("Fig_GrowthRate_JVPSII_Photoperiod_Chla",".png",sep = "")), height=9, width= 7,  dpi = 300, limitsize = TRUE)
+```
+
+
+
+```{r preliminary plot, fig.height = 8, fig.width = 8, warning = FALSE}
+scientific_10 <- function(y) {   parse(text=gsub("e\\+*", " %*% 10^", scales::scientific_format()(y))) }
+data_textB <- data.frame(facetsStrain  = c("Strain"), Strain  = c("PC-rich_056"), label = c('B'))
+
+JVPSIIParamAll_Light$facetsStrain <- 'Strain'
+
+PlotB<-JVPSIIParamAll_Light %>% 
+  filter(term == "a") %>% 
+  filter(Fit!= "All") %>% 
+  rename(SE="std.error") %>% 
+  ggplot() +
+  geom_point(aes(x = as.numeric(Fit), y = estimate), size = 2.5, alpha = 0.8, show.legend = F) +
+  geom_line(aes(x = as.numeric(Fit), y = estimate), linetype = "dotted", size = 0.5, alpha = 0.8, show.legend = F) +
+  geom_errorbar(aes(x = as.numeric(Fit), ymin = estimate - SE, ymax = estimate + SE), width=0, size=0.3, data = . %>% filter(SE<0.02), show.legend = F) +
+  geom_text(data=data_textB, aes(x=8, y=0.038, label=label), size=5) +
+  #scale_colour_discrete(type=c("seagreen4", "palegreen3", "brown1", "brown4"), name="") +
+  scale_y_continuous(breaks=seq(0, 0.04, by = 0.01), label=scientific_10) +
+  scale_x_continuous(limits = c(30, 900), breaks = c(30, 90, 180, 300, 600, 900)) +
+  coord_cartesian(ylim = c(0, 0.04)) +
+  labs(y = "Alpha", x = "Photoperiod (h)") +
+  ggh4x::facet_nested(rows = vars(facetsStrain, Strain), labeller = label_parsed) +
+  theme_bw() +
+  theme(panel.grid.minor = element_blank(),
+        panel.grid.major = element_blank(),
+        axis.text = element_text(size=12),
+        axis.title = element_text(size=16),
+        strip.background = element_rect(fill="white"),
+        strip.text = element_text(size=14),
+        axis.title.y = element_text(margin=margin(r=10)),
+        axis.title.x = element_text(margin=margin(t=10)),
+        legend.background = element_rect(fill="transparent"),
+        legend.position = c(0.8,0.9),
+        legend.text = element_text(size=11))
+PlotB
+
+
+g <- ggplot_gtable(ggplot_build(PlotB))
+stripr <- which(grepl('strip-r', g$layout$name))
+fills <- c("white","seagreen4","palegreen3","brown1", "brown4")
+k <- 1
+for (i in stripr) {
+j <- which(grepl('rect', g$grobs[[i]]$grobs[[1]]$childrenOrder))
+g$grobs[[i]]$grobs[[1]]$children[[j]]$gp$fill <- fills[k]
+k <- k+1
+}
+grid.draw(g)
+```
+
+
+```{r, warning = FALSE, fig.height = 9, fig.width = 12}
+ggp<- PlotALightJVPSII+PlotB  
+ggp                           
+```
+
+
+
+
 
 # Save RDS that create stats and tables
 
@@ -1991,6 +2143,37 @@ Set up R codes for Greek letters
 \u03C8  ψ   Greek Small Letter psi
 \u03C9  ω   Greek Small Letter omega
 
+```{r}
+
+p <- ggplot(mpg, aes(displ, cty)) + geom_point() + facet_grid(drv ~ cyl)
+p
+g <- ggplot_gtable(ggplot_build(p))
+stripr <- which(grepl('strip-r', g$layout$name))
+fills <- c("red","green","blue","yellow")
+k <- 1
+for (i in stripr) {
+j <- which(grepl('rect', g$grobs[[i]]$grobs[[1]]$childrenOrder))
+g$grobs[[i]]$grobs[[1]]$children[[j]]$gp$fill <- fills[k]
+k <- k+1
+}
+grid.draw(g)
+
+
+
+# library(grid)
+# p <- ggplot(mpg, aes(displ, cty)) + geom_point() + facet_grid(drv ~ cyl)
+# p
+# g <- ggplot_gtable(ggplot_build(p))
+# strip_both <- which(grepl('strip-', g$layout$name))
+# fills <- c("red","green","blue","yellow","red","green","blue","yellow")
+# k <- 1
+# for (i in strip_both) {
+# j <- which(grepl('rect', g$grobs[[i]]$grobs[[1]]$childrenOrder))
+# g$grobs[[i]]$grobs[[1]]$children[[j]]$gp$fill <- fills[k]
+# k <- k+1
+# }
+# grid.draw(g)
+```
 
 
 
