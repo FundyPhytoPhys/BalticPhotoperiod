@@ -31,8 +31,8 @@ Expert <- "SySl"
 GamFit <- "PICO_Cleaned_MCData.Rds"
 
 #"..", takes up a level in the directory path
-# DataIn <- file.path("..","Data", "CleanedData", "CleanedMCData")
-# DataOut <- file.path("..","Data", "CleanedData")
+DataIn <- file.path("..","Data", "CleanedData", "CleanedMCData")
+DataOut <- file.path("..","Data", "CleanedData")
 # PlotsOut <- file.path("..","Output", "Figures")
 FigPath <- file.path("..", "Output", "Figures")
 FigRdsPath <- file.path("..", "Output", "FiguresRds")
@@ -782,7 +782,7 @@ HyperChlPlotHigh <- PicoGAM_Plot_Prep %>%
     metR::geom_contour2(aes(Photoperiod, Par_ue, z = fit, fill = fit, label = stat(level)),
                         breaks = ContourLines$quantileValue,
                         skip = 0) +
-    metR::geom_contour2(data = PicoGrowthFits, aes(x = Photoperiod, y = Par_ue, z = PARPhotonDose_day), breaks = c(100000,500000,1000000,2000000,4000000,8000000,16000000, 32000000), linetype = "dashed") + 
+    metR::geom_contour2(data = PicoGrowthFits, aes(x = Photoperiod, y = Par_ue, z = PARPhotonDose_day), breaks = c(100000,500000,1000000,2000000,4000000,8000000,16000000, 32000000), linetype = "dashed", size = 0.2, colour = "gray10") + 
     scale_x_continuous(limits = c(8, 24), breaks = c(8, 12, 16, 24)) +
     scale_y_continuous(limits = c(10, 900), breaks = c(30, 90, 180, 300, 600, 900)) +
     geom_text(data=data_textA, aes(x=9, y=860, label=label), size=5) +
@@ -854,7 +854,7 @@ HyperChlPlotHigh <- PicoGAM_Plot_Prep %>%
     metR::geom_contour2(aes(Photoperiod, Par_ue, z = fit, fill = fit, label = stat(level)),
                         breaks = ContourLines$quantileValue,
                         skip = 0) +
-    metR::geom_contour2(data = PicoGrowthFits, aes(x = Photoperiod, y = Par_ue, z = PARPhotonDose_day), breaks = c(100000,500000,1000000,2000000,4000000,8000000,16000000, 32000000), linetype = "dashed") + 
+    metR::geom_contour2(data = PicoGrowthFits, aes(x = Photoperiod, y = Par_ue, z = PARPhotonDose_day), breaks = c(100000,500000,1000000,2000000,4000000,8000000,16000000, 32000000), linetype = "dashed", size = 0.2, colour = "gray10") + 
     scale_x_continuous(limits = c(8, 24), breaks = c(8, 12, 16, 24)) +
     scale_y_continuous(limits = c(10, 900), breaks = c(30, 90, 180, 300, 600, 900)) +
     geom_text(data=data_textB, aes(x=9, y=860, label=label), size=5) +
@@ -927,7 +927,7 @@ HyperChlPlotHigh <- PicoGAM_Plot_Prep %>%
     metR::geom_contour2(aes(Photoperiod, Par_ue, z = fit, fill = fit, label = stat(level)),
                         breaks = ContourLines$quantileValue,
                         skip = 0) +
-    metR::geom_contour2(data = PicoGrowthFits, aes(x = Photoperiod, y = Par_ue, z = PARPhotonDose_day), breaks = c(100000,500000,1000000,2000000,4000000,8000000,16000000, 32000000), linetype = "dashed") + 
+    metR::geom_contour2(data = PicoGrowthFits, aes(x = Photoperiod, y = Par_ue, z = PARPhotonDose_day), breaks = c(100000,500000,1000000,2000000,4000000,8000000,16000000, 32000000), linetype = "dashed", size = 0.2, colour = "gray10") + 
     scale_x_continuous(limits = c(8, 24), breaks = c(8, 12, 16, 24)) +
     scale_y_continuous(limits = c(10, 900), breaks = c(30, 90, 180, 300, 600, 900)) +
     geom_text(data=data_textC, aes(x=9, y=860, label=label), size=5) +
@@ -1000,7 +1000,7 @@ HyperChlPlotHigh <- PicoGAM_Plot_Prep %>%
     metR::geom_contour2(aes(Photoperiod, Par_ue, z = fit, fill = fit, label = stat(level)),
                         breaks = ContourLines$quantileValue,
                         skip = 0) +
-    metR::geom_contour2(data = PicoGrowthFits, aes(x = Photoperiod, y = Par_ue, z = PARPhotonDose_day), breaks = c(100000,500000,1000000,2000000,4000000,8000000,16000000, 32000000), linetype = "dashed") + 
+    metR::geom_contour2(data = PicoGrowthFits, aes(x = Photoperiod, y = Par_ue, z = PARPhotonDose_day), breaks = c(100000,500000,1000000,2000000,4000000,8000000,16000000, 32000000), linetype = "dashed", size = 0.2, colour = "gray10") + 
     scale_x_continuous(limits = c(8, 24), breaks = c(8, 12, 16, 24)) +
     scale_y_continuous(limits = c(10, 900), breaks = c(30, 90, 180, 300, 600, 900)) +
     geom_text(data=data_textD, aes(x=9, y=860, label=label), size=5) +

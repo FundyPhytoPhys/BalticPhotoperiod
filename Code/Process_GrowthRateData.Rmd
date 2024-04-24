@@ -50,6 +50,7 @@ library(data.table)
 library(googledrive)
 library(googlesheets4)
 library(tidyverse)
+library("patchwork") # merging plots
 ```
 
 ```{r set project variables}
@@ -123,94 +124,94 @@ MCGrowthRate<-rbind(MultiCultiGrowth1, MultiCultiGrowth2, MultiCultiGrowth3)
 # Create preliminary plot
 
 ```{r preliminary plot, warning = FALSE}
-MCGrowthRate %>%
-  ggplot() +
-  geom_point(aes(x = Par_ue, y = deltaOD_Lmu_corr,colour=as.factor(Strain)), size = 3.5, alpha = 0.9, show.legend = T) +
-  geom_errorbar(aes(x = Par_ue, ymin = deltaOD_Lmu_corr - deltaOD_Lmu_se, ymax = deltaOD_Lmu_corr + deltaOD_Lmu_se), alpha = 0.5) +
-  scale_colour_discrete(type=c("seagreen4", "palegreen3", "brown1", "brown4")) +
-  ggh4x::facet_nested(rows = vars(Strain), cols = vars(Photoperiod)) +
-  theme_bw()
-
-MCGrowthRate %>%
-  ggplot() +
-  geom_point(aes(x = Par_ue, y = Photoperiod, alpha = deltaOD_Lmu_corr, fill = as.factor(Strain), colour = as.factor(Strain), size = Par_ue * 0.5), shape = 22, show.legend = T) +
-  scale_colour_discrete(type=c("seagreen4", "palegreen3", "brown1", "brown4")) +
-  scale_fill_discrete(type=c("seagreen4", "palegreen3", "brown1", "brown4")) +
-  ggh4x::facet_nested(rows = vars(Strain)) +
-  theme_bw()
-
-MCGrowthRate %>%
-  ggplot() +
-  geom_point(aes(x = Par_ue, y = Photoperiod, alpha = deltaOD_Lmu_corr, fill = as.factor(Strain), colour = as.factor(Strain)), size = 5, show.legend = T) +
-  scale_colour_discrete(type=c("seagreen4", "palegreen3", "brown1", "brown4")) +
-  scale_fill_discrete(type=c("seagreen4", "palegreen3", "brown1", "brown4")) +
-  ggh4x::facet_nested(rows = vars(Strain)) +
-  theme_bw()
-
-MCGrowthRate %>%
-  ggplot() +
-  geom_raster(aes(x = Par_ue, y = Photoperiod, alpha = deltaOD_Lmu_corr, fill = as.factor(Strain), colour = as.factor(Strain)), interpolate = FALSE, show.legend = T) +
-  scale_colour_discrete(type=c("seagreen4", "palegreen3", "brown1", "brown4")) +
-  scale_fill_discrete(type=c("seagreen4", "palegreen3", "brown1", "brown4")) +
-  facet_wrap(vars(Strain)) +
-#  ggh4x::facet_nested(rows = vars(Strain), cols = vars(Photoperiod)) +
-  theme_bw()
-
-MCGrowthRate %>%
-  ggplot() +
-  geom_raster(aes(x = as.factor(Par_ue), y = as.factor(Photoperiod), alpha = deltaOD_Lmu_corr, fill = as.factor(Strain), colour = as.factor(Strain)), interpolate = FALSE, show.legend = T) +
-  scale_colour_discrete(type=c("seagreen4", "palegreen3", "brown1", "brown4")) +
-  scale_fill_discrete(type=c("seagreen4", "palegreen3", "brown1", "brown4")) +
-  facet_wrap(vars(Strain)) +
-#  ggh4x::facet_nested(rows = vars(Strain), cols = vars(Photoperiod)) +
-  theme_bw()
-
-MCGrowthRate %>%
-  ggplot() +
-  geom_tile(aes(x = Par_ue, y = Photoperiod, alpha = deltaOD_Lmu_corr, fill = as.factor(Strain), colour = as.factor(Strain)), height = 4, width = 60, interpolate = FALSE, show.legend = T) +
-  scale_colour_discrete(type=c("seagreen4", "palegreen3", "brown1", "brown4")) +
-  scale_fill_discrete(type=c("seagreen4", "palegreen3", "brown1", "brown4")) +
-  facet_wrap(vars(Strain)) +
-  theme_bw() +
-  theme(panel.grid.major = element_blank(),
-        panel.grid.minor = element_blank())
-
-MCGrowthRate %>%
-  ggplot() +
-  geom_tile(aes(x = log(Par_ue), y = Photoperiod, alpha = deltaOD_Lmu_corr, fill = Strain,  height = 4, width = log(Par_ue)/2),  interpolate = FALSE, show.legend = T) +
-  scale_colour_discrete(type=c("seagreen4", "palegreen3", "brown1", "brown4")) +
-  scale_fill_discrete(type=c("seagreen4", "palegreen3", "brown1", "brown4")) +
-  facet_wrap(vars(Strain)) +
-  theme_bw() +
-  theme(panel.grid.major = element_blank(),
-        panel.grid.minor = element_blank())
-
-#would be smarter to do ParNUM and PhotoNUM with kth function
-MCGrowthRate %>%
-  mutate(ParNUM = case_when(Par_ue == 30 ~ 1,
-                            Par_ue == 90 ~ 2,
-                            Par_ue == 180 ~ 3,
-                            Par_ue == 300 ~ 4,
-                            Par_ue == 600 ~ 5,
-                            Par_ue == 900 ~ 6)) |>
-  mutate(PhotoNUM = case_when(Photoperiod == 8 ~ 1,
-                            Photoperiod == 12 ~ 2,
-                            Photoperiod == 16 ~ 3,
-                            Photoperiod == 24 ~ 4)) |>
-  ggplot() +
-  geom_tile(aes(x = ParNUM, y = PhotoNUM, alpha = deltaOD_Lmu_corr, fill = Strain),  interpolate = FALSE, show.legend = T) +
-  scale_colour_discrete(type=c("seagreen4", "palegreen3", "brown1", "brown4")) +
-  scale_fill_discrete(type=c("seagreen4", "palegreen3", "brown1", "brown4")) +
-  scale_x_continuous(breaks = c(1, 2, 3, 4, 5, 6),
-                     labels = c(30, 90, 180, 300, 600, 900)) +
-  scale_y_continuous(breaks = c(1, 2, 3, 4),
-                     labels = c(8, 12, 16, 24)) +
- labs(x = "umol photons m-2 s-1",
-      y = "Photoperiod (h)") +
-  facet_wrap(vars(Strain)) +
-  theme_bw() +
-  theme(panel.grid.major = element_blank(),
-        panel.grid.minor = element_blank())
+# MCGrowthRate %>%
+#   ggplot() +
+#   geom_point(aes(x = Par_ue, y = deltaOD_Lmu_corr,colour=as.factor(Strain)), size = 3.5, alpha = 0.9, show.legend = T) +
+#   geom_errorbar(aes(x = Par_ue, ymin = deltaOD_Lmu_corr - deltaOD_Lmu_se, ymax = deltaOD_Lmu_corr + deltaOD_Lmu_se), alpha = 0.5) +
+#   scale_colour_discrete(type=c("seagreen4", "palegreen3", "brown1", "brown4")) +
+#   ggh4x::facet_nested(rows = vars(Strain), cols = vars(Photoperiod)) +
+#   theme_bw()
+# 
+# MCGrowthRate %>%
+#   ggplot() +
+#   geom_point(aes(x = Par_ue, y = Photoperiod, alpha = deltaOD_Lmu_corr, fill = as.factor(Strain), colour = as.factor(Strain), size = Par_ue * 0.5), shape = 22, show.legend = T) +
+#   scale_colour_discrete(type=c("seagreen4", "palegreen3", "brown1", "brown4")) +
+#   scale_fill_discrete(type=c("seagreen4", "palegreen3", "brown1", "brown4")) +
+#   ggh4x::facet_nested(rows = vars(Strain)) +
+#   theme_bw()
+# 
+# MCGrowthRate %>%
+#   ggplot() +
+#   geom_point(aes(x = Par_ue, y = Photoperiod, alpha = deltaOD_Lmu_corr, fill = as.factor(Strain), colour = as.factor(Strain)), size = 5, show.legend = T) +
+#   scale_colour_discrete(type=c("seagreen4", "palegreen3", "brown1", "brown4")) +
+#   scale_fill_discrete(type=c("seagreen4", "palegreen3", "brown1", "brown4")) +
+#   ggh4x::facet_nested(rows = vars(Strain)) +
+#   theme_bw()
+# 
+# MCGrowthRate %>%
+#   ggplot() +
+#   geom_raster(aes(x = Par_ue, y = Photoperiod, alpha = deltaOD_Lmu_corr, fill = as.factor(Strain), colour = as.factor(Strain)), interpolate = FALSE, show.legend = T) +
+#   scale_colour_discrete(type=c("seagreen4", "palegreen3", "brown1", "brown4")) +
+#   scale_fill_discrete(type=c("seagreen4", "palegreen3", "brown1", "brown4")) +
+#   facet_wrap(vars(Strain)) +
+# #  ggh4x::facet_nested(rows = vars(Strain), cols = vars(Photoperiod)) +
+#   theme_bw()
+# 
+# MCGrowthRate %>%
+#   ggplot() +
+#   geom_raster(aes(x = as.factor(Par_ue), y = as.factor(Photoperiod), alpha = deltaOD_Lmu_corr, fill = as.factor(Strain), colour = as.factor(Strain)), interpolate = FALSE, show.legend = T) +
+#   scale_colour_discrete(type=c("seagreen4", "palegreen3", "brown1", "brown4")) +
+#   scale_fill_discrete(type=c("seagreen4", "palegreen3", "brown1", "brown4")) +
+#   facet_wrap(vars(Strain)) +
+# #  ggh4x::facet_nested(rows = vars(Strain), cols = vars(Photoperiod)) +
+#   theme_bw()
+# 
+# MCGrowthRate %>%
+#   ggplot() +
+#   geom_tile(aes(x = Par_ue, y = Photoperiod, alpha = deltaOD_Lmu_corr, fill = as.factor(Strain), colour = as.factor(Strain)), height = 4, width = 60, interpolate = FALSE, show.legend = T) +
+#   scale_colour_discrete(type=c("seagreen4", "palegreen3", "brown1", "brown4")) +
+#   scale_fill_discrete(type=c("seagreen4", "palegreen3", "brown1", "brown4")) +
+#   facet_wrap(vars(Strain)) +
+#   theme_bw() +
+#   theme(panel.grid.major = element_blank(),
+#         panel.grid.minor = element_blank())
+# 
+# MCGrowthRate %>%
+#   ggplot() +
+#   geom_tile(aes(x = log(Par_ue), y = Photoperiod, alpha = deltaOD_Lmu_corr, fill = Strain,  height = 4, width = log(Par_ue)/2),  interpolate = FALSE, show.legend = T) +
+#   scale_colour_discrete(type=c("seagreen4", "palegreen3", "brown1", "brown4")) +
+#   scale_fill_discrete(type=c("seagreen4", "palegreen3", "brown1", "brown4")) +
+#   facet_wrap(vars(Strain)) +
+#   theme_bw() +
+#   theme(panel.grid.major = element_blank(),
+#         panel.grid.minor = element_blank())
+# 
+# #would be smarter to do ParNUM and PhotoNUM with kth function
+# MCGrowthRate %>%
+#   mutate(ParNUM = case_when(Par_ue == 30 ~ 1,
+#                             Par_ue == 90 ~ 2,
+#                             Par_ue == 180 ~ 3,
+#                             Par_ue == 300 ~ 4,
+#                             Par_ue == 600 ~ 5,
+#                             Par_ue == 900 ~ 6)) |>
+#   mutate(PhotoNUM = case_when(Photoperiod == 8 ~ 1,
+#                             Photoperiod == 12 ~ 2,
+#                             Photoperiod == 16 ~ 3,
+#                             Photoperiod == 24 ~ 4)) |>
+#   ggplot() +
+#   geom_tile(aes(x = ParNUM, y = PhotoNUM, alpha = deltaOD_Lmu_corr, fill = Strain),  interpolate = FALSE, show.legend = T) +
+#   scale_colour_discrete(type=c("seagreen4", "palegreen3", "brown1", "brown4")) +
+#   scale_fill_discrete(type=c("seagreen4", "palegreen3", "brown1", "brown4")) +
+#   scale_x_continuous(breaks = c(1, 2, 3, 4, 5, 6),
+#                      labels = c(30, 90, 180, 300, 600, 900)) +
+#   scale_y_continuous(breaks = c(1, 2, 3, 4),
+#                      labels = c(8, 12, 16, 24)) +
+#  labs(x = "umol photons m-2 s-1",
+#       y = "Photoperiod (h)") +
+#   facet_wrap(vars(Strain)) +
+#   theme_bw() +
+#   theme(panel.grid.major = element_blank(),
+#         panel.grid.minor = element_blank())
 
 
 
@@ -971,10 +972,128 @@ saveRDS(AnovaTest_GrowthRateModel_Photoperiod_PUR, file.path(TableRdsPath, paste
 ```
 
 
+# Exstracting parameters from each fit (for each light and all light together)
+
+```{r}
+GrowthRateAllParam<-GRCplatt_PredictGrowthAll %>%
+  dplyr::select(c(Strain, term, estimate, std.error, statistic, p.value)) %>%
+  unique()
+  GrowthRateAllParam$Fit <- 'All'
+
+GrowthRate30Param<-GRCplatt_PredictGrowth30 %>% 
+  dplyr::select(c(Strain, term, estimate, std.error, statistic, p.value)) %>% 
+  unique()
+  GrowthRate30Param$Fit <- '30'
+
+GrowthRate90Param<-GRCplatt_PredictGrowth90 %>% 
+  dplyr::select(c(Strain, term, estimate, std.error, statistic, p.value)) %>% 
+  unique()
+  GrowthRate90Param$Fit <- '90'
+  
+GrowthRate180Param<-GRCplatt_PredictGrowth180 %>% 
+  dplyr::select(c(Strain, term, estimate, std.error, statistic, p.value)) %>% 
+  unique()
+  GrowthRate180Param$Fit <- '180'
+  
+GrowthRate300Param<-GRCplatt_PredictGrowth300 %>% 
+  dplyr::select(c(Strain, term, estimate, std.error, statistic, p.value)) %>% 
+  unique()
+  GrowthRate300Param$Fit <- '300'
+  
+GrowthRate900Param<-GRCplatt_PredictGrowth900 %>% 
+  dplyr::select(c(Strain, term, estimate, std.error, statistic, p.value)) %>% 
+  unique()
+  GrowthRate900Param$Fit <- '900'
+  
+MCParamAll_Light<-rbind(GrowthRateAllParam, GrowthRate30Param, GrowthRate90Param, GrowthRate180Param, GrowthRate300Param, GrowthRate900Param)
+
+MCParamAll_Light<-MCParamAll_Light %>% 
+  unique()
+
+rm(GrowthRate30Param, GrowthRate90Param, GrowthRate180Param, GrowthRate300Param, GrowthRate900Param)
+```
+
+# Exstracting parameters from each fit (for each photoperiod and all photoperiod together)
+
+```{r}
+# GrowthRateAllParam<-GRCplatt_PredictGrowthAll %>% 
+#   dplyr::select(c(Strain, term, estimate, std.error, statistic, p.value)) %>% 
+#   unique()
+#   GrowthRateAllParam$Fit <- 'All'
+
+GrowthRate8Param<-GRCplatt_PredictGrowth8 %>% 
+  dplyr::select(c(Strain, term, estimate, std.error, statistic, p.value)) %>% 
+  unique()
+  GrowthRate8Param$Fit <- '8'
+
+GrowthRate12Param<-GRCplatt_PredictGrowth12 %>% 
+  dplyr::select(c(Strain, term, estimate, std.error, statistic, p.value)) %>% 
+  unique()
+  GrowthRate12Param$Fit <- '12'
+  
+GrowthRate16Param<-GRCplatt_PredictGrowth16 %>% 
+  dplyr::select(c(Strain, term, estimate, std.error, statistic, p.value)) %>% 
+  unique()
+  GrowthRate16Param$Fit <- '16'
+  
+GrowthRate24Param<-GRCplatt_PredictGrowth24 %>% 
+  dplyr::select(c(Strain, term, estimate, std.error, statistic, p.value)) %>% 
+  unique()
+  GrowthRate24Param$Fit <- '24'
+  
+
+MCParamAll_Photoperiod<-rbind(GrowthRateAllParam, GrowthRate8Param, GrowthRate12Param, GrowthRate16Param, GrowthRate24Param)
+
+MCParamAll_Photoperiod<-MCParamAll_Photoperiod %>% 
+  unique()
+
+rm(GrowthRate8Param, GrowthRate12Param, GrowthRate16Param, GrowthRate24Param)
+```
+
+
+# Create preliminary plot from parameters
+
+```{r preliminary plot}
+
+MCParamAll_Light %>% 
+  filter(term == "a") %>% 
+  filter(Fit!= "All") %>% 
+  ggplot() +
+  geom_point(aes(x = as.numeric(Fit), y = estimate, color = Strain)) +
+  ggh4x::facet_nested(rows = vars(Strain), labeller = label_parsed, scales = "free") +
+  theme_bw()
+
+MCParamAll_Photoperiod %>% 
+  filter(term == "a") %>% 
+  filter(Fit!= "All") %>% 
+  ggplot() +
+  geom_point(aes(x = as.numeric(Fit), y = estimate, color = Strain)) +
+  ggh4x::facet_nested(rows = vars(Strain), labeller = label_parsed, scales = "free") +
+  theme_bw()
+
+MCParamAll_Light %>% 
+  filter(term == "Pmax") %>% 
+  filter(Fit!= "All") %>% 
+  ggplot() +
+  geom_point(aes(x = as.numeric(Fit), y = estimate, color = Strain)) +
+  ggh4x::facet_nested(rows = vars(Strain), labeller = label_parsed, scales = "free") +
+  theme_bw()
+
+MCParamAll_Photoperiod %>% 
+  filter(term == "Pmax") %>% 
+  filter(Fit!= "All") %>% 
+  ggplot() +
+  geom_point(aes(x = as.numeric(Fit), y = estimate, color = Strain)) +
+  ggh4x::facet_nested(rows = vars(Strain), labeller = label_parsed, scales = "free") +
+  theme_bw()
+
+```
+
+
 # Cleaning the environment
 
 ```{r}
-rm(GRCplatt_PredictGrowthExpAll, MCGrowthExpSP, MCGrowthExpSPFit, MCGrowthRateExp)
+#rm(GRCplatt_PredictGrowthExpAll, MCGrowthExpSP, MCGrowthExpSPFit, MCGrowthRateExp)
 ```
 
 
@@ -1282,14 +1401,6 @@ rm(GrowthRate8Param, GrowthRate12Param, GrowthRate16Param, GrowthRate24Param)
 # Create preliminary plot from parameters
 
 ```{r preliminary plot}
-# MCParamAll_Light %>% 
-#   filter(term == "a") %>% 
-#   filter(Fit!= "All") %>% 
-#   ggplot() +
-#   geom_tail(aes(x = as.numeric(Fit), y = estimate, color = Strain)) +
-#   ggh4x::facet_nested(rows = vars(Strain), labeller = label_parsed, scales = "free") +
-#   theme_bw()
-
 
 MCParamAll_Light %>% 
   filter(term == "a") %>% 
@@ -1299,7 +1410,6 @@ MCParamAll_Light %>%
   ggh4x::facet_nested(rows = vars(Strain), labeller = label_parsed, scales = "free") +
   theme_bw()
 
-
 MCParamAll_Photoperiod %>% 
   filter(term == "a") %>% 
   filter(Fit!= "All") %>% 
@@ -1308,8 +1418,175 @@ MCParamAll_Photoperiod %>%
   ggh4x::facet_nested(rows = vars(Strain), labeller = label_parsed, scales = "free") +
   theme_bw()
 
+MCParamAll_Light %>% 
+  filter(term == "Pmax") %>% 
+  filter(Fit!= "All") %>% 
+  ggplot() +
+  geom_point(aes(x = as.numeric(Fit), y = estimate, color = Strain)) +
+  ggh4x::facet_nested(rows = vars(Strain), labeller = label_parsed, scales = "free") +
+  theme_bw()
+
+MCParamAll_Photoperiod %>% 
+  filter(term == "Pmax") %>% 
+  filter(Fit!= "All") %>% 
+  ggplot() +
+  geom_point(aes(x = as.numeric(Fit), y = estimate, color = Strain)) +
+  ggh4x::facet_nested(rows = vars(Strain), labeller = label_parsed, scales = "free") +
+  theme_bw()
 
 ```
+# Create preliminary plot from parameters
+
+```{r preliminary plot, warning = FALSE, fig.height = 5, fig.width = 5}
+scientific_10 <- function(y) {   parse(text=gsub("e\\+*", " %*% 10^", scales::scientific_format()(y))) }
+data_textA <- data.frame(label = c('A'))
+PlotA<-MCParamAll_Light %>% 
+  filter(term == "a") %>% 
+  filter(Fit!= "All") %>% 
+  rename(SE="std.error") %>% 
+  ggplot() +
+  geom_point(aes(x = as.numeric(Fit), y = estimate, color = as.factor(Strain)), size = 2.5, alpha = 0.8, show.legend = T) +
+  geom_smooth(aes(x = as.numeric(Fit), y = estimate, color = as.factor(Strain)), linetype = "dotted", size = 0.5, alpha = 0, show.legend = F) +
+  # geom_errorbar(aes(x = as.numeric(Fit), ymin = estimate - SE, ymax = estimate + SE, colour = as.factor(Strain)), width=0, size=0.3, data = . %>% filter(SE<2.997371e+01), show.legend = F) +
+  geom_text(data=data_textA, aes(x=9, y=8e-07, label=label), size=5) +
+  scale_colour_discrete(type=c("seagreen4", "palegreen3", "brown1", "brown4"), name="") +
+  scale_y_continuous(breaks=seq(0, 8e-07, by = 2e-07), label=scientific_10) +
+  coord_cartesian(ylim = c(0, 8e-07)) +
+  # labs(y = "Alpha ( µmol photons "~m^-2~""~d^-1~")") +
+  labs(y = "Alpha") +
+  #ggh4x::facet_nested(rows = vars(Strain), labeller = label_parsed) +
+  theme_bw() +
+  theme(panel.grid.minor = element_blank(),
+        panel.grid.major = element_blank(),
+        axis.text = element_text(size=12),
+        axis.title = element_text(size=16),
+        strip.background = element_rect(fill="white"),
+        strip.text = element_text(size=14),
+        axis.title.y = element_text(margin=margin(r=10)),
+        axis.title.x = element_blank(),
+        #axis.title.x = element_text(margin=margin(t=10)),
+        legend.background = element_rect(fill="transparent"),
+        legend.position = c(0.8,0.8),
+        legend.text = element_text(size=11))
+PlotA
+```
+
+```{r preliminary plot, warning = FALSE, fig.height = 5, fig.width = 5}
+scientific_10 <- function(y) {   parse(text=gsub("e\\+*", " %*% 10^", scales::scientific_format()(y))) }
+data_textB <- data.frame(label = c('B'))
+PlotB<-MCParamAll_Photoperiod %>% 
+  filter(term == "a") %>% 
+  filter(Fit!= "All") %>% 
+  rename(SE="std.error") %>% 
+  ggplot() +
+  geom_point(aes(x = as.numeric(Fit), y = estimate, color = as.factor(Strain)), size = 2.5, alpha = 0.8, show.legend = F) +
+  geom_smooth(aes(x = as.numeric(Fit), y = estimate, color = as.factor(Strain)), linetype = "dotted", size = 0.5, alpha = 0, show.legend = F) +
+  # geom_errorbar(aes(x = as.numeric(Fit), ymin = estimate - SE, ymax = estimate + SE, colour = as.factor(Strain)), width=0, size=0.3, data = . %>% filter(SE<2.997371e+01), show.legend = F) +
+  geom_text(data=data_textB, aes(x=8, y=8e-07, label=label), size=5) +
+  scale_colour_discrete(type=c("seagreen4", "palegreen3", "brown1", "brown4"), name="") +
+  scale_y_continuous(breaks=seq(0, 8e-07, by = 2e-07), label=scientific_10) +
+  scale_x_continuous(limits = c(8, 24), breaks = c(8, 12, 16, 24)) +
+  coord_cartesian(ylim = c(0, 8e-07)) +
+  theme_bw() +
+  theme(panel.grid.minor = element_blank(),
+        panel.grid.major = element_blank(),
+        axis.text = element_text(size=12),
+        axis.title = element_text(size=16),
+        strip.background = element_rect(fill="white"),
+        strip.text = element_text(size=14),
+        #axis.title.y = element_text(margin=margin(r=10)),
+        axis.title.y = element_blank(),
+        axis.title.x = element_blank(),
+        #axis.title.x = element_text(margin=margin(t=10)),
+        legend.background = element_rect(fill="transparent"),
+        legend.position = c(0.8,0.9),
+        legend.text = element_text(size=11))
+PlotB
+```
+
+```{r preliminary plot, warning = FALSE, fig.height = 5, fig.width = 5}
+scientific_10 <- function(y) {   parse(text=gsub("e\\+*", " %*% 10^", scales::scientific_format()(y))) }
+data_textC <- data.frame(label = c('C'))
+
+PlotC<-MCParamAll_Light %>% 
+  filter(term == "Pmax") %>% 
+  filter(Fit!= "All") %>% 
+  rename(SE="std.error") %>% 
+  #filter(SE<5.655529e+05) %>% 
+  ggplot() +
+  geom_point(aes(x = as.numeric(Fit), y = estimate, color = as.factor(Strain)), size = 2.5, alpha = 0.8, show.legend = F) +
+  geom_smooth(aes(x = as.numeric(Fit), y = estimate, color = as.factor(Strain)), linetype = "dotted", size = 0.5, alpha = 0, show.legend = F) +
+  # geom_errorbar(aes(x = as.numeric(Fit), ymin = estimate - SE, ymax = estimate + SE, colour = as.factor(Strain)), width=0, size=0.3, show.legend = F) +
+  geom_text(data=data_textC, aes(x=9, y=4000, label=label), size=5) +
+  scale_colour_discrete(type=c("seagreen4", "palegreen3", "brown1", "brown4"), name="") +
+  scale_y_continuous(label=scientific_10) +
+  # labs(y = ""~italic(P)~""["max"]~" ( µmol photons "~m^-2~""~d^-1~")", x = "PAR ( µmol photons "~m^-2~""~s^-1~")") +
+  labs(y = ""~italic(P)~""["max"]~"", x = "PAR ( µmol photons "~m^-2~""~s^-1~")") +
+  # scale_y_continuous(breaks=seq(0, 5e-07, by = 1e-07), label=scientific_10) +
+  # coord_cartesian(ylim = c(0, 5e-07)) +
+
+  theme_bw() +
+  theme(panel.grid.minor = element_blank(),
+        panel.grid.major = element_blank(),
+        axis.text = element_text(size=12),
+        axis.title = element_text(size=16),
+        strip.background = element_rect(fill="white"),
+        strip.text = element_text(size=14),
+        axis.title.y = element_text(margin=margin(r=10)),
+        #axis.title.y = element_blank(),
+        axis.title.x = element_text(margin=margin(t=10)),
+        legend.background = element_rect(fill="transparent"),
+        legend.position = c(0.8,0.9),
+        legend.text = element_text(size=11))
+PlotC
+```
+
+```{r preliminary plot, warning = FALSE, fig.height = 5, fig.width = 5}
+scientific_10 <- function(y) {   parse(text=gsub("e\\+*", " %*% 10^", scales::scientific_format()(y))) }
+data_textD <- data.frame(label = c('D'))
+
+PlotD<-MCParamAll_Photoperiod %>% 
+  filter(term == "Pmax") %>% 
+  filter(Fit!= "All") %>% 
+  rename(SE="std.error") %>% 
+  ggplot() +
+  geom_point(aes(x = as.numeric(Fit), y = estimate, color = as.factor(Strain)), size = 2.5, alpha = 0.8, show.legend = F) +
+  geom_smooth(aes(x = as.numeric(Fit), y = estimate, color = as.factor(Strain)), linetype = "dotted", size = 0.5, alpha = 0, show.legend = F) +
+  # geom_errorbar(aes(x = as.numeric(Fit), ymin = estimate - SE, ymax = estimate + SE, colour = as.factor(Strain)), width=0, size=0.3, data = . %>% filter(SE<2.997371e+01), show.legend = F) +
+  geom_text(data=data_textD, aes(x=8, y=4000, label=label), size=5) +
+  scale_colour_discrete(type=c("seagreen4", "palegreen3", "brown1", "brown4"), name="") +
+  scale_y_continuous(breaks=seq(0, 4000, by = 1000), label=scientific_10) +
+  scale_x_continuous(limits = c(8, 24), breaks = c(8, 12, 16, 24)) +
+  coord_cartesian(ylim = c(0, 4000)) +
+  labs(x = "Photoperiod (h)") +
+  theme_bw() +
+  theme(panel.grid.minor = element_blank(),
+        panel.grid.major = element_blank(),
+        axis.text = element_text(size=12),
+        axis.title = element_text(size=16),
+        strip.background = element_rect(fill="white"),
+        strip.text = element_text(size=14),
+        #axis.title.y = element_text(margin=margin(r=10)),
+        axis.title.y = element_blank(),
+        axis.title.x = element_text(margin=margin(t=10)),
+        legend.background = element_rect(fill="transparent"),
+        legend.position = c(0.8,0.9),
+        legend.text = element_text(size=11))
+PlotD
+```
+
+```{r, warning = FALSE, fig.height = 9, fig.width = 10}
+ggp<- (PlotA+PlotB)/(PlotC+PlotD)   
+ggp                           
+```
+
+# Save plot 
+
+```{r save plot}
+ggsave(file = file.path(FigPath, paste("Fig_GrowthParam",".png",sep = "")), height=10, width= 9.5,  dpi = 300, limitsize = TRUE)
+```
+
+
 # Save RDS that create stats and tables
 
 ```{r}
@@ -1354,6 +1631,9 @@ TukeyHSDTest_GrowthRateFitParam_Photoperiod<-TukeyHSD(model, which = c("Fit", "S
 
 rm(model, MCParamAllStats)
 ```
+
+
+
 
 
 # Save RDS that create stats and tables
@@ -1700,6 +1980,66 @@ ggplot(MCGrowthSP, aes(PARPhotonDose_day, deltaOD_Lmu_corr)) +
 ```{r save plot}
 ggsave(file = file.path(FigPath, paste("SFig_GrowthRate_Photoperiod_PAR",".png",sep = "")), height=9, width= 7,  dpi = 300, limitsize = TRUE)
 ```
+
+-------------------------------- Different idea ----------------------------------------
+
+# Create plot - Photoperiod
+
+```{r create plot, fig.height = 8, fig.width = 8, warning = FALSE}
+lab1=c(expression("8 h"), expression("12 h"), expression("16 h"), expression("24 h"))
+lab2=c(expression("30 µE"), expression("90 µE"), expression("180 µE"), expression("300 µE"), expression("600 µE"), expression("900 µE"))
+scientific_10 <- function(x) {   parse(text=gsub("e\\+*", " %*% 10^", scales::scientific_format()(x))) }
+
+PARPhotoperiod<-ggplot(MCGrowthSP, aes(PARPhotonDose_day, deltaOD_Lmu_corr)) +
+  geom_point(aes(PARPhotonDose_day, deltaOD_Lmu_corr, colour = as.factor(Par_ue), shape = as.factor(Photoperiod)), alpha = 0.8, size = 3.5, show.legend = T) +
+  geom_errorbar(aes(x = PARPhotonDose_day, ymin = deltaOD_Lmu_corr - deltaOD_Lmu_se, ymax = deltaOD_Lmu_corr + deltaOD_Lmu_se, colour = as.factor(Par_ue)), width=0, size=0.3, data = . %>% filter(deltaOD_Lmu_se<8.057558e-03), show.legend = F) +
+  geom_line(aes(PARPhotonDose_day, .fitted), colour = "blue", linetype = "solid", size = 0.3, show.legend = F, GRCplatt_PredictGrowthAll) +
+  geom_line(aes(PARPhotonDose_day, .fitted), colour = "black", linetype = "dotted",  show.legend = F, GRCplatt_PredictGrowth8) +
+  geom_line(aes(PARPhotonDose_day, .fitted), colour = "black", linetype = "longdash", show.legend = F, GRCplatt_PredictGrowth12) +
+  geom_line(aes(PARPhotonDose_day, .fitted), colour = "black", linetype = "dashed", show.legend = F, GRCplatt_PredictGrowth16) +
+  geom_line(aes(PARPhotonDose_day, .fitted), colour = "black", linetype = "dotdash", show.legend = F, GRCplatt_PredictGrowth24) +
+  scale_x_continuous(label=scientific_10) +
+  #scale_linetype_manual(values=c("equal900" = "dotted", "less900" = "solid"), breaks=c('8', '12', '16', "24", "", "")) +
+  scale_colour_manual(values = c("darkslategray", "lightblue4", "hotpink4", "indianred3", "goldenrod2", "khaki2"), name="", labels = lab2, breaks=c('30', "90", "180", "300", "600","900")) +
+  scale_shape_manual(values = c(15, 16, 17, 18), name="", labels = lab1) +
+  labs(y = "Chlorophyll specific exponential growth rate " ~ "("~d^-1~")", x = "Cumulative diel PAR ( µmol photons "~m^-2~""~d^-1~")") +
+  ggh4x::facet_nested(rows = vars(facetsStrain, Strain), labeller = label_parsed) +
+  theme_bw() +
+  theme(panel.grid.minor = element_blank(),
+        panel.grid.major = element_blank(),
+        axis.text = element_text(size=12),
+        axis.title = element_text(size=16),
+        strip.background = element_rect(fill="white"),
+        strip.text = element_text(size=12),
+        axis.title.y = element_text(margin=margin(r=10)),
+        axis.title.x = element_text(margin=margin(t=10)),
+        legend.background = element_rect(fill="white"),
+        legend.position = c(0.90,0.88),
+        legend.key.height= unit(0.003, 'cm'),
+        legend.spacing.y = unit(-0.1, "cm"),
+        legend.spacing.x = unit(-0.1, 'cm'),
+        legend.title = element_blank(),
+        legend.text = element_text(size=11))
+PARPhotoperiod
+```
+# Create preliminary plot from parameters
+
+```{r preliminary plot}
+
+ParamPAR<-MCParamAll_Photoperiod %>% 
+  filter(term == "a") %>% 
+  filter(Fit!= "All") %>% 
+  ggplot() +
+  geom_point(aes(x = as.numeric(Fit), y = estimate, color = Strain), show.legend = F) +
+  ggh4x::facet_nested(rows = vars(Strain), labeller = label_parsed) +
+  theme_bw()
+ParamPAR
+```
+```{r, warning = FALSE, fig.height = 9, fig.width = 10}
+ggp<- PARPhotoperiod+ParamPAR   
+ggp                           
+```
+
 
 # Save RDS that create plot
 
