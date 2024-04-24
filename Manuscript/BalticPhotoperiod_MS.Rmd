@@ -289,9 +289,17 @@ GrowthRateLightPUR_cap<- glue("**Chlorophyll specific exponential growth rates (
 knitr::include_graphics(file.path(FiguresFP,"Fig_GrowthRate_Light_PUR.png"))
 ```
 
+<<<<<<< HEAD
 ```{r GrowthParam, fig.cap = GrowthParam_cap, fig.height = 8, fig.width = 6, echo = FALSE}
 GrowthParam_cap<- glue("**Alpha and Pmax estimated from three parameter model (Harrison and Platt, 1986) for chlorophyll specific exponential growth rates (d^−1^) vs. cumulative diel Photosynthetically Usable Radiation (PUR, µmol photons m^−2^d^−1^)**. Alpha (panel A) and Pmax (panel B) were estimated from the model fitted separately for 30, 90, 180, 300, 600 together with 900 peak PAR µmol photons m^−2^s^−1^. Alpha (panel C) and Pmax (panel D) parameters were estimated from the model fitted separately for 8, 12, 16, 24 h of photoperiod.", .sep = " ")
 knitr::include_graphics(file.path(FiguresFP,"Fig_GrowthParam.png"))
+=======
+The GAM model in Fig. \@ref(fig:GAM) summarizes growth responses of PC-rich and PE-rich picocyanobacteria to 6 peak PAR and 4 photoperiods. PC-rich_056 *Synechococcus* sp. showed the highest growth rate in photoperiod of 24 h, regardless of the prevailing peak PAR indicated by the contour line labeled 1.45 d^−1^ (representing the 90^th^ percentile of achieved growth rate). On the other hand, the other tested PC-rich strain (077) showed the highest growth in the range of photoperiod 16-24 h and peak PAR between 300 – 700 µmol photons m^−2^s^−1^ indicated by the 1.81 d^−1^ contour line representing the 90^th^ percentile of maximum achieved growth rate. Also, For both PC-rich strains, growth was the lowest in the 30 µmol photons m^−2^s^−1^ and photoperiod of 8 h. Note, the growth rate for PC-rich and PE-rich *Synechococcus* sp. was not consistent with the cumulative diel photon dose (µmol photons m^−2^d^−1^). Both PE-rich strains achieved fastest growth rates above peak PAR of ~300 µmol photons m^−2^s^−1^, and the longest photoperiod of 24 h, indicated by the 1.97 d^−1^ for PE-rich_048 and 2.34 d^−1^ for PE-rich_127 contour line representing the 90^th^ percentile of maximum achieved growth rate. For these strains growth decreased with decreasing photoperiod and decreasing peak PAR. Moreover, PE-rich strains showed strong photoinhibition at peak PAR of 900 µmol photons m^−2^s^−1^ and photoperiod of 24 h.
+
+```{r GAM, fig.cap = GAM_cap, fig.height = 8, fig.width = 6, echo = FALSE}
+GAM_cap<- glue("**A contour plot of a Generalized Additive Model (GAM) of chlorophyll specific growth rates (d^−1^)** for two PhycoCyanin(PC)-rich cultures (A; 056, B; 077) and two PhycoErythrin(PE)-rich cultures (C; 048, D; 127) of *Synechococcus* sp. originating from the Baltic Sea. Cultures were grown at 30, 90, 180, 300, 600, or 900 peak PAR µmol photons m^−2^s^−1^; and photoperiods of 8, 12, 16, or 24 h. Legends show colour gradients of growth rate (µ; d^−1^) from no growth (white) to 3.0 d^−1^ (dark green for PC-rich_056, light green for PC-rich_077, light red for PE-rich_048 or dark red for PE-rich_127 strains). Labeled contour lines indicate the 90%, 50%, and 10% quantiles for achieved growth rate. Dashed contour lines show isoclines of cumulative diel photon dose (µmol photons m^−2^d^−1^).", .sep = " ")
+knitr::include_graphics(file.path(FiguresFP,"Fig_GAM_Colour.png"))
+>>>>>>> eb4f99241e3846347d302bba20aaf76234ad1001
 ```
 
 
