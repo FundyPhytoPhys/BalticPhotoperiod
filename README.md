@@ -44,7 +44,7 @@ https://docs.google.com/spreadsheets/d/1cfyxO1bFSeEMlMnx1vAyuskk3Un_bqkE9-uUSc-j
 
 ## Keywords
 
-Cumulative diel photon dose, Light intensity, PAR, Photic regime, Phase of growth, Photoperiod, picocyanobacteria, PUR
+Cumulative diel photon dose, Light-capture, PAR, Photic regime, Phase of growth, Photoperiod, Picocyanobacteria, PUR
 
 ## Additional information and support
 
@@ -243,6 +243,9 @@ The Output folder contains 3 folders: Figures, FiguresRds, and TablesRds.
 https://docs.google.com/spreadsheets/d/1byJ7NV2LrHfzkcw9GQgZdQijKw1UbdzvtvZ1d1KL_cY/edit#gid=0
 
 ### Manuscript
+
+- URL for Cover Letter:
+https://docs.google.com/document/d/1psjN1uv4ZVc6sRh8Wf4iacDQ940KGxOhbyeOVwffp8o/edit
 
 - URL for main Manuscript:
 https://docs.google.com/document/d/1rpUJyodvmd8ISzSk8PKRrZo73a6tK26yKlcucbD-EHI/edit
