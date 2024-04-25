@@ -244,7 +244,7 @@ https://docs.google.com/spreadsheets/d/1byJ7NV2LrHfzkcw9GQgZdQijKw1UbdzvtvZ1d1KL
 
 ### Manuscript
 
-- URL for Cover Letter:
+- URL for Significance Statement:
 https://docs.google.com/document/d/1psjN1uv4ZVc6sRh8Wf4iacDQ940KGxOhbyeOVwffp8o/edit
 
 - URL for main Manuscript:
