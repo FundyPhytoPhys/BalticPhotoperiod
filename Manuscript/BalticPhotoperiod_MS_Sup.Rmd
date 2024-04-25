@@ -1,5 +1,6 @@
 ---
-title: "Growth vs. light-capture in PhycoCyanin and PhycoErythrin-rich picocyanobacteria, across photic regimes and growth phases"
+title: "Growth vs. light-capture in PhycoCyanin and PhycoErythrin-rich picocyanobacteria, across photic regimes and growth phases
+Long, low & slow; or high, short & fast; growth yields of light and photoperiods in PhycoCyanin and PhycoErythrin-rich picocyanobacteria"
 author:
 - Sylwia Śliwińska-Wilczewska:
     institute:
@@ -22,7 +23,7 @@ author:
     email: nomar@mta.ca
 - Douglas A. Campbell:
     institute: MTA
-    email: dcampbel@mta.ca
+    email: dubhglascambeuil@gmail.com
     correspondence: true
 institute:
 - MTA: Department of Biology, Mount Allison University, 53 York St., Sackville NB,
@@ -56,7 +57,7 @@ output:
 bibliography:
 - BalticPhotoperiod.bib
 - packages.bib
-csl: "plos-one.csl"
+csl: "limnology-and-oceanography.csl"
 ---
 
 ```{r, import libraries, include = FALSE}

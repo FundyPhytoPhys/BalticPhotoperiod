@@ -895,7 +895,7 @@ PlotALightPUR<-ggplot(MCGrowthExpSP, aes(PURPhotonDose_day, deltaOD_Lmu_corr)) +
   #scale_linetype_manual(values=c("equal900" = "dotted", "less900" = "solid"), breaks=c('8', '12', '16', "24", "", "")) +
   scale_colour_manual(values = c("darkslategray", "lightblue4", "hotpink4", "indianred3", "goldenrod2", "khaki2"), name="", labels = lab2, breaks=c('30', "90", "180", "300", "600","900")) +
   scale_shape_manual(values = c(15, 16, 17, 18), name="", labels = lab1) +
-  labs(y = "Chlorophyll specific exponential growth rate " ~ "("~d^-1~")", x = "Cumulative diel PUR ( µmol photons "~m^-2~""~d^-1~")") +
+  labs(y = "Chlorophyll-specific exponential growth rate " ~ "("~d^-1~")", x = "Cumulative diel PUR ( µmol photons "~m^-2~""~d^-1~")") +
   ggh4x::facet_nested(rows = vars(facetsStrain, Strain), labeller = label_parsed) +
   theme_bw() +
   theme(panel.grid.minor = element_blank(),
@@ -920,7 +920,7 @@ PlotALightPUR
 # Save plot 
 
 ```{r save plot}
-# ggsave(file = file.path(FigPath, paste("SFig_GrowthRate_Light_PUR",".png",sep = "")), height=9, width= 7,  dpi = 300, limitsize = TRUE)
+# ggsave(file = file.path(FigPath, paste("Fig_GrowthRate_Light_PUR",".png",sep = "")), height=9, width= 7,  dpi = 300, limitsize = TRUE)
 ```
 
 # Create plot - Photoperiod
@@ -946,7 +946,7 @@ PlotAPhotoperiodPUR<-ggplot(MCGrowthExpSP, aes(PURPhotonDose_day, deltaOD_Lmu_co
   #scale_linetype_manual(values=c("equal900" = "dotted", "less900" = "solid"), breaks=c('8', '12', '16', "24", "", "")) +
   scale_colour_manual(values = c("darkslategray", "lightblue4", "hotpink4", "indianred3", "goldenrod2", "khaki2"), name="", labels = lab2, breaks=c('30', "90", "180", "300", "600","900")) +
   scale_shape_manual(values = c(15, 16, 17, 18), name="", labels = lab1) +
-  labs(y = "Chlorophyll specific exponential growth rate " ~ "("~d^-1~")", x = "Cumulative diel PUR ( µmol photons "~m^-2~""~d^-1~")") +
+  labs(y = "Chlorophyll-specific exponential growth rate " ~ "("~d^-1~")", x = "Cumulative diel PUR ( µmol photons "~m^-2~""~d^-1~")") +
   ggh4x::facet_nested(rows = vars(facetsStrain, Strain), labeller = label_parsed) +
   theme_bw() +
   theme(panel.grid.minor = element_blank(),
@@ -1101,7 +1101,7 @@ PlotB<-MCParamAll_Photoperiod %>%
   scale_y_continuous(breaks=seq(0, 1.5e-06, by = 0.5e-06), label=scientific_10) +
   scale_x_continuous(limits = c(8, 24), breaks = c(8, 12, 16, 24)) +
   coord_cartesian(ylim = c(0, 1.6e-06)) +
-  labs(y = "Alpha", x = "Photoperiod (h)") +
+  labs(y = "\u03B1", x = "Photoperiod (h)") +
   ggh4x::facet_nested(rows = vars(facetsStrain, Strain), labeller = label_parsed) +
   theme_bw() +
   theme(panel.grid.minor = element_blank(),
@@ -1136,7 +1136,7 @@ ggp
 # Save plot 
 
 ```{r save plot}
-# ggsave(file = file.path(FigPath, paste("Fig_GrowthRate_Photoperiod_PUR",".png",sep = "")), height=9, width= 7,  dpi = 300, limitsize = TRUE)
+ggsave(file = file.path(FigPath, paste("Fig_GrowthRate_Photoperiod_PUR",".png",sep = "")), height=9, width= 12,  dpi = 300, limitsize = TRUE)
 ```
 
 
@@ -1172,7 +1172,7 @@ PlotB<-MCParamAll_Light %>%
   scale_y_continuous(breaks=seq(0, 1.5e-06, by = 0.5e-06), label=scientific_10) +
   scale_x_continuous(limits = c(30, 900), breaks = c(30, 90, 180, 300, 600, 900)) +
   coord_cartesian(ylim = c(-0.2e-06, 1.5e-06)) +
-  labs(y = "Alpha", x = "PAR ( µmol photons "~m^-2~""~s^-1~")") +
+  labs(y = "\u03B1", x = "PAR ( µmol photons "~m^-2~""~s^-1~")") +
   ggh4x::facet_nested(rows = vars(facetsStrain, Strain), labeller = label_parsed) +
   theme_bw() +
   theme(panel.grid.minor = element_blank(),
@@ -1210,7 +1210,7 @@ ggp
 # Save plot 
 
 ```{r save plot}
-# ggsave(file = file.path(FigPath, paste("SFig_GrowthRate_Light_PUR",".png",sep = "")), height=9, width= 7,  dpi = 300, limitsize = TRUE)
+ggsave(file = file.path(FigPath, paste("Fig_GrowthRate_Light_PUR",".png",sep = "")), height=9, width= 12,  dpi = 300, limitsize = TRUE)
 ```
 
 
@@ -2034,7 +2034,7 @@ ggplot(MCGrowthSP, aes(PARPhotonDose_day, deltaOD_Lmu_corr)) +
   #scale_linetype_manual(values=c("equal900" = "dotted", "less900" = "solid"), breaks=c('8', '12', '16', "24", "", "")) +
   scale_colour_manual(values = c("darkslategray", "lightblue4", "hotpink4", "indianred3", "goldenrod2", "khaki2"), name="", labels = lab2, breaks=c('30', "90", "180", "300", "600","900")) +
   scale_shape_manual(values = c(15, 16, 17, 18), name="", labels = lab1) +
-  labs(y = "Chlorophyll specific exponential growth rate " ~ "("~d^-1~")", x = "Cumulative diel PAR ( µmol photons "~m^-2~""~d^-1~")") +
+  labs(y = "Chlorophyll-specific exponential growth rate " ~ "("~d^-1~")", x = "Cumulative diel PAR ( µmol photons "~m^-2~""~d^-1~")") +
   ggh4x::facet_nested(rows = vars(facetsStrain, Strain), labeller = label_parsed) +
   theme_bw() +
   theme(panel.grid.minor = element_blank(),
@@ -2079,7 +2079,7 @@ ggplot(MCGrowthSP, aes(PARPhotonDose_day, deltaOD_Lmu_corr)) +
   #scale_linetype_manual(values=c("equal900" = "dotted", "less900" = "solid"), breaks=c('8', '12', '16', "24", "", "")) +
   scale_colour_manual(values = c("darkslategray", "lightblue4", "hotpink4", "indianred3", "goldenrod2", "khaki2"), name="", labels = lab2, breaks=c('30', "90", "180", "300", "600","900")) +
   scale_shape_manual(values = c(15, 16, 17, 18), name="", labels = lab1) +
-  labs(y = "Chlorophyll specific exponential growth rate " ~ "("~d^-1~")", x = "Cumulative diel PAR ( µmol photons "~m^-2~""~d^-1~")") +
+  labs(y = "Chlorophyll-specific exponential growth rate " ~ "("~d^-1~")", x = "Cumulative diel PAR ( µmol photons "~m^-2~""~d^-1~")") +
   ggh4x::facet_nested(rows = vars(facetsStrain, Strain), labeller = label_parsed) +
   theme_bw() +
   theme(panel.grid.minor = element_blank(),
@@ -2126,7 +2126,7 @@ PARPhotoperiod<-ggplot(MCGrowthSP, aes(PARPhotonDose_day, deltaOD_Lmu_corr)) +
   #scale_linetype_manual(values=c("equal900" = "dotted", "less900" = "solid"), breaks=c('8', '12', '16', "24", "", "")) +
   scale_colour_manual(values = c("darkslategray", "lightblue4", "hotpink4", "indianred3", "goldenrod2", "khaki2"), name="", labels = lab2, breaks=c('30', "90", "180", "300", "600","900")) +
   scale_shape_manual(values = c(15, 16, 17, 18), name="", labels = lab1) +
-  labs(y = "Chlorophyll specific exponential growth rate " ~ "("~d^-1~")", x = "Cumulative diel PAR ( µmol photons "~m^-2~""~d^-1~")") +
+  labs(y = "Chlorophyll-specific exponential growth rate " ~ "("~d^-1~")", x = "Cumulative diel PAR ( µmol photons "~m^-2~""~d^-1~")") +
   ggh4x::facet_nested(rows = vars(facetsStrain, Strain), labeller = label_parsed) +
   theme_bw() +
   theme(panel.grid.minor = element_blank(),
