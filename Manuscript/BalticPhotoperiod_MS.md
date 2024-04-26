@@ -62,6 +62,7 @@ output:
     pandoc_args:
     - "--lua-filter=scholarly-metadata.lua"
     - "--lua-filter=author-info-blocks.lua"
+    - "--lua-filter=custom_filter.lua"
 bibliography:
 - BalticPhotoperiod.bib
 - packages.bib
@@ -120,7 +121,7 @@ Picocyanobacterial growth was monitored every 5 minutes by automatically recordi
 
 To summarize the growth responses of the four picocyanobacterial strains we used a Generalized Additive Model (GAM) [@woodGeneralizedAdditiveModels2017] was applied to the relation of chlorophyll-specific µ, d^-1^ to photoperiod and PAR level. The R package *`mgcv`* [@woodGeneralizedAdditiveModels2017] was used to model the growth rate with smoothing terms and indicate the 90, 50 and 10% quantiles for growth rate across the levels of factors. Only growth rate estimates for which the amplitude of standard error was smaller than 50% of the fitted growth rate were included in the GAM. We visually compared the GAM contours to isoclines of equal cumulative diel PAR (µmol photons m^−2^d^−1^).
 
-The 1^st^ derivative of OD~680~ taken over 1 h increments was computed using *xts*: eXtensible Time Series  [@ryanXtsEXtensibleTime2024] and *signal*: Signal Processing [@liggesSignalSignalProcessing2024] R packages. The time when the cultures reached their maximum absolute hourly growth (tMaxAHG) of the 1^st^ derivative of OD~680~ was taken as the time of transition from exponential to pre-stationary growth phases (Fig. \@ref(fig:**FirstDerivative**)).
+The 1^st^ derivative of OD~680~ taken over 1 h increments was computed using *xts*: eXtensible Time Series  [@ryanXtsEXtensibleTime2024] and *signal*: Signal Processing [@liggesSignalSignalProcessing2024] R packages. The time when the cultures reached their maximum absolute hourly growth (tMaxAHG) of the 1^st^ derivative of OD~680~ was taken as the time of transition from exponential to pre-stationary growth phases (Fig. <a href="#fig:FirstDerivative">1</a>).
 
 ![<span id="fig:FirstDerivative"></span>**Fig. **1: Example of a growth curve (tracked as OD~720~, OD~680~, or ΔOD; red solid lines, left y-axis) of PE-rich culture of *Synechococcus* sp. (048) vs. elapsed time (d, x-axis). 1^st^ derivative of OD~680~ taken over 1 h increments (black solid line, right y-axis); solid blue line shows logistic fits of chlorophyll proxy OD~680~ – OD~720~ (ΔOD) vs. elapsed time. The vertical red dot dash line represents the time when the culture reached the maximum of the 1^st^ derivative of OD~680~, or maximum absolute hourly growth (tMaxAHG), taken as the time of transition from exponential to pre-stationary growth phases.](../Output/Figures/Fig_FirstDerivative.png)
 
