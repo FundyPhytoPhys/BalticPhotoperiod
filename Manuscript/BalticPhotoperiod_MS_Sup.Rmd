@@ -1,36 +1,44 @@
 ---
 title: "Growth vs. light-capture in PhycoCyanin and PhycoErythrin-rich picocyanobacteria, across photic regimes and growth phases
-Long, low & slow; or high, short & fast; growth yields of light and photoperiods in PhycoCyanin and PhycoErythrin-rich picocyanobacteria"
+
+Alternate:
+Long & low vs. high & short & fast; growth yields, light and photoperiods in PhycoCyanin and PhycoErythrin-rich picocyanobacteria"
+
 author:
 - Sylwia Śliwińska-Wilczewska:
     institute:
     - MTA
     - UG
     email: ssliwinskawilczews@mta.ca
+    ORCID: ORCID 0000-0002-3147-6605
 - Marta Konik:
     institute:
     - VU
     - IOPAN
     email: mk@iopan.gda.pl
+    ORCID: 0000-0003-1145-9127
 - Mireille Savoie:
     institute: MTA
     email: msavoie@mta.ca
+    ORCID: 0009-0009-9499-6657
 - Anabella Aguilera:
     institute: SW
     email: anabella.aguilera@lnu.se
-- Naaman Omar:
+    ORCID: 0000-0001-6743-3001
+- Naaman M. Omar:
     institute: MTA
     email: nomar@mta.ca
+    ORCID: 0000-0001-9583-2886
 - Douglas A. Campbell:
     institute: MTA
     email: dubhglascambeuil@gmail.com
+    ORCID: 0000-0001-8996-5463
     correspondence: true
 institute:
-- MTA: Department of Biology, Mount Allison University, 53 York St., Sackville NB,
-    Canada, E4L 1C9
+- MTA: Department of Biology, Mount Allison University, 53 York St., Sackville, NB, E4L 1C9, Canada
 - UG: "Institute of Oceanography, University of Gdansk, 46 Pilsudskiego St, P81-378,
     Gdynia, Poland"
-- VU: Department of Geography, University of Victoria, Victoria, BC V8P 5C2, Canada
+- VU: Department of Geography, University of Victoria, Victoria, BC, V8P 5C2, Canada
 - IOPAN: "Institute of Oceanology, Polish Academy of Sciences, 81-712 Sopot, Poland"
 - SW: Sweden
 output:
@@ -57,6 +65,7 @@ output:
 bibliography:
 - BalticPhotoperiod.bib
 - packages.bib
+- faultycitations.bib
 csl: "limnology-and-oceanography.csl"
 ---
 

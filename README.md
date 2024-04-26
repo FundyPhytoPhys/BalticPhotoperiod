@@ -12,7 +12,8 @@ Analyses of the responses of Baltic picocyanobacteria, of distinct pigment compo
 
 - Sylwia Sliwinska-Wilczewska, Mount Allison University, University of Gdansk, ssliwinskawilczews@mta.ca, ORCID 0000-0002-3147-6605
 - Marta Konik, University of Victoria, Institute of Oceanology, Polish Academy of Sciences, mk@iopan.gda.pl, ORCID 0000-0003-1145-9127
-- Mireille Savoie, Mount Allison University, msavoie@mta.ca, ORCID 0000-0003-3024-2687
+- Mireille Savoie, Mount Allison University, msavoie@mta.ca, ORCID 0009-0009-9499-6657
+- Anabella Aguilera, Sweden, anabella.aguilera@lnu.se, ORCID 0000-0001-6743-3001
 - Naaman Omar, Mount Allison University, nomar@mta.ca, ORCID 0000-0001-9583-2886
 - Douglas A. Campbell, Mount Allison University, dcampbel@mta.ca, ORCID 0000-0001-8996-5463
 

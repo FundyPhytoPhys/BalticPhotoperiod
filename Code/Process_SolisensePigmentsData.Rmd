@@ -50,6 +50,7 @@ library(googledrive)
 library(googlesheets4)
 library(readxl)
 library(multcompView)
+library("patchwork") # merging plots
 ```
 
 ```{r set project variables}
@@ -774,7 +775,7 @@ lab1=c(expression("8 h"), expression("12 h"), expression("16 h"), expression("24
 lab2=c(expression("30 µE"), expression("90 µE"), expression("180 µE"), expression("300 µE"), expression("600 µE"), expression("900 µE"))
 
   
-SolFitsAllPigmentPCPE590 %>% 
+ASolPig590<-SolFitsAllPigmentPCPE590 %>% 
   ggplot() +
   geom_point(aes(x = AllmeanPhycoChlaRatio, y = AllmeanSig_nm2psii, colour = as.factor(Par_ue), shape = as.factor(Photoperiod)), size = 3.5, alpha = 0.8, show.legend = T, SolFitsAllPigmentPCPE590) + 
   geom_point(aes(x = AllmeanPhycoChlaRatio, y = Sig_nm2psii, colour = as.factor(Par_ue), shape = as.factor(Photoperiod)), size = 1, show.legend = F, SolFitsAllPigmentPCPE590) + 
@@ -809,33 +810,71 @@ SolFitsAllPigmentPCPE590 %>%
   scale_shape_manual(values = c(15, 16, 17,18), name="", labels = lab1) +
   scale_colour_manual(values = c("darkslategray", "lightblue4", "hotpink4", "indianred3", "goldenrod2", "khaki2"), name="", labels = lab2) +
   scale_x_continuous(breaks=seq(0, 5, by = 1)) +
-  scale_y_continuous(breaks=seq(0, 8, by = 2)) +
-  coord_cartesian(xlim = c(0, 5.5), ylim = c(-1.5, 10)) +
+  scale_y_continuous(breaks=seq(0, 10, by = 2)) +
+  coord_cartesian(xlim = c(0, 5.5), ylim = c(-2, 12)) +
   
   labs(y=expression(paste(sigma,""["PSII"]*"' (nm"^"2"*" quanta"^"-1"*")")), x = "Phycobiliprotein to Chl" ~italic(a)~ "ratio (µg/µg)") +
   ggh4x::facet_nested(cols = vars(facetsPhase, Phase), rows = vars(facetsStrain, Strain), labeller = label_parsed) +
   theme_bw() +
+  # theme(panel.grid.minor = element_blank(),
+  #       panel.grid.major = element_blank(),
+  #       axis.text = element_text(size=12),
+  #       axis.title = element_text(size=16),
+  #       strip.background = element_rect(fill="white"),
+  #       strip.text = element_text(size=12),
+  #       axis.title.y = element_text(margin=margin(r=10)),
+  #       axis.title.x = element_text(margin=margin(t=10)),
+  #       legend.background = element_rect(fill="transparent"),
+  #       legend.position = c(0.9,0.88),
+  #       legend.key.height= unit(0.005, 'cm'),
+  #       legend.spacing.y = unit(-0.1, "cm"),
+  #       legend.title = element_blank(),
+  #       legend.text = element_text(size=11))
+
   theme(panel.grid.minor = element_blank(),
         panel.grid.major = element_blank(),
         axis.text = element_text(size=12),
         axis.title = element_text(size=16),
         strip.background = element_rect(fill="white"),
         strip.text = element_text(size=12),
-        axis.title.y = element_text(margin=margin(r=10)),
+        strip.background.y = element_blank(),
+        strip.text.y = element_blank(),
+
         axis.title.x = element_text(margin=margin(t=10)),
+        axis.title.y = element_blank(),
         legend.background = element_rect(fill="transparent"),
-        legend.position = c(0.9,0.88),
-        legend.key.height= unit(0.005, 'cm'),
+        legend.position = c(0.90,0.88),
+        legend.key.height= unit(0.003, 'cm'),
         legend.spacing.y = unit(-0.1, "cm"),
+        legend.spacing.x = unit(-0.1, 'cm'),
         legend.title = element_blank(),
         legend.text = element_text(size=11))
+
+
+
+
+ASolPig590
 ```
 
 
 # Save plot 
 
 ```{r save plot}
-ggsave(file = file.path(FigPath, paste("Fig_SigmaPig590",".png",sep = "")), height=9, width= 7,  dpi = 300, limitsize = TRUE)
+# ggsave(file = file.path(FigPath, paste("Fig_SigmaPig590",".png",sep = "")), height=9, width= 7,  dpi = 300, limitsize = TRUE)
+```
+
+
+
+
+```{r, warning = FALSE, fig.height = 8, fig.width = 12}
+ggp<- (ASigPAR+ASolPig590)
+ggp                           
+```
+
+# Save plot 
+
+```{r save plot}
+ggsave(file = file.path(FigPath, paste("Sig_newIdea2",".png",sep = "")), height=9, width= 12,  dpi = 300, limitsize = TRUE)
 ```
 
 
