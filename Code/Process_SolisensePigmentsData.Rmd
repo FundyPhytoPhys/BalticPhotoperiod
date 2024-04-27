@@ -960,13 +960,13 @@ Soli590B
 ```
 
 ```{r, warning = FALSE, fig.height = 9, fig.width = 12}
-ggp<- Soli590A+Soli590B
-ggp                           
+# ggp<- Soli590A+Soli590B
+# ggp                           
 ```
 
 
 ```{r save plot}
-ggsave(file = file.path(FigPath, paste("Fig_Sigma590Merge",".png",sep = "")), height=9, width= 12,  dpi = 300, limitsize = TRUE)
+# ggsave(file = file.path(FigPath, paste("Fig_Sigma590Merge",".png",sep = "")), height=9, width= 12,  dpi = 300, limitsize = TRUE)
 ```
 
 
@@ -1242,6 +1242,14 @@ filter(Ex_WL == 445)
 
 
 ```{r fig.height = 8, fig.width = 8, warning = FALSE}
+
+data_textB <- data.frame(facetsPhase = c("Phase~of~growth"), Phase = c("Exponential"), facetsStrain  = c("Strain"), Strain  = c("PC-rich_056"), label = c('B'))
+
+k_data056 = data.frame(facetsPhase = c("Phase~of~growth"), Phase = c("Pre-stationary"), facetsStrain  = c("Strain"), Strain  = c("PC-rich_056"))
+k_data077 = data.frame(facetsPhase = c("Phase~of~growth"), Phase = c("Pre-stationary"), facetsStrain  = c("Strain"), Strain  = c("PC-rich_077"))
+k_data048 = data.frame(facetsPhase = c("Phase~of~growth"), Phase = c("Pre-stationary"), facetsStrain  = c("Strain"), Strain  = c("PE-rich_048"))
+k_data127 = data.frame(facetsPhase = c("Phase~of~growth"), Phase = c("Pre-stationary"), facetsStrain  = c("Strain"), Strain  = c("PE-rich_127"))
+
 # WL.labs <- c("Excitation (nm)")
 # names(WL.labs) <- c("WW")
 # O2.labs <- c("Strain")
@@ -1276,7 +1284,7 @@ lab1=c(expression("8 h"), expression("12 h"), expression("16 h"), expression("24
 lab2=c(expression("30 µE"), expression("90 µE"), expression("180 µE"), expression("300 µE"), expression("600 µE"), expression("900 µE"))
 
   
-SolFitsAllPigmentPCPE445 %>% 
+SoliPigSupB<-SolFitsAllPigmentPCPE445 %>% 
   ggplot() +
   geom_point(aes(x = AllmeanPhycoChlaRatio, y = AllmeanSig_nm2psii, colour = as.factor(Par_ue), shape = as.factor(Photoperiod)), size = 3.5, alpha = 0.8, show.legend = T, SolFitsAllPigmentPCPE445) + 
   geom_point(aes(x = AllmeanPhycoChlaRatio, y = Sig_nm2psii, colour = as.factor(Par_ue), shape = as.factor(Photoperiod)), size = 1, show.legend = F, SolFitsAllPigmentPCPE445) + 
@@ -1306,11 +1314,18 @@ SolFitsAllPigmentPCPE445 %>%
   geom_text(data=data_text_AnovaPhase, aes(x=1.7, y=-0.4, label=label), colour = "blue", size=4) +
   geom_text(data=data_text_AnovaPhase2, aes(x=0.5, y=-0.4, label=label), colour = "blue", size=4, parse = TRUE) +
   
+  geom_text(data=data_textB, aes(x=0.5, y=10, label=label), size=6) +
+  
+  geom_segment(data = k_data056, aes(x =5, y = -Inf, xend = 5, yend = Inf), color = "seagreen4", size = 6, alpha = 0.7) +
+  geom_segment(data = k_data077, aes(x =5, y = -Inf, xend = 5, yend = Inf), color = "palegreen3", size = 6, alpha = 0.7) +
+  geom_segment(data = k_data048, aes(x =5, y = -Inf, xend = 5, yend = Inf), color = "brown1", size = 6, alpha = 0.7) +
+  geom_segment(data = k_data127, aes(x =5, y = -Inf, xend = 5, yend = Inf), color = "brown4", size = 6, alpha = 0.7) +
+  
   scale_shape_manual(values = c(15, 16, 17,18), name="", labels = lab1) +
   scale_colour_manual(values = c("darkslategray", "lightblue4", "hotpink4", "indianred3", "goldenrod2", "khaki2"), name="", labels = lab2) +
   scale_x_continuous(breaks=seq(0, 5, by = 1)) +
   scale_y_continuous(breaks=seq(0, 10, by = 2)) +
-  coord_cartesian(xlim = c(0, 5.5), ylim = c(-2, 12)) +
+  coord_cartesian(xlim = c(0, 5), ylim = c(-2, 12)) +
   labs(y=expression(paste(sigma,""["PSII"]*"' (nm"^"2"*" quanta"^"-1"*")")), x = "Phycobiliprotein to Chl" ~italic(a)~ "ratio (µg:µg)") +
   ggh4x::facet_nested(cols = vars(facetsPhase, Phase), rows = vars(facetsStrain, Strain), labeller = label_parsed) +
   theme_bw() +
@@ -1323,18 +1338,19 @@ SolFitsAllPigmentPCPE445 %>%
         axis.title.y = element_text(margin=margin(r=10)),
         axis.title.x = element_text(margin=margin(t=10)),
         legend.background = element_rect(fill="transparent"),
-        legend.position = c(0.9,0.88),
+        legend.position = c(0.85,0.88),
         legend.key.height= unit(0.005, 'cm'),
         legend.spacing.y = unit(-0.1, "cm"),
         legend.title = element_blank(),
         legend.text = element_text(size=11))
+SoliPigSupB
 ```
 
 
 # Save plot 
 
 ```{r save plot}
-ggsave(file = file.path(FigPath, paste("SFig_SigmaPig445",".png",sep = "")), height=9, width= 7,  dpi = 300, limitsize = TRUE)
+# ggsave(file = file.path(FigPath, paste("SFig_SigmaPig445",".png",sep = "")), height=9, width= 7,  dpi = 300, limitsize = TRUE)
 ```
 
 # Calculated Anova and Tukey test from data points
@@ -1624,6 +1640,14 @@ SolFitsAllPigmentPCPE590dark %>%
 # O2.labs <- c("Strain")
 # names(O2.labs) <- c(21)
 
+
+data_textA <- data.frame(facetsPhase = c("Phase~of~growth"), Phase = c("Exponential"), facetsStrain  = c("Strain"), Strain  = c("PC-rich_056"), label = c('A'))
+
+k_data056 = data.frame(facetsPhase = c("Phase~of~growth"), Phase = c("Pre-stationary"), facetsStrain  = c("Strain"), Strain  = c("PC-rich_056"))
+k_data077 = data.frame(facetsPhase = c("Phase~of~growth"), Phase = c("Pre-stationary"), facetsStrain  = c("Strain"), Strain  = c("PC-rich_077"))
+k_data048 = data.frame(facetsPhase = c("Phase~of~growth"), Phase = c("Pre-stationary"), facetsStrain  = c("Strain"), Strain  = c("PE-rich_048"))
+k_data127 = data.frame(facetsPhase = c("Phase~of~growth"), Phase = c("Pre-stationary"), facetsStrain  = c("Strain"), Strain  = c("PE-rich_127"))
+
 data_text_AnovaExp56<- data.frame(facetsPhase = c("Phase~of~growth"), Phase = c("Exponential"), facetsStrain = c("Strain"), Strain  = c("PC-rich_056"), label = c('a'))
 data_text_AnovaExp77<- data.frame(facetsPhase = c("Phase~of~growth"), Phase = c("Exponential"), facetsStrain = c("Strain"), Strain  = c("PC-rich_077"), label = c("b"))
 data_text_AnovaExp48<- data.frame(facetsPhase = c("Phase~of~growth"), Phase = c("Exponential"), facetsStrain = c("Strain"), Strain  = c("PE-rich_048"), label = c("c"))
@@ -1653,9 +1677,9 @@ lab1=c(expression("8 h"), expression("12 h"), expression("16 h"), expression("24
 lab2=c(expression("30 µE"), expression("90 µE"), expression("180 µE"), expression("300 µE"), expression("600 µE"), expression("900 µE"))
 
   
-SolFitsAllPigmentPCPE590dark %>% 
+SoliPigSupA<-SolFitsAllPigmentPCPE590dark %>% 
   ggplot() +
-  geom_point(aes(x = AllmeanPhycoChlaRatio, y = AllmeanSigdark_nm2psii, colour = as.factor(Par_ue), shape = as.factor(Photoperiod)), size = 3.5, alpha = 0.8, show.legend = T, SolFitsAllPigmentPCPE590dark) + 
+  geom_point(aes(x = AllmeanPhycoChlaRatio, y = AllmeanSigdark_nm2psii, colour = as.factor(Par_ue), shape = as.factor(Photoperiod)), size = 3.5, alpha = 0.8, show.legend = F, SolFitsAllPigmentPCPE590dark) + 
   geom_point(aes(x = AllmeanPhycoChlaRatio, y = Sigdark_nm2psii, colour = as.factor(Par_ue), shape = as.factor(Photoperiod)), size = 1, show.legend = F, SolFitsAllPigmentPCPE590dark) + 
   geom_errorbar(aes(x = AllmeanPhycoChlaRatio, ymin = AllmeanSigdark_nm2psii - AllsdSigdark_nm2psii, ymax = AllmeanSigdark_nm2psii + AllsdSigdark_nm2psii, colour = as.factor(Par_ue)), show.legend = F, width=0, size=0.3, SolFitsAllPigmentPCPE590dark) +
   geom_line(aes(x = AllmeanPhycoChlaRatio, y = `.fitted`), colour = "blue", linetype = "solid", size = 0.3, show.legend = F, augmented590pigmentdark) + 
@@ -1683,11 +1707,18 @@ SolFitsAllPigmentPCPE590dark %>%
   geom_text(data=data_text_AnovaPhase, aes(x=1.7, y=-0.4, label=label), colour = "blue", size=4) +
   geom_text(data=data_text_AnovaPhase2, aes(x=0.5, y=-0.4, label=label), colour = "blue", size=4, parse = TRUE) +
   
+  geom_segment(data = k_data056, aes(x =5, y = -Inf, xend = 5, yend = Inf), color = "seagreen4", size = 6, alpha = 0.7) +
+  geom_segment(data = k_data077, aes(x =5, y = -Inf, xend = 5, yend = Inf), color = "palegreen3", size = 6, alpha = 0.7) +
+  geom_segment(data = k_data048, aes(x =5, y = -Inf, xend = 5, yend = Inf), color = "brown1", size = 6, alpha = 0.7) +
+  geom_segment(data = k_data127, aes(x =5, y = -Inf, xend = 5, yend = Inf), color = "brown4", size = 6, alpha = 0.7) +
+  
+  geom_text(data=data_textA, aes(x=0.5, y=10, label=label), size=6) +
+  
   scale_shape_manual(values = c(15, 16, 17,18), name="", labels = lab1) +
   scale_colour_manual(values = c("darkslategray", "lightblue4", "hotpink4", "indianred3", "goldenrod2", "khaki2"), name="", labels = lab2) +
   scale_x_continuous(breaks=seq(0, 5, by = 1)) +
   scale_y_continuous(breaks=seq(0, 10, by = 2)) +
-  coord_cartesian(xlim = c(0, 5.5), ylim = c(-2, 12)) +
+  coord_cartesian(xlim = c(0, 5), ylim = c(-2, 12)) +
   labs(y=expression(paste(sigma,""["PSII"]*" (nm"^"2"*" quanta"^"-1"*")")), x = "Phycobiliprotein to Chl" ~italic(a)~ "ratio (µg:µg)") +
   ggh4x::facet_nested(cols = vars(facetsPhase, Phase), rows = vars(facetsStrain, Strain), labeller = label_parsed) +
   theme_bw() +
@@ -1697,22 +1728,42 @@ SolFitsAllPigmentPCPE590dark %>%
         axis.title = element_text(size=16),
         strip.background = element_rect(fill="white"),
         strip.text = element_text(size=12),
+        
+        strip.background.y = element_blank(),
+        strip.text.y = element_blank(),
+        
         axis.title.y = element_text(margin=margin(r=10)),
         axis.title.x = element_text(margin=margin(t=10)),
         legend.background = element_rect(fill="transparent"),
-        legend.position = c(0.9,0.88),
+        legend.position = c(0.85,0.88),
         legend.key.height= unit(0.005, 'cm'),
         legend.spacing.y = unit(-0.1, "cm"),
         legend.title = element_blank(),
         legend.text = element_text(size=11))
+SoliPigSupA
 ```
 
 
 # Save plot 
 
 ```{r save plot}
-ggsave(file = file.path(FigPath, paste("SFig_SigmaPig590dark",".png",sep = "")), height=9, width= 7,  dpi = 300, limitsize = TRUE)
+# ggsave(file = file.path(FigPath, paste("SFig_SigmaPig590dark",".png",sep = "")), height=9, width= 7,  dpi = 300, limitsize = TRUE)
 ```
+
+# Merge plots for suplement - sig vs pig ratio supl
+
+```{r, warning = FALSE, fig.height = 9, fig.width = 12}
+ggp<- SoliPigSupA+SoliPigSupB
+ggp
+```
+
+
+```{r save plot}
+ggsave(file = file.path(FigPath, paste("SFig_SigmaPigMerge",".png",sep = "")), height=9, width= 12,  dpi = 300, limitsize = TRUE)
+```
+
+
+
 
 # Anova from the linear model 
 https://stackoverflow.com/questions/24527116/write-regression-summary-to-the-csv-file-in-r
@@ -2009,397 +2060,6 @@ saveRDS(SolFitsPigmentExp, file.path(DataOut, paste(Project, "Processed_Solisens
 colnames(SolFitsPigmentExp)
 ```
 
-------------------------------- join the plots --------------------------------
-
-
-```{r fig.height = 8, fig.width = 8, warning = FALSE}
-# WL.labs <- c("Excitation (nm)")
-# names(WL.labs) <- c("WW")
-# O2.labs <- c("Strain")
-# names(O2.labs) <- c(21)
-# data_text_AnovaExp<- data.frame(facetsPhase = c("Phase~of~growth"), Phase = c("Exponential"), facetsStrain = c("Strain"), Strain  = c("PC-rich_056", "PC-rich_077", "PE-rich_048", "PE-rich_127"),  label = c(' ANOVA, \u03B1 = 0.05, ab', 'ANOVA, \u03B1 = 0.05, a', 'ANOVA, \u03B1 = 0.05, b', 'ANOVA, \u03B1 = 0.05, c'))
-# data_text_AnovaSt<- data.frame(facetsPhase = c("Phase~of~growth"), Phase = c("Pre-stationary"), facetsStrain = c("Strain"), Strain  = c("PC-rich_056", "PC-rich_077", "PE-rich_048", "PE-rich_127"),  label = c('ANOVA, \u03B1 = 0.05, a', 'ANOVA, \u03B1 = 0.05, a', 'ANOVA, \u03B1 = 0.05, b', ' ANOVA, \u03B1 = 0.05, ab'))
-
-data_text_AnovaExp56<- data.frame(facetsPhase = c("Phase~of~growth"), Phase = c("Exponential"), facetsStrain = c("Strain"), Strain  = c("PC-rich_056"), label = c('ab'))
-data_text_AnovaExp77<- data.frame(facetsPhase = c("Phase~of~growth"), Phase = c("Exponential"), facetsStrain = c("Strain"), Strain  = c("PC-rich_077"), label = c("a"))
-data_text_AnovaExp48<- data.frame(facetsPhase = c("Phase~of~growth"), Phase = c("Exponential"), facetsStrain = c("Strain"), Strain  = c("PE-rich_048"), label = c("b"))
-data_text_AnovaExp127<- data.frame(facetsPhase = c("Phase~of~growth"), Phase = c("Exponential"), facetsStrain = c("Strain"), Strain  = c("PE-rich_127"), label = c("c"))
-
-data_text_AnovaSt56<- data.frame(facetsPhase = c("Phase~of~growth"), Phase = c("Pre-stationary"), facetsStrain = c("Strain"), Strain  = c("PC-rich_056"), label = c('a'))
-data_text_AnovaSt77<- data.frame(facetsPhase = c("Phase~of~growth"), Phase = c("Pre-stationary"), facetsStrain = c("Strain"), Strain  = c("PC-rich_077"), label = c("a"))
-data_text_AnovaSt48<- data.frame(facetsPhase = c("Phase~of~growth"), Phase = c("Pre-stationary"), facetsStrain = c("Strain"), Strain  = c("PE-rich_048"), label = c("b"))
-data_text_AnovaSt127<- data.frame(facetsPhase = c("Phase~of~growth"), Phase = c("Pre-stationary"), facetsStrain = c("Strain"), Strain  = c("PE-rich_127"), label = c("ab"))
-
-
-data_text_AnovaExp56P<- data.frame(facetsPhase = c("Phase~of~growth"), Phase = c("Exponential"), facetsStrain = c("Strain"), Strain  = c("PC-rich_056"), label = c('A'))
-data_text_AnovaExp77P<- data.frame(facetsPhase = c("Phase~of~growth"), Phase = c("Exponential"), facetsStrain = c("Strain"), Strain  = c("PC-rich_077"), label = c("A"))
-data_text_AnovaExp48P<- data.frame(facetsPhase = c("Phase~of~growth"), Phase = c("Exponential"), facetsStrain = c("Strain"), Strain  = c("PE-rich_048"), label = c("A"))
-data_text_AnovaExp127P<- data.frame(facetsPhase = c("Phase~of~growth"), Phase = c("Exponential"), facetsStrain = c("Strain"), Strain  = c("PE-rich_127"), label = c("A"))
-
-data_text_AnovaSt56P<- data.frame(facetsPhase = c("Phase~of~growth"), Phase = c("Pre-stationary"), facetsStrain = c("Strain"), Strain  = c("PC-rich_056"), label = c('B'))
-data_text_AnovaSt77P<- data.frame(facetsPhase = c("Phase~of~growth"), Phase = c("Pre-stationary"), facetsStrain = c("Strain"), Strain  = c("PC-rich_077"), label = c("B"))
-data_text_AnovaSt48P<- data.frame(facetsPhase = c("Phase~of~growth"), Phase = c("Pre-stationary"), facetsStrain = c("Strain"), Strain  = c("PE-rich_048"), label = c("A"))
-data_text_AnovaSt127P<- data.frame(facetsPhase = c("Phase~of~growth"), Phase = c("Pre-stationary"), facetsStrain = c("Strain"), Strain  = c("PE-rich_127"), label = c("A"))
-
-data_text_AnovaPhase<- data.frame(facetsPhase = c("Phase~of~growth"), Phase = c("Exponential"), facetsStrain = c("Strain"), Strain  = c("PC-rich_056", "PC-rich_077", "PE-rich_048", "PE-rich_127"),  label = c(' , \u03B1 = 0.05', ' , \u03B1 = 0.05', ' , \u03B1 = 0.05', ' , \u03B1 = 0.05'))
-data_text_AnovaPhase2<- data.frame(facetsPhase = c("Phase~of~growth"), Phase = c("Exponential"), facetsStrain = c("Strain"), Strain  = c("PC-rich_056", "PC-rich_077", "PE-rich_048", "PE-rich_127"),  label = c('italic(t)~-test', 'italic(t)~-test', 'italic(t)~-test', 'italic(t)~-test'))
-
-scientific_10 <- function(x) {   parse(text=gsub("e\\+*", " %*% 10^", scales::scientific_format()(x))) }
-lab1=c(expression("8 h"), expression("12 h"), expression("16 h"), expression("24 h"))
-lab2=c(expression("30 µE"), expression("90 µE"), expression("180 µE"), expression("300 µE"), expression("600 µE"), expression("900 µE"))
-
-  
-Soli590B<-SolFitsAllPigmentPCPE590 %>% 
-  ggplot() +
-  geom_point(aes(x = AllmeanPhycoChlaRatio, y = AllmeanSig_nm2psii, colour = as.factor(Par_ue), shape = as.factor(Photoperiod)), size = 3.5, alpha = 0.8, show.legend = T, SolFitsAllPigmentPCPE590) + 
-  geom_point(aes(x = AllmeanPhycoChlaRatio, y = Sig_nm2psii, colour = as.factor(Par_ue), shape = as.factor(Photoperiod)), size = 1, show.legend = F, SolFitsAllPigmentPCPE590) + 
-  # geom_point(aes(x = PhycoChlaRatio, y = AllmeanSig_nm2psii, colour = as.factor(Par_ue), shape = as.factor(Photoperiod)), size = 1, show.legend = F, SolFitsAllPigmentPCPE590) + 
-  geom_errorbar(aes(x = AllmeanPhycoChlaRatio, ymin = AllmeanSig_nm2psii - AllsdSig_nm2psii, ymax = AllmeanSig_nm2psii + AllsdSig_nm2psii, colour = as.factor(Par_ue)), show.legend = F, width=0, size=0.3, SolFitsAllPigmentPCPE590) +
-  # geom_errorbar(aes(y = AllmeanSig_nm2psii, xmin = AllmeanPhycoChlaRatio - AllsdPhycoChlaRatio, xmax = AllmeanPhycoChlaRatio + AllsdPhycoChlaRatio, colour = as.factor(Par_ue)), show.legend = F, width=0, size=0.3, SolFitsAllPigmentPCPE590) +
-  geom_line(aes(x = AllmeanPhycoChlaRatio, y = `.fitted`), colour = "blue", linetype = "solid", size = 0.3, show.legend = F, augmented590pigment) +   
-  
-  geom_text(data=data_text_AnovaExp56, aes(x=3, y=8, label=label), colour = "blue", size=4) +
-  geom_text(data=data_text_AnovaExp77, aes(x=3.8, y=7.5, label=label), colour = "blue", size=4) +
-  geom_text(data=data_text_AnovaExp48, aes(x=4.8, y=9.3, label=label), colour = "blue", size=4) +
-  geom_text(data=data_text_AnovaExp127, aes(x=4.5, y=9, label=label), colour = "blue", size=4) +
-    
-  geom_text(data=data_text_AnovaSt56, aes(x=2.3, y=6.0, label=label), colour = "blue", size=4) +
-  geom_text(data=data_text_AnovaSt77, aes(x=3.5, y=6.9, label=label), colour = "blue", size=4) +
-  geom_text(data=data_text_AnovaSt48, aes(x=3.1, y=7.5, label=label), colour = "blue", size=4) +
-  geom_text(data=data_text_AnovaSt127, aes(x=3.7, y=7, label=label), colour = "blue", size=4) +
-    
-  geom_text(data=data_text_AnovaExp56P, aes(x=3, y=4, label=label), colour = "blue", size=4) +
-  geom_text(data=data_text_AnovaExp77P, aes(x=3.8, y=2.5, label=label), colour = "blue", size=4) +
-  geom_text(data=data_text_AnovaExp48P, aes(x=4.8, y=5.3, label=label), colour = "blue", size=4) +
-  geom_text(data=data_text_AnovaExp127P, aes(x=4.5, y=4, label=label), colour = "blue", size=4) +
-    
-  geom_text(data=data_text_AnovaSt56P, aes(x=2.3, y=1.0, label=label), colour = "blue", size=4) +
-  geom_text(data=data_text_AnovaSt77P, aes(x=3.5, y=2.9, label=label), colour = "blue", size=4) +
-  geom_text(data=data_text_AnovaSt48P, aes(x=3.1, y=2.5, label=label), colour = "blue", size=4) +
-  geom_text(data=data_text_AnovaSt127P, aes(x=3.7, y=3, label=label), colour = "blue", size=4) +
-  
-  geom_text(data=data_text_AnovaPhase, aes(x=1.7, y=-0.2, label=label), colour = "blue", size=4) +
-  geom_text(data=data_text_AnovaPhase2, aes(x=0.5, y=-0.2, label=label), colour = "blue", size=4, parse = TRUE) +
-  
-  scale_shape_manual(values = c(15, 16, 17,18), name="", labels = lab1) +
-  scale_colour_manual(values = c("darkslategray", "lightblue4", "hotpink4", "indianred3", "goldenrod2", "khaki2"), name="", labels = lab2) +
-  scale_x_continuous(breaks=seq(0, 5, by = 1)) +
-  scale_y_continuous(breaks=seq(0, 10, by = 2)) +
-  coord_cartesian(xlim = c(0, 5.5), ylim = c(-2, 12)) +
-  
-  labs(y=expression(paste(sigma,""["PSII"]*"' (nm"^"2"*" quanta"^"-1"*")")), x = "Phycobiliprotein to Chl" ~italic(a)~ "ratio (µg:µg)") +
-  ggh4x::facet_nested(cols = vars(facetsPhase, Phase), rows = vars(facetsStrain, Strain), labeller = label_parsed) +
-  theme_bw() +
-  theme(panel.grid.minor = element_blank(),
-        panel.grid.major = element_blank(),
-        axis.text = element_text(size=12),
-        axis.title = element_text(size=16),
-        strip.background = element_rect(fill="white"),
-        strip.text = element_text(size=12),
-        axis.title.y = element_text(margin=margin(r=10)),
-        axis.title.x = element_text(margin=margin(t=10)),
-        legend.background = element_rect(fill="transparent"),
-        legend.position = c(0.9,0.88),
-        legend.key.height= unit(0.005, 'cm'),
-        legend.spacing.y = unit(-0.1, "cm"),
-        legend.title = element_blank(),
-        legend.text = element_text(size=11))
-
-Soli590B
-```
-
-
-# Filter otliers to calculate exponential decay function
-
-```{r filter outliers (5 data points from Exp)}
-
-Sol7<-SolFitsAllPigmentPCPE590 %>% 
-  filter(Ex_WL==445) 
-
-Sol3<-SolFitsAllPigmentPCPE590 %>% #keeping all data except <180 (one data point)
-  filter(Phase == "Exponential") %>% 
-  filter(Ex_WL==590) %>% 
-  filter(Par_ue !=900) %>% 
-  filter(Strain=="PC-rich_056") %>% 
-  filter(Sig>180)
-Sol6<-SolFitsAllPigmentPCPE590 %>% # keeping all except 2 data points
-  filter(Phase == "Exponential") %>% 
-  filter(Ex_WL==590) %>% 
-  filter(Par_ue ==900) %>% 
-  filter(Strain=="PC-rich_056") 
-
-Sol8<-SolFitsAllPigmentPCPE590 %>% 
-  filter(Phase == "Pre-stationary") %>% 
-  filter(Strain=="PC-rich_056") %>% 
-  filter(Par_ue ==900 | Par_ue ==600) %>% 
-  filter(Sig<230)
-
-Sol9<-SolFitsAllPigmentPCPE590 %>% 
-  filter(Phase == "Pre-stationary") %>% 
-  filter(Strain=="PC-rich_056") %>% 
-  filter(Par_ue !=900 & Par_ue !=600) %>% 
-  filter(Sig>130)
-
-#BA127
-Sol4<-SolFitsAllPigmentPCPE590 %>% #removing one data point
-  filter(Phase == "Exponential") %>%
-  filter(Ex_WL==590) %>%
-  filter(Par_ue ==30) %>%
-  filter(Strain=="PE-rich_127") %>%
-  filter(Sig>310)
-Sol5<-SolFitsAllPigmentPCPE590 %>%
-  filter(Phase == "Exponential") %>% #removing 3 data points
-  filter(Ex_WL==590) %>%
-  filter(Par_ue ==300 | Par_ue ==180 | Par_ue ==90) %>%
-  filter(Strain=="PE-rich_127") %>%
-  filter(Sig>200)
-Sol16<-SolFitsAllPigmentPCPE590 %>% # keeping all except 2 data points
-  filter(Phase == "Exponential") %>% 
-  filter(Ex_WL==590) %>% 
-  filter(Par_ue ==900 | Par_ue ==600) %>% 
-  filter(Strain=="PE-rich_127")  %>% 
-  filter(Sig<520)
-Sol12<-SolFitsAllPigmentPCPE590 %>% 
-  filter(Phase == "Pre-stationary") %>% 
-  filter(Strain=="PE-rich_127")
-
-#BA48
-Sol1<-SolFitsAllPigmentPCPE590 %>% #keeping all data
-  filter(Phase == "Exponential") %>% 
-  filter(Ex_WL==590) %>% 
-  filter(Par_ue !=900) %>% 
-  filter(Strain=="PE-rich_048") 
-Sol15<-SolFitsAllPigmentPCPE590 %>% # removing 2 data points
-  filter(Phase == "Exponential") %>% 
-  filter(Ex_WL==590) %>% 
-  filter(Par_ue ==900 | Par_ue ==600) %>% 
-  filter(Strain=="PE-rich_048") %>% 
-  filter(Sig<520) 
-Sol10<-SolFitsAllPigmentPCPE590 %>% # removing few data points
-  filter(Phase == "Pre-stationary") %>% 
-  filter(Par_ue !=900) %>% 
-  filter(Strain=="PE-rich_048") %>% 
-  filter(Sig>290)
-Sol11<-SolFitsAllPigmentPCPE590 %>% #keeping all data
-  filter(Phase == "Pre-stationary") %>%
-  filter(Par_ue ==900) %>%
-  filter(Strain=="PE-rich_048")
-
-
-#BA77
-Sol2<-SolFitsAllPigmentPCPE590 %>% #keeping all data
-  filter(Phase == "Exponential") %>% 
-  filter(Ex_WL==590) %>% 
-  filter(Par_ue !=900) %>% 
-  filter(Strain=="PC-rich_077") 
-Sol13<-SolFitsAllPigmentPCPE590 %>% #keeping all data
-  filter(Phase == "Pre-stationary") %>% 
-  filter(Strain=="PC-rich_077") %>% 
-  filter(Par_ue != 600)  
-  #filter(Sig<490)
-Sol14<-SolFitsAllPigmentPCPE590 %>% #filter 1 data point
-  filter(Phase == "Pre-stationary") %>% 
-  filter(Strain=="PC-rich_077") %>% 
-  filter(Par_ue==600) %>% 
-  filter(Sig<250)
-Sol17<-SolFitsAllPigmentPCPE590 %>% # removing 2 data points
-  filter(Phase == "Exponential") %>% 
-  filter(Ex_WL==590) %>% 
-  filter(Par_ue ==900 | Par_ue ==600) %>% 
-  filter(Strain=="PC-rich_077") %>% 
-  filter(Sig<520) 
-
-SolFitsExpFitAll<-rbind(Sol1, Sol2, Sol3, Sol4, Sol5, Sol6, Sol7, Sol8, Sol9, Sol10, Sol11, Sol12, Sol13, Sol14, Sol15, Sol16, Sol17)
-
-rm(Sol1, Sol2, Sol3, Sol4, Sol5, Sol6, Sol7, Sol8, Sol9, Sol10, Sol11, Sol12, Sol13, Sol14, Sol15, Sol16, Sol17)
-
-
-SolFitsExpFitAll_1<-SolFitsExpFitAll %>%
-  filter(Phase == "Exponential") 
-SolFitsExpFitAll_2<-SolFitsExpFitAll %>%
-  filter(Phase == "Pre-stationary") %>%
-  filter(Strain=="PC-rich_056" | Strain=="PC-rich_077") %>%
-  filter(Par_ue!=90)
-SolFitsExpFitAll_3<-SolFitsExpFitAll %>%
-  filter(Phase == "Pre-stationary") %>%
-  filter(Strain=="PE-rich_048" | Strain=="PE-rich_127") 
-
-SolFitsExpFitAll<-rbind(SolFitsExpFitAll_1, SolFitsExpFitAll_2, SolFitsExpFitAll_3)
-
-```
-
-# Create plot to check data before and after filtering outliers
-
-```{r checking data before and after filtering outliers}
-lab1=c(expression("8 h"), expression("12 h"), expression("16 h"), expression("24 h"))
-lab2=c(expression("30 µE"), expression("90 µE"), expression("180 µE"), expression("300 µE"), expression("600 µE"), expression("900 µE"))
-
-
-SolFitsExpFitAll %>% 
-  filter(Ex_WL == 590) %>% 
-  ggplot() +
-  geom_point(aes(x = PARPhotonDose_day, y = Sig_nm2psii, colour = as.factor(Par_ue), shape = as.factor(Photoperiod)), size = 3.5, show.legend = T) +
-  scale_shape_manual(values = c(15, 16, 17,18), name="", labels = lab1) +
-  scale_colour_manual(values = c("darkslategray", "lightblue4", "hotpink4", "indianred3",  "goldenrod2", "khaki2"), name="", labels = lab2) +
-  ggh4x::facet_nested(cols = vars(Phase), rows = vars(Strain), labeller = label_parsed) +
-  theme_bw() 
-```
-
-
-# Fit the data to exponential decays
-
-```{r fit the data to exponential decays, echo=FALSE, warning = FALSE}
-SolFitsExpFit590Clean <-SolFitsExpFitAll %>% 
-  drop_na(Sig_nm2psii) %>%
-  filter(Ex_WL == 590) %>% 
-  select(c(Sig_nm2psii, PARPhotonDose_day, Strain, Phase, O2, WL)) 
-
-# Fit the data
-fitted590 <- SolFitsExpFit590Clean %>% 
-  nest(-c(Strain, Phase, O2, WL)) %>%
-  mutate(
-    fit = map(data, possibly(~nls(Sig_nm2psii ~ SSasymp(PARPhotonDose_day, yf, y0, log_alpha), data = .))),
-    tidied = map(fit, tidy),
-    augmented590 = map(fit, augment))
-
-# Produce a table of fit parameters: y0, yf, alpha
-fitted_Param590<-fitted590 %>% 
-  unnest(tidied) %>% 
-  select(Strain, Phase, term, estimate) %>% 
-pivot_wider(., names_from = c(term), values_from = c(estimate)) %>% 
-  mutate(alpha = exp(log_alpha))
-```
-
-```{r unnest, preparing df to preparing final plot, echo=FALSE, warning = FALSE}
-augmented590<-fitted590  %>%
-  unnest(augmented590) %>%
-  select(c(Strain, Phase, O2, WL, PARPhotonDose_day,Sig_nm2psii, .fitted)) 
-```
-
-# Create Sigma plot at 590
-
-```{r create Sigma plot, fig.height = 8, fig.width = 8, warning = FALSE}
-data_text_y0Exp<- data.frame(WL = c("WW", "WW"), Phase = c("Exponential"), O2=c(21, 21, 21, 21), Strain  = c("PC-rich_056", "PC-rich_077", "PE-rich_048", "PE-rich_127"),  label = c('y0 = 7.4', 'y0 = 5.9', 'y0 = 8.5', 'y0 = 7.9'))
-data_text_yfExp<- data.frame(WL = c("WW", "WW"), Phase = c("Exponential"), O2=c(21, 21, 21, 21), Strain  = c("PC-rich_056", "PC-rich_077", "PE-rich_048", "PE-rich_127"),  label = c('yf = 3.3', 'yf = 1.9', 'yf = 4.4', 'yf = 3.7'))
-data_text_lambdaExp<- data.frame(WL = c("WW", "WW"), Phase = c("Exponential"), O2=c(21, 21, 21, 21), Strain  = c("PC-rich_056", "PC-rich_077", "PE-rich_048", "PE-rich_127"),  label = c('    \u03BB = 3.6e-07', '    \u03BB = 3.1e-07', '    \u03BB = 2.4e-07', '    \u03BB = 3.3e-07'))
-
-data_text_y0St<- data.frame(WL = c("WW", "WW"), Phase = c("Pre-stationary"), O2=c(21, 21, 21, 21), Strain  = c("PC-rich_056", "PC-rich_077", "PE-rich_048", "PE-rich_127"),  label = c(' y0 = 20.8', 'y0 = 9.8', 'y0 = 8.8', 'y0 = 9.5'))
-data_text_yfSt<- data.frame(WL = c("WW", "WW"), Phase = c("Pre-stationary"), O2=c(21, 21, 21, 21), Strain  = c("PC-rich_056", "PC-rich_077", "PE-rich_048", "PE-rich_127"),  label = c('yf = 1.7', 'yf = 1.4', 'yf = 3.0', 'yf = 2.3'))
-data_text_lambdaSt<- data.frame(WL = c("WW", "WW"), Phase = c("Pre-stationary"), O2=c(21, 21, 21, 21), Strain  = c("PC-rich_056", "PC-rich_077", "PE-rich_048", "PE-rich_127"),  label = c('    \u03BB = 1.3e-06', '    \u03BB = 5.3e-07', '    \u03BB = 5.5e-07', '    \u03BB = 6.6e-07'))
-
-# data_text_AnovaExp<- data.frame(WL = c("WW", "WW"), Phase = c("Exponential"), O2=c(21, 21, 21, 21), Strain  = c("PC-rich_056", "PC-rich_077", "PE-rich_048", "PE-rich_127"),  label = c('ANOVA, \u03B1 = 0.05, a', 'ANOVA, \u03B1 = 0.05, a', 'ANOVA, \u03B1 = 0.05, b', ' ANOVA, \u03B1 = 0.05, ab'))
-# data_text_AnovaSt<- data.frame(WL = c("WW", "WW"), Phase = c("Pre-stationary"), O2=c(21, 21, 21, 21), Strain  = c("PC-rich_056", "PC-rich_077", "PE-rich_048", "PE-rich_127"),  label = c('ANOVA, \u03B1 = 0.05, a', 'ANOVA, \u03B1 = 0.05, b', ' ANOVA, \u03B1 = 0.05, bc', 'ANOVA, \u03B1 = 0.05, d'))
-
-data_text_AnovaExp56<- data.frame(WL = c("WW"), Phase = c("Exponential"), O2=c(21), Strain  = c("PC-rich_056"),  label = c('a'))
-data_text_AnovaExp77<- data.frame(WL = c("WW"), Phase = c("Exponential"), O2=c(21), Strain  = c("PC-rich_077"),  label = c("a"))
-data_text_AnovaExp48<- data.frame(WL = c("WW"), Phase = c("Exponential"), O2=c(21), Strain  = c("PE-rich_048"),  label = c("b"))
-data_text_AnovaExp127<- data.frame(WL = c("WW"), Phase = c("Exponential"), O2=c(21), Strain  = c("PE-rich_127"),  label = c("ab"))
-
-data_text_AnovaSt56<- data.frame(WL = c("WW"), Phase = c("Pre-stationary"), O2=c(21), Strain  = c("PC-rich_056"),  label = c('a'))
-data_text_AnovaSt77<- data.frame(WL = c("WW"), Phase = c("Pre-stationary"), O2=c(21), Strain  = c("PC-rich_077"),  label = c("b"))
-data_text_AnovaSt48<- data.frame(WL = c("WW"), Phase = c("Pre-stationary"), O2=c(21), Strain  = c("PE-rich_048"),  label = c("bc"))
-data_text_AnovaSt127<- data.frame(WL = c("WW"), Phase = c("Pre-stationary"), O2=c(21), Strain  = c("PE-rich_127"),  label = c("d"))
-
-data_text_AnovaExp56P<- data.frame(WL = c("WW"), Phase = c("Exponential"), O2=c(21), Strain  = c("PC-rich_056"),  label = c('A'))
-data_text_AnovaExp77P<- data.frame(WL = c("WW"), Phase = c("Exponential"), O2=c(21), Strain  = c("PC-rich_077"),  label = c("A"))
-data_text_AnovaExp48P<- data.frame(WL = c("WW"), Phase = c("Exponential"), O2=c(21), Strain  = c("PE-rich_048"),  label = c("A"))
-data_text_AnovaExp127P<- data.frame(WL = c("WW"), Phase = c("Exponential"), O2=c(21), Strain  = c("PE-rich_127"),  label = c("A"))
-
-data_text_AnovaSt56P<- data.frame(WL = c("WW"), Phase = c("Pre-stationary"), O2=c(21), Strain  = c("PC-rich_056"),  label = c('B'))
-data_text_AnovaSt77P<- data.frame(WL = c("WW"), Phase = c("Pre-stationary"), O2=c(21), Strain  = c("PC-rich_077"),  label = c("B"))
-data_text_AnovaSt48P<- data.frame(WL = c("WW"), Phase = c("Pre-stationary"), O2=c(21), Strain  = c("PE-rich_048"),  label = c("A"))
-data_text_AnovaSt127P<- data.frame(WL = c("WW"), Phase = c("Pre-stationary"), O2=c(21), Strain  = c("PE-rich_127"),  label = c("B"))
-
-
-data_text_AnovaPhase<- data.frame(WL = c("WW", "WW"), Phase = c("Exponential"), O2=c(21, 21, 21, 21), Strain  = c("PC-rich_056", "PC-rich_077", "PE-rich_048", "PE-rich_127"),  label = c('ANOVA, \u03B1 = 0.05', 'ANOVA, \u03B1 = 0.05', 'ANOVA, \u03B1 = 0.05', 'ANOVA, \u03B1 = 0.05'))
-
-
-
-# WL.labs <- c("Phase of growth")
-# names(WL.labs) <- c("WW")
-# O2.labs <- c("Strain")
-# names(O2.labs) <- c(21)
-
-scientific_10 <- function(x) {   parse(text=gsub("e\\+*", " %*% 10^", scales::scientific_format()(x))) }
-lab1=c(expression("8 h"), expression("12 h"), expression("16 h"), expression("24 h"))
-lab2=c(expression("30 µE"), expression("90 µE"), expression("180 µE"), expression("300 µE"), expression("600 µE"), expression("900 µE"))
-
-SolFitsExpFitAll590<-SolFitsExpFitAll %>% 
-  filter(Ex_WL==590) 
-
-ASigPAR<-ggplot(SolFitsExpFitAll590, aes(x = PARPhotonDose_day, y = Sig_nm2psii)) +
-  geom_point(aes(x = PARPhotonDose_day, y = AllmeanSig_nm2psii, colour = as.factor(Par_ue), shape = as.factor(Photoperiod)), size = 3.5, alpha = 0.8, show.legend = F) +
-  geom_point(aes(x = PARPhotonDose_day, y = Sig_nm2psii, colour = as.factor(Par_ue), shape = as.factor(Photoperiod)), size = 1, show.legend = F) +
-  geom_errorbar(aes(x = PARPhotonDose_day, ymin = AllmeanSig_nm2psii - AllsdSig_nm2psii, ymax = AllmeanSig_nm2psii + AllsdSig_nm2psii, colour=as.factor(Par_ue)), width=0, size=0.3, show.legend = F) +
-  geom_line(aes(PARPhotonDose_day, .fitted), colour = "blue", linetype = "solid", size = 0.3, show.legend = F, augmented590) +
-  # geom_text(data=data_text_y0Exp, aes(x=70000000, y=9, label=label), size=3.5) +
-  # geom_text(data=data_text_yfExp, aes(x=70000000, y=8.5, label=label), size=3.5) +
-  # geom_text(data=data_text_lambdaExp, aes(x=70000000, y=7, label=label), size=3.5) +
-  # 
-  # geom_text(data=data_text_y0St, aes(x=7500000, y=9, label=label), size=3.5) +
-  # geom_text(data=data_text_yfSt, aes(x=7500000, y=8.5, label=label), size=3.5) +
-  # geom_text(data=data_text_lambdaSt, aes(x=7500000, y=7, label=label), size=3.5) +
-
-  
-  # geom_text(data=data_text_AnovaExp56, aes(x=75000000, y=4.6, label=label), colour = "blue", size=4) +
-  # geom_text(data=data_text_AnovaExp77, aes(x=75000000, y=3.5, label=label), colour = "blue", size=4) +
-  # geom_text(data=data_text_AnovaExp48, aes(x=75000000, y=5.5, label=label), colour = "blue", size=4) +
-  # geom_text(data=data_text_AnovaExp127, aes(x=75000000, y=5, label=label), colour = "blue", size=4) +
-  #   
-  # geom_text(data=data_text_AnovaSt56, aes(x=75000000, y=3.2, label=label), colour = "blue", size=4) +
-  # geom_text(data=data_text_AnovaSt77, aes(x=75000000, y=3.0, label=label), colour = "blue", size=4) +
-  # geom_text(data=data_text_AnovaSt48, aes(x=75000000, y=4.5, label=label), colour = "blue", size=4) +
-  # geom_text(data=data_text_AnovaSt127, aes(x=75000000, y=4, label=label), colour = "blue", size=4) +
-  #   
-  # geom_text(data=data_text_AnovaExp56P, aes(x=75000000, y=1.6, label=label), colour = "blue", size=4) +
-  # geom_text(data=data_text_AnovaExp77P, aes(x=75000000, y=0.5, label=label), colour = "blue", size=4) +
-  # geom_text(data=data_text_AnovaExp48P, aes(x=75000000, y=2.5, label=label), colour = "blue", size=4) +
-  # geom_text(data=data_text_AnovaExp127P, aes(x=75000000, y=2, label=label), colour = "blue", size=4) +
-  #   
-  # geom_text(data=data_text_AnovaSt56P, aes(x=75000000, y=0.2, label=label), colour = "blue", size=4) +
-  # geom_text(data=data_text_AnovaSt77P, aes(x=75000000, y=0.0, label=label), colour = "blue", size=4) +
-  # geom_text(data=data_text_AnovaSt48P, aes(x=75000000, y=1.5, label=label), colour = "blue", size=4) +
-  # geom_text(data=data_text_AnovaSt127P, aes(x=75000000, y=1, label=label), colour = "blue", size=4) +
-  # 
-  # geom_text(data=data_text_AnovaPhase, aes(x=24000000, y=-0.8, label=label), colour = "blue", size=4) +
-  
-  scale_shape_manual(values = c(15, 16, 17,18), name="", labels = lab1) +
-  scale_colour_manual(values = c("darkslategray", "lightblue4", "hotpink4", "indianred3",  "goldenrod2", "khaki2"), name="", labels = lab2) +
-  labs(y=expression(paste(sigma,""["PSII"]*"' (nm"^"2"*" quanta"^"-1"*")")), x = "Cumulative diel PAR ( µmol photons "~m^-2~""~d^-1~")") +
-  scale_x_continuous(breaks=seq(0, 60000000, by = 30000000), label=scientific_10) +
-  scale_y_continuous(breaks=seq(0, 10, by = 2)) +
-  coord_cartesian(xlim = c(0, 82000000), ylim = c(-2, 12)) +  
-  ggh4x::facet_nested(cols = vars(facetsPhase, Phase), rows = vars(facetsStrain, Strain), labeller = label_parsed) +
-  
-  #ggh4x::facet_nested(rows = vars(O2, Strain), cols = vars(WL, Phase), labeller = labeller(WL = WL.labs, O2 = O2.labs)) +
-  theme_bw() +
-  theme(panel.grid.minor = element_blank(),
-        panel.grid.major = element_blank(),
-        axis.text = element_text(size=12),
-        axis.title = element_text(size=16),
-        strip.background = element_rect(fill="white"),
-        strip.text = element_text(size=12),
-        axis.title.y = element_text(margin=margin(r=10)),
-        axis.title.x = element_text(margin=margin(t=10)),
-        legend.background = element_rect(fill="transparent"),
-        legend.position = c(0.9,0.88),
-        legend.key.height= unit(0.005, 'cm'),
-        legend.spacing.y = unit(-0.1, "cm"),
-        legend.title = element_blank(),
-        legend.text = element_text(size=11))
-ASigPAR
-```
-
-```{r, warning = FALSE, fig.height = 9, fig.width = 12}
-ggp<- ASigPAR+Soli590B
-ggp                           
-```
-
-# Save plot 
-
-```{r save plot}
-ggsave(file = file.path(FigPath, paste("newidea",".png",sep = "")), height=9, width= 12,  dpi = 300, limitsize = TRUE)
-```
 
 The anova() function will take the model objects as arguments, and return an ANOVA testing whether the more complex model is significantly better at capturing the data than the simpler model. If the resulting p-value is sufficiently low (usually less than 0.05), we conclude that the more complex model is significantly better than the simpler model, and thus favor the more complex model. If the p-value is not sufficiently low (usually greater than 0.05), we should favor the simpler model.
 

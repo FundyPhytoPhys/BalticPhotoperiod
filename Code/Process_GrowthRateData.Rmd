@@ -119,6 +119,29 @@ MCGrowthRate<-rbind(MultiCultiGrowth1, MultiCultiGrowth2, MultiCultiGrowth3)
   rm(MultiCultiGrowth, MultiCultiGrowth1, MultiCultiGrowth2, MultiCultiGrowth3)
 ```
 
+```{r}
+MCGrowthRate127<-MCGrowthRate %>% 
+  filter(Strain == "PC-rich_056") %>% 
+  select(c(Strain, Par_ue, Photoperiod, deltaOD_Lmu_corr)) %>% 
+  mutate(deltaOD_Lmu_corr=deltaOD_Lmu_corr*24)
+```
+
+
+```{r}
+MCGrowthRate %>%
+  ggplot() +
+  geom_point(aes(y = Par_ue, x = deltaOD_Lmu_corr*24,colour=as.factor(Strain)), size = 3.5, alpha = 0.9, show.legend = T) +
+  scale_colour_discrete(type=c("seagreen4", "palegreen3", "brown1", "brown4")) +
+  
+  #ggh4x::facet_nested(rows = vars(Strain), cols = vars(Photoperiod)) +
+  
+    ggh4x::facet_nested(cols = vars(Photoperiod)) +
+  
+  # ggh4x::facet_nested(cols = vars(Photoperiod), rows = vars(factor(Par_ue, levels=c("900","600","300","180","90","30"))), labeller = label_parsed) +
+  
+  theme_bw()
+```
+
 
 
 # Create preliminary plot
@@ -126,11 +149,12 @@ MCGrowthRate<-rbind(MultiCultiGrowth1, MultiCultiGrowth2, MultiCultiGrowth3)
 ```{r preliminary plot, warning = FALSE}
 MCGrowthRate %>%
   ggplot() +
-  geom_point(aes(x = Par_ue, y = deltaOD_Lmu_corr,colour=as.factor(Strain)), size = 3.5, alpha = 0.9, show.legend = T) +
+  geom_point(aes(x = Par_ue, y = deltaOD_Lmu_corr*24,colour=as.factor(Strain)), size = 3.5, alpha = 0.9, show.legend = T) +
   geom_errorbar(aes(x = Par_ue, ymin = deltaOD_Lmu_corr - deltaOD_Lmu_se, ymax = deltaOD_Lmu_corr + deltaOD_Lmu_se), alpha = 0.5) +
   scale_colour_discrete(type=c("seagreen4", "palegreen3", "brown1", "brown4")) +
   ggh4x::facet_nested(rows = vars(Strain), cols = vars(Photoperiod)) +
   theme_bw()
+
 # 
 # MCGrowthRate %>%
 #   ggplot() +

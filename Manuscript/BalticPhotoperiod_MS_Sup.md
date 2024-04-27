@@ -1,33 +1,46 @@
 ---
-title: "Growth vs. light-capture in PhycoCyanin and PhycoErythrin-rich picocyanobacteria, across photic regimes and growth phases"
+title: "Growth vs. light-capture in PhycoCyanin and PhycoErythrin-rich picocyanobacteria, across photic regimes and growth phases
+
+Alternate:
+Long & low vs. high & short & fast; growth yields, light and photoperiods in PhycoCyanin and PhycoErythrin-rich picocyanobacteria"
+
 author:
 - Sylwia Śliwińska-Wilczewska:
     institute:
     - MTA
     - UG
     email: ssliwinskawilczews@mta.ca
+    ORCID: ORCID 0000-0002-3147-6605
 - Marta Konik:
     institute:
     - VU
     - IOPAN
     email: mk@iopan.gda.pl
+    ORCID: 0000-0003-1145-9127
 - Mireille Savoie:
     institute: MTA
     email: msavoie@mta.ca
-- Naaman Omar:
+    ORCID: 0009-0009-9499-6657
+- Anabella Aguilera:
+    institute: SW
+    email: anabella.aguilera@lnu.se
+    ORCID: 0000-0001-6743-3001
+- Naaman M. Omar:
     institute: MTA
     email: nomar@mta.ca
+    ORCID: 0000-0001-9583-2886
 - Douglas A. Campbell:
     institute: MTA
-    email: dcampbel@mta.ca
+    email: dubhglascambeuil@gmail.com
+    ORCID: 0000-0001-8996-5463
     correspondence: true
 institute:
-- MTA: Department of Biology, Mount Allison University, 53 York St., Sackville NB,
-    Canada, E4L 1C9
+- MTA: Department of Biology, Mount Allison University, 53 York St., Sackville, NB, E4L 1C9, Canada
 - UG: "Institute of Oceanography, University of Gdansk, 46 Pilsudskiego St, P81-378,
     Gdynia, Poland"
-- VU: Department of Geography, University of Victoria, Victoria, BC V8P 5C2, Canada
+- VU: Department of Geography, University of Victoria, Victoria, BC, V8P 5C2, Canada
 - IOPAN: "Institute of Oceanology, Polish Academy of Sciences, 81-712 Sopot, Poland"
+- SW: Sweden
 output:
   bookdown::word_document2:
     reference_docx: Template.docx
@@ -52,7 +65,8 @@ output:
 bibliography:
 - BalticPhotoperiod.bib
 - packages.bib
-csl: "plos-one.csl"
+- faultycitations.bib
+csl: "limnology-and-oceanography.csl"
 ---
 
 
@@ -63,42 +77,14 @@ csl: "plos-one.csl"
 
 
 
-# Supplementary material {.unnumbered}
-
-![<span id="fig:GrowthCurveOD680"></span>Figure 1: **Growth curves (tracked as OD~680~) vs. elapsed time (d).** Growth curves were estimated over 5-min intervals for two PhycoCyanin(PC)-rich cultures (056, 077) and two PhycoErythrin(PE)-rich cultures (048, 127) of *Synechococcus* sp. originating from the Baltic Sea. Cultures were grown at 30, 90, 180, 300, 600, or 900 peak PAR µmol photons m^−2^s^−1^; and photoperiods of 8, 12, 16, or 24 h. The vertical lines represent the time when the cultures (PC-rich_056; dark green, PC-rich_077; light green, PE-rich_048; light red, PE-rich_127; dark red) reached the maximum of the 1^st^ derivative of OD~680~, or maximum absolute hourly growth (tMaxAHG), taken as an index of transition from exponential to pre-stationary growth phases. The orange area represents the photoperiods, with peak PAR x 1/1000 to scale to the Y axis.](../Output/Figures/SFig_GrowthCurve_OD680.png)
-
-![<span id="fig:GrowthCurveOD720"></span>Figure 2: **Growth curves (tracked as OD~720~) vs. elapsed time (d).** Growth curves were estimated over 5-min intervals for two PhycoCyanin(PC)-rich cultures (056, 077) and two PhycoErythrin(PE)-rich cultures (048, 127) of *Synechococcus* sp. originating from the Baltic Sea. Cultures were grown at 30, 90, 180, 300, 600, or 900 peak PAR µmol photons m^−2^s^−1^; and photoperiods of 8, 12, 16, or 24 h. The vertical lines represent the time when the cultures (PC-rich_056; dark green, PC-rich_077; light green, PE-rich_048; light red, PE-rich_127; dark red) reached the maximum of the 1^st^ derivative of OD~680~, or maximum absolute hourly growth (tMaxAHG), taken as an index of transition from exponential to pre-stationary growth phases. The orange area represents the photoperiods, with peak PAR x 1/1000 to scale to the Y axis.](../Output/Figures/SFig_GrowthCurve_OD720.png)
-
-
-![<span id="fig:GrowthCurveDeltaOD"></span>Figure 3: **Growth curves (tracked as chlorophyll proxy OD~680~-OD~720~; Δ OD) vs. elapsed time (d).** Growth curves were estimated over 5-min intervals for two PhycoCyanin(PC)-rich cultures (056, 077) and two PhycoErythrin(PE)-rich cultures (048, 127) of *Synechococcus* sp. originating from the Baltic Sea. Cultures were grown at 30, 90, 180, 300, 600, or 900 peak PAR µmol photons m^−2^s^−1^; and photoperiods of 8, 12, 16, or 24 h. The vertical lines represent the time when the cultures (PC-rich_056; dark green, PC-rich_077; light green, PE-rich_048; light red, PE-rich_127; dark red) reached the maximum of the 1^st^ derivative of OD~680~, or maximum absolute hourly growth (tMaxAHG), taken as an index of transition from exponential to pre-stationary growth phases. The orange area represents the photoperiods, with peak PAR x 1/2000 to scale to the Y axis.](../Output/Figures/SFig_GrowthCurve_DeltaOD.png)
-
-
-![<span id="fig:GrowthCurveFit"></span>Figure 4: **Logistic fits of chlorophyll proxy OD~680~-OD~720~ (Δ OD) vs. elapsed time (d).** Logistic fits were estimated for two PhycoCyanin(PC)-rich cultures (056, 077) and two PhycoErythrin(PE)-rich cultures (048, 127) of *Synechococcus* sp. originating from the Baltic Sea. Cultures were grown at 30, 90, 180, 300, 600, or 900 peak PAR µmol photons m^−2^s^−1^; and photoperiods of 8, 12, 16, or 24 h. Growth curves (thin line) estimated over 5-min intervals for each strain were also presented (PC-rich_056; dark green, PC-rich_077; light green, PE-rich_048; light red, PE-rich_127; dark red).](../Output/Figures/SFig_GrowthCurve_Fit.png)
-
-![<span id="fig:GrowthRatePhotoperiodPAR"></span>Figure 5: **Chlorophyll specific exponential growth rates (d^−1^) vs. cumulative diel PAR (µmol photons m^−2^d^−1^).** Growth rates (+/- SE falling within symbols) were estimated from logistic fits of chlorophyll proxy OD~680~ - OD~720~ vs. elapsed time (Fig. 1, S4), for two PhycoCyanin(PC)-rich cultures (056, 077) and two PhycoErythrin(PE)-rich cultures (048, 127) of *Synechococcus* sp. originating from the Baltic Sea. Cultures were grown at 30 (dark gray), 90 (light gray), 180 (purple), 300 (red), 600 (orange), or 900 (yellow) peak PAR µmol photons m^−2^s^−1^ (µE); and photoperiods of 8 (square), 12 (circle), 16 (triangle), or 24 (diamond) h. Solid blue line shows a fit of the pooled growth rates for each strain, with a three parameter model (Harrison and Platt, 1986). We also fit the same model separately for 8 (dotted line), 12 (long dash line), 16 (dashed line), or 24 (two dash line) h photoperiods, since for all strains they were each significantly different (ANOVA, *p* < 0.05) from the fit of pooled data.](../Output/Figures/SFig_GrowthRate_Photoperiod_PAR.png)
-
-
-
-
-![<span id="fig:GrowthRateLightPAR"></span>Figure 6: **Chlorophyll specific exponential growth rates (d^−1^) vs. cumulative diel PAR (µmol photons m^−2^d^−1^).** Growth rates (+/- SE falling within symbols) were estimated from logistic fits of chlorophyll proxy OD~680~-OD~720~ vs. elapsed time (Fig. S4), for two PhycoCyanin(PC)-rich cultures (056, 077) and two PhycoErythrin(PE)-rich cultures (048, 127) of *Synechococcus* sp. originating from the Baltic Sea. Cultures were grown at 30 (dark gray), 90 (light gray), 180 (purple), 300 (red), 600 (orange), or 900 (yellow) peak PAR µmol photons m^−2^s^−1^ (µE); and photoperiods of 8 (square), 12 (circle), 16 (triangle), or 24 (diamond) h. Solid blue line shows a fit of the pooled growth rates for each strain, with a three parameter model (Harrison and Platt, 1986). We also fit the same model separately for 30 (dark gray), 90 (light gray), 180 (purple), 300 (red), 600 together with 900 (orange) peak PAR µmol photons m^−2^s^−1^, only when they were each significantly different (ANOVA, *p* < 0.05) from the fit of pooled data.](../Output/Figures/SFig_GrowthRate_Light_PAR.png)
-
-![<span id="fig:PhycoChlaRatio"></span>Figure 7: **Changes of Phycobiliprotein to Chl *a* ratio (µg/µg) vs. cumulative diel PAR (µmol photons m^−2^d^−1^).** Phycobiliprotein/Chl *a* ratio was estimated for two PhycoCyanin(PC)-rich cultures (056, 077) and two PhycoErythrin(PE)-rich cultures (048, 127) of *Synechococcus* sp. originating from the Baltic Sea. Cultures were grown at 30 (dark gray), 90 (light gray), 180 (purple), 300 (red), 600 (orange), or 900 (yellow) peak PAR µmol photons m^−2^s^−1^ (µE); and photoperiods of 8 (square), 12 (circle), 16 (triangle), or 24 (diamond) h. Figure presents data (smaller symbols) and means (bigger symbols) from exponential or pre-stationary phase of growth. Blue solid line shows single phase exponential decay fit for data from each strain and growth phase, fit parameters are presented. Different lowercase letters indicate statistically significant differences between the fit models for different strains within a given phase of growth. Different uppercase letters indicate statistically significant differences between the fit models for different phases of growth within a given strain (ANOVA; *p* < 0.05).](../Output/Figures/SFig_PhycoChlaRatio.png)
-
-![<span id="fig:SigmaPig590dark"></span>Figure 8: **Changes of effective absorption cross section of PSII** (σ~PSII~; nm^2^ quanta^−1^) **measured at the dark period under Ex590 nm (orange) excitation vs. the ratio of sum of µg phycobilins (PE, PC, APC protein, Phycobiliprotein)/µg Chl *a*** Effective absorption cross section of PSII (σ~PSII~; nm^2^ quanta^-1^) was estimated for two PhycoCyanin(PC)-rich cultures (056, 077) and two PhycoErythrin(PE)-rich cultures (048, 127) of *Synechococcus* sp. originating from the Baltic Sea. Cultures were grown at 30 (dark gray), 90 (light gray), 180 (purple), 300 (red), 600 (orange), or 900 (yellow) peak PAR µmol photons m^−2^s^−1^ (µE); and photoperiods of 8 (square), 12 (circle), 16 (triangle), or 24 (diamond) h. Figure presents data (smaller symbols) and means (bigger symbols) from exponential or pre-stationary phase of growth. Blue solid line shows linear model fit for data from each strain and growth phase. Different lowercase letters indicate statistically significant differences between the fit models for different strains within a given phase of growth. Different uppercase letters indicate statistically significant differences between the fit models for different phases of growth within a given strain (*t*-test; *p* < 0.05).](../Output/Figures/SFig_SigmaPig590dark.png)
-
-![<span id="fig:Sigma445"></span>Figure 9: **Effective absorption cross section of PSII** (σ~PSII~'; nm^2^ quanta^−1^) **measured under diel peak PAR growth light under Ex445 nm (blue) excitation vs. cumulative diel PAR (µmol photons m^−2^d^−1^).** Effective absorption cross section of PSII (σ~PSII~'; nm^2^ quanta^-1^) was estimated for two PhycoCyanin(PC)-rich cultures (056, 077) and two PhycoErythrin(PE)-rich cultures (048, 127) of *Synechococcus* sp. originating from the Baltic Sea. Cultures were grown at 30 (dark gray), 90 (light gray), 180 (purple), 300 (red), 600 (orange), or 900 (yellow) peak PAR µmol photons m^−2^s^−1^ (µE); and photoperiods of 8 (square), 12 (circle), 16 (triangle), or 24 (diamond) h. Figure presents data (smaller symbols) and means (bigger symbols) from exponential or pre-stationary phase of growth. Blue solid line shows linear model fit for data from each strain and growth phase. Different lowercase letters indicate statistically significant differences between the fit models for different strains within a given phase of growth. Different uppercase letters indicate statistically significant differences between the fit models for different phases of growth within a given strain (*t*-test; *p* < 0.05).](../Output/Figures/SFig_Sigma445.png)
-
-
-![<span id="fig:SigmaPig445"></span>Figure 10: **Changes of effective absorption cross section of PSII** (σ~PSII~'; nm^2^ quanta^−1^) **measured under diel peak PAR growth light under Ex445 nm (blue) excitation vs. the ratio of sum of µg phycobilins (PE, PC, APC protein, Phycobiliprotein)/µg Chl *a*** Effective absorption cross section of PSII (σ~PSII~'; nm^2^ quanta^-1^) was estimated for two PhycoCyanin(PC)-rich cultures (056, 077) and two PhycoErythrin(PE)-rich cultures (048, 127) of *Synechococcus* sp. originating from the Baltic Sea. Cultures were grown at 30 (dark gray), 90 (light gray), 180 (purple), 300 (red), 600 (orange), or 900 (yellow) peak PAR µmol photons m^−2^s^−1^ (µE); and photoperiods of 8 (square), 12 (circle), 16 (triangle), or 24 (diamond) h. Figure presents data (smaller symbols) and means (bigger symbols) from exponential or pre-stationary phase of growth. Blue solid line shows linear model fit for data from each strain and growth phase. Different lowercase letters indicate statistically significant differences between the fit models for different strains within a given phase of growth. Different uppercase letters indicate statistically significant differences between the fit models for different phases of growth within a given strain (*t*-test; *p* < 0.05).](../Output/Figures/SFig_SigmaPig445.png)
-
-![<span id="fig:GrowthRateJVPSIILight"></span>Figure 11: **Chlorophyll specific exponential growth rates (d^−1^) vs. cumulative diel PSII electron flux (*JV*~PSII~; µmol e^−^ µmol Chl *a*^−1^ d^−1^) measured under diel peak PAR growth light.** Growth rates (+/- SE falling within symbols) were estimated from logistic fits of chlorophyll proxy OD~680~ - OD~720~ vs. elapsed time (Fig. S4). PSII flux (*JV*~PSII~; µmol e^−^ µmol Chl *a*^−1^ d^−1^) was estimated using FRRf induction curves with excitation of chlorophyll (Ex~445nm~, blue), for two PhycoCyanin(PC)-rich cultures (056, 077) and two PhycoErythrin(PE)-rich cultures (048, 127) of *Synechococcus* sp. originating from the Baltic Sea. Cultures were grown at 30 (dark gray), 90 (light gray), 180 (purple), 300 (red), 600 (orange), or 900 (yellow) peak PAR µmol photons m^−2^s^−1^ (µE); and photoperiods of 8 (square), 12 (circle), 16 (triangle), or 24 (diamond) h. Solid blue line shows a fit of the pooled growth rates for each strain, with a three parameter model [@harrisonPhotosynthesisirradianceRelationshipsPolar1986]. We also fit the same model separately for 600 together with 900 (orange) peak PAR µmol photons m^−2^s^−1^, when they were significantly different (ANOVA, *p* < 0.05) from the fit of pooled data.](../Output/Figures/SFig_GrowthRate_JVPSII_Light_Chla.png)
+# Supporting Information {.unnumbered}
 
 
 
 
 ::: {custom-style="Table Caption"}
 
-<caption><span id="tab:unnamed-chunk-1"></span>Table 1: `<w:r><w:t xml:space="preserve">Linear regression, coefficient of determination (R square), Pearson correlation coefficients (R), and p-value used to calculate the pigment content (µg mL-1) of two PhycoCyanin(PC)-rich cultures (056, 077) and two PhycoErythrin(PE)-rich cultures (048, 127) (Culture Collection of Baltic Algae) of Synechococcus sp. based on absorbance (A) measurements.</w:t></w:r>`{=openxml}</caption>
+<caption><span id="tab:unnamed-chunk-1"></span>Tab.1: `<w:r><w:t xml:space="preserve">Linear regression, coefficient of determination (R square), Pearson correlation coefficients (R), and p-value used to calculate the pigment content (µg mL-1) of two PhycoCyanin(PC)-rich cultures (056, 077) and two PhycoErythrin(PE)-rich cultures (048, 127) (Culture Collection of Baltic Algae) of Synechococcus sp. based on absorbance (A) measurements.</w:t></w:r>`{=openxml}</caption>
 
 :::
 
@@ -109,7 +95,7 @@ csl: "plos-one.csl"
 
 ::: {custom-style="Table Caption"}
 
-<caption><span id="tab:unnamed-chunk-2"></span>Table 2: `<w:r><w:t xml:space="preserve">Three-way factorial ANOVA testing whether peak PAR, photoperiod, strain, and their interactions (Source_of_variation), significantly influence the chlorophyll specific exponential growth rate (µ; d−1), estimated from logistic fits of chlorophyll proxy OD680 – OD720 vs. cumulative diel PUR, for two PhycoCyanin(PC)-rich cultures (056, 077) and two PhycoErythrin(PE)-rich cultures (048, 127) (Culture Collection of Baltic Algae) of Synechococcus sp., grown at 30, 90, 180, 300, 600, or 900 peak PAR µmol photons m−2s−1; and photoperiods of 8, 12, 16, or 24 h. Df – degrees of freedom; Sum Sq – sum of squares; Mean Sq – mean sum of squares; F_value – Fisher's F-test statistic; p_value - level of significance.</w:t></w:r>`{=openxml}</caption>
+<caption><span id="tab:unnamed-chunk-2"></span>Tab.2: `<w:r><w:t xml:space="preserve">Three-way factorial ANOVA testing whether peak PAR, photoperiod, strain, and their interactions (Source_of_variation), significantly influence the chlorophyll specific exponential growth rate (µ; d−1), estimated from logistic fits of chlorophyll proxy OD680 – OD720 vs. cumulative diel PUR, for two PhycoCyanin(PC)-rich cultures (056, 077) and two PhycoErythrin(PE)-rich cultures (048, 127) (Culture Collection of Baltic Algae) of Synechococcus sp., grown at 30, 90, 180, 300, 600, or 900 peak PAR µmol photons m−2s−1; and photoperiods of 8, 12, 16, or 24 h. Df – degrees of freedom; Sum Sq – sum of squares; Mean Sq – mean sum of squares; F_value – Fisher's F-test statistic; p_value - level of significance.</w:t></w:r>`{=openxml}</caption>
 
 :::
 
@@ -120,7 +106,7 @@ csl: "plos-one.csl"
 
 ::: {custom-style="Table Caption"}
 
-<caption><span id="tab:unnamed-chunk-3"></span>Table 3: `<w:r><w:t xml:space="preserve">One-way ANOVA of a three parameter model (Harrison and Platt 1986) from pooled data (All) and data fit across different photoperiods (8, 12, 16, or 24) from chlorophyll specific exponential growth rate vs. cumulative diel PUR (Fit_model), for two PhycoCyanin(PC)-rich cultures (056, 077) and two PhycoErythrin(PE)-rich cultures (048, 127) of Synechococcus sp. originating from the Baltic Sea, grown at 30, 90, 180, 300, 600, or 900 peak PAR µmol photons m−2s−1; and photoperiods of 8, 12, 16, or 24 h. Res.Df - residual degrees of freedom for each model; Res.Sum Sq - residual sum of squares for each model; F_value – Fisher's F-test statistic; p_value - level of significance.</w:t></w:r>`{=openxml}</caption>
+<caption><span id="tab:unnamed-chunk-3"></span>Tab.3: `<w:r><w:t xml:space="preserve">One-way ANOVA of a three parameter model (Harrison and Platt 1986) from pooled data (All) and data fit across different photoperiods (8, 12, 16, or 24) from chlorophyll specific exponential growth rate vs. cumulative diel PUR (Fit_model), for two PhycoCyanin(PC)-rich cultures (056, 077) and two PhycoErythrin(PE)-rich cultures (048, 127) of Synechococcus sp. originating from the Baltic Sea, grown at 30, 90, 180, 300, 600, or 900 peak PAR µmol photons m−2s−1; and photoperiods of 8, 12, 16, or 24 h. Res.Df - residual degrees of freedom for each model; Res.Sum Sq - residual sum of squares for each model; F_value – Fisher's F-test statistic; p_value - level of significance.</w:t></w:r>`{=openxml}</caption>
 
 :::
 
@@ -130,7 +116,7 @@ csl: "plos-one.csl"
 
 ::: {custom-style="Table Caption"}
 
-<caption><span id="tab:unnamed-chunk-4"></span>Table 4: `<w:r><w:t xml:space="preserve">One-way ANOVA of a three parameter model (Harrison and Platt 1986) from pooled data (All) and data fit across different peak PAR (30, 90, 180, 300, 600 together with 900) from chlorophyll specific exponential growth rate vs. cumulative diel PUR (Fit_model), for two PhycoCyanin(PC)-rich cultures (056, 077) and two PhycoErythrin(PE)-rich cultures (048, 127) of Synechococcus sp. originating from the Baltic Sea, grown at 30, 90, 180, 300, 600, or 900 peak PAR µmol photons m−2s−1; and photoperiods of 8, 12, 16, or 24 h. Res.Df - residual degrees of freedom for each model; Res.Sum Sq - residual sum of squares for each model; F_value – Fisher's F-test statistic; p_value - level of significance.</w:t></w:r>`{=openxml}</caption>
+<caption><span id="tab:unnamed-chunk-4"></span>Tab.4: `<w:r><w:t xml:space="preserve">One-way ANOVA of a three parameter model (Harrison and Platt 1986) from pooled data (All) and data fit across different peak PAR (30, 90, 180, 300, 600 together with 900) from chlorophyll specific exponential growth rate vs. cumulative diel PUR (Fit_model), for two PhycoCyanin(PC)-rich cultures (056, 077) and two PhycoErythrin(PE)-rich cultures (048, 127) of Synechococcus sp. originating from the Baltic Sea, grown at 30, 90, 180, 300, 600, or 900 peak PAR µmol photons m−2s−1; and photoperiods of 8, 12, 16, or 24 h. Res.Df - residual degrees of freedom for each model; Res.Sum Sq - residual sum of squares for each model; F_value – Fisher's F-test statistic; p_value - level of significance.</w:t></w:r>`{=openxml}</caption>
 
 :::
 
@@ -149,7 +135,7 @@ Table S8: One-way ANOVA of a three parameter model (Harrison and Platt 1986) fro
 
 ::: {custom-style="Table Caption"}
 
-<caption><span id="tab:unnamed-chunk-5"></span>Table 5: `<w:r><w:t xml:space="preserve">One-way ANOVA of single phase exponential decay fit model (Fit_model) of pooled data across different strains for a given phase of growth (exponential; _Exp, pre-stationary; _St) and across different phase of growth for a given strain (_Exp_St) from PUR/PAR ratio in relation to the cumulative diel PAR (µmol photons m−2d−1), for two PhycoCyanin(PC)-rich cultures (056, 077) and two PhycoErythrin(PE)-rich cultures (048, 127) (Culture Collection of Baltic Algae) of Synechococcus sp., grown at 30, 90, 180, 300, 600, or 900 peak PAR µmol photons m−2s−1; and photoperiods of 8, 12, 16, or 24 h. Res.Df - residual degrees of freedom for each model; Res.Sum Sq - residual sum of squares for each model; F_value – Fisher's F-test statistic; p_value - level of significance.</w:t></w:r>`{=openxml}</caption>
+<caption><span id="tab:unnamed-chunk-5"></span>Tab.5: `<w:r><w:t xml:space="preserve">One-way ANOVA of single phase exponential decay fit model (Fit_model) of pooled data across different strains for a given phase of growth (exponential; _Exp, pre-stationary; _St) and across different phase of growth for a given strain (_Exp_St) from PUR/PAR ratio in relation to the cumulative diel PAR (µmol photons m−2d−1), for two PhycoCyanin(PC)-rich cultures (056, 077) and two PhycoErythrin(PE)-rich cultures (048, 127) (Culture Collection of Baltic Algae) of Synechococcus sp., grown at 30, 90, 180, 300, 600, or 900 peak PAR µmol photons m−2s−1; and photoperiods of 8, 12, 16, or 24 h. Res.Df - residual degrees of freedom for each model; Res.Sum Sq - residual sum of squares for each model; F_value – Fisher's F-test statistic; p_value - level of significance.</w:t></w:r>`{=openxml}</caption>
 
 :::
 
@@ -161,7 +147,7 @@ Table S8: One-way ANOVA of a three parameter model (Harrison and Platt 1986) fro
 
 ::: {custom-style="Table Caption"}
 
-<caption><span id="tab:unnamed-chunk-6"></span>Table 6: `<w:r><w:t xml:space="preserve">One-way ANOVA of single phase exponential decay fit model (Fit_model) of pooled data across different strains for a given phase of growth (exponential; _Exp, pre-stationary; _St) and across different phase of growth for a given strain (_Exp_St) from Phycobiliprotein to Chl a ratio in relation to the cumulative diel PAR (µmol photons m−2d−1), for two PhycoCyanin(PC)-rich cultures (056, 077) and two PhycoErythrin(PE)-rich cultures (048, 127) (Culture Collection of Baltic Algae) of Synechococcus sp., grown at 30, 90, 180, 300, 600, or 900 peak PAR µmol photons m−2s−1; and photoperiods of 8, 12, 16, or 24 h. Res.Df - residual degrees of freedom for each model; Res.Sum Sq - residual sum of squares for each model; F_value – Fisher's F-test statistic; p_value - level of significance.</w:t></w:r>`{=openxml}</caption>
+<caption><span id="tab:unnamed-chunk-6"></span>Tab.6: `<w:r><w:t xml:space="preserve">One-way ANOVA of single phase exponential decay fit model (Fit_model) of pooled data across different strains for a given phase of growth (exponential; _Exp, pre-stationary; _St) and across different phase of growth for a given strain (_Exp_St) from Phycobiliprotein to Chl a ratio in relation to the cumulative diel PAR (µmol photons m−2d−1), for two PhycoCyanin(PC)-rich cultures (056, 077) and two PhycoErythrin(PE)-rich cultures (048, 127) (Culture Collection of Baltic Algae) of Synechococcus sp., grown at 30, 90, 180, 300, 600, or 900 peak PAR µmol photons m−2s−1; and photoperiods of 8, 12, 16, or 24 h. Res.Df - residual degrees of freedom for each model; Res.Sum Sq - residual sum of squares for each model; F_value – Fisher's F-test statistic; p_value - level of significance.</w:t></w:r>`{=openxml}</caption>
 
 :::
 
@@ -173,7 +159,7 @@ Table S8: One-way ANOVA of a three parameter model (Harrison and Platt 1986) fro
 
 ::: {custom-style="Table Caption"}
 
-<caption><span id="tab:unnamed-chunk-7"></span>Table 7: `<w:r><w:t xml:space="preserve">One-way ANOVA of single phase exponential decay fit model (Fit_model) of pooled data across different strains for a given phase of growth (exponential; _Exp, pre-stationary; _St) and across different phase of growth for a given strain (_Exp_St) from effective absorption cross section of PSII (σPSII′; nm2 quanta−1) measured under diel peak PAR growth light under Ex590nm (orange) excitation in relation to the cumulative diel PAR (µmol photons m−2d−1), for two PhycoCyanin(PC)-rich cultures (056, 077) and two PhycoErythrin(PE)-rich cultures (048, 127) (Culture Collection of Baltic Algae) of Synechococcus sp., grown at 30, 90, 180, 300, 600, or 900 peak PAR µmol photons m−2s−1; and photoperiods of 8, 12, 16, or 24 h. Res.Df - residual degrees of freedom for each model; Res.Sum Sq - residual sum of squares for each model; F_value – Fisher's F-test statistic; p_value - level of significance.</w:t></w:r>`{=openxml}</caption>
+<caption><span id="tab:unnamed-chunk-7"></span>Tab.7: `<w:r><w:t xml:space="preserve">One-way ANOVA of single phase exponential decay fit model (Fit_model) of pooled data across different strains for a given phase of growth (exponential; _Exp, pre-stationary; _St) and across different phase of growth for a given strain (_Exp_St) from effective absorption cross section of PSII (σPSII′; nm2 quanta−1) measured under diel peak PAR growth light under Ex590nm (orange) excitation in relation to the cumulative diel PAR (µmol photons m−2d−1), for two PhycoCyanin(PC)-rich cultures (056, 077) and two PhycoErythrin(PE)-rich cultures (048, 127) (Culture Collection of Baltic Algae) of Synechococcus sp., grown at 30, 90, 180, 300, 600, or 900 peak PAR µmol photons m−2s−1; and photoperiods of 8, 12, 16, or 24 h. Res.Df - residual degrees of freedom for each model; Res.Sum Sq - residual sum of squares for each model; F_value – Fisher's F-test statistic; p_value - level of significance.</w:t></w:r>`{=openxml}</caption>
 
 :::
 
@@ -185,7 +171,7 @@ Table S8: One-way ANOVA of a three parameter model (Harrison and Platt 1986) fro
 
 ::: {custom-style="Table Caption"}
 
-<caption><span id="tab:unnamed-chunk-8"></span>Table 8: `<w:r><w:t xml:space="preserve">T-test of linear fit model (Fit_model) of pooled data across different strains for a given phase of growth (exponential; _Exp, pre-stationary; _St) and across different phase of growth for a given strain (_Exp_St) from effective absorption cross section of PSII (σPSIIʹ; nm2 quanta−1) measured under diel peak PAR growth light under Ex445nm (blue) excitation in relation to the cumulative diel PAR (µmol photons m−2d−1, for two PhycoCyanin(PC)-rich cultures (056, 077) and two PhycoErythrin(PE)-rich cultures (048, 127) (Culture Collection of Baltic Algae) of Synechococcus sp., grown at 30, 90, 180, 300, 600, or 900 peak PAR µmol photons m−2s−1; and photoperiods of 8, 12, 16, or 24 h. Estimate - estimation statistics; Std.Error - standard error of the estimate; t_value – t-test statistic; p_value - level of significance.</w:t></w:r>`{=openxml}</caption>
+<caption><span id="tab:unnamed-chunk-8"></span>Tab.8: `<w:r><w:t xml:space="preserve">T-test of linear fit model (Fit_model) of pooled data across different strains for a given phase of growth (exponential; _Exp, pre-stationary; _St) and across different phase of growth for a given strain (_Exp_St) from effective absorption cross section of PSII (σPSIIʹ; nm2 quanta−1) measured under diel peak PAR growth light under Ex445nm (blue) excitation in relation to the cumulative diel PAR (µmol photons m−2d−1, for two PhycoCyanin(PC)-rich cultures (056, 077) and two PhycoErythrin(PE)-rich cultures (048, 127) (Culture Collection of Baltic Algae) of Synechococcus sp., grown at 30, 90, 180, 300, 600, or 900 peak PAR µmol photons m−2s−1; and photoperiods of 8, 12, 16, or 24 h. Estimate - estimation statistics; Std.Error - standard error of the estimate; t_value – t-test statistic; p_value - level of significance.</w:t></w:r>`{=openxml}</caption>
 
 :::
 
@@ -196,7 +182,7 @@ Table S8: One-way ANOVA of a three parameter model (Harrison and Platt 1986) fro
 
 ::: {custom-style="Table Caption"}
 
-<caption><span id="tab:unnamed-chunk-9"></span>Table 9: `<w:r><w:t xml:space="preserve">T-test of linear fit model (Fit_model) of pooled data across different strains for a given phase of growth (exponential; _Exp, pre-stationary; _St) and across different phase of growth for a given strain (_Exp_St) from effective absorption cross section of PSII (σPSIIʹ; nm2 quanta−1) measured under diel peak PAR growth light under Ex445nm (blue) excitation in relation to Phycobiliprotein to Chl a ratio, for two PhycoCyanin(PC)-rich cultures (056, 077) and two PhycoErythrin(PE)-rich cultures (048, 127) (Culture Collection of Baltic Algae) of Synechococcus sp., grown at 30, 90, 180, 300, 600, or 900 peak PAR µmol photons m−2s−1; and photoperiods of 8, 12, 16, or 24 h. Estimate - estimation statistics; Std.Error - standard error of the estimate; t_value – t-test statistic; p_value - level of significance.</w:t></w:r>`{=openxml}</caption>
+<caption><span id="tab:unnamed-chunk-9"></span>Tab.9: `<w:r><w:t xml:space="preserve">T-test of linear fit model (Fit_model) of pooled data across different strains for a given phase of growth (exponential; _Exp, pre-stationary; _St) and across different phase of growth for a given strain (_Exp_St) from effective absorption cross section of PSII (σPSIIʹ; nm2 quanta−1) measured under diel peak PAR growth light under Ex445nm (blue) excitation in relation to Phycobiliprotein to Chl a ratio, for two PhycoCyanin(PC)-rich cultures (056, 077) and two PhycoErythrin(PE)-rich cultures (048, 127) (Culture Collection of Baltic Algae) of Synechococcus sp., grown at 30, 90, 180, 300, 600, or 900 peak PAR µmol photons m−2s−1; and photoperiods of 8, 12, 16, or 24 h. Estimate - estimation statistics; Std.Error - standard error of the estimate; t_value – t-test statistic; p_value - level of significance.</w:t></w:r>`{=openxml}</caption>
 
 :::
 
@@ -209,7 +195,7 @@ Table S8: One-way ANOVA of a three parameter model (Harrison and Platt 1986) fro
 
 ::: {custom-style="Table Caption"}
 
-<caption><span id="tab:unnamed-chunk-10"></span>Table 10: `<w:r><w:t xml:space="preserve">T-test of linear fit model (Fit_model) of pooled data across different strains for a given phase of growth (exponential; _Exp, pre-stationary; _St) and across different phase of growth for a given strain (_Exp_St) from effective absorption cross section of PSII (σPSII′; nm2 quanta−1) measured under Ex590nm (orange) excitation in relation to the Phycobiliprotein to Chl a ratio, for two PhycoCyanin(PC)-rich cultures (056, 077) and two PhycoErythrin(PE)-rich cultures (048, 127) (Culture Collection of Baltic Algae) of Synechococcus sp., grown at 30, 90, 180, 300, 600, or 900 peak PAR µmol photons m−2s−1; and photoperiods of 8, 12, 16, or 24 h. Estimate - estimation statistics; Std.Error - standard error of the estimate; t_value – t-test statistic; p_value - level of significance.</w:t></w:r>`{=openxml}</caption>
+<caption><span id="tab:unnamed-chunk-10"></span>Tab.10: `<w:r><w:t xml:space="preserve">T-test of linear fit model (Fit_model) of pooled data across different strains for a given phase of growth (exponential; _Exp, pre-stationary; _St) and across different phase of growth for a given strain (_Exp_St) from effective absorption cross section of PSII (σPSII′; nm2 quanta−1) measured under Ex590nm (orange) excitation in relation to the Phycobiliprotein to Chl a ratio, for two PhycoCyanin(PC)-rich cultures (056, 077) and two PhycoErythrin(PE)-rich cultures (048, 127) (Culture Collection of Baltic Algae) of Synechococcus sp., grown at 30, 90, 180, 300, 600, or 900 peak PAR µmol photons m−2s−1; and photoperiods of 8, 12, 16, or 24 h. Estimate - estimation statistics; Std.Error - standard error of the estimate; t_value – t-test statistic; p_value - level of significance.</w:t></w:r>`{=openxml}</caption>
 
 :::
 
@@ -220,9 +206,36 @@ Table S8: One-way ANOVA of a three parameter model (Harrison and Platt 1986) fro
 Table S15: T-test of linear fit model (Fit_model) of pooled data across different strains for a given phase of growth (exponential; _Exp, pre-stationary; _St) and across different phase of growth for a given strain (_Exp_St) from effective absorption cross section of PSII (σPSII; nm2 quanta−1) measured under Ex590nm (orange) excitation in relation to the Phycobiliprotein to Chl a ratio, for two PhycoCyanin(PC)-rich cultures (056, 077) and two PhycoErythrin(PE)-rich cultures (048, 127) (Culture Collection of Baltic Algae) of Synechococcus sp., grown at 30, 90, 180, 300, 600, or 900 peak PAR µmol photons m−2s−1; and photoperiods of 8, 12, 16, or 24 h. Estimate - estimation statistics; Std.Error - standard error of the estimate; t_value – t-test statistic; p_value - level of significance.
 
 
+![<span id="fig:Genetics"></span>**Fig. **1: Phylogenetic tree for tested picocyanobacteria.](../Output/Figures/SFig_GeneticsThatWillBeDoneSoon.png)
+
+
+![<span id="fig:GrowthCurveOD680"></span>**Fig. **2: Growth curves, tracked as OD~680~ (**A**) and OD~720~ (**B**) vs. elapsed time (d). Growth curves were estimated over 5-min intervals for two PhycoCyanin(PC)-rich cultures (056, 077) and two PhycoErythrin(PE)-rich cultures (048, 127) of *Synechococcus* sp. originating from the Baltic Sea. Cultures were grown at 30, 90, 180, 300, 600, or 900 peak PAR µmol photons m^−2^s^−1^; and photoperiods of 8, 12, 16, or 24 h. The vertical lines represent the time when the cultures (PC-rich_056; dark green, PC-rich_077; light green, PE-rich_048; light red, PE-rich_127; dark red) reached the maximum of the 1^st^ derivative of OD~680~, or maximum absolute hourly growth (tMaxAHG), taken as an index of transition from exponential to pre-stationary growth phases. The orange area represents the photoperiods, with peak PAR x 1/1000 to scale to the Y axis.](../Output/Figures/SFig_GrowthCurve_OD680720.png)
+
+![<span id="fig:GrowthCurveDeltaOD"></span>**Fig. **3: (**A**) Growth curves (tracked as chlorophyll proxy OD~680~-OD~720~; Δ OD) vs. elapsed time (d). Growth curves were estimated over 5-min intervals for two PhycoCyanin(PC)-rich cultures (056, 077) and two PhycoErythrin(PE)-rich cultures (048, 127) of *Synechococcus* sp. originating from the Baltic Sea. Cultures were grown at 30, 90, 180, 300, 600, or 900 peak PAR µmol photons m^−2^s^−1^; and photoperiods of 8, 12, 16, or 24 h. The vertical lines represent the time when the cultures (PC-rich_056; dark green, PC-rich_077; light green, PE-rich_048; light red, PE-rich_127; dark red) reached the maximum of the 1^st^ derivative of OD~680~, or maximum absolute hourly growth (tMaxAHG), taken as an index of transition from exponential to pre-stationary growth phases. The orange area represents the photoperiods, with peak PAR x 1/2000 to scale to the Y axis. (**B**) Logistic fits of chlorophyll proxy OD~680~-OD~720~ (Δ OD) vs. elapsed time (d). Growth curves (thin line) estimated over 5-min intervals for each strain were also presented (PC-rich_056; dark green, PC-rich_077; light green, PE-rich_048; light red, PE-rich_127; dark red).](../Output/Figures/SFig_GrowthCurve_ODDeltaFit.png)
+
+
+
+
+![<span id="fig:GrowthRatePhotoperiodPAR"></span>**Fig. **4: Chlorophyll-specific exponential growth rates (d^−1^) vs. cumulative diel PAR (µmol photons m^−2^d^−1^). (**A**) Growth rates (± SE falling within symbols) were estimated from logistic fits of chlorophyll proxy OD~680~ – OD~720~ (ΔOD) vs. elapsed time (Fig. 1, Fig. S3), for two PhycoCyanin(PC)-rich cultures (056, 077) and two PhycoErythrin(PE)-rich cultures (048, 127) of *Synechococcus* sp. originating from the Baltic Sea. Cultures were grown at 30 (dark gray), 90 (light gray), 180 (purple), 300 (red), 600 (orange), or 900 (yellow) peak PAR µmol photons m^−2^s^−1^ (µE); and photoperiods of 8 (square), 12 (circle), 16 (triangle), or 24 (diamond) h. Solid blue line shows a fit of the pooled growth rates for each strain, with a three parameter model [@harrisonPhotosynthesisirradianceRelationshipsPolar1986]. We also fit the same model separately for 8 (dotted line), 12 (long dash line), 16 (dashed line), or 24 (two dash line) h photoperiods, since for all strains they were each significantly different (ANOVA, *p* < 0.05) from the fit of pooled data. (**B**) Alpha parameters of the initial rise of growth rate (α) vs. cumulative diel PAR, estimated from data pooled for each photoperiod (points (± SE) connected by dashed lines), and estimated for all data across photoperiods (solid blue horizontal line ± SE), for each strain.](../Output/Figures/SFig_GrowthRate_Photoperiod_PAR.png)
+
+
+![<span id="fig:GrowthRateLightPAR"></span>**Fig. **5: Chlorophyll-specific exponential growth rates (d^−1^) vs. cumulative diel PAR (µmol photons m^−2^d^−1^). (**A**) Growth rates (± SE falling within symbols) were estimated from logistic fits of chlorophyll proxy OD~680~ – OD~720~ (ΔOD) vs. elapsed time (Fig. 1, Fig. S3), for two PhycoCyanin(PC)-rich cultures (056, 077) and two PhycoErythrin(PE)-rich cultures (048, 127) of *Synechococcus* sp. originating from the Baltic Sea. Cultures were grown at 30 (dark gray), 90 (light gray), 180 (purple), 300 (red), 600 (orange), or 900 (yellow) peak PAR µmol photons m^−2^s^−1^ (µE); and photoperiods of 8 (square), 12 (circle), 16 (triangle), or 24 (diamond) h. Solid blue line shows a fit of the pooled growth rates for each strain, with a three parameter model (Harrison and Platt, 1986). We also fit the same model separately for 30 (dark gray), 90 (light gray), 180 (purple), 300 (red), 600 together with 900 (orange) peak PAR µmol photons m^−2^s^−1^, only when they were each significantly different (ANOVA, *p* < 0.05) from the fit of pooled data. (**B**) Alpha parameters of the initial rise of growth rate (α) vs. cumulative diel PAR, estimated from data pooled for each peak PAR (points (± SE) connected by dashed lines), and estimated for all data across all peak PAR, for each strain (solid blue horizontal line ± SE).](../Output/Figures/SFig_GrowthRate_Light_PAR.png)
+
+![<span id="fig:PhycoChlaRatio"></span>**Fig. **6: Changes of Phycobiliprotein to Chl *a* ratio (µg:µg) vs. cumulative diel PAR (µmol photons m^−2^d^−1^). Phycobiliprotein/Chl *a* ratio was estimated for two PhycoCyanin(PC)-rich cultures (056, 077) and two PhycoErythrin(PE)-rich cultures (048, 127) of *Synechococcus* sp. originating from the Baltic Sea. Cultures were grown at 30 (dark gray), 90 (light gray), 180 (purple), 300 (red), 600 (orange), or 900 (yellow) peak PAR µmol photons m^−2^s^−1^ (µE); and photoperiods of 8 (square), 12 (circle), 16 (triangle), or 24 (diamond) h. Figure presents data (smaller symbols) and means (bigger symbols) from exponential or pre-stationary phase of growth. Blue solid line shows single phase exponential decay fit for data from each strain and growth phase, fit parameters are presented. Different lowercase letters indicate statistically significant differences between the fit models for different strains within a given phase of growth. Different uppercase letters indicate statistically significant differences between the fit models for different phases of growth within a given strain (ANOVA; *p* < 0.05).](../Output/Figures/SFig_PhycoChlaRatio.png)
+
+
+![<span id="fig:Sigma445"></span>**Fig. **7: Effective absorption cross section of PSII (σ~PSII~'; nm^2^ quanta^−1^) measured under diel peak PAR growth light under Ex445 nm (blue) excitation vs. cumulative diel PAR (µmol photons m^−2^d^−1^). Effective absorption cross section of PSII (σ~PSII~'; nm^2^ quanta^-1^) was estimated for two PhycoCyanin(PC)-rich cultures (056, 077) and two PhycoErythrin(PE)-rich cultures (048, 127) of *Synechococcus* sp. originating from the Baltic Sea. Cultures were grown at 30 (dark gray), 90 (light gray), 180 (purple), 300 (red), 600 (orange), or 900 (yellow) peak PAR µmol photons m^−2^s^−1^ (µE); and photoperiods of 8 (square), 12 (circle), 16 (triangle), or 24 (diamond) h. Figure presents data (smaller symbols) and means (bigger symbols) from exponential or pre-stationary phase of growth. Blue solid line shows linear model fit for data from each strain and growth phase. Different lowercase letters indicate statistically significant differences between the fit models for different strains within a given phase of growth. Different uppercase letters indicate statistically significant differences between the fit models for different phases of growth within a given strain (*t*-test; *p* < 0.05).](../Output/Figures/SFig_Sigma445.png)
+
+
+
+
+![<span id="fig:SigmaPig445"></span>**Fig. **8: (**A**) Changes of effective absorption cross section of PSII (σ~PSII~; nm^2^ quanta^−1^) measured at the dark period under Ex590 nm (orange) excitation vs. the ratio of sum of µg phycobilins (PE, PC, APC protein, Phycobiliprotein)/µg Chl *a*. (**B**) Changes of effective absorption cross section of PSII (σ~PSII~'; nm^2^ quanta^−1^) measured under diel peak PAR growth light under Ex445 nm (blue) excitation vs. the ratio of sum of µg phycobilins (PE, PC, APC protein, Phycobiliprotein)/µg Chl *a*. Effective absorption cross section of PSII (σ~PSII~'; nm^2^ quanta^-1^) was estimated for two PhycoCyanin(PC)-rich cultures (056, 077) and two PhycoErythrin(PE)-rich cultures (048, 127) of *Synechococcus* sp. originating from the Baltic Sea. Cultures were grown at 30 (dark gray), 90 (light gray), 180 (purple), 300 (red), 600 (orange), or 900 (yellow) peak PAR µmol photons m^−2^s^−1^ (µE); and photoperiods of 8 (square), 12 (circle), 16 (triangle), or 24 (diamond) h. Figure presents data (smaller symbols) and means (bigger symbols) from exponential or pre-stationary phase of growth. Blue solid line shows linear model fit for data from each strain and growth phase. Different lowercase letters indicate statistically significant differences between the fit models for different strains within a given phase of growth. Different uppercase letters indicate statistically significant differences between the fit models for different phases of growth within a given strain (*t*-test; *p* < 0.05).](../Output/Figures/SFig_SigmaPigMerge.png)
+
+![<span id="fig:GrowthRateJVPSIILight"></span>**Fig. **9: Chlorophyll specific exponential growth rates (d^−1^) vs. cumulative diel PSII electron flux (*JV*~PSII~; µmol e^−^ µmol Chl *a*^−1^ d^−1^) measured under diel peak PAR growth light. Growth rates (± SE falling within symbols) were estimated from logistic fits of chlorophyll proxy OD~680~ – OD~720~ (ΔOD) vs. elapsed time (Fig. S3). PSII flux (*JV*~PSII~; µmol e^−^ µmol Chl *a*^−1^ d^−1^) was estimated using FRRf induction curves with excitation of chlorophyll (Ex~445nm~, blue), for two PhycoCyanin(PC)-rich cultures (056, 077) and two PhycoErythrin(PE)-rich cultures (048, 127) of *Synechococcus* sp. originating from the Baltic Sea. Cultures were grown at 30 (dark gray), 90 (light gray), 180 (purple), 300 (red), 600 (orange), or 900 (yellow) peak PAR µmol photons m^−2^s^−1^ (µE); and photoperiods of 8 (square), 12 (circle), 16 (triangle), or 24 (diamond) h. Solid blue line shows a fit of the pooled growth rates for each strain, with a three parameter model [@harrisonPhotosynthesisirradianceRelationshipsPolar1986]. We also fit the same model separately for 600 together with 900 (orange) peak PAR µmol photons m^−2^s^−1^, when they were significantly different (ANOVA, *p* < 0.05) from the fit of pooled data.](../Output/Figures/SFig_GrowthRate_JVPSII_Light_Chla.png)
 
 
 
 
 
+# References {.unnumbered}
 
