@@ -1,0 +1,123 @@
+---
+title: "Import_MetaData"
+author:
+- Sylwia Sliwinska-Wilczewska
+- Douglas A. Campbell
+date: "`r format(Sys.Date())`"
+output:
+bookdown::html_document2:
+    code_folding: show
+    keep_md: yes
+    toc: TRUE
+    toc_float: TRUE
+    toc_depth: 6
+    fig_caption: yes
+bibliography: BalticPhotoperiod.bib
+csl: plos-one.csl
+editor_options: 
+  markdown: 
+    wrap: 72
+---
+
+# Set Chunk Options
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE)
+knitr::opts_chunk$set(fig.path='Figs/')
+```
+
+# Introduction
+
+Import_MetaData.Rmd imports culture MetaData Catalog from a google sheet and stored in Data/ImportedData/ImportedMetaData folder as: CultureCatalog.Rds.
+
+# Load Libraries and set Project Variables
+
+```{r load libraries, warning = FALSE, echo=FALSE}
+library(tidyverse)
+library(lubridate)
+library(knitr)
+library(data.table)
+library(googledrive)
+library(googlesheets4)
+```
+
+```{r set project variables, warning = FALSE, echo=FALSE}
+#"..", takes up a level in the directory path
+# Project <- "BalticPhotoperiod"
+# DataOut <- file.path("..","Data", "ImportedData", "ImportedMetaData")
+
+```
+
+# Create map
+https://www.geeksforgeeks.org/how-to-make-world-map-with-ggplot2-in-r/
+
+```{r}
+
+# load library tidyverse 
+library(tidyverse) 
+  
+# create data for world coordinates using  
+# map_data() function 
+world_coordinates <- map_data("world") 
+  
+# create world map using ggplot() function 
+ggplot() + 
+  
+# geom_map() function takes world coordinates  
+# as input to plot world map 
+  geom_map( 
+    data = world_coordinates, map = world_coordinates, 
+    aes(long, lat, map_id = region),
+    color = "white", fill = "darkgreen", size = 0.2
+  )
+
+```
+
+```{r}
+# create data for world coordinates using map_data() function 
+world_coordinates <- map_data("world") 
+  
+# read volcano_eruption data from volcano.csv 
+volcano_eruption <- readr::read_csv("volcano.csv") 
+  
+# create world map using ggplot() function 
+ggplot() + 
+# geom_map() funct 
+ion takes world coordinates as input 
+# to plot world map color parameter determines the 
+# color of borders in map fill parameter determines the 
+# color of fill in map size determines the thickness of 
+# border in map 
+  geom_map( 
+    data = world, map = world, 
+    aes(long, lat, map_id = region), 
+    color = "green", fill= "lightyellow"
+  )+ 
+# geom_point function is used to plot scatter plot on top  
+# of world map 
+geom_point( 
+    data = volcano_eruption, 
+    aes(longitude, latitude, color = primary_volcano_type, 
+        size=population_within_10_km), 
+    alpha = 1 
+  ) + 
+  
+# legend.position as none removes the legend 
+theme(legend.position="none") 
+```
+<!-- Here's a complete roadmap for you to become a developer: Learn DSA -> Master Frontend/Backend/Full Stack -> Build Projects -> Keep Applying to Jobs -->
+
+# Save rds for further analysis
+
+```{r save rds}
+saveRDS(object = CultureCatalog, file = file.path("..", "Data", "ImportedData", "ImportedMetaData", "CultureCatalog.Rds"), compress = "xz")
+```
+
+# Variable names used in Data Dictionary
+
+```{r}
+colnames(CultureCatalog)
+```
+
+
+

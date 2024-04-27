@@ -911,6 +911,12 @@ augmentedPhycoChlaRatio<-fittedPhycoChlaRatio  %>%
 # Create Phyco/Chla ratio plot at 590
 
 ```{r create Sigma plot, fig.height = 8, fig.width = 8, warning = FALSE}
+
+k_data056 = data.frame(WL = c("WW", "WW"), Phase = c("Pre-stationary"), O2=c(21, 21, 21, 21), Strain  = c("PC-rich_056"))
+k_data077 = data.frame(WL = c("WW", "WW"), Phase = c("Pre-stationary"), O2=c(21, 21, 21, 21), Strain  = c("PC-rich_077"))
+k_data048 = data.frame(WL = c("WW", "WW"), Phase = c("Pre-stationary"), O2=c(21, 21, 21, 21), Strain  = c("PE-rich_048"))
+k_data127 = data.frame(WL = c("WW", "WW"), Phase = c("Pre-stationary"), O2=c(21, 21, 21, 21), Strain  = c("PE-rich_127"))
+
 data_text_y0Exp<- data.frame(WL = c("WW", "WW"), Phase = c("Exponential"), O2=c(21, 21, 21, 21), Strain  = c("PC-rich_056", "PC-rich_077", "PE-rich_048", "PE-rich_127"),  label = c('y[0]~"="~2.2', 'y[0]~"="~3.1', 'y[0]~"="~4.1', 'y[0]~"="~3.9'))
 data_text_yfExp<- data.frame(WL = c("WW", "WW"), Phase = c("Exponential"), O2=c(21, 21, 21, 21), Strain  = c("PC-rich_056", "PC-rich_077", "PE-rich_048", "PE-rich_127"),  label = c('y[f]~"="~0.2', 'y[f]~"="~-0.3', 'y[f]~"="~-0.3', 'y[f]~"="~0.2'))
 data_text_lambdaExp<- data.frame(WL = c("WW", "WW"), Phase = c("Exponential"), O2=c(21, 21, 21, 21), Strain  = c("PC-rich_056", "PC-rich_077", "PE-rich_048", "PE-rich_127"),  label = c('    \u03BB = 5.9e-08', '    \u03BB = 2.8e-08', '    \u03BB = 2.6e-08', '    \u03BB = 4.2e-08'))
@@ -991,12 +997,17 @@ ggplot(PhycoChlaRatioChoosen, aes(x = PARPhotonDose_day, y = PhycoChlaRatio)) +
   
   geom_text(data=data_text_AnovaPhase, aes(x=24000000, y=-0.8, label=label), colour = "blue", size=4) +
   
+  geom_segment(data = k_data056, aes(x =9e07, y = -Inf, xend = 9e07, yend = Inf), color = "seagreen4", size = 6, alpha = 0.3) +
+  geom_segment(data = k_data077, aes(x =9e07, y = -Inf, xend = 9e07, yend = Inf), color = "palegreen3", size = 6, alpha = 0.3) +
+  geom_segment(data = k_data048, aes(x =9e07, y = -Inf, xend = 9e07, yend = Inf), color = "brown1", size = 6, alpha = 0.3) +
+  geom_segment(data = k_data127, aes(x =9e07, y = -Inf, xend = 9e07, yend = Inf), color = "brown4", size = 6, alpha = 0.3) +
+  
   scale_shape_manual(values = c(15, 16, 17,18), name="", labels = lab1) +
   scale_colour_manual(values = c("darkslategray", "lightblue4", "hotpink4", "indianred3",  "goldenrod2", "khaki2"), name="", labels = lab2) +
   labs(y="Phycobiliprotein to Chl" ~italic(a)~ "ratio (µg:µg)", x = "Cumulative diel PAR ( µmol photons "~m^-2~""~d^-1~")") +
-  scale_x_continuous(breaks=seq(0, 60000000, by = 30000000), label=scientific_10) +
+  scale_x_continuous(breaks=seq(0, 80000000, by = 30000000), label=scientific_10) +
   scale_y_continuous(breaks=seq(0, 8, by = 2)) +
-  coord_cartesian(xlim = c(0, 82000000), ylim = c(-1.2, 9)) +
+  coord_cartesian(xlim = c(0, 90000000), ylim = c(-1.2, 9)) +
   ggh4x::facet_nested(rows = vars(O2, Strain), cols = vars(WL, Phase), labeller = labeller(WL = WL.labs, O2 = O2.labs)) +
   theme_bw() +
   theme(panel.grid.minor = element_blank(),
@@ -1008,7 +1019,7 @@ ggplot(PhycoChlaRatioChoosen, aes(x = PARPhotonDose_day, y = PhycoChlaRatio)) +
         axis.title.y = element_text(margin=margin(r=10)),
         axis.title.x = element_text(margin=margin(t=10)),
         legend.background = element_rect(fill="transparent"),
-        legend.position = c(0.90,0.88),
+        legend.position = c(0.85,0.88),
         legend.key.height= unit(0.003, 'cm'),
         legend.spacing.y = unit(-0.1, "cm"),
         legend.spacing.x = unit(-0.1, 'cm'),
@@ -1315,6 +1326,12 @@ augmentedPURPARRatio<-fittedPURPARRatio  %>%
 # Create PUR/PAR ratio plot 
 
 ```{r create Sigma plot, fig.height = 8, fig.width = 8, warning = FALSE}
+
+k_data056 = data.frame(WL = c("WW", "WW"), Phase = c("Pre-stationary"), O2=c(21, 21, 21, 21), Strain  = c("PC-rich_056"))
+k_data077 = data.frame(WL = c("WW", "WW"), Phase = c("Pre-stationary"), O2=c(21, 21, 21, 21), Strain  = c("PC-rich_077"))
+k_data048 = data.frame(WL = c("WW", "WW"), Phase = c("Pre-stationary"), O2=c(21, 21, 21, 21), Strain  = c("PE-rich_048"))
+k_data127 = data.frame(WL = c("WW", "WW"), Phase = c("Pre-stationary"), O2=c(21, 21, 21, 21), Strain  = c("PE-rich_127"))
+
 data_text_y0Exp<- data.frame(WL = c("WW", "WW"), Phase = c("Exponential"), O2=c(21, 21, 21, 21), Strain  = c("PC-rich_056", "PC-rich_077", "PE-rich_048", "PE-rich_127"),  label = c('y[0]~"="~0.5', 'y[0]~"="~0.5', 'y[0]~"="~1.0', 'y[0]~"="~0.9'))
 data_text_yfExp<- data.frame(WL = c("WW", "WW"), Phase = c("Exponential"), O2=c(21, 21, 21, 21), Strain  = c("PC-rich_056", "PC-rich_077", "PE-rich_048", "PE-rich_127"),  label = c('y[f]~"="~0.3', 'y[f]~"="~0.4', 'y[f]~"="~0.5', 'y[f]~"="~0.5'))
 data_text_lambdaExp<- data.frame(WL = c("WW", "WW"), Phase = c("Exponential"), O2=c(21, 21, 21, 21), Strain  = c("PC-rich_056", "PC-rich_077", "PE-rich_048", "PE-rich_127"),  label = c('    \u03BB = 3.4e-08', '    \u03BB = 2.4e-07', '    \u03BB = 5.4e-07', '    \u03BB = 4.7e-07'))
@@ -1393,12 +1410,17 @@ ggplot(PURPARRatioChoosen, aes(x = PARPhotonDose_day, y = PURPARRatio)) +
   
   geom_text(data=data_text_AnovaPhase, aes(x=24000000, y=-0.04, label=label), colour = "blue", size=4) +
   
+  geom_segment(data = k_data056, aes(x =9e07, y = -Inf, xend = 9e07, yend = Inf), color = "seagreen4", size = 6, alpha = 0.3) +
+  geom_segment(data = k_data077, aes(x =9e07, y = -Inf, xend = 9e07, yend = Inf), color = "palegreen3", size = 6, alpha = 0.3) +
+  geom_segment(data = k_data048, aes(x =9e07, y = -Inf, xend = 9e07, yend = Inf), color = "brown1", size = 6, alpha = 0.3) +
+  geom_segment(data = k_data127, aes(x =9e07, y = -Inf, xend = 9e07, yend = Inf), color = "brown4", size = 6, alpha = 0.3) +
+  
   scale_shape_manual(values = c(15, 16, 17,18), name="", labels = lab1) +
   scale_colour_manual(values = c("darkslategray", "lightblue4", "hotpink4", "indianred3",  "goldenrod2", "khaki2"), name="", labels = lab2) +
   labs(y="PUR/PAR ratio", x = "Cumulative diel PAR ( µmol photons "~m^-2~""~d^-1~")") +
-  scale_x_continuous(breaks=seq(0, 60000000, by = 30000000), label=scientific_10) +
+  scale_x_continuous(breaks=seq(0, 80000000, by = 30000000), label=scientific_10) +
   scale_y_continuous(breaks=seq(0, 1.2, by = 0.3)) +
-  coord_cartesian(xlim = c(0, 82000000), ylim = c(-0.15, 1.5)) +
+  coord_cartesian(xlim = c(0, 90000000), ylim = c(-0.15, 1.5)) +
   ggh4x::facet_nested(rows = vars(O2, Strain), cols = vars(WL, Phase), labeller = labeller(WL = WL.labs, O2 = O2.labs)) +
   theme_bw() +
   theme(panel.grid.minor = element_blank(),
@@ -1410,7 +1432,7 @@ ggplot(PURPARRatioChoosen, aes(x = PARPhotonDose_day, y = PURPARRatio)) +
         axis.title.y = element_text(margin=margin(r=10)),
         axis.title.x = element_text(margin=margin(t=10)),
         legend.background = element_rect(fill="transparent"),
-        legend.position = c(0.9,0.88),
+        legend.position = c(0.85,0.88),
         legend.key.height= unit(0.003, 'cm'),
         legend.spacing.y = unit(-0.1, "cm"),
         legend.spacing.x = unit(-0.1, 'cm'),

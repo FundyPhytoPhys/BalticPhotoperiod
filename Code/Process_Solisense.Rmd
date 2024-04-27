@@ -712,6 +712,12 @@ augmented590<-fitted590  %>%
 # Create Sigma plot at 590
 
 ```{r create Sigma plot, fig.height = 8, fig.width = 8, warning = FALSE}
+
+k_data056 = data.frame(facetsPhase = c("Phase~of~growth"), Phase = c("Pre-stationary"), facetsStrain  = c("Strain"), Strain  = c("PC-rich_056"))
+k_data077 = data.frame(facetsPhase = c("Phase~of~growth"), Phase = c("Pre-stationary"), facetsStrain  = c("Strain"), Strain  = c("PC-rich_077"))
+k_data048 = data.frame(facetsPhase = c("Phase~of~growth"), Phase = c("Pre-stationary"), facetsStrain  = c("Strain"), Strain  = c("PE-rich_048"))
+k_data127 = data.frame(facetsPhase = c("Phase~of~growth"), Phase = c("Pre-stationary"), facetsStrain  = c("Strain"), Strain  = c("PE-rich_127"))
+
 data_text_y0Exp<- data.frame(facetsPhase = c("Phase~of~growth"), Phase = c("Exponential"), facetsStrain = c("Strain"), Strain  = c("PC-rich_056", "PC-rich_077", "PE-rich_048", "PE-rich_127"),  label = c('y0 = 7.4', 'y0 = 5.9', 'y0 = 8.5', 'y0 = 7.9'))
 data_text_yfExp<- data.frame(facetsPhase = c("Phase~of~growth"), Phase = c("Exponential"), facetsStrain = c("Strain"), Strain  = c("PC-rich_056", "PC-rich_077", "PE-rich_048", "PE-rich_127"),  label = c('yf = 3.3', 'yf = 1.9', 'yf = 4.4', 'yf = 3.7'))
 data_text_lambdaExp<- data.frame(facetsPhase = c("Phase~of~growth"), Phase = c("Exponential"), facetsStrain = c("Strain"), Strain  = c("PC-rich_056", "PC-rich_077", "PE-rich_048", "PE-rich_127"),  label = c('    \u03BB = 3.6e-07', '    \u03BB = 3.1e-07', '    \u03BB = 2.4e-07', '    \u03BB = 3.3e-07'))
@@ -797,12 +803,18 @@ ggplot(SolFitsExpFitAll590, aes(x = PARPhotonDose_day, y = Sig_nm2psii)) +
   
   geom_text(data=data_text_AnovaPhase, aes(x=24000000, y=-0.8, label=label), colour = "blue", size=4) +
   
+  geom_segment(data = k_data056, aes(x =9e07, y = -Inf, xend = 9e07, yend = Inf), color = "seagreen4", size = 6, alpha = 0.7) +
+  geom_segment(data = k_data077, aes(x =9e07, y = -Inf, xend = 9e07, yend = Inf), color = "palegreen3", size = 6, alpha = 0.7) +
+  geom_segment(data = k_data048, aes(x =9e07, y = -Inf, xend = 9e07, yend = Inf), color = "brown1", size = 6, alpha = 0.7) +
+  geom_segment(data = k_data127, aes(x =9e07, y = -Inf, xend = 9e07, yend = Inf), color = "brown4", size = 6, alpha = 0.7) +
+  
+  
   scale_shape_manual(values = c(15, 16, 17,18), name="", labels = lab1) +
   scale_colour_manual(values = c("darkslategray", "lightblue4", "hotpink4", "indianred3",  "goldenrod2", "khaki2"), name="", labels = lab2) +
   labs(y=expression(paste(sigma,""["PSII"]*"' (nm"^"2"*" quanta"^"-1"*")")), x = "Cumulative diel PAR ( µmol photons "~m^-2~""~d^-1~")") +
-  scale_x_continuous(breaks=seq(0, 60000000, by = 30000000), label=scientific_10) +
+  scale_x_continuous(breaks=seq(0, 80000000, by = 30000000), label=scientific_10) +
   scale_y_continuous(breaks=seq(0, 10, by = 2)) +
-  coord_cartesian(xlim = c(0, 82000000), ylim = c(-2, 12)) +
+  coord_cartesian(xlim = c(0, 90000000), ylim = c(-2, 12)) +
   
   ggh4x::facet_nested(cols = vars(facetsPhase, Phase), rows = vars(facetsStrain, Strain), labeller = label_parsed) +
   #ggh4x::facet_nested(rows = vars(O2, Strain), cols = vars(WL, Phase), labeller = labeller(WL = WL.labs, O2 = O2.labs)) +
@@ -816,7 +828,7 @@ ggplot(SolFitsExpFitAll590, aes(x = PARPhotonDose_day, y = Sig_nm2psii)) +
         axis.title.y = element_text(margin=margin(r=10)),
         axis.title.x = element_text(margin=margin(t=10)),
         legend.background = element_rect(fill="transparent"),
-        legend.position = c(0.90,0.88),
+        legend.position = c(0.85,0.88),
         legend.key.height= unit(0.003, 'cm'),
         legend.spacing.y = unit(-0.1, "cm"),
         legend.spacing.x = unit(-0.1, 'cm'),
@@ -835,6 +847,12 @@ ggsave(file = file.path(FigPath, paste("Fig_Sigma590",".png",sep = "")), height=
 
 ```{r create Sigma plot, fig.height = 8, fig.width = 8, warning = FALSE}
 data_textA <- data.frame(facetsPhase = c("Phase~of~growth"), Phase = c("Exponential"), facetsStrain  = c("Strain"), Strain  = c("PC-rich_056"), label = c('A'))
+
+k_data056 = data.frame(facetsPhase = c("Phase~of~growth"), Phase = c("Pre-stationary"), facetsStrain  = c("Strain"), Strain  = c("PC-rich_056"))
+k_data077 = data.frame(facetsPhase = c("Phase~of~growth"), Phase = c("Pre-stationary"), facetsStrain  = c("Strain"), Strain  = c("PC-rich_077"))
+k_data048 = data.frame(facetsPhase = c("Phase~of~growth"), Phase = c("Pre-stationary"), facetsStrain  = c("Strain"), Strain  = c("PE-rich_048"))
+k_data127 = data.frame(facetsPhase = c("Phase~of~growth"), Phase = c("Pre-stationary"), facetsStrain  = c("Strain"), Strain  = c("PE-rich_127"))
+
 
 data_text_y0Exp<- data.frame(facetsPhase = c("Phase~of~growth"), Phase = c("Exponential"), facetsStrain = c("Strain"), Strain  = c("PC-rich_056", "PC-rich_077", "PE-rich_048", "PE-rich_127"),  label = c('y[0]~"="~7.4', 'y[0]~"="~5.9', 'y[0]~"="~8.5', 'y[0]~"="~7.9'))
 data_text_yfExp<- data.frame(facetsPhase = c("Phase~of~growth"), Phase = c("Exponential"), facetsStrain = c("Strain"), Strain  = c("PC-rich_056", "PC-rich_077", "PE-rich_048", "PE-rich_127"),  label = c('y[f]~"="~3.3', 'y[f]~"="~1.9', 'y[f]~"="~4.4', 'y[f]~"="~3.7'))
@@ -918,12 +936,18 @@ Soli590A<-ggplot(SolFitsExpFitAll590, aes(x = PARPhotonDose_day, y = Sig_nm2psii
   geom_text(data=data_text_AnovaPhase, aes(x=24000000, y=-0.8, label=label), colour = "blue", size=4) +
   geom_text(data=data_textA, aes(x=0.5e07, y=10, label=label), size=6) +
   
+  geom_segment(data = k_data056, aes(x =9e07, y = -Inf, xend = 9e07, yend = Inf), color = "seagreen4", size = 6, alpha = 0.7) +
+  geom_segment(data = k_data077, aes(x =9e07, y = -Inf, xend = 9e07, yend = Inf), color = "palegreen3", size = 6, alpha = 0.7) +
+  geom_segment(data = k_data048, aes(x =9e07, y = -Inf, xend = 9e07, yend = Inf), color = "brown1", size = 6, alpha = 0.7) +
+  geom_segment(data = k_data127, aes(x =9e07, y = -Inf, xend = 9e07, yend = Inf), color = "brown4", size = 6, alpha = 0.7) +
+  
+  
   scale_shape_manual(values = c(15, 16, 17,18), name="", labels = lab1) +
   scale_colour_manual(values = c("darkslategray", "lightblue4", "hotpink4", "indianred3",  "goldenrod2", "khaki2"), name="", labels = lab2) +
   labs(y=expression(paste(sigma,""["PSII"]*"' (nm"^"2"*" quanta"^"-1"*")")), x = "Cumulative diel PAR ( µmol photons "~m^-2~""~d^-1~")") +
-  scale_x_continuous(breaks=seq(0, 60000000, by = 30000000), label=scientific_10) +
+  scale_x_continuous(breaks=seq(0, 80000000, by = 30000000), label=scientific_10) +
   scale_y_continuous(breaks=seq(0, 10, by = 2)) +
-  coord_cartesian(xlim = c(0, 82000000), ylim = c(-2, 12)) +
+  coord_cartesian(xlim = c(0, 90000000), ylim = c(-2, 12)) +
   
   ggh4x::facet_nested(cols = vars(facetsPhase, Phase), rows = vars(facetsStrain, Strain), labeller = label_parsed) +
   #ggh4x::facet_nested(rows = vars(O2, Strain), cols = vars(WL, Phase), labeller = labeller(WL = WL.labs, O2 = O2.labs)) +
@@ -939,7 +963,7 @@ Soli590A<-ggplot(SolFitsExpFitAll590, aes(x = PARPhotonDose_day, y = Sig_nm2psii
         axis.title.y = element_text(margin=margin(r=10)),
         axis.title.x = element_text(margin=margin(t=10)),
         legend.background = element_rect(fill="transparent"),
-        legend.position = c(0.90,0.88),
+        legend.position = c(0.85,0.88),
         legend.key.height= unit(0.003, 'cm'),
         legend.spacing.y = unit(-0.1, "cm"),
         legend.spacing.x = unit(-0.1, 'cm'),
@@ -1122,6 +1146,12 @@ augmented445<-fitted445 %>%
 # data_text_AnovaSt<- data.frame(WL = c("WW", "WW"), Phase = c("Pre-stationary"), O2=c(21, 21, 21, 21), Strain  = c("PC-rich_056", "PC-rich_077", "PE-rich_048", "PE-rich_127"),  label = c('ANOVA, \u03B1 = 0.05, a', 'ANOVA, \u03B1 = 0.05, a', 'ANOVA, \u03B1 = 0.05, b', 'ANOVA, \u03B1 = 0.05, a'))
 # data_text_AnovaPhase<- data.frame(WL = c("WW", "WW"), Phase = c("Pre-stationary"), O2=c(21, 21, 21, 21), Strain  = c("PC-rich_056", "PC-rich_077", "PE-rich_048", "PE-rich_127"),  label = c("Phase, p > 0.05", 'Phase, p < 0.05', 'Phase, p < 0.05', 'Phase, p < 0.05'))
 
+k_data056 = data.frame(WL = c("WW"), Phase = c("Pre-stationary"), O2=c(21), Strain  = c("PC-rich_056"))
+k_data077 = data.frame(WL = c("WW"), Phase = c("Pre-stationary"), O2=c(21), Strain  = c("PC-rich_077"))
+k_data048 = data.frame(WL = c("WW"), Phase = c("Pre-stationary"), O2=c(21), Strain  = c("PE-rich_048"))
+k_data127 = data.frame(WL = c("WW"),Phase = c("Pre-stationary"), O2=c(21), Strain  = c("PE-rich_127"))
+
+
 data_text_AnovaExp56<- data.frame(WL = c("WW"), Phase = c("Exponential"), O2=c(21), Strain  = c("PC-rich_056"),  label = c('a'))
 data_text_AnovaExp77<- data.frame(WL = c("WW"), Phase = c("Exponential"), O2=c(21), Strain  = c("PC-rich_077"),  label = c("a"))
 data_text_AnovaExp48<- data.frame(WL = c("WW"), Phase = c("Exponential"), O2=c(21), Strain  = c("PE-rich_048"),  label = c("a"))
@@ -1190,12 +1220,17 @@ ggplot(SolFitsExpFitAll445, aes(x = PARPhotonDose_day, y = Sig_nm2psii)) +
   geom_text(data=data_text_AnovaPhase, aes(x=24500000, y=-0.8, label=label), colour = "blue", size=4) +
   geom_text(data=data_text_AnovaPhase2, aes(x=6500000, y=-0.8, label=label), colour = "blue", size=4, parse = TRUE) +
   
+  geom_segment(data = k_data056, aes(x =9e07, y = -Inf, xend = 9e07, yend = Inf), color = "seagreen4", size = 6, alpha = 0.7) +
+  geom_segment(data = k_data077, aes(x =9e07, y = -Inf, xend = 9e07, yend = Inf), color = "palegreen3", size = 6, alpha = 0.7) +
+  geom_segment(data = k_data048, aes(x =9e07, y = -Inf, xend = 9e07, yend = Inf), color = "brown1", size = 6, alpha = 0.7) +
+  geom_segment(data = k_data127, aes(x =9e07, y = -Inf, xend = 9e07, yend = Inf), color = "brown4", size = 6, alpha = 0.7) +
+  
   scale_shape_manual(values = c(15, 16, 17,18), name="", labels = lab1) +
   scale_colour_manual(values = c("darkslategray", "lightblue4", "hotpink4", "indianred3",  "goldenrod2", "khaki2"), name="", labels = lab2) +
   labs(y=expression(paste(sigma,""["PSII"]*"' (nm"^"2"*" quanta"^"-1"*")")), x = "Cumulative diel PAR ( µmol photons "~m^-2~""~d^-1~")") +
-  scale_x_continuous(breaks=seq(0, 60000000, by = 30000000), label=scientific_10) +
+  scale_x_continuous(breaks=seq(0, 80000000, by = 30000000), label=scientific_10) +
   scale_y_continuous(breaks=seq(0, 10, by = 2)) +
-  coord_cartesian(xlim = c(0, 82000000), ylim = c(-2, 12)) +
+  coord_cartesian(xlim = c(0, 90000000), ylim = c(-2, 12)) +
   ggh4x::facet_nested(rows = vars(O2, Strain), cols = vars(WL, Phase), labeller = labeller(WL = WL.labs, O2 = O2.labs)) +
   theme_bw() +
   theme(panel.grid.minor = element_blank(),
@@ -1207,7 +1242,7 @@ ggplot(SolFitsExpFitAll445, aes(x = PARPhotonDose_day, y = Sig_nm2psii)) +
         axis.title.y = element_text(margin=margin(r=10)),
         axis.title.x = element_text(margin=margin(t=10)),
         legend.background = element_rect(fill="transparent"),
-        legend.position = c(0.90,0.88),
+        legend.position = c(0.85,0.88),
         legend.key.height= unit(0.003, 'cm'),
         legend.spacing.y = unit(-0.1, "cm"),
         legend.spacing.x = unit(-0.1, 'cm'),

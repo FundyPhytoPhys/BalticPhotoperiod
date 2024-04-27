@@ -1095,6 +1095,12 @@ GRCplatt_PredictGrowth8_BA127<-GRCplatt_PredictGrowthJVPSII8 %>%
 ```{r fig.height = 8, fig.width = 8, warning = FALSE, warning = FALSE}
 data_textA <- data.frame(facetsStrain  = c("Strain"), Strain  = c("PC-rich_056"), label = c('A'))
 
+k_data056 = data.frame(facetsStrain  = c("Strain"), Strain  = c("PC-rich_056"))
+k_data077 = data.frame(facetsStrain  = c("Strain"), Strain  = c("PC-rich_077"))
+k_data048 = data.frame(facetsStrain  = c("Strain"), Strain  = c("PE-rich_048"))
+k_data127 = data.frame(facetsStrain  = c("Strain"), Strain  = c("PE-rich_127"))
+
+
 lab1=c(expression("8 h"), expression("12 h"), expression("16 h"), expression("24 h"))
 lab2=c(expression("30 µE"), expression("90 µE"), expression("180 µE"), expression("300 µE"), expression("600 µE"), expression("900 µE"))
 lab4=c(expression(""), expression(""), expression(""), expression(""))
@@ -1116,9 +1122,19 @@ ggplot() +
   geom_line(aes(JVPSII_umol_eLs_Par_ue_umolChl_day, .fitted), colour = "darkslategray", linetype = "dashed", show.legend = F, GRCplatt_PredictGrowth30_BA127) +
   geom_line(aes(JVPSII_umol_eLs_Par_ue_umolChl_day, .fitted), colour = "goldenrod2", linetype = "dashed", show.legend = F, GRCplatt_PredictGrowth900_BA127) +
   geom_text(data=data_textA, aes(x=0, y=4, label=label), size=6) +
-  scale_x_continuous(label=scientific_10) +
+  
+  geom_segment(data = k_data056, aes(x =2e05, y = -Inf, xend = 2e05, yend = Inf), color = "seagreen4", size = 6, alpha = 0.7) +
+  geom_segment(data = k_data077, aes(x =2e05, y = -Inf, xend = 2e05, yend = Inf), color = "palegreen3", size = 6, alpha = 0.7) +
+  geom_segment(data = k_data048, aes(x =2e05, y = -Inf, xend = 2e05, yend = Inf), color = "brown1", size = 6, alpha = 0.7) +
+  geom_segment(data = k_data127, aes(x =2e05, y = -Inf, xend = 2e05, yend = Inf), color = "brown4", size = 6, alpha = 0.7) +
+  
+  #scale_x_continuous(label=scientific_10) +
   scale_colour_manual(values = c("darkslategray", "lightblue4", "hotpink4", "indianred3", "goldenrod2", "khaki2"), name="", labels = lab2, breaks=c('30', "90", "180", "300", "600","900")) +
   scale_shape_manual(values = c(15, 16, 17, 18), name="", labels = lab1) +
+  
+  scale_x_continuous(breaks=seq(0, 2e05, by = 0.5e05), label=scientific_10) +
+  coord_cartesian(xlim = c(0, 2e05)) +
+  
   # labs(y = "Chlorophyll specific exponential growth rate " ~ "("~d^-1~")", x = ""~italic(JV)~""["PSII"]*" ("~e^-~""~Chla^-1~""~d^-1~")") +
   # labs(y = "Chlorophyll specific exponential growth rate " ~ "("~d^-1~")", x = ""~italic(JV)~""["PSII"]*" (µmol"~e^-~""~µg~Chla^-1~""~d^-1~")") +
   labs(y = "Chlorophyll-specific exponential growth rate " ~ "("~d^-1~")", x = ""~italic(JV)~""["PSII"]*" (µmol"~e^-~""~µmol~Chl~italic(a)~""^-1~""~d^-1~")") +
@@ -1134,8 +1150,8 @@ ggplot() +
         strip.text = element_blank(),
         axis.title.y = element_text(margin=margin(r=10)),
         axis.title.x = element_text(margin=margin(t=10)),
-        legend.background = element_rect(fill="white"),
-        legend.position = c(0.90,0.88),
+        legend.background = element_rect(fill="transparent"),
+        legend.position = c(0.85,0.88),
         legend.key.height= unit(0.003, 'cm'),
         legend.spacing.y = unit(-0.1, "cm"),
         legend.spacing.x = unit(-0.1, 'cm'),
@@ -1183,15 +1199,25 @@ ggplot() +
   geom_line(aes(JVPSII_umol_eLs_Par_ue_umolChl_day, .fitted), colour = "black", linetype = "dotted", size = 0.6, show.legend = F, GRCplatt_PredictGrowth8_BA127) +
   geom_text(data=data_textA, aes(x=0, y=4, label=label), size=6) +
 
+  geom_segment(data = k_data056, aes(x =2e05, y = -Inf, xend = 2e05, yend = Inf), color = "seagreen4", size = 6, alpha = 0.7) +
+  geom_segment(data = k_data077, aes(x =2e05, y = -Inf, xend = 2e05, yend = Inf), color = "palegreen3", size = 6, alpha = 0.7) +
+  geom_segment(data = k_data048, aes(x =2e05, y = -Inf, xend = 2e05, yend = Inf), color = "brown1", size = 6, alpha = 0.7) +
+  geom_segment(data = k_data127, aes(x =2e05, y = -Inf, xend = 2e05, yend = Inf), color = "brown4", size = 6, alpha = 0.7) +
+  
   scale_colour_manual(values = c("darkslategray", "lightblue4", "hotpink4", "indianred3", "goldenrod2", "khaki2"), name="", labels = lab2, breaks=c('30', "90", "180", "300", "600","900")) +
   scale_shape_manual(values = c(15, 16, 17, 18), name="", labels = lab1) +
+  
+
+  
   # labs(y = "Chlorophyll specific exponential growth rate " ~ "("~d^-1~")", x = ""~italic(JV)~""["PSII"]*" ("~e^-~""~Chla^-1~""~d^-1~")") +
     # labs(y = "Chlorophyll specific exponential growth rate " ~ "("~d^-1~")", x = ""~italic(JV)~""["PSII"]*" ("~e^-~""~Chl~italic(a)~""^-1~""~d^-1~")") +
     labs(y = "Chlorophyll-specific exponential growth rate " ~ "("~d^-1~")", x = ""~italic(JV)~""["PSII"]*" (µmol"~e^-~""~µmol~Chl~italic(a)~""^-1~""~d^-1~")") +
-  scale_x_continuous(label=scientific_10) +
-  scale_y_continuous(breaks=seq(0, 4.5, by = 1)) +
-  coord_cartesian(ylim = c(0, 4.5)) +
+  #scale_x_continuous(label=scientific_10) +
+  # scale_y_continuous(breaks=seq(0, 4.5, by = 1)) +
+  # coord_cartesian(ylim = c(0, 4.5)) +
   
+  scale_x_continuous(breaks=seq(0, 2e05, by = 0.5e05), label=scientific_10) +
+  coord_cartesian(xlim = c(0, 2e05)) +
   
   ggh4x::facet_nested(rows = vars(Strain), labeller = label_parsed) +
   theme_bw() +
@@ -1205,8 +1231,8 @@ ggplot() +
         strip.text = element_blank(),
         axis.title.y = element_text(margin=margin(r=10)),
         axis.title.x = element_text(margin=margin(t=10)),
-        legend.background = element_rect(fill="white"),
-        legend.position = c(0.90,0.88),
+        legend.background = element_rect(fill="transparent"),
+        legend.position = c(0.85,0.88),
         legend.key.height= unit(0.003, 'cm'),
         legend.spacing.y = unit(-0.1, "cm"),
         legend.spacing.x = unit(-0.1, 'cm'),
@@ -1362,9 +1388,15 @@ PlotBPhotoperiodJVPSII<-JVPSIIParamAll_Photoperiod %>%
   geom_rect(xmin=-Inf, xmax=Inf, aes(ymin = estimate - SE, ymax = estimate + SE), show.legend = F, data = JVPSIIParamAll_PhotoperiodAll, fill = "blue", alpha = 0.1) +
   
   geom_text(data=data_textB, aes(x=8, y=0.0017, label=label), size=6) +
+  
+  geom_segment(data = k_data056, aes(x =25, y = -Inf, xend = 25, yend = Inf), color = "seagreen4", size = 6, alpha = 0.7) +
+  geom_segment(data = k_data077, aes(x =25, y = -Inf, xend = 25, yend = Inf), color = "palegreen3", size = 6, alpha = 0.7) +
+  geom_segment(data = k_data048, aes(x =25, y = -Inf, xend = 25, yend = Inf), color = "brown1", size = 6, alpha = 0.7) +
+  geom_segment(data = k_data127, aes(x =25, y = -Inf, xend = 25, yend = Inf), color = "brown4", size = 6, alpha = 0.7) +
+  
   scale_colour_discrete(type=c("seagreen4", "palegreen3", "brown1", "brown4"), name="") +
   scale_y_continuous(breaks=seq(0, 0.0020, by = 0.0005), label=scientific_10) +
-  scale_x_continuous(limits = c(8, 24), breaks = c(8, 12, 16, 24)) +
+  scale_x_continuous(limits = c(8, 25), breaks = c(8, 12, 16, 24)) +
   coord_cartesian(ylim = c(0, 0.0020)) +
   labs(y = "\u03B1", x = "Photoperiod (h)") +
   ggh4x::facet_nested(rows = vars(facetsStrain, Strain), labeller = label_parsed) +
@@ -1436,11 +1468,15 @@ PlotBLightJVPSII<-JVPSIIParamAll_Light %>%
   geom_hline(data = JVPSIIParamAll_PhotoperiodAll, aes(yintercept = estimate), linetype="solid", colour = "blue", size=0.4) +
   geom_rect(xmin=-Inf, xmax=Inf, aes(ymin = estimate - SE, ymax = estimate + SE), show.legend = F, data = JVPSIIParamAll_LightAll, fill = "blue", alpha = 0.1) +
   
+  geom_segment(data = k_data056, aes(x =930, y = -Inf, xend = 930, yend = Inf), color = "seagreen4", size = 6, alpha = 0.7) +
+  geom_segment(data = k_data077, aes(x =930, y = -Inf, xend = 930, yend = Inf), color = "palegreen3", size = 6, alpha = 0.7) +
+  geom_segment(data = k_data048, aes(x =930, y = -Inf, xend = 930, yend = Inf), color = "brown1", size = 6, alpha = 0.7) +
+  geom_segment(data = k_data127, aes(x =930, y = -Inf, xend = 930, yend = Inf), color = "brown4", size = 6, alpha = 0.7) +
   
   geom_text(data=data_textB, aes(x=30, y=0.035, label=label), size=6) +
   #scale_colour_discrete(type=c("seagreen4", "palegreen3", "brown1", "brown4"), name="") +
   scale_y_continuous(breaks=seq(0, 0.040, by = 0.01), label=scientific_10) +
-  scale_x_continuous(limits = c(30, 900), breaks = c(30, 90, 180, 300, 600, 900)) +
+  scale_x_continuous(limits = c(30, 930), breaks = c(30, 90, 180, 300, 600, 900)) +
   coord_cartesian(ylim = c(0, 0.040)) +
   labs(y = "\u03B1", x = "PAR ( µmol photons "~m^-2~""~s^-1~")") +
   ggh4x::facet_nested(rows = vars(facetsStrain, Strain), labeller = label_parsed) +
@@ -1449,7 +1485,7 @@ PlotBLightJVPSII<-JVPSIIParamAll_Light %>%
         panel.grid.major = element_blank(),
         axis.text = element_text(size=12),
         axis.title = element_text(size=16),
-        strip.background = element_rect(fill="white"),
+        strip.background = element_rect(fill="transparent"),
         strip.text = element_text(size=14),
         axis.title.y = element_text(margin=margin(r=10)),
         axis.title.x = element_text(margin=margin(t=10)),

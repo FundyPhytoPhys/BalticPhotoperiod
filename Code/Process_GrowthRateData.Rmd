@@ -124,13 +124,13 @@ MCGrowthRate<-rbind(MultiCultiGrowth1, MultiCultiGrowth2, MultiCultiGrowth3)
 # Create preliminary plot
 
 ```{r preliminary plot, warning = FALSE}
-# MCGrowthRate %>%
-#   ggplot() +
-#   geom_point(aes(x = Par_ue, y = deltaOD_Lmu_corr,colour=as.factor(Strain)), size = 3.5, alpha = 0.9, show.legend = T) +
-#   geom_errorbar(aes(x = Par_ue, ymin = deltaOD_Lmu_corr - deltaOD_Lmu_se, ymax = deltaOD_Lmu_corr + deltaOD_Lmu_se), alpha = 0.5) +
-#   scale_colour_discrete(type=c("seagreen4", "palegreen3", "brown1", "brown4")) +
-#   ggh4x::facet_nested(rows = vars(Strain), cols = vars(Photoperiod)) +
-#   theme_bw()
+MCGrowthRate %>%
+  ggplot() +
+  geom_point(aes(x = Par_ue, y = deltaOD_Lmu_corr,colour=as.factor(Strain)), size = 3.5, alpha = 0.9, show.legend = T) +
+  geom_errorbar(aes(x = Par_ue, ymin = deltaOD_Lmu_corr - deltaOD_Lmu_se, ymax = deltaOD_Lmu_corr + deltaOD_Lmu_se), alpha = 0.5) +
+  scale_colour_discrete(type=c("seagreen4", "palegreen3", "brown1", "brown4")) +
+  ggh4x::facet_nested(rows = vars(Strain), cols = vars(Photoperiod)) +
+  theme_bw()
 # 
 # MCGrowthRate %>%
 #   ggplot() +
@@ -873,6 +873,11 @@ GRCplatt_PredictGrowth900_BA127<-GRCplatt_PredictGrowth900 %>%
 ```{r create plot, fig.height = 8, fig.width = 8, warning = FALSE}
 data_textA <- data.frame(facetsStrain  = c("Strain"), Strain  = c("PC-rich_056"), label = c('A'))
 
+k_data056 = data.frame(facetsStrain  = c("Strain"), Strain  = c("PC-rich_056"))
+k_data077 = data.frame(facetsStrain  = c("Strain"), Strain  = c("PC-rich_077"))
+k_data048 = data.frame(facetsStrain  = c("Strain"), Strain  = c("PE-rich_048"))
+k_data127 = data.frame(facetsStrain  = c("Strain"), Strain  = c("PE-rich_127"))
+
 lab1=c(expression("8 h"), expression("12 h"), expression("16 h"), expression("24 h"))
 lab2=c(expression("30 µE"), expression("90 µE"), expression("180 µE"), expression("300 µE"), expression("600 µE"), expression("900 µE"))
 scientific_10 <- function(x) {   parse(text=gsub("e\\+*", " %*% 10^", scales::scientific_format()(x))) }
@@ -891,10 +896,20 @@ PlotALightPUR<-ggplot(MCGrowthExpSP, aes(PURPhotonDose_day, deltaOD_Lmu_corr)) +
   #geom_line(aes(PARPhotonDose_day, .fitted), colour = "goldenrod2", show.legend = F, GRCplatt_PredictGrowth900_BA48) +
   geom_line(aes(PURPhotonDose_day, .fitted), colour = "goldenrod2", linetype = "dashed", show.legend = F, GRCplatt_PredictGrowth900_BA127) +
   geom_text(data=data_textA, aes(x=0, y=4, label=label), size=6) +
-  scale_x_continuous(label=scientific_10) +
+  
+  geom_segment(data = k_data056, aes(x =4e07, y = -Inf, xend = 4e07, yend = Inf), color = "seagreen4", size = 6, alpha = 0.7) +
+  geom_segment(data = k_data077, aes(x =4e07, y = -Inf, xend = 4e07, yend = Inf), color = "palegreen3", size = 6, alpha = 0.7) +
+  geom_segment(data = k_data048, aes(x =4e07, y = -Inf, xend = 4e07, yend = Inf), color = "brown1", size = 6, alpha = 0.7) +
+  geom_segment(data = k_data127, aes(x =4e07, y = -Inf, xend = 4e07, yend = Inf), color = "brown4", size = 6, alpha = 0.7) +
+
+  #scale_x_continuous(label=scientific_10) +
   #scale_linetype_manual(values=c("equal900" = "dotted", "less900" = "solid"), breaks=c('8', '12', '16', "24", "", "")) +
   scale_colour_manual(values = c("darkslategray", "lightblue4", "hotpink4", "indianred3", "goldenrod2", "khaki2"), name="", labels = lab2, breaks=c('30', "90", "180", "300", "600","900")) +
   scale_shape_manual(values = c(15, 16, 17, 18), name="", labels = lab1) +
+  
+  scale_x_continuous(breaks=seq(0, 4e07, by = 1e07), label=scientific_10) +
+  coord_cartesian(xlim = c(0, 4e07)) +
+  
   labs(y = "Chlorophyll-specific exponential growth rate " ~ "("~d^-1~")", x = "Cumulative diel PUR ( µmol photons "~m^-2~""~d^-1~")") +
   ggh4x::facet_nested(rows = vars(facetsStrain, Strain), labeller = label_parsed) +
   theme_bw() +
@@ -908,8 +923,8 @@ PlotALightPUR<-ggplot(MCGrowthExpSP, aes(PURPhotonDose_day, deltaOD_Lmu_corr)) +
         strip.text = element_blank(),
         axis.title.y = element_text(margin=margin(r=10)),
         axis.title.x = element_text(margin=margin(t=10)),
-        legend.background = element_rect(fill="white"),
-        legend.position = c(0.90,0.88),
+        legend.background = element_rect(fill="transparent"),
+        legend.position = c(0.85,0.88),
         legend.key.height= unit(0.003, 'cm'),
         legend.spacing.y = unit(-0.1, "cm"),
         legend.spacing.x = unit(-0.1, 'cm'),
@@ -942,10 +957,20 @@ PlotAPhotoperiodPUR<-ggplot(MCGrowthExpSP, aes(PURPhotonDose_day, deltaOD_Lmu_co
   geom_line(aes(PURPhotonDose_day, .fitted), colour = "black", linetype = "dashed", show.legend = F, GRCplatt_PredictGrowth16) +
   geom_line(aes(PURPhotonDose_day, .fitted), colour = "black", linetype = "dotdash", show.legend = F, GRCplatt_PredictGrowth24) +
   geom_text(data=data_textA, aes(x=0, y=4, label=label), size=6) +
-  scale_x_continuous(label=scientific_10) +
+  
+  geom_segment(data = k_data056, aes(x =4e07, y = -Inf, xend = 4e07, yend = Inf), color = "seagreen4", size = 6, alpha = 0.7) +
+  geom_segment(data = k_data077, aes(x =4e07, y = -Inf, xend = 4e07, yend = Inf), color = "palegreen3", size = 6, alpha = 0.7) +
+  geom_segment(data = k_data048, aes(x =4e07, y = -Inf, xend = 4e07, yend = Inf), color = "brown1", size = 6, alpha = 0.7) +
+  geom_segment(data = k_data127, aes(x =4e07, y = -Inf, xend = 4e07, yend = Inf), color = "brown4", size = 6, alpha = 0.7) +
+  
+  #scale_x_continuous(label=scientific_10) +
   #scale_linetype_manual(values=c("equal900" = "dotted", "less900" = "solid"), breaks=c('8', '12', '16', "24", "", "")) +
   scale_colour_manual(values = c("darkslategray", "lightblue4", "hotpink4", "indianred3", "goldenrod2", "khaki2"), name="", labels = lab2, breaks=c('30', "90", "180", "300", "600","900")) +
   scale_shape_manual(values = c(15, 16, 17, 18), name="", labels = lab1) +
+  
+  scale_x_continuous(breaks=seq(0, 4e07, by = 1e07), label=scientific_10) +
+  coord_cartesian(xlim = c(0, 4e07)) +
+  
   labs(y = "Chlorophyll-specific exponential growth rate " ~ "("~d^-1~")", x = "Cumulative diel PUR ( µmol photons "~m^-2~""~d^-1~")") +
   ggh4x::facet_nested(rows = vars(facetsStrain, Strain), labeller = label_parsed) +
   theme_bw() +
@@ -959,8 +984,8 @@ PlotAPhotoperiodPUR<-ggplot(MCGrowthExpSP, aes(PURPhotonDose_day, deltaOD_Lmu_co
         strip.text = element_blank(),
         axis.title.y = element_text(margin=margin(r=10)),
         axis.title.x = element_text(margin=margin(t=10)),
-        legend.background = element_rect(fill="white"),
-        legend.position = c(0.90,0.88),
+        legend.background = element_rect(fill="transparent"),
+        legend.position = c(0.85,0.88),
         legend.key.height= unit(0.003, 'cm'),
         legend.spacing.y = unit(-0.1, "cm"),
         legend.spacing.x = unit(-0.1, 'cm'),
@@ -1092,14 +1117,17 @@ PlotB<-MCParamAll_Photoperiod %>%
   
   # geom_ribbon(aes(x = as.numeric(Fit), ymin = estimate - SE, ymax = estimate + SE), alpha = 0.1, width=0, size=0.3, data = . %>% filter(SE<2.997371e+01), show.legend = F) +
   
+  geom_rect(xmin=-Inf, xmax=Inf, aes(ymin = estimate - SE, ymax = estimate + SE), show.legend = F, data = MCParamAll_PhotoperiodAll, fill = "blue", alpha = 0.1) +
   
-    geom_rect(xmin=-Inf, xmax=Inf, aes(ymin = estimate - SE, ymax = estimate + SE), show.legend = F, data = MCParamAll_PhotoperiodAll, fill = "blue", alpha = 0.1) +
-  
+  geom_segment(data = k_data056, aes(x =25, y = -Inf, xend = 25, yend = Inf), color = "seagreen4", size = 6, alpha = 0.7) +
+  geom_segment(data = k_data077, aes(x =25, y = -Inf, xend = 25, yend = Inf), color = "palegreen3", size = 6, alpha = 0.7) +
+  geom_segment(data = k_data048, aes(x =25, y = -Inf, xend = 25, yend = Inf), color = "brown1", size = 6, alpha = 0.7) +
+  geom_segment(data = k_data127, aes(x =25, y = -Inf, xend = 25, yend = Inf), color = "brown4", size = 6, alpha = 0.7) +
   
   geom_text(data=data_textB, aes(x=8, y=1.4e-06, label=label), size=6) +
   scale_colour_discrete(type=c("seagreen4", "palegreen3", "brown1", "brown4"), name="") +
   scale_y_continuous(breaks=seq(0, 1.5e-06, by = 0.5e-06), label=scientific_10) +
-  scale_x_continuous(limits = c(8, 24), breaks = c(8, 12, 16, 24)) +
+  scale_x_continuous(limits = c(8, 25), breaks = c(8, 12, 16, 24)) +
   coord_cartesian(ylim = c(0, 1.6e-06)) +
   labs(y = "\u03B1", x = "Photoperiod (h)") +
   ggh4x::facet_nested(rows = vars(facetsStrain, Strain), labeller = label_parsed) +
@@ -1168,9 +1196,14 @@ PlotB<-MCParamAll_Light %>%
   
       geom_rect(xmin=-Inf, xmax=Inf, aes(ymin = estimate - SE, ymax = estimate + SE), show.legend = F, data = MCParamAll_LightAll, fill = "blue", alpha = 0.1) +
   
+  geom_segment(data = k_data056, aes(x =930, y = -Inf, xend = 930, yend = Inf), color = "seagreen4", size = 6, alpha = 0.7) +
+  geom_segment(data = k_data077, aes(x =930, y = -Inf, xend = 930, yend = Inf), color = "palegreen3", size = 6, alpha = 0.7) +
+  geom_segment(data = k_data048, aes(x =930, y = -Inf, xend = 930, yend = Inf), color = "brown1", size = 6, alpha = 0.7) +
+  geom_segment(data = k_data127, aes(x =930, y = -Inf, xend = 930, yend = Inf), color = "brown4", size = 6, alpha = 0.7) +
+  
   scale_colour_discrete(type=c("seagreen4", "palegreen3", "brown1", "brown4"), name="") +
   scale_y_continuous(breaks=seq(0, 1.5e-06, by = 0.5e-06), label=scientific_10) +
-  scale_x_continuous(limits = c(30, 900), breaks = c(30, 90, 180, 300, 600, 900)) +
+  scale_x_continuous(limits = c(30, 930), breaks = c(30, 90, 180, 300, 600, 900)) +
   coord_cartesian(ylim = c(-0.2e-06, 1.5e-06)) +
   labs(y = "\u03B1", x = "PAR ( µmol photons "~m^-2~""~s^-1~")") +
   ggh4x::facet_nested(rows = vars(facetsStrain, Strain), labeller = label_parsed) +
@@ -1179,7 +1212,7 @@ PlotB<-MCParamAll_Light %>%
         panel.grid.major = element_blank(),
         axis.text = element_text(size=12),
         axis.title = element_text(size=16),
-        strip.background = element_rect(fill="white"),
+        strip.background = element_rect(fill="transparent"),
         strip.text = element_text(size=14),
         axis.title.y = element_text(margin=margin(r=10)),
         axis.title.x = element_text(margin=margin(t=10)),
@@ -1210,7 +1243,7 @@ ggp
 # Save plot 
 
 ```{r save plot}
-ggsave(file = file.path(FigPath, paste("Fig_GrowthRate_Light_PUR",".png",sep = "")), height=9, width= 12,  dpi = 300, limitsize = TRUE)
+ggsave(file = file.path(FigPath, paste("Fig_GrowthRate_Light_PUR2",".png",sep = "")), height=9, width= 12,  dpi = 300, limitsize = TRUE)
 ```
 
 
@@ -1893,10 +1926,19 @@ LightPAR<-ggplot(MCGrowthSP, aes(PARPhotonDose_day, deltaOD_Lmu_corr)) +
   
   geom_text(data=data_textA, aes(x=0, y=4, label=label), size=6) +
   
-  scale_x_continuous(label=scientific_10) +
+  geom_segment(data = k_data056, aes(x =9.5e07, y = -Inf, xend = 9.5e07, yend = Inf), color = "seagreen4", size = 6, alpha = 0.7) +
+  geom_segment(data = k_data077, aes(x =9.5e07, y = -Inf, xend = 9.5e07, yend = Inf), color = "palegreen3", size = 6, alpha = 0.7) +
+  geom_segment(data = k_data048, aes(x =9.5e07, y = -Inf, xend = 9.5e07, yend = Inf), color = "brown1", size = 6, alpha = 0.7) +
+  geom_segment(data = k_data127, aes(x =9.5e07, y = -Inf, xend = 9.5e07, yend = Inf), color = "brown4", size = 6, alpha = 0.7) +
+  
+  #scale_x_continuous(label=scientific_10) +
   #scale_linetype_manual(values=c("equal900" = "dotted", "less900" = "solid"), breaks=c('8', '12', '16', "24", "", "")) +
   scale_colour_manual(values = c("darkslategray", "lightblue4", "hotpink4", "indianred3", "goldenrod2", "khaki2"), name="", labels = lab2, breaks=c('30', "90", "180", "300", "600","900")) +
   scale_shape_manual(values = c(15, 16, 17, 18), name="", labels = lab1) +
+  
+  scale_x_continuous(breaks=seq(0, 9.5e07, by = 2e07), label=scientific_10) +
+  coord_cartesian(xlim = c(0, 9.5e07)) +
+  
   labs(y = "Chlorophyll-specific exponential growth rate " ~ "("~d^-1~")", x = "Cumulative diel PAR ( µmol photons "~m^-2~""~d^-1~")") +
   ggh4x::facet_nested(rows = vars(facetsStrain, Strain), labeller = label_parsed) +
   theme_bw() +
@@ -1912,8 +1954,8 @@ LightPAR<-ggplot(MCGrowthSP, aes(PARPhotonDose_day, deltaOD_Lmu_corr)) +
         strip.background.y = element_blank(),
         strip.text.y = element_blank(),
         
-        legend.background = element_rect(fill="white"),
-        legend.position = c(0.90,0.88),
+        legend.background = element_rect(fill="transparent"),
+        legend.position = c(0.85,0.88),
         legend.key.height= unit(0.003, 'cm'),
         legend.spacing.y = unit(-0.1, "cm"),
         legend.spacing.x = unit(-0.1, 'cm'),
@@ -1949,10 +1991,20 @@ PhotoperiodPAR<-ggplot(MCGrowthSP, aes(PARPhotonDose_day, deltaOD_Lmu_corr)) +
   
   geom_text(data=data_textA, aes(x=0, y=4, label=label), size=6) +
   
-  scale_x_continuous(label=scientific_10) +
+  
+  geom_segment(data = k_data056, aes(x =9.5e07, y = -Inf, xend = 9.5e07, yend = Inf), color = "seagreen4", size = 6, alpha = 0.7) +
+  geom_segment(data = k_data077, aes(x =9.5e07, y = -Inf, xend = 9.5e07, yend = Inf), color = "palegreen3", size = 6, alpha = 0.7) +
+  geom_segment(data = k_data048, aes(x =9.5e07, y = -Inf, xend = 9.5e07, yend = Inf), color = "brown1", size = 6, alpha = 0.7) +
+  geom_segment(data = k_data127, aes(x =9.5e07, y = -Inf, xend = 9.5e07, yend = Inf), color = "brown4", size = 6, alpha = 0.7) +
+  
+  #scale_x_continuous(label=scientific_10) +
   #scale_linetype_manual(values=c("equal900" = "dotted", "less900" = "solid"), breaks=c('8', '12', '16', "24", "", "")) +
   scale_colour_manual(values = c("darkslategray", "lightblue4", "hotpink4", "indianred3", "goldenrod2", "khaki2"), name="", labels = lab2, breaks=c('30', "90", "180", "300", "600","900")) +
   scale_shape_manual(values = c(15, 16, 17, 18), name="", labels = lab1) +
+  
+  scale_x_continuous(breaks=seq(0, 9.5e07, by = 2e07), label=scientific_10) +
+  coord_cartesian(xlim = c(0, 9.5e07)) +
+  
   labs(y = "Chlorophyll-specific exponential growth rate " ~ "("~d^-1~")", x = "Cumulative diel PAR ( µmol photons "~m^-2~""~d^-1~")") +
   ggh4x::facet_nested(rows = vars(facetsStrain, Strain), labeller = label_parsed) +
   theme_bw() +
@@ -1968,8 +2020,8 @@ PhotoperiodPAR<-ggplot(MCGrowthSP, aes(PARPhotonDose_day, deltaOD_Lmu_corr)) +
         
         axis.title.y = element_text(margin=margin(r=10)),
         axis.title.x = element_text(margin=margin(t=10)),
-        legend.background = element_rect(fill="white"),
-        legend.position = c(0.90,0.88),
+        legend.background = element_rect(fill="transparent"),
+        legend.position = c(0.85,0.88),
         legend.key.height= unit(0.003, 'cm'),
         legend.spacing.y = unit(-0.1, "cm"),
         legend.spacing.x = unit(-0.1, 'cm'),
@@ -2011,11 +2063,16 @@ PlotBLightPAR<-MCParamAll_Light %>%
   geom_hline(data = MCParamAll_LightAll, aes(yintercept = estimate), linetype="solid", colour = "blue", size=0.4) +
   # geom_ribbon(aes(x = as.numeric(Fit), ymin = estimate - SE, ymax = estimate + SE), alpha = 0.1, width=0, size=0.3, data = . %>% filter(SE<2.997371e+01), show.legend = F) +
   
-      geom_rect(xmin=-Inf, xmax=Inf, aes(ymin = estimate - SE, ymax = estimate + SE), show.legend = F, data = MCParamAll_LightAll, fill = "blue", alpha = 0.1) +
+  geom_rect(xmin=-Inf, xmax=Inf, aes(ymin = estimate - SE, ymax = estimate + SE), show.legend = F, data = MCParamAll_LightAll, fill = "blue", alpha = 0.1) +
+  
+  geom_segment(data = k_data056, aes(x =930, y = -Inf, xend = 930, yend = Inf), color = "seagreen4", size = 6, alpha = 0.7) +
+  geom_segment(data = k_data077, aes(x =930, y = -Inf, xend = 930, yend = Inf), color = "palegreen3", size = 6, alpha = 0.7) +
+  geom_segment(data = k_data048, aes(x =930, y = -Inf, xend = 930, yend = Inf), color = "brown1", size = 6, alpha = 0.7) +
+  geom_segment(data = k_data127, aes(x =930, y = -Inf, xend = 930, yend = Inf), color = "brown4", size = 6, alpha = 0.7) +
   
   scale_colour_discrete(type=c("seagreen4", "palegreen3", "brown1", "brown4"), name="") +
   scale_y_continuous(breaks=seq(0, 1.5e-06, by = 0.5e-06), label=scientific_10) +
-  scale_x_continuous(limits = c(30, 900), breaks = c(30, 90, 180, 300, 600, 900)) +
+  scale_x_continuous(limits = c(30, 930), breaks = c(30, 90, 180, 300, 600, 900)) +
   coord_cartesian(ylim = c(-0.2e-06, 1.5e-06)) +
   labs(y = "\u03B1", x = "PAR ( µmol photons "~m^-2~""~s^-1~")") +
   ggh4x::facet_nested(rows = vars(facetsStrain, Strain), labeller = label_parsed) +
@@ -2062,14 +2119,17 @@ PlotBPhotoperiodPAR<-MCParamAll_Photoperiod %>%
   
   # geom_ribbon(aes(x = as.numeric(Fit), ymin = estimate - SE, ymax = estimate + SE), alpha = 0.1, width=0, size=0.3, data = . %>% filter(SE<2.997371e+01), show.legend = F) +
   
+  geom_rect(xmin=-Inf, xmax=Inf, aes(ymin = estimate - SE, ymax = estimate + SE), show.legend = F, data = MCParamAll_PhotoperiodAll, fill = "blue", alpha = 0.1) +
   
-    geom_rect(xmin=-Inf, xmax=Inf, aes(ymin = estimate - SE, ymax = estimate + SE), show.legend = F, data = MCParamAll_PhotoperiodAll, fill = "blue", alpha = 0.1) +
-  
+  geom_segment(data = k_data056, aes(x =25, y = -Inf, xend = 25, yend = Inf), color = "seagreen4", size = 6, alpha = 0.7) +
+  geom_segment(data = k_data077, aes(x =25, y = -Inf, xend = 25, yend = Inf), color = "palegreen3", size = 6, alpha = 0.7) +
+  geom_segment(data = k_data048, aes(x =25, y = -Inf, xend = 25, yend = Inf), color = "brown1", size = 6, alpha = 0.7) +
+  geom_segment(data = k_data127, aes(x =25, y = -Inf, xend = 25, yend = Inf), color = "brown4", size = 6, alpha = 0.7) +
   
   geom_text(data=data_textB, aes(x=8, y=1.4e-06, label=label), size=6) +
   scale_colour_discrete(type=c("seagreen4", "palegreen3", "brown1", "brown4"), name="") +
   scale_y_continuous(breaks=seq(0, 1.5e-06, by = 0.5e-06), label=scientific_10) +
-  scale_x_continuous(limits = c(8, 24), breaks = c(8, 12, 16, 24)) +
+  scale_x_continuous(limits = c(8, 25), breaks = c(8, 12, 16, 24)) +
   coord_cartesian(ylim = c(0, 1.6e-06)) +
   labs(y = "\u03B1", x = "Photoperiod (h)") +
   ggh4x::facet_nested(rows = vars(facetsStrain, Strain), labeller = label_parsed) +
