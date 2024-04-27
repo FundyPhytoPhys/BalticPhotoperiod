@@ -1115,7 +1115,7 @@ ggplot() +
   
   geom_line(aes(JVPSII_umol_eLs_Par_ue_umolChl_day, .fitted), colour = "darkslategray", linetype = "dashed", show.legend = F, GRCplatt_PredictGrowth30_BA127) +
   geom_line(aes(JVPSII_umol_eLs_Par_ue_umolChl_day, .fitted), colour = "goldenrod2", linetype = "dashed", show.legend = F, GRCplatt_PredictGrowth900_BA127) +
-  geom_text(data=data_textA, aes(x=0, y=4.3, label=label), size=5) +
+  geom_text(data=data_textA, aes(x=0, y=4, label=label), size=6) +
   scale_x_continuous(label=scientific_10) +
   scale_colour_manual(values = c("darkslategray", "lightblue4", "hotpink4", "indianred3", "goldenrod2", "khaki2"), name="", labels = lab2, breaks=c('30', "90", "180", "300", "600","900")) +
   scale_shape_manual(values = c(15, 16, 17, 18), name="", labels = lab1) +
@@ -1181,7 +1181,7 @@ ggplot() +
   geom_line(aes(JVPSII_umol_eLs_Par_ue_umolChl_day, .fitted), colour = "black", linetype = "dotdash", size = 0.6, show.legend = F,  GRCplatt_PredictGrowth24_BA56) +
   
   geom_line(aes(JVPSII_umol_eLs_Par_ue_umolChl_day, .fitted), colour = "black", linetype = "dotted", size = 0.6, show.legend = F, GRCplatt_PredictGrowth8_BA127) +
-  geom_text(data=data_textA, aes(x=0, y=4.3, label=label), size=5) +
+  geom_text(data=data_textA, aes(x=0, y=4, label=label), size=6) +
 
   scale_colour_manual(values = c("darkslategray", "lightblue4", "hotpink4", "indianred3", "goldenrod2", "khaki2"), name="", labels = lab2, breaks=c('30', "90", "180", "300", "600","900")) +
   scale_shape_manual(values = c(15, 16, 17, 18), name="", labels = lab1) +
@@ -1344,7 +1344,7 @@ JVPSIIParamAll_PhotoperiodAll<-JVPSIIParamAll_Photoperiod %>%
   rename(SE="std.error") 
 
 
-PlotB<-JVPSIIParamAll_Photoperiod %>% 
+PlotBPhotoperiodJVPSII<-JVPSIIParamAll_Photoperiod %>% 
   filter(term == "a") %>% 
   filter(Fit!= "All") %>% 
   rename(SE="std.error") %>% 
@@ -1361,7 +1361,7 @@ PlotB<-JVPSIIParamAll_Photoperiod %>%
   
   geom_rect(xmin=-Inf, xmax=Inf, aes(ymin = estimate - SE, ymax = estimate + SE), show.legend = F, data = JVPSIIParamAll_PhotoperiodAll, fill = "blue", alpha = 0.1) +
   
-  geom_text(data=data_textB, aes(x=8, y=0.0019, label=label), size=5) +
+  geom_text(data=data_textB, aes(x=8, y=0.0017, label=label), size=6) +
   scale_colour_discrete(type=c("seagreen4", "palegreen3", "brown1", "brown4"), name="") +
   scale_y_continuous(breaks=seq(0, 0.0020, by = 0.0005), label=scientific_10) +
   scale_x_continuous(limits = c(8, 24), breaks = c(8, 12, 16, 24)) +
@@ -1385,7 +1385,7 @@ PlotB<-JVPSIIParamAll_Photoperiod %>%
         legend.title = element_blank(),
         #panel.spacing.y = unit(0.4, 'cm'),
         legend.text = element_text(size=11))
-PlotB
+PlotBPhotoperiodJVPSII
 
 # g <- ggplot_gtable(ggplot_build(PlotB))
 # stripr <- which(grepl('strip-r', g$layout$name))
@@ -1400,7 +1400,7 @@ PlotB
 ```
 
 ```{r, warning = FALSE, fig.height = 9, fig.width = 12}
-ggp<- (PlotAPhotoperiodJVPSII+PlotB) 
+ggp<- (PlotAPhotoperiodJVPSII+PlotBPhotoperiodJVPSII) 
 ggp                           
 ```
 
@@ -1418,7 +1418,13 @@ data_textB <- data.frame(facetsStrain  = c("Strain"), Strain  = c("PC-rich_056")
 
 JVPSIIParamAll_Light$facetsStrain <- 'Strain'
 
-PlotB<-JVPSIIParamAll_Light %>% 
+JVPSIIParamAll_LightAll<-JVPSIIParamAll_Light %>% 
+  filter(term == "a") %>% 
+  filter(Fit== "All") %>% 
+  rename(SE="std.error") 
+
+
+PlotBLightJVPSII<-JVPSIIParamAll_Light %>% 
   filter(term == "a") %>% 
   filter(Fit!= "All") %>% 
   rename(SE="std.error") %>% 
@@ -1426,12 +1432,17 @@ PlotB<-JVPSIIParamAll_Light %>%
   geom_point(aes(x = as.numeric(Fit), y = estimate), size = 2.5, alpha = 0.8, show.legend = F) +
   geom_line(aes(x = as.numeric(Fit), y = estimate), linetype = "dotted", size = 0.5, alpha = 0.8, show.legend = F) +
   geom_errorbar(aes(x = as.numeric(Fit), ymin = estimate - SE, ymax = estimate + SE), width=0, size=0.3, data = . %>% filter(SE<0.02), show.legend = F) +
-  geom_text(data=data_textB, aes(x=8, y=0.038, label=label), size=5) +
+  
+  geom_hline(data = JVPSIIParamAll_PhotoperiodAll, aes(yintercept = estimate), linetype="solid", colour = "blue", size=0.4) +
+  geom_rect(xmin=-Inf, xmax=Inf, aes(ymin = estimate - SE, ymax = estimate + SE), show.legend = F, data = JVPSIIParamAll_LightAll, fill = "blue", alpha = 0.1) +
+  
+  
+  geom_text(data=data_textB, aes(x=30, y=0.035, label=label), size=6) +
   #scale_colour_discrete(type=c("seagreen4", "palegreen3", "brown1", "brown4"), name="") +
-  scale_y_continuous(breaks=seq(0, 0.04, by = 0.01), label=scientific_10) +
+  scale_y_continuous(breaks=seq(0, 0.040, by = 0.01), label=scientific_10) +
   scale_x_continuous(limits = c(30, 900), breaks = c(30, 90, 180, 300, 600, 900)) +
-  coord_cartesian(ylim = c(0, 0.04)) +
-  labs(y = "Alpha", x = "Photoperiod (h)") +
+  coord_cartesian(ylim = c(0, 0.040)) +
+  labs(y = "\u03B1", x = "PAR ( µmol photons "~m^-2~""~s^-1~")") +
   ggh4x::facet_nested(rows = vars(facetsStrain, Strain), labeller = label_parsed) +
   theme_bw() +
   theme(panel.grid.minor = element_blank(),
@@ -1445,28 +1456,33 @@ PlotB<-JVPSIIParamAll_Light %>%
         legend.background = element_rect(fill="transparent"),
         legend.position = c(0.8,0.9),
         legend.text = element_text(size=11))
-PlotB
+PlotBLightJVPSII
 
 
-g <- ggplot_gtable(ggplot_build(PlotB))
-stripr <- which(grepl('strip-r', g$layout$name))
-fills <- c("white","seagreen4","palegreen3","brown1", "brown4")
-k <- 1
-for (i in stripr) {
-j <- which(grepl('rect', g$grobs[[i]]$grobs[[1]]$childrenOrder))
-g$grobs[[i]]$grobs[[1]]$children[[j]]$gp$fill <- fills[k]
-k <- k+1
-}
-grid.draw(g)
+# g <- ggplot_gtable(ggplot_build(PlotB))
+# stripr <- which(grepl('strip-r', g$layout$name))
+# fills <- c("white","seagreen4","palegreen3","brown1", "brown4")
+# k <- 1
+# for (i in stripr) {
+# j <- which(grepl('rect', g$grobs[[i]]$grobs[[1]]$childrenOrder))
+# g$grobs[[i]]$grobs[[1]]$children[[j]]$gp$fill <- fills[k]
+# k <- k+1
+# }
+# grid.draw(g)
 ```
 
 
 ```{r, warning = FALSE, fig.height = 9, fig.width = 12}
-ggp<- PlotALightJVPSII+PlotB  
+ggp<- PlotALightJVPSII+PlotBLightJVPSII  
 ggp                           
 ```
 
 
+# Save plot 
+
+```{r save plot}
+ggsave(file = file.path(FigPath, paste("Fig_GrowthRate_JVPSII_Light_Chla",".png",sep = "")), height=9, width= 12,  dpi = 300, limitsize = TRUE)
+```
 
 
 

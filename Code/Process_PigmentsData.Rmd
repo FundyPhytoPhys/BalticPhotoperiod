@@ -911,12 +911,12 @@ augmentedPhycoChlaRatio<-fittedPhycoChlaRatio  %>%
 # Create Phyco/Chla ratio plot at 590
 
 ```{r create Sigma plot, fig.height = 8, fig.width = 8, warning = FALSE}
-data_text_y0Exp<- data.frame(WL = c("WW", "WW"), Phase = c("Exponential"), O2=c(21, 21, 21, 21), Strain  = c("PC-rich_056", "PC-rich_077", "PE-rich_048", "PE-rich_127"),  label = c('y0 = 2.2', 'y0 = 3.1', 'y0 = 4.1', 'y0 = 3.9'))
-data_text_yfExp<- data.frame(WL = c("WW", "WW"), Phase = c("Exponential"), O2=c(21, 21, 21, 21), Strain  = c("PC-rich_056", "PC-rich_077", "PE-rich_048", "PE-rich_127"),  label = c('yf = 0.2', 'yf = -0.3', 'yf = -0.3', 'yf = 0.2'))
+data_text_y0Exp<- data.frame(WL = c("WW", "WW"), Phase = c("Exponential"), O2=c(21, 21, 21, 21), Strain  = c("PC-rich_056", "PC-rich_077", "PE-rich_048", "PE-rich_127"),  label = c('y[0]~"="~2.2', 'y[0]~"="~3.1', 'y[0]~"="~4.1', 'y[0]~"="~3.9'))
+data_text_yfExp<- data.frame(WL = c("WW", "WW"), Phase = c("Exponential"), O2=c(21, 21, 21, 21), Strain  = c("PC-rich_056", "PC-rich_077", "PE-rich_048", "PE-rich_127"),  label = c('y[f]~"="~0.2', 'y[f]~"="~-0.3', 'y[f]~"="~-0.3', 'y[f]~"="~0.2'))
 data_text_lambdaExp<- data.frame(WL = c("WW", "WW"), Phase = c("Exponential"), O2=c(21, 21, 21, 21), Strain  = c("PC-rich_056", "PC-rich_077", "PE-rich_048", "PE-rich_127"),  label = c('    \u03BB = 5.9e-08', '    \u03BB = 2.8e-08', '    \u03BB = 2.6e-08', '    \u03BB = 4.2e-08'))
 
-data_text_y0St<- data.frame(WL = c("WW", "WW"), Phase = c("Pre-stationary"), O2=c(21, 21, 21, 21), Strain  = c("PC-rich_056", "PC-rich_077", "PE-rich_048", "PE-rich_127"),  label = c('y0 = 7.2', ' y0 = 10.8', 'y0 = 3.0', 'y0 = 2.9'))
-data_text_yfSt<- data.frame(WL = c("WW", "WW"), Phase = c("Pre-stationary"), O2=c(21, 21, 21, 21), Strain  = c("PC-rich_056", "PC-rich_077", "PE-rich_048", "PE-rich_127"),  label = c('yf = 0.6', 'yf = 0.8', 'yf = -0.4', 'yf = -0.2'))
+data_text_y0St<- data.frame(WL = c("WW", "WW"), Phase = c("Pre-stationary"), O2=c(21, 21, 21, 21), Strain  = c("PC-rich_056", "PC-rich_077", "PE-rich_048", "PE-rich_127"),  label = c('y[0]~"="~7.2', '~~y[0]~"="~10.8', 'y[0]~"="~3.1', 'y[0]~"="~2.9'))
+data_text_yfSt<- data.frame(WL = c("WW", "WW"), Phase = c("Pre-stationary"), O2=c(21, 21, 21, 21), Strain  = c("PC-rich_056", "PC-rich_077", "PE-rich_048", "PE-rich_127"),  label = c('y[f]~"="~0.6', 'y[f]~"="~0.8', '~~y[f]~"="~-0.4', '~~y[f]~"="~-0.2'))
 data_text_lambdaSt<- data.frame(WL = c("WW", "WW"), Phase = c("Pre-stationary"), O2=c(21, 21, 21, 21), Strain  = c("PC-rich_056", "PC-rich_077", "PE-rich_048", "PE-rich_127"),  label = c('    \u03BB = 9.3e-07', '    \u03BB = 7.0e-07', '    \u03BB = 2.9e-08', '    \u03BB = 2.4e-08'))
 
 # data_text_AnovaExp<- data.frame(WL = c("WW", "WW"), Phase = c("Exponential"), O2=c(21, 21, 21, 21), Strain  = c("PC-rich_056", "PC-rich_077", "PE-rich_048", "PE-rich_127"),  label = c('ANOVA, \u03B1 = 0.05, a', 'ANOVA, \u03B1 = 0.05, b', 'ANOVA, \u03B1 = 0.05, b', 'ANOVA, \u03B1 = 0.05, c'))
@@ -960,13 +960,13 @@ ggplot(PhycoChlaRatioChoosen, aes(x = PARPhotonDose_day, y = PhycoChlaRatio)) +
   geom_point(aes(x = PARPhotonDose_day, y = PhycoChlaRatio, colour = as.factor(Par_ue), shape = as.factor(Photoperiod)), size = 1, show.legend = F) +
   geom_errorbar(aes(x = PARPhotonDose_day, ymin = AllmeanPhycoChlaRatio - AllsdPhycoChlaRatio, ymax = AllmeanPhycoChlaRatio + AllsdPhycoChlaRatio, colour=as.factor(Par_ue)), width=0, size=0.3, show.legend = F) +
   geom_line(aes(PARPhotonDose_day, .fitted), colour = "blue", linetype = "solid", size = 0.3, show.legend = F, augmentedPhycoChlaRatio) +
-  geom_text(data=data_text_y0Exp, aes(x=70000000, y=8, label=label), size=3.5) +
-  geom_text(data=data_text_yfExp, aes(x=70000000, y=6.5, label=label), size=3.5) +
-  geom_text(data=data_text_lambdaExp, aes(x=70000000, y=5, label=label), size=3.5) +
+  geom_text(data=data_text_y0Exp, aes(x=70000000, y=8, label=label), size=3.5, parse = TRUE) +
+  geom_text(data=data_text_yfExp, aes(x=70000000, y=6.5, label=label), size=3.5, parse = TRUE) +
+  #geom_text(data=data_text_lambdaExp, aes(x=70000000, y=5, label=label), size=3.5) +
   
-  geom_text(data=data_text_y0St, aes(x=7500000, y=8, label=label), size=3.5) +
-  geom_text(data=data_text_yfSt, aes(x=7500000, y=6.5, label=label), size=3.5) +
-  geom_text(data=data_text_lambdaSt, aes(x=7500000, y=5, label=label), size=3.5) +
+  geom_text(data=data_text_y0St, aes(x=7500000, y=8, label=label), size=3.5, parse = TRUE) +
+  geom_text(data=data_text_yfSt, aes(x=7500000, y=6.5, label=label), size=3.5, parse = TRUE) +
+  #geom_text(data=data_text_lambdaSt, aes(x=7500000, y=5, label=label), size=3.5) +
   
   geom_text(data=data_text_AnovaExp56, aes(x=75000000, y=1.5, label=label), colour = "blue", size=4) +
   geom_text(data=data_text_AnovaExp77, aes(x=75000000, y=1.5, label=label), colour = "blue", size=4) +
@@ -993,7 +993,7 @@ ggplot(PhycoChlaRatioChoosen, aes(x = PARPhotonDose_day, y = PhycoChlaRatio)) +
   
   scale_shape_manual(values = c(15, 16, 17,18), name="", labels = lab1) +
   scale_colour_manual(values = c("darkslategray", "lightblue4", "hotpink4", "indianred3",  "goldenrod2", "khaki2"), name="", labels = lab2) +
-  labs(y="Phycobiliprotein to Chl" ~italic(a)~ "ratio (µg/µg)", x = "Cumulative diel PAR ( µmol photons "~m^-2~""~d^-1~")") +
+  labs(y="Phycobiliprotein to Chl" ~italic(a)~ "ratio (µg:µg)", x = "Cumulative diel PAR ( µmol photons "~m^-2~""~d^-1~")") +
   scale_x_continuous(breaks=seq(0, 60000000, by = 30000000), label=scientific_10) +
   scale_y_continuous(breaks=seq(0, 8, by = 2)) +
   coord_cartesian(xlim = c(0, 82000000), ylim = c(-1.2, 9)) +
