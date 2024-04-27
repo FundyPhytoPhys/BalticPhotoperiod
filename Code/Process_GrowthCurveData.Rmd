@@ -33,10 +33,9 @@ Process_GrowthCurveData.Rmd separately processes and combines all .Rds from Data
 # Load Libraries and set Project Variables
 
 ```{r load libraries} 
-library(xts)
-library(signal)
+# library(xts)
+# library(signal)
 
-library(tidyverse)
 library(lubridate)
 library(stringr)
 library(broom)
@@ -47,7 +46,7 @@ library(ggpubr)
 library(data.table)
 library(googledrive)
 library(googlesheets4)
-
+library(tidyverse)
 ```
 
 ```{r set project variables}
@@ -143,20 +142,20 @@ tmaxAG$facetsStrain = factor(tmaxAG$O2, labels = c("Strain"))
 
 ```{r select revelant columns}
 tMaxAGLines_056<-tmaxAG %>% 
-  filter(Strain == "PC-rich_056") %>% 
-  select(c(Par_ue, Photoperiod, facetsPar_ue, facetsPhotoperiod, tMaxAG)) %>% 
+    dplyr::filter(Strain == "PC-rich_056") %>% 
+    dplyr::select(c(Par_ue, Photoperiod, facetsPar_ue, facetsPhotoperiod, tMaxAG)) %>% 
   unique()
 tMaxAGLines_077<-tmaxAG %>% 
-  filter(Strain == "PC-rich_077") %>% 
-  select(c(Par_ue, Photoperiod, facetsPar_ue, facetsPhotoperiod, tMaxAG)) %>% 
+    dplyr::filter(Strain == "PC-rich_077") %>% 
+    dplyr::select(c(Par_ue, Photoperiod, facetsPar_ue, facetsPhotoperiod, tMaxAG)) %>% 
   unique()
 tMaxAGLines_048<-tmaxAG %>% 
-  filter(Strain == "PE-rich_048") %>% 
-  select(c(Par_ue, Photoperiod, facetsPar_ue, facetsPhotoperiod, tMaxAG)) %>% 
+    dplyr::filter(Strain == "PE-rich_048") %>% 
+    dplyr::select(c(Par_ue, Photoperiod, facetsPar_ue, facetsPhotoperiod, tMaxAG)) %>% 
   unique()
 tMaxAGLines_127<-tmaxAG %>% 
-  filter(Strain == "PE-rich_127") %>% 
-  select(c(Par_ue, Photoperiod, facetsPar_ue, facetsPhotoperiod, tMaxAG)) %>% 
+    dplyr::filter(Strain == "PE-rich_127") %>% 
+    dplyr::select(c(Par_ue, Photoperiod, facetsPar_ue, facetsPhotoperiod, tMaxAG)) %>% 
   unique()
 ```
 
@@ -167,7 +166,7 @@ tMaxAGLines_127<-tmaxAG %>%
 MultiCultiDataAll %>%
   #filter(Par_ue != 600) %>% 
   filter(Run != 77) %>% 
-  ggplot() +
+ggplot() +
   geom_area(aes(x = Time_h/24, y = meanActinic_par_h), size = 0.1, fill = "tan1", alpha = 0.3) +
   geom_line(aes(x = Time_h/24, y = meanOD680_h, colour = as.factor(Strain)), size = 0.5, show.legend = T) +
   geom_vline(data = tMaxAGLines_056, aes(xintercept = tMaxAG/24), linetype="dotdash", colour = "seagreen4", size=0.4) +
@@ -194,6 +193,7 @@ MultiCultiDataAll %>%
         legend.key.height= unit(0.005, 'cm'),
         legend.spacing.x = unit(0.01, 'cm'),
         legend.text = element_text(size=11))
+
 ```
 
 # Save plot 
@@ -208,7 +208,7 @@ ggsave(file = file.path(FigPath, paste("SFig_GrowthCurve_OD680",".png",sep = "")
 MultiCultiDataAll %>%
   #filter(Par_ue != 600) %>% 
   filter(Run != 77) %>% 
-  ggplot() +
+  B720<- ggplot() +
   geom_area(aes(x = Time_h/24, y = meanActinic_par_h), size = 0.1, fill = "tan1", alpha = 0.3) +
   geom_line(aes(x = Time_h/24, y = meanOD720_h, colour = as.factor(Strain)), size = 0.5, show.legend = T) +
   geom_vline(data = tMaxAGLines_056, aes(xintercept = tMaxAG/24), linetype="dotdash", colour = "seagreen4", size=0.4) +
@@ -235,9 +235,20 @@ MultiCultiDataAll %>%
         legend.key.height= unit(0.005, 'cm'),
         legend.spacing.x = unit(0.01, 'cm'),
         legend.text = element_text(size=11))
+B720
 ```
 
 # Save plot 
+
+```{r save plot}
+ggsave(file = file.path(FigPath, paste("SFig_GrowthCurve_OD720",".png",sep = "")), height=9, width= 7,  dpi = 300, limitsize = TRUE)
+```
+
+
+```{r, warning = FALSE, fig.height = 9, fig.width = 12}
+ggp<- Soli590A+Soli590B
+ggp                           
+```
 
 ```{r save plot}
 ggsave(file = file.path(FigPath, paste("SFig_GrowthCurve_OD720",".png",sep = "")), height=9, width= 7,  dpi = 300, limitsize = TRUE)
