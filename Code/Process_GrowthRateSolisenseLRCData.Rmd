@@ -1132,8 +1132,8 @@ ggplot() +
   scale_colour_manual(values = c("darkslategray", "lightblue4", "hotpink4", "indianred3", "goldenrod2", "khaki2"), name="", labels = lab2, breaks=c('30', "90", "180", "300", "600","900")) +
   scale_shape_manual(values = c(15, 16, 17, 18), name="", labels = lab1) +
   
-  scale_x_continuous(breaks=seq(0, 2e05, by = 0.5e05), label=scientific_10) +
-  coord_cartesian(xlim = c(0, 2e05)) +
+  scale_x_continuous(breaks=seq(0, 1.94e05, by = 0.5e05), label=scientific_10) +
+  coord_cartesian(xlim = c(0, 1.94e05)) +
   
   # labs(y = "Chlorophyll specific exponential growth rate " ~ "("~d^-1~")", x = ""~italic(JV)~""["PSII"]*" ("~e^-~""~Chla^-1~""~d^-1~")") +
   # labs(y = "Chlorophyll specific exponential growth rate " ~ "("~d^-1~")", x = ""~italic(JV)~""["PSII"]*" (µmol"~e^-~""~µg~Chla^-1~""~d^-1~")") +
@@ -1216,8 +1216,8 @@ ggplot() +
   # scale_y_continuous(breaks=seq(0, 4.5, by = 1)) +
   # coord_cartesian(ylim = c(0, 4.5)) +
   
-  scale_x_continuous(breaks=seq(0, 2e05, by = 0.5e05), label=scientific_10) +
-  coord_cartesian(xlim = c(0, 2e05)) +
+  scale_x_continuous(breaks=seq(0, 1.94e05, by = 0.5e05), label=scientific_10) +
+  coord_cartesian(xlim = c(0, 1.94e05)) +
   
   ggh4x::facet_nested(rows = vars(Strain), labeller = label_parsed) +
   theme_bw() +
@@ -1397,7 +1397,7 @@ PlotBPhotoperiodJVPSII<-JVPSIIParamAll_Photoperiod %>%
   scale_colour_discrete(type=c("seagreen4", "palegreen3", "brown1", "brown4"), name="") +
   scale_y_continuous(breaks=seq(0, 0.0020, by = 0.0005), label=scientific_10) +
   scale_x_continuous(limits = c(8, 25), breaks = c(8, 12, 16, 24)) +
-  coord_cartesian(ylim = c(0, 0.0020)) +
+  coord_cartesian(ylim = c(0, 0.0020), xlim = c(8, 24.5)) +
   labs(y = "\u03B1", x = "Photoperiod (h)") +
   ggh4x::facet_nested(rows = vars(facetsStrain, Strain), labeller = label_parsed) +
   theme_bw() +
@@ -1477,7 +1477,7 @@ PlotBLightJVPSII<-JVPSIIParamAll_Light %>%
   #scale_colour_discrete(type=c("seagreen4", "palegreen3", "brown1", "brown4"), name="") +
   scale_y_continuous(breaks=seq(0, 0.040, by = 0.01), label=scientific_10) +
   scale_x_continuous(limits = c(30, 930), breaks = c(30, 90, 180, 300, 600, 900)) +
-  coord_cartesian(ylim = c(0, 0.040)) +
+  coord_cartesian(ylim = c(0, 0.040), xlim = c(30, 905)) +
   labs(y = "\u03B1", x = "PAR ( µmol photons "~m^-2~""~s^-1~")") +
   ggh4x::facet_nested(rows = vars(facetsStrain, Strain), labeller = label_parsed) +
   theme_bw() +
