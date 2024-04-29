@@ -22,7 +22,9 @@ author:
     email: msavoie@mta.ca
     ORCID: 0009-0009-9499-6657
 - Anabella Aguilera:
-    institute: SW
+    institute: 
+    - SW
+    - SW2
     email: anabella.aguilera@lnu.se
     ORCID: 0000-0001-6743-3001
 - Naaman M. Omar:
@@ -40,7 +42,8 @@ institute:
     Gdynia, Poland"
 - VU: Department of Geography, University of Victoria, Victoria, BC, V8P 5C2, Canada
 - IOPAN: "Institute of Oceanology, Polish Academy of Sciences, 81-712 Sopot, Poland"
-- SW: Sweden
+- SW: Department of Biology and Environmental Science, Centre for Ecology and Evolution in Microbial Model Systems (EEMiS), Linnaeus University, Kalmar, Sweden
+- SW2: "Department of Aquatic Sciences and Assessment, Swedish University of Agricultural Sciences, Uppsala, Sweden (present address)"
 output:
   bookdown::word_document2:
     reference_docx: Template.docx
@@ -62,6 +65,7 @@ output:
     pandoc_args:
     - "--lua-filter=scholarly-metadata.lua"
     - "--lua-filter=author-info-blocks.lua"
+    - "--lua-filter=custom_filter.lua"
 bibliography:
 - BalticPhotoperiod.bib
 - packages.bib
