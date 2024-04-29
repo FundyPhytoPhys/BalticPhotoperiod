@@ -88,7 +88,11 @@ csl: "limnology-and-oceanography.csl"
 
 
 
+<br>
+
 **Running head:** *Picocyanobacteria across photic regimes*
+
+<br>
 
 # Abstract {.unnumbered}
 
@@ -191,7 +195,7 @@ $$\begin{equation}
 
 Chlorophyll *a* (Chl *a*) (µg mL^−1^) was measured using Trilogy Laboratory Fluorometer (Turner Designs, Inc., CA, USA) equipped with Chlorophyll In-Vivo Module, previously calibrated using 20 mL ampoules with known Chl *a* concentrations in 3:2 90% acetone:DMSO solution. Quantitative analysis of Chl *a* was obtained after adding 50 µL of culture and 2 mL of a 90% acetone:DMSO solution in a 3:2 ratio.
 
-We also estimated the pigment content (µg mL^−1^): chlorophyll *a* (Chl *a*), carotenoids (Car), phycoerythrin (PE), phycocyanin (PC), and allophycocyanin (APC) in *Synechococcus* sp. cultures over time using previously determined linear correlations between pigment content obtained by extraction  [@stricklandPracticalHandBook1972; @bennettCOMPLEMENTARYCHROMATICADAPTATION1973] and absorbance values of individual pigment peaks (Car; 480, PE; 565, PC; 620, APC; 650, and Chl *a*; 665 nm) obtained from the whole-cell absorbance spectra using integrating cavity upgrade spectrophotometer (CLARiTY 17 UV/Vis/NIR, On-Line Instrument Systems, Inc., Bogart, GA, USA) (Tab. S1, Supporting Information). The sum of phycobiliproteins (PE, PC, APC protein) to Chl *a* ratio (µg:µg) for individual strains was also calculated.
+We also estimated the pigment content (µg mL^−1^): chlorophyll *a* (Chl *a*), carotenoids (Car), phycoerythrin (PE), phycocyanin (PC), and allophycocyanin (APC) in *Synechococcus* sp. cultures over time using previously determined linear correlations between pigment content obtained by extraction  [@stricklandPracticalHandBook1972; @bennettComplementaryChromaticAdaptation1973] and absorbance values of individual pigment peaks (Car; 480, PE; 565, PC; 620, APC; 650, and Chl *a*; 665 nm) obtained from the whole-cell absorbance spectra using integrating cavity upgrade spectrophotometer (CLARiTY 17 UV/Vis/NIR, On-Line Instrument Systems, Inc., Bogart, GA, USA) (Tab. S1, Supporting Information). The sum of phycobiliproteins (PE, PC, APC protein) to Chl *a* ratio (µg:µg) for individual strains was also calculated.
 
 <br>
 
