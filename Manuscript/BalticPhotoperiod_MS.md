@@ -302,7 +302,7 @@ Available photic regimes, combining photoperiod and peak PAR, may determine the 
 ## Photic regimes - implications for cumulative diel PSII electron flux {.unnumbered}
 
 Algal dynamics respond rapidly to changes in environmental conditions [@connorInvestigatingUseFast2018]. We used Fast Repetition Rate fluorometry (FRRf; Fig. <a href="#fig:LIFT">3</a>) [@kolberMeasurementsVariableChlorophyll1998] to support 
-an index of PSII electron transport rate per unit volume (*JV*~PSII~)[@oxboroughDirectEstimationFunctional2012; @suggettFastRepetitionRate2003]. We calibrated the *JV*~PSII~ estimator to absolute rates of electron transport measured through oxygen evolution. Using this *JV*~PSII~ estimator we show that growth of PC-rich and PE-rich picocyanobacteria are well predicted by cumulative diel PSII electron fluxes, across different photic regimes. The growth rate, µ, of PC-rich and PE-rich picocyanobacteria shows fairly consistent saturating responses to increasing cumulative diel PSII electron flux (*JV*~PSII~; µmol e^−^ µmol Chl *a*^−1^ d^−1^; Fig. <a href="#fig:GrowthRateJVPSII">9</a>). As previously found for diatoms [@liDiatomGrowthResponses2017] cumulative diel reductant generation was indeed a better predictor of µ than was cumulative diel PUR, although photoperiod and peak PAR retain secondary influences on achieved growth responses of the picocyanobacteria under some conditions.
+an index of PSII electron transport rate per unit volume (*JV*~PSII~) [@oxboroughDirectEstimationFunctional2012; @suggettFastRepetitionRate2003]. We calibrated the *JV*~PSII~ estimator to absolute rates of electron transport measured through oxygen evolution. Using this *JV*~PSII~ estimator we show that growth of PC-rich and PE-rich picocyanobacteria are well predicted by cumulative diel PSII electron fluxes, across different photic regimes. The growth rate, µ, of PC-rich and PE-rich picocyanobacteria shows fairly consistent saturating responses to increasing cumulative diel PSII electron flux (*JV*~PSII~; µmol e^−^ µmol Chl *a*^−1^ d^−1^; Fig. <a href="#fig:GrowthRateJVPSII">9</a>). As previously found for diatoms [@liDiatomGrowthResponses2017] cumulative diel reductant generation was indeed a better predictor of µ than was cumulative diel PUR, although photoperiod and peak PAR retain secondary influences on achieved growth responses of the picocyanobacteria under some conditions.
 
 # Conclusions {.unnumbered}
 
@@ -320,6 +320,7 @@ https://docs.google.com/spreadsheets/d/1ZXpwR7Gfto-uRzVdXzMpQF4frbrvMLH_IyLqonFZ
 
 Code to perform data processing and analyses is available at https://github.com/FundyPhytoPhys/BalticPhotoperiod.
 
+16S rRNA sequences used in this study are available in GenBank under the accession numbers PP034393, PP034394, PP034396 and PP034403. 
 
 ## Acknowledgements {.unnumbered}
 
