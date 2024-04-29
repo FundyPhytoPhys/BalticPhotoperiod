@@ -388,7 +388,7 @@ Table S15: T-test of linear fit model (Fit_model) of pooled data across differen
 
 
 ```{r Genetics, fig.cap = Genetics_cap, fig.height = 8, fig.width = 6, echo = FALSE}
-Genetics_cap<- glue("Phylogenetic tree for tested picocyanobacteria.", .sep = " ")
+Genetics_cap<- glue("*Phylogenetic placements of tested picocyanobacteria*. Treescale ???", .sep = " ")
 knitr::include_graphics(file.path(FiguresFP, "SFig.Tree.png"))
 ```
 
