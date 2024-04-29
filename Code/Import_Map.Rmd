@@ -784,7 +784,7 @@ Growth8<-GrowthRate %>%
         strip.text = element_text(size=14),
         # axis.title.y = element_text(margin=margin(r=10)),
         # axis.title.x = element_text(margin=margin(t=10)),
-        axis.title.x = element_blank(),
+        #axis.title.x = element_blank(),
         
         axis.text.y = element_blank(),
         axis.title.y = element_blank(),
