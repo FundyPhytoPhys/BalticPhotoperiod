@@ -71,12 +71,13 @@ d=data.frame(x1=c(-Inf), x2=c(Inf), y1=c(-90), y2=c(-66))
 d2=data.frame(x1=c(-Inf), x2=c(Inf), y1=c(90), y2=c(66))
 
 world_coordinates <- map_data("world") 
-world_coordinates$facetsPhotoperiod24 <- 'Photoperiod~~(24~h)'
+world_coordinates$facetsPhotoperiod24 <- 'Photoperiod~~24~h~-Polar~summer'
 Map24<-ggplot() + 
   geom_map(data = world_coordinates, map = world_coordinates, aes(long, lat, map_id = region), color = "white", fill = "gray50", size = 0.2) +
-  geom_rect(data=d, mapping=aes(xmin=x1, xmax=x2, ymin=y1, ymax=y2), fill = "gold1", color="gold1", alpha=0.5) +
-  geom_rect(data=d2, mapping=aes(xmin=x1, xmax=x2, ymin=y1, ymax=y2), fill = "gold1", color="gold1", alpha=0.5) +
-  geom_text(data=data_textA, aes(x=-190, y=80, label=label), size=6) +
+  #geom_rect(data=d, mapping=aes(xmin=x1, xmax=x2, ymin=y1, ymax=y2), fill = "gold1", color="gold1", alpha=0.5) +
+  geom_rect(data=d, mapping=aes(xmin=x1, xmax=x2, ymin=y1, ymax=y2), fill = "lightskyblue1", color="lightskyblue3", alpha=0.5) +
+  geom_rect(data=d2, mapping=aes(xmin=x1, xmax=x2, ymin=y1, ymax=y2), fill = "lightskyblue1", color="lightskyblue3", alpha=0.5) +
+  geom_text(data=data_textA, aes(x=-190, y=80, label=label), size=8) +
   # geom_circle(aes(x0 = x0, y0 = y0, r = r), data = circles) +
   # geom_text(data=data_textGrowth, aes(x=-150, y=-66, label=label), size=5, parse=TRUE) +
   
@@ -85,10 +86,10 @@ Map24<-ggplot() +
   theme_bw() +
   theme(panel.grid.minor = element_blank(),
         panel.grid.major = element_blank(),
-        axis.text = element_text(size=12),
-        axis.title = element_text(size=16),
+        axis.text = element_text(size=14),
+        axis.title = element_text(size=18),
         strip.background = element_rect(fill="white"),
-        strip.text = element_text(size=12),
+        strip.text = element_text(size=14),
         axis.title.y = element_text(margin=margin(r=10)),
         # axis.title.x = element_text(margin=margin(t=10)),
         axis.title.x = element_blank(),
@@ -96,32 +97,34 @@ Map24<-ggplot() +
         legend.position = c(0.12,0.76),
         legend.key.height= unit(0.005, 'cm'),
         legend.spacing.x = unit(0.01, 'cm'),
-        legend.text = element_text(size=11))
+        legend.text = element_text(size=14))
 Map24
 ```
 
 ```{r create GrowthCurve plot, fig.height = 4, fig.width = 6, warning = FALSE}
 data_textB <- data.frame(label = c('B'))
-d=data.frame(x1=c(-Inf), x2=c(Inf), y1=c(23), y2=c(66))
+d=data.frame(x1=c(-Inf), x2=c(Inf), y1=c(35), y2=c(55))
+d2=data.frame(x1=c(-Inf), x2=c(Inf), y1=c(-35), y2=c(-55))
 
 world_coordinates <- map_data("world") 
-world_coordinates$facetsPhotoperiod16 <- 'Photoperiod~~(16~h)'
+world_coordinates$facetsPhotoperiod16 <- 'Photoperiod~~16~h~-Temperate~summer'
 
 Map16<-ggplot() + 
   geom_map(data = world_coordinates, map = world_coordinates, aes(long, lat, map_id = region), color = "white", fill = "gray50", size = 0.2) +
-  geom_rect(data=d, mapping=aes(xmin=x1, xmax=x2, ymin=y1, ymax=y2), fill = "gold1", color="gold1", alpha=0.5) +
+  geom_rect(data=d, mapping=aes(xmin=x1, xmax=x2, ymin=y1, ymax=y2), fill = "lightskyblue1", color="lightskyblue3", alpha=0.5) +
+  geom_rect(data=d2, mapping=aes(xmin=x1, xmax=x2, ymin=y1, ymax=y2), fill = "lightskyblue1", color="lightskyblue3", alpha=0.5) +
     # geom_rect(data=d, mapping=aes(xmin=x1, xmax=x2, ymin=y1, ymax=y2), fill = "lightskyblue1", color="lightskyblue3", alpha=0.5) +
-  geom_text(data=data_textB, aes(x=-190, y=80, label=label), size=6) +
+  #geom_text(data=data_textB, aes(x=-190, y=80, label=label), size=6) +
   
   labs(y = "Latitude", x = "Longitude") +
   ggh4x::facet_nested(cols = vars(facetsPhotoperiod16), labeller = label_parsed) +
   theme_bw() +
   theme(panel.grid.minor = element_blank(),
         panel.grid.major = element_blank(),
-        axis.text = element_text(size=12),
-        axis.title = element_text(size=16),
+        axis.text = element_text(size=14),
+        axis.title = element_text(size=18),
         strip.background = element_rect(fill="white"),
-        strip.text = element_text(size=12),
+        strip.text = element_text(size=14),
         axis.title.y = element_text(margin=margin(r=10)),
         # axis.title.x = element_text(margin=margin(t=10)),
         axis.title.x = element_blank(),
@@ -129,30 +132,30 @@ Map16<-ggplot() +
         legend.position = c(0.12,0.76),
         legend.key.height= unit(0.005, 'cm'),
         legend.spacing.x = unit(0.01, 'cm'),
-        legend.text = element_text(size=11))
+        legend.text = element_text(size=14))
 Map16
 ```
 
 ```{r create GrowthCurve plot, fig.height = 4, fig.width = 6, warning = FALSE}
 data_textC <- data.frame(label = c('C'))
-d=data.frame(x1=c(-Inf), x2=c(Inf), y1=c(-23), y2=c(23))
+d=data.frame(x1=c(-Inf), x2=c(Inf), y1=c(-15), y2=c(15))
 
 world_coordinates <- map_data("world") 
-world_coordinates$facetsPhotoperiod12 <- 'Photoperiod~~(12~h)'
+world_coordinates$facetsPhotoperiod12 <- 'Photoperiod~~12~h~-Tropic~summer~and~winter'
 Map12<-ggplot() + 
   geom_map(data = world_coordinates, map = world_coordinates, aes(long, lat, map_id = region), color = "white", fill = "gray50", size = 0.2) +
-  geom_rect(data=d, mapping=aes(xmin=x1, xmax=x2, ymin=y1, ymax=y2), fill = "gold1", color="gold1", alpha=0.5) +
-  geom_text(data=data_textC, aes(x=-190, y=80, label=label), size=6) +
+  geom_rect(data=d, mapping=aes(xmin=x1, xmax=x2, ymin=y1, ymax=y2), fill = "lightskyblue1", color="lightskyblue3", alpha=0.5) +
+  #geom_text(data=data_textC, aes(x=-190, y=80, label=label), size=6) +
   
   labs(y = "Latitude", x = "Longitude") +
   ggh4x::facet_nested(cols = vars(facetsPhotoperiod12), labeller = label_parsed) +
   theme_bw() +
   theme(panel.grid.minor = element_blank(),
         panel.grid.major = element_blank(),
-        axis.text = element_text(size=12),
-        axis.title = element_text(size=16),
+        axis.text = element_text(size=14),
+        axis.title = element_text(size=18),
         strip.background = element_rect(fill="white"),
-        strip.text = element_text(size=12),
+        strip.text = element_text(size=14),
         axis.title.y = element_text(margin=margin(r=10)),
         # axis.title.x = element_text(margin=margin(t=10)),
         axis.title.x = element_blank(),
@@ -160,38 +163,40 @@ Map12<-ggplot() +
         legend.position = c(0.12,0.76),
         legend.key.height= unit(0.005, 'cm'),
         legend.spacing.x = unit(0.01, 'cm'),
-        legend.text = element_text(size=11))
+        legend.text = element_text(size=14))
 Map12
 ```
 
 
 ```{r create GrowthCurve plot, fig.height = 4, fig.width = 6, warning = FALSE}
 data_textD <- data.frame(label = c('D'))
-d=data.frame(x1=c(-Inf), x2=c(Inf), y1=c(-23), y2=c(-66))
+d=data.frame(x1=c(-Inf), x2=c(Inf), y1=c(35), y2=c(55))
+d2=data.frame(x1=c(-Inf), x2=c(Inf), y1=c(-35), y2=c(-55))
 
 world_coordinates <- map_data("world") 
-world_coordinates$facetsPhotoperiod8 <- 'Photoperiod~~(8~h)'
+world_coordinates$facetsPhotoperiod8 <- 'Photoperiod~~8~h~-Temperate~winter'
 Map8<-ggplot() + 
   geom_map(data = world_coordinates, map = world_coordinates, aes(long, lat, map_id = region), color = "white", fill = "gray50", size = 0.2) +
-  geom_rect(data=d, mapping=aes(xmin=x1, xmax=x2, ymin=y1, ymax=y2), fill = "gold1", color="gold1", alpha=0.5) +
-  geom_text(data=data_textD, aes(x=-190, y=80, label=label), size=6) +
+  geom_rect(data=d, mapping=aes(xmin=x1, xmax=x2, ymin=y1, ymax=y2), fill = "lightskyblue1", color="lightskyblue3", alpha=0.5) +
+  geom_rect(data=d2, mapping=aes(xmin=x1, xmax=x2, ymin=y1, ymax=y2), fill = "lightskyblue1", color="lightskyblue3", alpha=0.5) +
+  #geom_text(data=data_textD, aes(x=-190, y=80, label=label), size=6) +
   
   labs(y = "Latitude", x = "Longitude") +
   ggh4x::facet_nested(cols = vars(facetsPhotoperiod8), labeller = label_parsed) +
   theme_bw() +
   theme(panel.grid.minor = element_blank(),
         panel.grid.major = element_blank(),
-        axis.text = element_text(size=12),
-        axis.title = element_text(size=16),
+        axis.text = element_text(size=14),
+        axis.title = element_text(size=18),
         strip.background = element_rect(fill="white"),
-        strip.text = element_text(size=12),
+        strip.text = element_text(size=14),
         axis.title.y = element_text(margin=margin(r=10)),
         axis.title.x = element_text(margin=margin(t=10)),
         legend.background = element_rect(fill="transparent"),
         legend.position = c(0.12,0.76),
         legend.key.height= unit(0.005, 'cm'),
         legend.spacing.x = unit(0.01, 'cm'),
-        legend.text = element_text(size=11))
+        legend.text = element_text(size=14))
 Map8
 ```
 
@@ -351,7 +356,10 @@ MCGrowthRate %>%
 
 ```
 ```{r create GrowthCurve plot, fig.height = 4, fig.width = 4, warning = FALSE}
-MCGrowthRate$facetsPhotoperiod24 <- 'Photoperiod~~(24~h)'
+data_textB <- data.frame(label = c('B'))
+
+
+MCGrowthRate$facetsPhotoperiod24 <- 'Photoperiod~~24~h'
 
 MCGrowthRate30_24<-MCGrowthRate30 %>% 
   filter(Photoperiod=="24")
@@ -377,19 +385,21 @@ Photoperiod24<-MCGrowthRate %>%
   geom_line(aes(x = ToD, y = meanActinic_par_h), size = 0.6, alpha = 0.9, MCGrowthRate600_24, colour = "goldenrod2") +
   geom_line(aes(x = ToD, y = meanActinic_par_h), size = 0.6, alpha = 0.98, MCGrowthRate900_24, colour = "khaki2") +
   
+  geom_text(data=data_textB, aes(x=-2, y=860, label=label), size=8) +
+  
   scale_x_continuous(breaks=seq(0, 24, by = 4)) +
   scale_y_continuous(limits = c(0, 900), breaks = c(30, 90, 180, 300, 600, 900)) +
-  coord_cartesian(xlim = c(0, 25), ylim = c(0, 900)) +
+  coord_cartesian(xlim = c(-3, 25), ylim = c(0, 900)) +
   labs(x = "Time of day (h)", y = "PAR ( µmol photons "~m^-2~""~s^-1~")") +
   ggh4x::facet_nested(cols = vars(facetsPhotoperiod24), labeller = label_parsed) +
   # ggh4x::facet_nested(cols = vars(facetsPhotoperiod, Photoperiod), rows = vars(facetsPar_ue, factor(Par_ue, levels=c("900","600","300","180","90","30"))), labeller = label_parsed) +
   theme_bw() +
   theme(panel.grid.minor = element_blank(),
         panel.grid.major = element_blank(),
-        axis.text = element_text(size=12),
-        axis.title = element_text(size=16),
+        axis.text = element_text(size=14),
+        axis.title = element_text(size=18),
         strip.background = element_rect(fill="white"),
-        strip.text = element_text(size=12),
+        strip.text = element_text(size=14),
         axis.title.y = element_text(margin=margin(r=10)),
         # axis.title.x = element_text(margin=margin(t=10)),
         axis.title.x = element_blank(),
@@ -397,13 +407,13 @@ Photoperiod24<-MCGrowthRate %>%
         legend.position = c(0.12,0.76),
         legend.key.height= unit(0.005, 'cm'),
         legend.spacing.x = unit(0.01, 'cm'),
-        legend.text = element_text(size=11))
+        legend.text = element_text(size=14))
 Photoperiod24
 ```
 
 
 ```{r create GrowthCurve plot, fig.height = 4, fig.width = 4, warning = FALSE}
-MCGrowthRate$facetsPhotoperiod16 <- 'Photoperiod~~(16~h)'
+MCGrowthRate$facetsPhotoperiod16 <- 'Photoperiod~~16~h'
 
 MCGrowthRate30_16<-MCGrowthRate30 %>% 
   filter(Photoperiod=="16")
@@ -431,17 +441,17 @@ Photoperiod16<-MCGrowthRate %>%
   
   scale_x_continuous(breaks=seq(0, 24, by = 4)) +
   scale_y_continuous(limits = c(0, 900), breaks = c(30, 90, 180, 300, 600, 900)) +
-  coord_cartesian(xlim = c(0, 25), ylim = c(0, 900)) +
+  coord_cartesian(xlim = c(-3, 25), ylim = c(0, 900)) +
   labs(x = "Time of day (h)", y = "PAR ( µmol photons "~m^-2~""~s^-1~")") +
   ggh4x::facet_nested(cols = vars(facetsPhotoperiod16), labeller = label_parsed) +
   # ggh4x::facet_nested(cols = vars(facetsPhotoperiod, Photoperiod), rows = vars(facetsPar_ue, factor(Par_ue, levels=c("900","600","300","180","90","30"))), labeller = label_parsed) +
   theme_bw() +
   theme(panel.grid.minor = element_blank(),
         panel.grid.major = element_blank(),
-        axis.text = element_text(size=12),
-        axis.title = element_text(size=16),
+        axis.text = element_text(size=14),
+        axis.title = element_text(size=18),
         strip.background = element_rect(fill="white"),
-        strip.text = element_text(size=12),
+        strip.text = element_text(size=14),
         axis.title.y = element_text(margin=margin(r=10)),
         # axis.title.x = element_text(margin=margin(t=10)),
         axis.title.x = element_blank(),
@@ -449,12 +459,12 @@ Photoperiod16<-MCGrowthRate %>%
         legend.position = c(0.12,0.76),
         legend.key.height= unit(0.005, 'cm'),
         legend.spacing.x = unit(0.01, 'cm'),
-        legend.text = element_text(size=11))
+        legend.text = element_text(size=14))
 Photoperiod16
 ```
 
 ```{r create GrowthCurve plot, fig.height = 4, fig.width = 4, warning = FALSE}
-MCGrowthRate$facetsPhotoperiod12 <- 'Photoperiod~~(12~h)'
+MCGrowthRate$facetsPhotoperiod12 <- 'Photoperiod~~12~h'
 
 MCGrowthRate30_12<-MCGrowthRate30 %>% 
   filter(Photoperiod=="12")
@@ -482,17 +492,17 @@ Photoperiod12<-MCGrowthRate %>%
   
   scale_x_continuous(breaks=seq(0, 24, by = 4)) +
   scale_y_continuous(limits = c(0, 900), breaks = c(30, 90, 180, 300, 600, 900)) +
-  coord_cartesian(xlim = c(0, 25), ylim = c(0, 900)) +
+  coord_cartesian(xlim = c(-3, 25), ylim = c(0, 900)) +
   labs(x = "Time of day (h)", y = "PAR ( µmol photons "~m^-2~""~s^-1~")") +
   ggh4x::facet_nested(cols = vars(facetsPhotoperiod12), labeller = label_parsed) +
   # ggh4x::facet_nested(cols = vars(facetsPhotoperiod, Photoperiod), rows = vars(facetsPar_ue, factor(Par_ue, levels=c("900","600","300","180","90","30"))), labeller = label_parsed) +
   theme_bw() +
   theme(panel.grid.minor = element_blank(),
         panel.grid.major = element_blank(),
-        axis.text = element_text(size=12),
-        axis.title = element_text(size=16),
+        axis.text = element_text(size=14),
+        axis.title = element_text(size=18),
         strip.background = element_rect(fill="white"),
-        strip.text = element_text(size=12),
+        strip.text = element_text(size=14),
         axis.title.y = element_text(margin=margin(r=10)),
         # axis.title.x = element_text(margin=margin(t=10)),
         axis.title.x = element_blank(),
@@ -500,11 +510,11 @@ Photoperiod12<-MCGrowthRate %>%
         legend.position = c(0.12,0.76),
         legend.key.height= unit(0.005, 'cm'),
         legend.spacing.x = unit(0.01, 'cm'),
-        legend.text = element_text(size=11))
+        legend.text = element_text(size=14))
 Photoperiod12
 ```
 ```{r create GrowthCurve plot, fig.height = 4, fig.width = 4, warning = FALSE}
-MCGrowthRate$facetsPhotoperiod8 <- 'Photoperiod~~(8~h)'
+MCGrowthRate$facetsPhotoperiod8 <- 'Photoperiod~~8~h'
 
 MCGrowthRate30_8<-MCGrowthRate30 %>% 
   filter(Photoperiod=="8")
@@ -532,23 +542,23 @@ Photoperiod8<-MCGrowthRate %>%
   
   scale_x_continuous(breaks=seq(0, 24, by = 4)) +
   scale_y_continuous(limits = c(0, 900), breaks = c(30, 90, 180, 300, 600, 900)) +
-  coord_cartesian(xlim = c(0, 25), ylim = c(0, 900)) +
+  coord_cartesian(xlim = c(-3, 25), ylim = c(0, 900)) +
   labs(x = "Time of day (h)", y = "PAR ( µmol photons "~m^-2~""~s^-1~")") +
   ggh4x::facet_nested(cols = vars(facetsPhotoperiod8), labeller = label_parsed) +
   theme_bw() +
   theme(panel.grid.minor = element_blank(),
         panel.grid.major = element_blank(),
-        axis.text = element_text(size=12),
-        axis.title = element_text(size=16),
+        axis.text = element_text(size=14),
+        axis.title = element_text(size=18),
         strip.background = element_rect(fill="white"),
-        strip.text = element_text(size=12),
+        strip.text = element_text(size=14),
         axis.title.y = element_text(margin=margin(r=10)),
         axis.title.x = element_text(margin=margin(t=10)),
         legend.background = element_rect(fill="transparent"),
         legend.position = c(0.12,0.76),
         legend.key.height= unit(0.005, 'cm'),
         legend.spacing.x = unit(0.01, 'cm'),
-        legend.text = element_text(size=11))
+        legend.text = element_text(size=14))
 Photoperiod8
 ```
 
@@ -628,26 +638,34 @@ GrowthRate %>%
   theme_bw()
 ```
 ```{r fig.height = 4, fig.width = 4, warning = FALSE}
-GrowthRate$facetsPhotoperiod24 <- 'Photoperiod~~(24~h)'
+data_textB <- data.frame(label = c('C'))
+
+
+GrowthRate$facetsPhotoperiod24 <- 'Photoperiod~~24~h'
 
 Growth24<-GrowthRate %>%
   filter(Photoperiod == 24) %>% 
   ggplot() +
-  geom_point(aes(y = Par_ue, x = deltaOD_Lmu_corr,colour=as.factor(Strain)), size = 3.5, alpha = 0.9, show.legend = F) +
-  geom_vline(xintercept = c(1, 2, 3, 4, 5), size = 0.3, linetype = "dotted") +
-  scale_colour_discrete(type=c("seagreen4", "palegreen3", "brown1", "brown4")) +
-  scale_x_continuous(breaks=seq(0, 5, by = 1)) +
-  scale_y_continuous(limits = c(0, 900), breaks = c(0, 30, 90, 180, 300, 600, 900)) +
-  coord_cartesian(xlim = c(0, 5), ylim = c(0, 900)) +
-  labs(x = "µ ("~d^-1~")") +
+  geom_point(aes(x = Par_ue, y = deltaOD_Lmu_corr,colour=as.factor(Strain)), size = 3.5, alpha = 0.9, show.legend = T) +
+  geom_line(aes(x = Par_ue, y = deltaOD_Lmu_corr,colour=as.factor(Strain)), size = 0.5, alpha = 0.9, show.legend = F) +
+  
+  geom_hline(yintercept = c(0, 1, 2, 3, 4, 5), size = 0.3, linetype = "dotted") +
+  geom_text(data=data_textB, aes(y=-0.3, x=860, label=label), size=8) +
+  
+  scale_colour_discrete(type=c("seagreen4", "palegreen3", "brown1", "brown4"), name="") +
+  scale_y_continuous(breaks=seq(0, 5, by = 1)) +
+  scale_x_continuous(limits = c(0, 900), breaks = c(0, 30, 90, 180, 300, 600, 900)) +
+  coord_cartesian(ylim = c(-1, 5), xlim = c(0, 900)) +
+  labs(y = "µ ("~d^-1~")") +
+  coord_flip()+
   ggh4x::facet_nested(cols = vars(facetsPhotoperiod24), labeller = label_parsed) +
   theme_bw() +
   theme(panel.grid.minor = element_blank(),
         panel.grid.major = element_blank(),
-        axis.text = element_text(size=12),
-        axis.title = element_text(size=16),
+        axis.text = element_text(size=14),
+        axis.title = element_text(size=18),
         strip.background = element_rect(fill="white"),
-        strip.text = element_text(size=12),
+        strip.text = element_text(size=14),
         # axis.title.y = element_text(margin=margin(r=10)),
         # axis.title.x = element_text(margin=margin(t=10)),
         axis.title.x = element_blank(),
@@ -656,34 +674,37 @@ Growth24<-GrowthRate %>%
         axis.title.y = element_blank(),
         axis.ticks.y=element_blank(),
         legend.background = element_rect(fill="transparent"),
-        legend.position = c(0.12,0.76),
+        legend.position = c(0.7,0.88),
         legend.key.height= unit(0.005, 'cm'),
         legend.spacing.x = unit(0.01, 'cm'),
-        legend.text = element_text(size=11))
+        legend.text = element_text(size=12))
 Growth24
 ```
 
 ```{r fig.height = 4, fig.width = 4, warning = FALSE}
-GrowthRate$facetsPhotoperiod16 <- 'Photoperiod~~(16~h)'
+GrowthRate$facetsPhotoperiod16 <- 'Photoperiod~~16~h'
 
 Growth16<-GrowthRate %>%
   filter(Photoperiod == 16) %>% 
   ggplot() +
-  geom_point(aes(y = Par_ue, x = deltaOD_Lmu_corr,colour=as.factor(Strain)), size = 3.5, alpha = 0.9, show.legend = F) +
-  geom_vline(xintercept = c(1, 2, 3, 4, 5), size = 0.3, linetype = "dotted") +
+  geom_point(aes(x = Par_ue, y = deltaOD_Lmu_corr,colour=as.factor(Strain)), size = 3.5, alpha = 0.9, show.legend = F) +
+  geom_line(aes(x = Par_ue, y = deltaOD_Lmu_corr,colour=as.factor(Strain)), size = 0.5, alpha = 0.9, show.legend = F) +
+  
+  geom_hline(yintercept = c(0, 1, 2, 3, 4, 5), size = 0.3, linetype = "dotted") +
   scale_colour_discrete(type=c("seagreen4", "palegreen3", "brown1", "brown4")) +
-  scale_x_continuous(breaks=seq(0, 5, by = 1)) +
-  scale_y_continuous(limits = c(0, 900), breaks = c(0, 30, 90, 180, 300, 600, 900)) +
-  coord_cartesian(xlim = c(0, 5), ylim = c(0, 900)) +
-  labs(x = "µ ("~d^-1~")") +
+  scale_y_continuous(breaks=seq(0, 5, by = 1)) +
+  scale_x_continuous(limits = c(0, 900), breaks = c(0, 30, 90, 180, 300, 600, 900)) +
+  coord_cartesian(ylim = c(-1, 5), xlim = c(0, 900)) +
+  labs(y = "µ ("~d^-1~")") +
+  coord_flip()+
   ggh4x::facet_nested(cols = vars(facetsPhotoperiod16), labeller = label_parsed) +
   theme_bw() +
   theme(panel.grid.minor = element_blank(),
         panel.grid.major = element_blank(),
-        axis.text = element_text(size=12),
-        axis.title = element_text(size=16),
+        axis.text = element_text(size=14),
+        axis.title = element_text(size=18),
         strip.background = element_rect(fill="white"),
-        strip.text = element_text(size=12),
+        strip.text = element_text(size=14),
         # axis.title.y = element_text(margin=margin(r=10)),
         # axis.title.x = element_text(margin=margin(t=10)),
         axis.title.x = element_blank(),
@@ -695,31 +716,34 @@ Growth16<-GrowthRate %>%
         legend.position = c(0.12,0.76),
         legend.key.height= unit(0.005, 'cm'),
         legend.spacing.x = unit(0.01, 'cm'),
-        legend.text = element_text(size=11))
+        legend.text = element_text(size=14))
 Growth16
 ```
 
 ```{r fig.height = 4, fig.width = 4, warning = FALSE}
-GrowthRate$facetsPhotoperiod12 <- 'Photoperiod~~(12~h)'
+GrowthRate$facetsPhotoperiod12 <- 'Photoperiod~~12~h'
 
 Growth12<-GrowthRate %>%
   filter(Photoperiod == 12) %>% 
   ggplot() +
-  geom_point(aes(y = Par_ue, x = deltaOD_Lmu_corr,colour=as.factor(Strain)), size = 3.5, alpha = 0.9, show.legend = F) +
-  geom_vline(xintercept = c(1, 2, 3, 4, 5), size = 0.3, linetype = "dotted") +
+  geom_point(aes(x = Par_ue, y = deltaOD_Lmu_corr,colour=as.factor(Strain)), size = 3.5, alpha = 0.9, show.legend = F) +
+  geom_line(aes(x = Par_ue, y = deltaOD_Lmu_corr,colour=as.factor(Strain)), size = 0.5, alpha = 0.9, show.legend = F) +
+  
+  geom_hline(yintercept = c(0, 1, 2, 3, 4, 5), size = 0.3, linetype = "dotted") +
   scale_colour_discrete(type=c("seagreen4", "palegreen3", "brown1", "brown4")) +
-  scale_x_continuous(breaks=seq(0, 5, by = 1)) +
-  scale_y_continuous(limits = c(0, 900), breaks = c(0, 30, 90, 180, 300, 600, 900)) +
-  coord_cartesian(xlim = c(0, 5), ylim = c(0, 900)) +
-  labs(x = "µ ("~d^-1~")") +
+  scale_y_continuous(breaks=seq(0, 5, by = 1)) +
+  scale_x_continuous(limits = c(0, 900), breaks = c(0, 30, 90, 180, 300, 600, 900)) +
+  coord_cartesian(ylim = c(-1, 5), xlim = c(0, 900)) +
+  labs(y = "µ ("~d^-1~")") +
+  coord_flip()+
   ggh4x::facet_nested(cols = vars(facetsPhotoperiod12), labeller = label_parsed) +
   theme_bw() +
   theme(panel.grid.minor = element_blank(),
         panel.grid.major = element_blank(),
-        axis.text = element_text(size=12),
-        axis.title = element_text(size=16),
+        axis.text = element_text(size=14),
+        axis.title = element_text(size=18),
         strip.background = element_rect(fill="white"),
-        strip.text = element_text(size=12),
+        strip.text = element_text(size=14),
         # axis.title.y = element_text(margin=margin(r=10)),
         # axis.title.x = element_text(margin=margin(t=10)),
         axis.title.x = element_blank(),
@@ -731,32 +755,36 @@ Growth12<-GrowthRate %>%
         legend.position = c(0.12,0.76),
         legend.key.height= unit(0.005, 'cm'),
         legend.spacing.x = unit(0.01, 'cm'),
-        legend.text = element_text(size=11))
+        legend.text = element_text(size=14))
 Growth12
 ```
 ```{r fig.height = 4, fig.width = 4, warning = FALSE}
-GrowthRate$facetsPhotoperiod8 <- 'Photoperiod~~(8~h)'
+GrowthRate$facetsPhotoperiod8 <- 'Photoperiod~~8~h'
 
 Growth8<-GrowthRate %>%
   filter(Photoperiod == 8) %>% 
   ggplot() +
-  geom_point(aes(y = Par_ue, x = deltaOD_Lmu_corr,colour=as.factor(Strain)), size = 3.5, alpha = 0.9, show.legend = F) +
-  geom_vline(xintercept = c(1, 2, 3, 4, 5), size = 0.3, linetype = "dotted") +
+  geom_point(aes(x = Par_ue, y = deltaOD_Lmu_corr,colour=as.factor(Strain)), size = 3.5, alpha = 0.9, show.legend = F) +
+  geom_line(aes(x = Par_ue, y = deltaOD_Lmu_corr,colour=as.factor(Strain)), size = 0.5, alpha = 0.9, show.legend = F) +
+  
+  geom_hline(yintercept = c(0, 1, 2, 3, 4, 5), size = 0.3, linetype = "dotted") +
   scale_colour_discrete(type=c("seagreen4", "palegreen3", "brown1", "brown4")) +
-  scale_x_continuous(breaks=seq(0, 5, by = 1)) +
-  scale_y_continuous(limits = c(0, 900), breaks = c(0, 30, 90, 180, 300, 600, 900)) +
-  coord_cartesian(xlim = c(0, 5), ylim = c(0, 900)) +
-  labs(x = "µ ("~d^-1~")") +
+  scale_y_continuous(breaks=seq(0, 5, by = 1)) +
+  scale_x_continuous(limits = c(0, 900), breaks = c(0, 30, 90, 180, 300, 600, 900)) +
+  coord_cartesian(ylim = c(-1, 5), xlim = c(0, 900)) +
+  labs(y = "µ ("~d^-1~")") +
+  coord_flip()+
   ggh4x::facet_nested(cols = vars(facetsPhotoperiod8), labeller = label_parsed) +
   theme_bw() +
   theme(panel.grid.minor = element_blank(),
         panel.grid.major = element_blank(),
-        axis.text = element_text(size=12),
-        axis.title = element_text(size=16),
+        axis.text = element_text(size=14),
+        axis.title = element_text(size=18),
         strip.background = element_rect(fill="white"),
-        strip.text = element_text(size=12),
+        strip.text = element_text(size=14),
         # axis.title.y = element_text(margin=margin(r=10)),
-        axis.title.x = element_text(margin=margin(t=10)),
+        # axis.title.x = element_text(margin=margin(t=10)),
+        axis.title.x = element_blank(),
         
         axis.text.y = element_blank(),
         axis.title.y = element_blank(),
@@ -765,7 +793,7 @@ Growth8<-GrowthRate %>%
         legend.position = c(0.12,0.76),
         legend.key.height= unit(0.005, 'cm'),
         legend.spacing.x = unit(0.01, 'cm'),
-        legend.text = element_text(size=11))
+        legend.text = element_text(size=14))
 Growth8
 ```
 
@@ -789,27 +817,27 @@ ggp8<- (Photoperiod8+Growth8)
 ggp8                          
 ```
 
-```{r, warning = FALSE, fig.height = 6, fig.width = 12}
+```{r, warning = FALSE, fig.height = 4, fig.width = 12}
 All24<- (Map24+ggp24)
 All24                          
 ```
 
-```{r, warning = FALSE, fig.height = 6, fig.width = 12}
+```{r, warning = FALSE, fig.height = 4, fig.width = 12}
 All16<- (Map16+ggp16)
 All16                          
 ```
 
-```{r, warning = FALSE, fig.height = 6, fig.width = 12}
+```{r, warning = FALSE, fig.height = 4, fig.width = 12}
 All12<- (Map12+ggp12)
 All12                          
 ```
 
-```{r, warning = FALSE, fig.height = 6, fig.width = 12}
+```{r, warning = FALSE, fig.height = 4, fig.width = 12}
 All8<- (Map8+ggp8)
 All8                          
 ```
 
-```{r, warning = FALSE, fig.height = 16, fig.width = 12}
+```{r, warning = FALSE, fig.height = 15, fig.width = 12}
 MapCombo<- All24/All16/All12/All8
 MapCombo                          
 ```
@@ -817,7 +845,7 @@ MapCombo
 
 
 ```{r save plot}
-ggsave(file = file.path(FigPath, paste("Fig_MapCombo",".png",sep = "")), height=16, width= 16,  dpi = 300, limitsize = TRUE)
+ggsave(file = file.path(FigPath, paste("Fig_MapCombo",".png",sep = "")), height=15, width= 12,  dpi = 300, limitsize = TRUE)
 ```
 
 
