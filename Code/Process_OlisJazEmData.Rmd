@@ -33,8 +33,8 @@ Process_OlisJazEmData.Rmd processes and combines BalticPhotoperiod_Imported_JazE
 # Load Libraries and set Project Variables
 
 ```{r load libraries, warning = FALSE, echo=FALSE} 
-library(tidyverse)
-library(lubridate)
+
+
 library(stringr)
 library(broom)
 library(knitr)
@@ -52,6 +52,8 @@ library(gcookbook)
 library(googledrive)
 library(googlesheets4)
 library(readxl)
+library(tidyverse)
+library(lubridate)
 ```
 
 ```{r set project variables}
