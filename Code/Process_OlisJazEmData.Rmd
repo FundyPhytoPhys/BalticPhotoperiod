@@ -394,9 +394,9 @@ OLISSpectraMetaPURShort %>%
   geom_area(aes(x = nm, y = PURNormBA77G, fill = "palegreen3"), alpha = 0.5, show.legend = F) +
   geom_line(aes(x = nm, y = AbsNorm440, colour = as.factor(Strain), linetype = as.factor(Strain)), show.legend = F, linewidth = 0.5) +
 
-  geom_text(data=data_textPUR0, aes(x=435, y=1.26, label=label), size=3.5) +
-  geom_text(data=data_textPUR1, aes(x=462, y=1.21, label=label), size=3.5) +
-  geom_text(data=data_textPUR2, aes(x=462, y=1.16, label=label), size=3.5) +
+  geom_text(data=data_textPUR0, aes(x=437, y=1.26, label=label), size=3.5) +
+  geom_text(data=data_textPUR1, aes(x=465, y=1.21, label=label), size=3.5) +
+  geom_text(data=data_textPUR2, aes(x=465, y=1.16, label=label), size=3.5) +
 
   geom_text(data=data_textpigment1, aes(x=450, y=1.07, label=label), size=4, colour = "darkgreen") + #chla440
   geom_text(data=data_textpigment5, aes(x=430, y=0.36, label=label), size=4, colour = "coral3") + #Car
@@ -581,7 +581,7 @@ OLISSpectraMetaPURShort48<-OLISSpectraMetaPURShort %>%
   mutate(Phase2=case_when(Par_ue==30~"Exponential",
          Par_ue==600~"Pre-stationary"))
 OLISSpectraMetaPURShort48$facetsPhase<-"Phase~of~growth"
-OLISSpectraMetaPURShort127$facetsStrain<-"Strain"
+OLISSpectraMetaPURShort48$facetsStrain<-"Strain"
 
 OLISSpectraMetaPURShort127<-OLISSpectraMetaPURShort %>% 
   filter(Strain=="PE-rich_127") %>% 
@@ -639,11 +639,12 @@ Spectra<-OLISSpectraMetaPURShort %>%
   theme(panel.grid.minor = element_blank(),
         panel.grid.major = element_blank(),
         axis.text = element_text(size=12),
+        axis.text.x = element_text(vjust = -1), 
         axis.title = element_text(size=16),
         strip.background = element_rect(fill="white"),
         strip.text = element_text(size=12),
         axis.title.y = element_text(margin=margin(r=10)),
-        axis.title.x = element_text(margin=margin(t=10)),
+        axis.title.x = element_text(margin=margin(t=10), vjust = -1),
         legend.background = element_rect(fill="transparent"),
         legend.position = c(0.85,0.88),
         legend.key.height= unit(0.003, 'cm'),
