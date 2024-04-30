@@ -46,6 +46,7 @@ library(caret)
 library(googledrive)
 library(googlesheets4)
 library(readxl)
+library("patchwork") # merging plots
 ```
 
 ```{r set project variables}
@@ -1326,56 +1327,56 @@ augmentedPURPARRatio<-fittedPURPARRatio  %>%
 # Create PUR/PAR ratio plot 
 
 ```{r create Sigma plot, fig.height = 8, fig.width = 8, warning = FALSE}
+PURPARRatioChoosen$facetsPhase<-"Phase~of~growth"
+augmentedPURPARRatio$facetsPhase<-"Phase~of~growth"
+augmentedPURPARRatio$facetsStrain<-"Strain"
 
-k_data056 = data.frame(WL = c("WW", "WW"), Phase = c("Pre-stationary"), O2=c(21, 21, 21, 21), Strain  = c("PC-rich_056"))
-k_data077 = data.frame(WL = c("WW", "WW"), Phase = c("Pre-stationary"), O2=c(21, 21, 21, 21), Strain  = c("PC-rich_077"))
-k_data048 = data.frame(WL = c("WW", "WW"), Phase = c("Pre-stationary"), O2=c(21, 21, 21, 21), Strain  = c("PE-rich_048"))
-k_data127 = data.frame(WL = c("WW", "WW"), Phase = c("Pre-stationary"), O2=c(21, 21, 21, 21), Strain  = c("PE-rich_127"))
+data_textA <- data.frame(facetsPhase = c("Phase~of~growth"), Phase = c("Exponential"), facetsStrain=c("Strain"), Strain  = c("PC-rich_056"), label = c('A'))
 
-data_text_y0Exp<- data.frame(WL = c("WW", "WW"), Phase = c("Exponential"), O2=c(21, 21, 21, 21), Strain  = c("PC-rich_056", "PC-rich_077", "PE-rich_048", "PE-rich_127"),  label = c('y[0]~"="~0.5', 'y[0]~"="~0.5', 'y[0]~"="~1.0', 'y[0]~"="~0.9'))
-data_text_yfExp<- data.frame(WL = c("WW", "WW"), Phase = c("Exponential"), O2=c(21, 21, 21, 21), Strain  = c("PC-rich_056", "PC-rich_077", "PE-rich_048", "PE-rich_127"),  label = c('y[f]~"="~0.3', 'y[f]~"="~0.4', 'y[f]~"="~0.5', 'y[f]~"="~0.5'))
-data_text_lambdaExp<- data.frame(WL = c("WW", "WW"), Phase = c("Exponential"), O2=c(21, 21, 21, 21), Strain  = c("PC-rich_056", "PC-rich_077", "PE-rich_048", "PE-rich_127"),  label = c('    \u03BB = 3.4e-08', '    \u03BB = 2.4e-07', '    \u03BB = 5.4e-07', '    \u03BB = 4.7e-07'))
+k_data056 = data.frame(facetsPhase = c("Phase~of~growth"), Phase = c("Pre-stationary"), facetsStrain=c("Strain"), Strain  = c("PC-rich_056"))
+k_data077 = data.frame(facetsPhase = c("Phase~of~growth"), Phase = c("Pre-stationary"), facetsStrain=c("Strain"), Strain  = c("PC-rich_077"))
+k_data048 = data.frame(facetsPhase = c("Phase~of~growth"), Phase = c("Pre-stationary"), facetsStrain=c("Strain"), Strain  = c("PE-rich_048"))
+k_data127 = data.frame(facetsPhase = c("Phase~of~growth"), Phase = c("Pre-stationary"), facetsStrain=c("Strain"), Strain  = c("PE-rich_127"))
 
-data_text_y0St<- data.frame(WL = c("WW", "WW"), Phase = c("Pre-stationary"), O2=c(21, 21, 21, 21), Strain  = c("PC-rich_056", "PC-rich_077", "PE-rich_048", "PE-rich_127"),  label = c('y[0]~"="~0.4', 'y[0]~"="~2.6', 'y[0]~"="~0.5', 'y[0]~"="~5.1'))
-data_text_yfSt<- data.frame(WL = c("WW", "WW"), Phase = c("Pre-stationary"), O2=c(21, 21, 21, 21), Strain  = c("PC-rich_056", "PC-rich_077", "PE-rich_048", "PE-rich_127"),  label = c('y[f]~"="~0.4', 'y[f]~"="~0.4', 'y[f]~"="~0.0', 'y[f]~"="~0.5'))
-data_text_lambdaSt<- data.frame(WL = c("WW", "WW"), Phase = c("Pre-stationary"), O2=c(21, 21, 21, 21), Strain  = c("PC-rich_056", "PC-rich_077", "PE-rich_048", "PE-rich_127"),  label = c('    \u03BB = 3.5e-08', '    \u03BB = 1.7e-06', '    \u03BB = 1.7e-09', '    \u03BB = 2.1e-06'))
+data_text_y0Exp<- data.frame(facetsPhase = c("Phase~of~growth"), Phase = c("Exponential"), facetsStrain=c("Strain"), Strain  = c("PC-rich_056", "PC-rich_077", "PE-rich_048", "PE-rich_127"),  label = c('y[0]~"="~0.5', 'y[0]~"="~0.5', 'y[0]~"="~1.0', 'y[0]~"="~0.9'))
+data_text_yfExp<- data.frame(facetsPhase = c("Phase~of~growth"), Phase = c("Exponential"), facetsStrain=c("Strain"), Strain  = c("PC-rich_056", "PC-rich_077", "PE-rich_048", "PE-rich_127"),  label = c('y[f]~"="~0.3', 'y[f]~"="~0.4', 'y[f]~"="~0.5', 'y[f]~"="~0.5'))
+data_text_lambdaExp<- data.frame(facetsPhase = c("Phase~of~growth"), Phase = c("Exponential"), facetsStrain=c("Strain"), Strain  = c("PC-rich_056", "PC-rich_077", "PE-rich_048", "PE-rich_127"),  label = c('    \u03BB = 3.4e-08', '    \u03BB = 2.4e-07', '    \u03BB = 5.4e-07', '    \u03BB = 4.7e-07'))
+
+data_text_y0St<- data.frame(facetsPhase = c("Phase~of~growth"), Phase = c("Pre-stationary"), facetsStrain=c("Strain"), Strain  = c("PC-rich_056", "PC-rich_077", "PE-rich_048", "PE-rich_127"),  label = c('y[0]~"="~0.4', 'y[0]~"="~2.6', 'y[0]~"="~0.5', 'y[0]~"="~5.1'))
+data_text_yfSt<- data.frame(facetsPhase = c("Phase~of~growth"), Phase = c("Pre-stationary"), facetsStrain=c("Strain"), Strain  = c("PC-rich_056", "PC-rich_077", "PE-rich_048", "PE-rich_127"),  label = c('y[f]~"="~0.4', 'y[f]~"="~0.4', 'y[f]~"="~0.0', 'y[f]~"="~0.5'))
+data_text_lambdaSt<- data.frame(facetsPhase = c("Phase~of~growth"), Phase = c("Pre-stationary"), facetsStrain=c("Strain"), Strain  = c("PC-rich_056", "PC-rich_077", "PE-rich_048", "PE-rich_127"),  label = c('    \u03BB = 3.5e-08', '    \u03BB = 1.7e-06', '    \u03BB = 1.7e-09', '    \u03BB = 2.1e-06'))
 
 # data_text_AnovaExp<- data.frame(WL = c("WW", "WW"), Phase = c("Exponential"), O2=c(21, 21, 21, 21), Strain  = c("PC-rich_056", "PC-rich_077", "PE-rich_048", "PE-rich_127"),  label = c('ANOVA, \u03B1 = 0.05, a', 'ANOVA, \u03B1 = 0.05, b', 'ANOVA, \u03B1 = 0.05, c', 'ANOVA, \u03B1 = 0.05, c'))
 # data_text_AnovaSt<- data.frame(WL = c("WW", "WW"), Phase = c("Pre-stationary"), O2=c(21, 21, 21, 21), Strain  = c("PC-rich_056", "PC-rich_077", "PE-rich_048", "PE-rich_127"),  label = c('ANOVA, \u03B1 = 0.05, a', 'ANOVA, \u03B1 = 0.05, a', 'ANOVA, \u03B1 = 0.05, a', 'ANOVA, \u03B1 = 0.05, a'))
 
-data_text_AnovaExp56<- data.frame(WL = c("WW"), Phase = c("Exponential"), O2=c(21), Strain  = c("PC-rich_056"),  label = c('a'))
-data_text_AnovaExp77<- data.frame(WL = c("WW"), Phase = c("Exponential"), O2=c(21), Strain  = c("PC-rich_077"),  label = c("b"))
-data_text_AnovaExp48<- data.frame(WL = c("WW"), Phase = c("Exponential"), O2=c(21), Strain  = c("PE-rich_048"),  label = c("c"))
-data_text_AnovaExp127<- data.frame(WL = c("WW"), Phase = c("Exponential"), O2=c(21), Strain  = c("PE-rich_127"),  label = c("c"))
+data_text_AnovaExp56<- data.frame(facetsPhase = c("Phase~of~growth"), Phase = c("Exponential"), facetsStrain=c("Strain"), Strain  = c("PC-rich_056"),  label = c('a'))
+data_text_AnovaExp77<- data.frame(facetsPhase = c("Phase~of~growth"), Phase = c("Exponential"), facetsStrain=c("Strain"), Strain  = c("PC-rich_077"),  label = c("b"))
+data_text_AnovaExp48<- data.frame(facetsPhase = c("Phase~of~growth"), Phase = c("Exponential"), facetsStrain=c("Strain"), Strain  = c("PE-rich_048"),  label = c("c"))
+data_text_AnovaExp127<- data.frame(facetsPhase = c("Phase~of~growth"), Phase = c("Exponential"), facetsStrain=c("Strain"), Strain  = c("PE-rich_127"),  label = c("c"))
 
-data_text_AnovaSt56<- data.frame(WL = c("WW"), Phase = c("Pre-stationary"), O2=c(21), Strain  = c("PC-rich_056"),  label = c('a'))
-data_text_AnovaSt77<- data.frame(WL = c("WW"), Phase = c("Pre-stationary"), O2=c(21), Strain  = c("PC-rich_077"),  label = c("a"))
-data_text_AnovaSt48<- data.frame(WL = c("WW"), Phase = c("Pre-stationary"), O2=c(21), Strain  = c("PE-rich_048"),  label = c("a"))
-data_text_AnovaSt127<- data.frame(WL = c("WW"), Phase = c("Pre-stationary"), O2=c(21), Strain  = c("PE-rich_127"),  label = c("a"))
+data_text_AnovaSt56<- data.frame(facetsPhase = c("Phase~of~growth"), Phase = c("Pre-stationary"), facetsStrain=c("Strain"), Strain  = c("PC-rich_056"),  label = c('a'))
+data_text_AnovaSt77<- data.frame(facetsPhase = c("Phase~of~growth"), Phase = c("Pre-stationary"), facetsStrain=c("Strain"), Strain  = c("PC-rich_077"),  label = c("a"))
+data_text_AnovaSt48<- data.frame(facetsPhase = c("Phase~of~growth"), Phase = c("Pre-stationary"), facetsStrain=c("Strain"), Strain  = c("PE-rich_048"),  label = c("a"))
+data_text_AnovaSt127<- data.frame(facetsPhase = c("Phase~of~growth"), Phase = c("Pre-stationary"), facetsStrain=c("Strain"), Strain  = c("PE-rich_127"),  label = c("a"))
 
-data_text_AnovaExp56P<- data.frame(WL = c("WW"), Phase = c("Exponential"), O2=c(21), Strain  = c("PC-rich_056"),  label = c('A'))
-data_text_AnovaExp77P<- data.frame(WL = c("WW"), Phase = c("Exponential"), O2=c(21), Strain  = c("PC-rich_077"),  label = c("A"))
-data_text_AnovaExp48P<- data.frame(WL = c("WW"), Phase = c("Exponential"), O2=c(21), Strain  = c("PE-rich_048"),  label = c("A"))
-data_text_AnovaExp127P<- data.frame(WL = c("WW"), Phase = c("Exponential"), O2=c(21), Strain  = c("PE-rich_127"),  label = c("A"))
+data_text_AnovaExp56P<- data.frame(facetsPhase = c("Phase~of~growth"), Phase = c("Exponential"), facetsStrain=c("Strain"), Strain  = c("PC-rich_056"),  label = c('A'))
+data_text_AnovaExp77P<- data.frame(facetsPhase = c("Phase~of~growth"), Phase = c("Exponential"), facetsStrain=c("Strain"), Strain  = c("PC-rich_077"),  label = c("A"))
+data_text_AnovaExp48P<- data.frame(facetsPhase = c("Phase~of~growth"), Phase = c("Exponential"), facetsStrain=c("Strain"), Strain  = c("PE-rich_048"),  label = c("A"))
+data_text_AnovaExp127P<- data.frame(facetsPhase = c("Phase~of~growth"), Phase = c("Exponential"), facetsStrain=c("Strain"), Strain  = c("PE-rich_127"),  label = c("A"))
 
-data_text_AnovaSt56P<- data.frame(WL = c("WW"), Phase = c("Pre-stationary"), O2=c(21), Strain  = c("PC-rich_056"),  label = c('A'))
-data_text_AnovaSt77P<- data.frame(WL = c("WW"), Phase = c("Pre-stationary"), O2=c(21), Strain  = c("PC-rich_077"),  label = c("B"))
-data_text_AnovaSt48P<- data.frame(WL = c("WW"), Phase = c("Pre-stationary"), O2=c(21), Strain  = c("PE-rich_048"),  label = c("B"))
-data_text_AnovaSt127P<- data.frame(WL = c("WW"), Phase = c("Pre-stationary"), O2=c(21), Strain  = c("PE-rich_127"),  label = c("B"))
+data_text_AnovaSt56P<- data.frame(facetsPhase = c("Phase~of~growth"), Phase = c("Pre-stationary"), facetsStrain=c("Strain"), Strain  = c("PC-rich_056"),  label = c('A'))
+data_text_AnovaSt77P<- data.frame(facetsPhase = c("Phase~of~growth"), Phase = c("Pre-stationary"), facetsStrain=c("Strain"), Strain  = c("PC-rich_077"),  label = c("B"))
+data_text_AnovaSt48P<- data.frame(facetsPhase = c("Phase~of~growth"), Phase = c("Pre-stationary"), facetsStrain=c("Strain"), Strain  = c("PE-rich_048"),  label = c("B"))
+data_text_AnovaSt127P<- data.frame(facetsPhase = c("Phase~of~growth"), Phase = c("Pre-stationary"), facetsStrain=c("Strain"), Strain  = c("PE-rich_127"),  label = c("B"))
 
-data_text_AnovaPhase<- data.frame(WL = c("WW", "WW"), Phase = c("Exponential"), O2=c(21, 21, 21, 21), Strain  = c("PC-rich_056", "PC-rich_077", "PE-rich_048", "PE-rich_127"),  label = c('ANOVA, \u03B1 = 0.05', 'ANOVA, \u03B1 = 0.05', 'ANOVA, \u03B1 = 0.05', 'ANOVA, \u03B1 = 0.05'))
-
-WL.labs <- c("Phase of growth")
-names(WL.labs) <- c("WW")
-O2.labs <- c("Strain")
-names(O2.labs) <- c(21)
+data_text_AnovaPhase<- data.frame(facetsPhase = c("Phase~of~growth"), Phase = c("Exponential"), facetsStrain=c("Strain"), Strain  = c("PC-rich_056", "PC-rich_077", "PE-rich_048", "PE-rich_127"),  label = c('ANOVA, \u03B1 = 0.05', 'ANOVA, \u03B1 = 0.05', 'ANOVA, \u03B1 = 0.05', 'ANOVA, \u03B1 = 0.05'))
 
 scientific_10 <- function(x) {   parse(text=gsub("e\\+*", " %*% 10^", scales::scientific_format()(x))) }
 lab1=c(expression("8 h"), expression("12 h"), expression("16 h"), expression("24 h"))
 lab2=c(expression("30 µE"), expression("90 µE"), expression("180 µE"), expression("300 µE"), expression("600 µE"), expression("900 µE"))
 
 
-ggplot(PURPARRatioChoosen, aes(x = PARPhotonDose_day, y = PURPARRatio)) +
+PURPAR<-ggplot(PURPARRatioChoosen, aes(x = PARPhotonDose_day, y = PURPARRatio)) +
   geom_point(aes(x = PARPhotonDose_day, y = AllmeanPURPARRatio, colour = as.factor(Par_ue), shape = as.factor(Photoperiod)), size = 3.5, alpha = 0.8, show.legend = T) +
   geom_point(aes(x = PARPhotonDose_day, y = PURPARRatio, colour = as.factor(Par_ue), shape = as.factor(Photoperiod)), size = 1, show.legend = F) +
   geom_errorbar(aes(x = PARPhotonDose_day, ymin = AllmeanPURPARRatio - AllsdPURPARRatio, ymax = AllmeanPURPARRatio + AllsdPURPARRatio, colour=as.factor(Par_ue)), width=0, size=0.3, show.legend = F) +
@@ -1410,10 +1411,12 @@ ggplot(PURPARRatioChoosen, aes(x = PARPhotonDose_day, y = PURPARRatio)) +
   
   geom_text(data=data_text_AnovaPhase, aes(x=24000000, y=-0.04, label=label), colour = "blue", size=4) +
   
-  geom_segment(data = k_data056, aes(x =9e07, y = -Inf, xend = 9e07, yend = Inf), color = "seagreen4", size = 6, alpha = 0.3) +
-  geom_segment(data = k_data077, aes(x =9e07, y = -Inf, xend = 9e07, yend = Inf), color = "palegreen3", size = 6, alpha = 0.3) +
-  geom_segment(data = k_data048, aes(x =9e07, y = -Inf, xend = 9e07, yend = Inf), color = "brown1", size = 6, alpha = 0.3) +
-  geom_segment(data = k_data127, aes(x =9e07, y = -Inf, xend = 9e07, yend = Inf), color = "brown4", size = 6, alpha = 0.3) +
+  geom_text(data=data_textA, aes(x=5000000, y=1.2, label=label), size=6) +
+  
+  geom_segment(data = k_data056, aes(x =9e07, y = -Inf, xend = 9e07, yend = Inf), color = "seagreen4", size = 6, alpha = 0.7) +
+  geom_segment(data = k_data077, aes(x =9e07, y = -Inf, xend = 9e07, yend = Inf), color = "palegreen3", size = 6, alpha = 0.7) +
+  geom_segment(data = k_data048, aes(x =9e07, y = -Inf, xend = 9e07, yend = Inf), color = "brown1", size = 6, alpha = 0.7) +
+  geom_segment(data = k_data127, aes(x =9e07, y = -Inf, xend = 9e07, yend = Inf), color = "brown4", size = 6, alpha = 0.7) +
   
   scale_shape_manual(values = c(15, 16, 17,18), name="", labels = lab1) +
   scale_colour_manual(values = c("darkslategray", "lightblue4", "hotpink4", "indianred3",  "goldenrod2", "khaki2"), name="", labels = lab2) +
@@ -1421,7 +1424,7 @@ ggplot(PURPARRatioChoosen, aes(x = PARPhotonDose_day, y = PURPARRatio)) +
   scale_x_continuous(breaks=seq(0, 80000000, by = 30000000), label=scientific_10) +
   scale_y_continuous(breaks=seq(0, 1.2, by = 0.3)) +
   coord_cartesian(xlim = c(0, 90000000), ylim = c(-0.15, 1.5)) +
-  ggh4x::facet_nested(rows = vars(O2, Strain), cols = vars(WL, Phase), labeller = labeller(WL = WL.labs, O2 = O2.labs)) +
+  ggh4x::facet_nested(rows = vars(facetsStrain, Strain), cols = vars(facetsPhase, Phase), labeller = label_parsed) +
   theme_bw() +
   theme(panel.grid.minor = element_blank(),
         panel.grid.major = element_blank(),
@@ -1438,13 +1441,21 @@ ggplot(PURPARRatioChoosen, aes(x = PARPhotonDose_day, y = PURPARRatio)) +
         legend.spacing.x = unit(-0.1, 'cm'),
         legend.title = element_blank(),
         legend.text = element_text(size=11))
+PURPAR
+```
+
+```{r, warning = FALSE, fig.height = 9, fig.width = 12}
+ggp<- PURPAR+Spectra
+ggp
 ```
 
 # Save plot 
 
 ```{r save plot}
-ggsave(file = file.path(FigPath, paste("Fig_PURPARRatio",".png",sep = "")), height=9, width= 7,  dpi = 300, limitsize = TRUE)
+ggsave(file = file.path(FigPath, paste("Fig_PURPARRatio2",".png",sep = "")),  height=9, width= 12,  dpi = 300, limitsize = TRUE)
 ```
+
+
 
 
 # Calculated Anova and Tukey test from data points

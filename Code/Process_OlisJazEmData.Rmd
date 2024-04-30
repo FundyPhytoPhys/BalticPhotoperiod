@@ -547,28 +547,50 @@ OLIS<-rbind(OLIS056, OLIS077, OLIS048, OLIS127)
 
 ```{r Changes strain names}
 OLISSpectraMetaPURShort <- OLIS %>%
-      mutate(Strain=case_when(Strain=="BA127R"~"PE-rich_127",
+    mutate(Strain=case_when(Strain=="BA127R"~"PE-rich_127",
          Strain=="BA48R"~"PE-rich_048",
         Strain=="BA56G"~"PC-rich_056",
-         Strain=="BA77G"~"PC-rich_077"))
+         Strain=="BA77G"~"PC-rich_077")) %>% 
+    mutate(Phase2=case_when(Par_ue==30~"Exponential",
+         Par_ue==600~"Pre-stationary"))
+OLISSpectraMetaPURShort$facetsPhase<-"Phase~of~growth"
+OLISSpectraMetaPURShort$facetsStrain<-"Strain"
 
 OLISSpectraMetaPURShort56<-OLISSpectraMetaPURShort %>% 
   filter(Strain=="PC-rich_056") %>% 
-  mutate(PURNorm56 = PURNorm)
+  filter(Photon=="Low") %>% 
+  mutate(PURNorm56 = PURNorm) %>% 
+  mutate(Phase2=case_when(Par_ue==30~"Exponential",
+         Par_ue==600~"Pre-stationary"))
+OLISSpectraMetaPURShort56$facetsPhase<-"Phase~of~growth"
+OLISSpectraMetaPURShort56$facetsStrain<-"Strain"
 
 OLISSpectraMetaPURShort77<-OLISSpectraMetaPURShort %>% 
   filter(Strain=="PC-rich_077") %>% 
-  mutate(PURNorm77 = PURNorm)
+  filter(Photon=="Low") %>% 
+  mutate(PURNorm77 = PURNorm) %>% 
+  mutate(Phase2=case_when(Par_ue==30~"Exponential",
+         Par_ue==600~"Pre-stationary"))
+OLISSpectraMetaPURShort77$facetsPhase<-"Phase~of~growth"
+OLISSpectraMetaPURShort77$facetsStrain<-"Strain"
 
 OLISSpectraMetaPURShort48<-OLISSpectraMetaPURShort %>% 
   filter(Strain=="PE-rich_048") %>% 
-  mutate(PURNorm48 = PURNorm)
+  filter(Photon=="Low") %>% 
+  mutate(PURNorm48 = PURNorm) %>% 
+  mutate(Phase2=case_when(Par_ue==30~"Exponential",
+         Par_ue==600~"Pre-stationary"))
+OLISSpectraMetaPURShort48$facetsPhase<-"Phase~of~growth"
+OLISSpectraMetaPURShort127$facetsStrain<-"Strain"
 
 OLISSpectraMetaPURShort127<-OLISSpectraMetaPURShort %>% 
-  filter(Strain=="PC-rich_127") %>% 
-  mutate(PURNorm127 = PURNorm)
-
-
+  filter(Strain=="PE-rich_127") %>% 
+  filter(Photon=="Low") %>% 
+  mutate(PURNorm127 = PURNorm) %>% 
+  mutate(Phase2=case_when(Par_ue==30~"Exponential",
+         Par_ue==600~"Pre-stationary"))
+OLISSpectraMetaPURShort127$facetsPhase<-"Phase~of~growth"
+OLISSpectraMetaPURShort127$facetsStrain<-"Strain"
 ```
 
 
@@ -577,37 +599,33 @@ OLISSpectraMetaPURShort127<-OLISSpectraMetaPURShort %>%
 
 # Create plot
 
-```{r Create plot}
-# Par_ue.labs <- c("30 µE", "90 µE", "180 µE", "Phase of growth", "900 µE")
-# names(Par_ue.labs) <- c("30", "90", "180", "300", "900")
-# 
-# Photoperiod.labs <- c("8 h", "Photoperiod: 12 h", "16 h", "24 h")
-# names(Photoperiod.labs) <- c("8", "12", "16", "24")
-# 
-# E_days.labs <- c("Exponential", "Pre-stationary")
-# names(E_days.labs) <- c("3", "7")
-# 
-# Strain.labs <- c("PC-rich", "PE-rich")
-# names(Strain.labs) <- c("PC-rich_077", "PE-rich_127")
-# 
-# O2.labs <- c("Strain")
-# names(O2.labs) <- c(21)
+```{r Create plot, fig.height = 8, fig.width = 8, warning = FALSE}
+data_textB <- data.frame(facetsPhase = c("Phase~of~growth"), Phase2 = c("Exponential"), facetsStrain  = c("Strain"), Strain  = c("PC-rich_056"), label = c('B'))
+
+# k_data056 = data.frame(WL = c("WW", "WW"), Phase = c("Pre-stationary"), O2=c(21, 21, 21, 21), Strain  = c("PC-rich_056"))
+# k_data077 = data.frame(WL = c("WW", "WW"), Phase = c("Pre-stationary"), O2=c(21, 21, 21, 21), Strain  = c("PC-rich_077"))
+# k_data048 = data.frame(WL = c("WW", "WW"), Phase = c("Pre-stationary"), O2=c(21, 21, 21, 21), Strain  = c("PE-rich_048"))
+# k_data127 = data.frame(WL = c("WW", "WW"), Phase = c("Pre-stationary"), O2=c(21, 21, 21, 21), Strain  = c("PE-rich_127"))
 
 
-
-OLISSpectraMetaPURShort %>%
+Spectra<-OLISSpectraMetaPURShort %>%
+    filter(Photon=="Low") %>% 
   ggplot() +
-
   geom_area(aes(x = nm, y = EmNormJaz439, fill = "gray84"), alpha = 0.6, show.legend = F) +
-  
   geom_area(aes(x = nm, y = PURNorm56, fill = "seagreen4"), alpha = 0.5, show.legend = F, OLISSpectraMetaPURShort56) +
   geom_area(aes(x = nm, y = PURNorm77, fill = "palegreen3"), alpha = 0.5, show.legend = F, OLISSpectraMetaPURShort77) +
   geom_area(aes(x = nm, y = PURNorm48, fill = "brown1"), alpha = 0.5, show.legend = F, OLISSpectraMetaPURShort48) +
   geom_area(aes(x = nm, y = PURNorm127, fill = "brown4"), alpha = 0.5, show.legend = F, OLISSpectraMetaPURShort127) +
   
-  
   geom_line(aes(x = nm, y = AbsNorm440, colour = as.factor(Strain)), show.legend = F, linewidth = 0.4) +
-
+  
+  geom_text(data=data_textB, aes(x=410, y=1.5, label=label), size=6) +
+  
+  # geom_segment(data = k_data056, aes(x =9e07, y = -Inf, xend = 9e07, yend = Inf), color = "seagreen4", size = 6, alpha = 0.3) +
+  # geom_segment(data = k_data077, aes(x =9e07, y = -Inf, xend = 9e07, yend = Inf), color = "palegreen3", size = 6, alpha = 0.3) +
+  # geom_segment(data = k_data048, aes(x =9e07, y = -Inf, xend = 9e07, yend = Inf), color = "brown1", size = 6, alpha = 0.3) +
+  # geom_segment(data = k_data127, aes(x =9e07, y = -Inf, xend = 9e07, yend = Inf), color = "brown4", size = 6, alpha = 0.3) +
+  
   scale_colour_discrete(type=c("seagreen4", "palegreen3", "brown1", "brown4"), name="") +
   # scale_linetype_manual(values = c("PC-rich_077" ="solid", "PE-rich_127" ="longdash")) +
   stat_wl_strip(aes(x = nm), ymin = -Inf, ymax = -0.025, alpha = 0.5) +
@@ -615,27 +633,25 @@ OLISSpectraMetaPURShort %>%
   labs(y = "Normalized whole-cell absorbance, lamp emission, and PUR", x = "Wavelength (nm)") +
   # scale_y_continuous(breaks=seq(0, 1.2, by = 0.4)) +
   # coord_cartesian(ylim = c (-0.01, 1.25)) +
-  ggh4x::facet_nested(cols = vars(Photon, Par_ue, Phase), rows = vars(Strain)) +
+  ggh4x::facet_nested(cols = vars(facetsPhase, Phase2), rows = vars(facetsStrain, Strain), labeller = label_parsed) +
     #ggh4x::facet_nested(cols = vars(Photon), rows = vars(Strain)) +
   theme_bw() +
   theme(panel.grid.minor = element_blank(),
         panel.grid.major = element_blank(),
-        panel.spacing.x = unit(0.4, 'cm'),
         axis.text = element_text(size=12),
-        axis.text.x = element_text(size=12),
         axis.title = element_text(size=16),
         strip.background = element_rect(fill="white"),
         strip.text = element_text(size=12),
         axis.title.y = element_text(margin=margin(r=10)),
         axis.title.x = element_text(margin=margin(t=10)),
         legend.background = element_rect(fill="transparent"),
+        legend.position = c(0.85,0.88),
+        legend.key.height= unit(0.003, 'cm'),
+        legend.spacing.y = unit(-0.1, "cm"),
+        legend.spacing.x = unit(-0.1, 'cm'),
         legend.title = element_blank(),
-        legend.direction="horizontal",
-        legend.position = c(0.08,0.97),
-        legend.spacing.x = unit(0.01, 'cm'),
-        legend.text.align = 0,
-        legend.key.width= unit(0.3, 'cm'),
-        legend.text = element_text(size=10))
+        legend.text = element_text(size=11))
+Spectra
 ```
 
 
