@@ -1,5 +1,5 @@
 ---
-title: "Growth vs. light-capture in PhycoCyanin and PhycoErythrin-rich picocyanobacteria, across photic regimes and growth phases
+title: "Growth and light-capture in PhycoCyanin and PhycoErythrin-rich picocyanobacteria, across photic regimes and growth phases
 
 Alternate:
 Long & low vs. high & short & fast; growth yields, light and photoperiods in PhycoCyanin and PhycoErythrin-rich picocyanobacteria"
@@ -416,7 +416,7 @@ Available photic regimes, combining photoperiod and peak PAR, may determine the 
 ## Photic regimes - implications for cumulative diel PSII electron flux {.unnumbered}
 
 Algal dynamics respond rapidly to changes in environmental conditions [@connorInvestigatingUseFast2018]. We used Fast Repetition Rate fluorometry (FRRf; Fig. \@ref(fig:LIFT)) [@kolberMeasurementsVariableChlorophyll1998] to support 
-an index of PSII electron transport rate per unit volume (*JV*~PSII~) [@oxboroughDirectEstimationFunctional2012; @suggettFastRepetitionRate2003; @tortellUserGuideApplication2021]. We calibrated the *JV*~PSII~ estimator to absolute rates of electron transport measured through oxygen evolution. Using this *JV*~PSII~ estimator we show that growth of PC-rich and PE-rich picocyanobacteria are well predicted by cumulative diel PSII electron fluxes, across different photic regimes. The growth rate, µ, of PC-rich and PE-rich picocyanobacteria shows fairly consistent saturating responses to increasing cumulative diel PSII electron flux (*JV*~PSII~; µmol e^−^ µmol Chl *a*^−1^ d^−1^; Fig. \@ref(fig:GrowthRateJVPSII)). As previously found for diatoms [@liDiatomGrowthResponses2017] cumulative diel reductant generation was indeed a better predictor of µ than was cumulative diel PUR, although photoperiod and peak PAR retain secondary influences on achieved growth responses of the picocyanobacteria under some conditions.
+an index of PSII electron transport rate per unit volume (*JV*~PSII~) [@oxboroughDirectEstimationFunctional2012; @berman-frankApplicationSingleTurnover2023; @tortellUserGuideApplication2021]. We calibrated the *JV*~PSII~ estimator to absolute rates of electron transport measured through oxygen evolution. Using this *JV*~PSII~ estimator we show that growth of PC-rich and PE-rich picocyanobacteria are well predicted by cumulative diel PSII electron fluxes, across different photic regimes. The growth rate, µ, of PC-rich and PE-rich picocyanobacteria shows fairly consistent saturating responses to increasing cumulative diel PSII electron flux (*JV*~PSII~; µmol e^−^ µmol Chl *a*^−1^ d^−1^; Fig. \@ref(fig:GrowthRateJVPSII)). As previously found for diatoms [@liDiatomGrowthResponses2017] cumulative diel reductant generation was indeed a better predictor of µ than was cumulative diel PUR, although photoperiod and peak PAR retain secondary influences on achieved growth responses of the picocyanobacteria under some conditions.
 
 <br>
 

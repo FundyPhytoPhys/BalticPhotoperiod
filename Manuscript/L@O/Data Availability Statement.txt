@@ -1,0 +1,5 @@
+Data supporting this study is available on:
+https://github.com/FundyPhytoPhys/BalticPhotoperiod (public GitHub Repository) and 
+https://docs.google.com/spreadsheets/d/1ZXpwR7Gfto-uRzVdXzMpQF4frbrvMLH_IyLqonFZRSw/edit#gid=0 (URL for MetaDataCatalog).
+Code to perform data processing and analyses is made available at https://github.com/FundyPhytoPhys/BalticPhotoperiod.
+16S rRNA sequences used in this study are available in GenBank under the accession numbers PP034393, PP034394, PP034396 and PP034403. 
