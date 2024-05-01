@@ -3,3 +3,8 @@ We find that both PhycoCyanin(PC)-rich and PhycoErythrin(PE)-rich phenotypes of 
 We demonstrate, for the first time, that picocyanobacteria show consistent patterns of effective absorption cross section for PSII photochemistry, versus increasing cumulative diel PAR doses. We also determined that growth yields of picocyanobacteria are well predicted by cumulative diel PSII electron fluxes across different photic regimes. 
 Our results suggest possible the expansion of the range of picocyanobacteria to new photic regimes in the near future and indicate that PE-rich Synechococcus sp. may turn out to be the dominant component of picophytoplankton in nutrient-rich environments.
 
+In PhycoCyanin(PC)-rich,  and particularly in PhycoErythrin(PE)-rich phenotypes of Synechococcus, photoperiod alters the responses of growth rates to cumulative diel photons, with both 8 and 24 h photoperiods provoking increased photoinhibition of growth. In contrast, growth rates show  simpler saturating responses to cumulative diel reductant generation, accessed through a chlorophyll fluorescence measure of electron flux, across a matrix of photoperiods and photosynthetically active radiation levels.
+Under optimal conditions of 24 h photoperiod and moderate photosynthetically active radiation, a PE-rich Synechococcus sp. reached a chlorophyll-specific exponential growth rate of 4.5 d−1, a record for cyanobacteria, comparable with genetically-modified industrial strains.
+As photoperiod opportunitists, with capacity to grow rapidly under 24 h photoperiod, coastal Synechococcus sp. show potential to emerge as phytoplankton components during summer in future, warmed, polar regions.  
+
+
