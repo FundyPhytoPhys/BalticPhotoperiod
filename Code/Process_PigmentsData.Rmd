@@ -1331,7 +1331,7 @@ PURPARRatioChoosen$facetsPhase<-"Phase~of~growth"
 augmentedPURPARRatio$facetsPhase<-"Phase~of~growth"
 augmentedPURPARRatio$facetsStrain<-"Strain"
 
-data_textA <- data.frame(facetsPhase = c("Phase~of~growth"), Phase = c("Exponential"), facetsStrain=c("Strain"), Strain  = c("PC-rich_056"), label = c('A'))
+# data_textA <- data.frame(facetsPhase = c("Phase~of~growth"), Phase = c("Exponential"), facetsStrain=c("Strain"), Strain  = c("PC-rich_056"), label = c('A'))
 
 k_data056 = data.frame(facetsPhase = c("Phase~of~growth"), Phase = c("Pre-stationary"), facetsStrain=c("Strain"), Strain  = c("PC-rich_056"))
 k_data077 = data.frame(facetsPhase = c("Phase~of~growth"), Phase = c("Pre-stationary"), facetsStrain=c("Strain"), Strain  = c("PC-rich_077"))
@@ -1409,14 +1409,14 @@ PURPAR<-ggplot(PURPARRatioChoosen, aes(x = PARPhotonDose_day, y = PURPARRatio)) 
   geom_text(data=data_text_AnovaSt48P, aes(x=75000000, y=0.05, label=label), colour = "blue", size=4) +
   geom_text(data=data_text_AnovaSt127P, aes(x=75000000, y=0.2, label=label), colour = "blue", size=4) +
   
-  geom_text(data=data_text_AnovaPhase, aes(x=24000000, y=-0.04, label=label), colour = "blue", size=4) +
+  geom_text(data=data_text_AnovaPhase, aes(x=15000000, y=-0.04, label=label), colour = "blue", size=4) +
   
-  geom_text(data=data_textA, aes(x=5000000, y=1.2, label=label), size=6) +
+  #geom_text(data=data_textA, aes(x=5000000, y=1.2, label=label), size=6) +
   
-  geom_segment(data = k_data056, aes(x =9e07, y = -Inf, xend = 9e07, yend = Inf), color = "seagreen4", size = 6, alpha = 0.7) +
-  geom_segment(data = k_data077, aes(x =9e07, y = -Inf, xend = 9e07, yend = Inf), color = "palegreen3", size = 6, alpha = 0.7) +
-  geom_segment(data = k_data048, aes(x =9e07, y = -Inf, xend = 9e07, yend = Inf), color = "brown1", size = 6, alpha = 0.7) +
-  geom_segment(data = k_data127, aes(x =9e07, y = -Inf, xend = 9e07, yend = Inf), color = "brown4", size = 6, alpha = 0.7) +
+  geom_segment(data = k_data056, aes(x =9.2e07, y = -Inf, xend = 9.2e07, yend = Inf), color = "seagreen4", size = 6, alpha = 0.7) +
+  geom_segment(data = k_data077, aes(x =9.2e07, y = -Inf, xend = 9.2e07, yend = Inf), color = "palegreen3", size = 6, alpha = 0.7) +
+  geom_segment(data = k_data048, aes(x =9.2e07, y = -Inf, xend = 9.2e07, yend = Inf), color = "brown1", size = 6, alpha = 0.7) +
+  geom_segment(data = k_data127, aes(x =9.2e07, y = -Inf, xend = 9.2e07, yend = Inf), color = "brown4", size = 6, alpha = 0.7) +
   
   scale_shape_manual(values = c(15, 16, 17,18), name="", labels = lab1) +
   scale_colour_manual(values = c("darkslategray", "lightblue4", "hotpink4", "indianred3",  "goldenrod2", "khaki2"), name="", labels = lab2) +
@@ -1432,12 +1432,12 @@ PURPAR<-ggplot(PURPARRatioChoosen, aes(x = PARPhotonDose_day, y = PURPARRatio)) 
         axis.title = element_text(size=16),
         strip.background = element_rect(fill="white"),
         strip.text = element_text(size=12),
-        strip.text.y = element_blank(),
-        strip.background.y = element_blank(),
-        # axis.title.y = element_text(margin=margin(r=10)),
+        # strip.text.y = element_blank(),
+        # strip.background.y = element_blank(),
+        axis.title.y = element_text(margin=margin(r=10)),
         axis.title.x = element_text(margin=margin(t=10)),
         legend.background = element_rect(fill="transparent"),
-        legend.position = c(0.85,0.63),
+        legend.position = c(0.9,0.63),
         legend.key.height= unit(0.003, 'cm'),
         legend.spacing.y = unit(-0.1, "cm"),
         legend.spacing.x = unit(-0.1, 'cm'),
@@ -1445,16 +1445,22 @@ PURPAR<-ggplot(PURPARRatioChoosen, aes(x = PARPhotonDose_day, y = PURPARRatio)) 
         legend.text = element_text(size=11))
 PURPAR
 ```
+# Save plot 
+
+```{r save plot}
+ggsave(file = file.path(FigPath, paste("Fig_PURPARRatio",".png",sep = "")),  height=9, width= 10,  dpi = 300, limitsize = TRUE)
+```
+
 
 ```{r, warning = FALSE, fig.height = 9, fig.width = 12}
-ggp<- PURPAR+Spectra
-ggp
+# ggp<- PURPAR+Spectra
+# ggp
 ```
 
 # Save plot 
 
 ```{r save plot}
-ggsave(file = file.path(FigPath, paste("Fig_PURPARRatio2",".png",sep = "")),  height=9, width= 12,  dpi = 300, limitsize = TRUE)
+# ggsave(file = file.path(FigPath, paste("Fig_PURPARRatio2",".png",sep = "")),  height=9, width= 12,  dpi = 300, limitsize = TRUE)
 ```
 
 

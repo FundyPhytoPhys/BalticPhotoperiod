@@ -972,6 +972,9 @@ AnovaTest_GrowthRateModel_Light_Chla <-AnovaTest_GrowthRateModel_Light_Chla %>%
 rm(anova056, anova077, anova048, anova127, MCModelAll_BA56, MCModelAll_BA77, MCModelAll_BA48, MCModelAll_BA127)
 ```
 
+
+
+
 # Separate fits per strain - for plots only - based on statistics - Light
 
 ```{r}
@@ -1071,6 +1074,15 @@ AnovaTest_GrowthRateModel_Photoperiod_Chla <-AnovaTest_GrowthRateModel_Photoperi
 rm(anova056_Photoperiod, anova077_Photoperiod, anova048_Photoperiod, anova127_Photoperiod, MCModelAll_BA56, MCModelAll_BA77, MCModelAll_BA48, MCModelAll_BA127)
 ```
 
+# Save RDS that create stats and tables
+
+
+```{r}
+saveRDS(AnovaTest_GrowthRateModel_Light_Chla, file.path(TableRdsPath, paste(Project, "Anova_GrowthRateJVPSII_Model_Light_Chla.Rds", sep = "_"), fsep = .Platform$file.sep), ascii = FALSE, version = NULL, compress = "xz", refhook = NULL)
+
+saveRDS(AnovaTest_GrowthRateModel_Photoperiod_Chla, file.path(TableRdsPath, paste(Project, "Anova_GrowthRateJVPSII_Model_Photoperiod_Chla.Rds", sep = "_"), fsep = .Platform$file.sep), ascii = FALSE, version = NULL, compress = "xz", refhook = NULL)
+
+```
 
 # Separate fits per strain - for plots only - based on statistics - Photoperiod
 
