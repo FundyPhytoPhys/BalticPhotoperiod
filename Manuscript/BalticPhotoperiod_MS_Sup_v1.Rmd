@@ -1,5 +1,5 @@
 ---
-title: "Growth yields and light-capture in PhycoCyanin and PhycoErythrin-rich picocyanobacteria, across photic regimes and growth phases"
+title: "Long & low; or high & short; photoperiods and light differential growth yields and light-capture capacities of PhycoCyanin and PhycoErythrin-rich picocyanobacteria"
 
 author:
 - Sylwia Śliwińska-Wilczewska:
@@ -514,7 +514,7 @@ rm(Anova_SigPig590_Modeldark)
 <br>
 
 ```{r Genetics, fig.cap = Genetics_cap, fig.height = 8, fig.width = 6, echo = FALSE}
-Genetics_cap<- glue("Phylogenetic tree derived from partial 16S rRNA gene sequences using topology given by Maximum Likelihood (1000 bootstraps). Support values are indicated by the size of internal nodes. Strains used in this study are shown in bold.", .sep = " ")
+Genetics_cap<- glue("Phylogenetic tree derived from partial 16S rRNA gene sequences using topology given by Maximum Likelihood (1000 bootstraps). Support values are indicated by the size of internal nodes. Strains used in this study are shown in bold. Phylogenetic trees were created using IQ-TREE v. 1.6.12 [@hoangUFBoot2ImprovingUltrafast2018], using GTR+F+I+I+R3 model determined by ModelFinder [@kalyaanamoorthyModelFinderFastModel2017]. Bootstrap values were calculated with 1000 replicates [@hoangUFBoot2ImprovingUltrafast2018]. Samples for total genomic DNA were collected by harvesting 10 mL of each culture and centrifuging for 8 minutes at 8,000 x g. DNA was extracted using the FastDNA™ SPIN Kit for Soil (MP Biomedicals) with Matrix E columns following manufacturer instructions with the addition of an incubation with proteinase-K (1% final concentration) at 55°C for one hour. DNA concentration was measured using an Invitrogen Qubit 2.0 fluorometer (Thermo Fisher Scientific Inc.) and purity was assessed using a Thermo Scientific™ NanoDrop 2000 spectrophotometer (Thermo Fisher Scientific Inc.).  ", .sep = " ")
 knitr::include_graphics(file.path(FiguresFP, "SFig.Tree.png"))
 ```
 
