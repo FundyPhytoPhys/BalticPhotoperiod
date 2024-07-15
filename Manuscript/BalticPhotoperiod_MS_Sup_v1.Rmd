@@ -142,7 +142,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ```{r echo = FALSE}
 PigmentsCorrelation <- readRDS(file = file.path("..", "Output", "TablesRds", "BalticPhotoperiod_Tab_PigmentsCorrelation.Rds"))
-PigmentsCorrelation<-PigmentsCorrelation %>%  
+PigmentsCorrelation<-PigmentsCorrelation %>% 
   relocate(Pigment, .before = Linear_regression) %>%
   relocate(Abs, .before = Linear_regression)
 
