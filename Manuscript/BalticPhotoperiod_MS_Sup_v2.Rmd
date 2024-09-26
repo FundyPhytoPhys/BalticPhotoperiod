@@ -138,7 +138,8 @@ knitr::opts_chunk$set(echo = TRUE)
 
 <br>
 <br>
-<br>
+
+
 
 ```{r echo = FALSE}
 PigmentsCorrelation <- readRDS(file = file.path("..", "Output", "TablesRds", "BalticPhotoperiod_Tab_PigmentsCorrelation.Rds"))
@@ -513,6 +514,25 @@ rm(Anova_SigPig590_Modeldark)
 
 <br>
 
+<br>
+
+
+```{r Spectra, fig.cap = Spectra_cap, fig.height = 6, fig.width = 8, echo = FALSE}
+Spectra_cap<- glue("Whole-cell absorbance spectra of PC-rich (077; solid light green lines) or PE-rich (127; dashed dark red lines) cultures of *Synechococcus* sp. Representative absorbance spectra, normalized to 440 nm (NormA~440~), were measured from the exponential or pre-stationary phases of growth, together with emission spectra of the white LED lamp used for PAR, normalized to emission at 440 nm (NormEm~440~, light gray area), in this example PAR was 300 µmol photons m^−2^s^−1^. Estimated Photosynthetically Usable Radiation (PUR) is shown as a darker green area for the PC-rich strain and a darker red area for the PE-rich strain, with PUR given for each culture (µE = µmol photons m^−2^s^−1^). Peaks characteristic of known pigments are labeled; Chl *a*, chlorophyll *a*; PC, phycocyanin; PE, phycoerythrin; PUB, phycourobilin; Car, carotenoids.", .sep = " ")
+knitr::include_graphics(file.path( FiguresFP,"Fig_OlisSpectra.png")) 
+```
+
+<br>
+
+
+```{r LIFT, fig.cap = LIFT_cap, fig.height = 6, fig.width = 8, echo = FALSE}
+LIFT_cap<- glue("Single turnover (ST) fluorescence induction by Fast Repetition Rate fluorometry (FRRf). (**A**) Examples of fluorescence yield vs. elapsed time (µs) for PE-rich culture of *Synechococcus* sp. (048) in the dark (dark-relaxed; 0 µmol photons m^−2^s^−1^) and under actinic PAR (in this example 80 µmol photons m^−2^s^−1^) using blue LED (Ex~445nm~; open blue circles) or orange (Ex~590nm~; open orange diamonds) excitation. The ST technique delivers a series of flashlets for non-intrusive, repeated monitoring of chlorophyll fluorescence parameters (including *F*~O~, *F*′, *F*~M~, *F*~M~′, \u03C4~1~-\u03C4~3~, \u03C4~1~′-\u03C4~3~′, \u03C3~PSII~, and \u03C3~PSII~′). (**B**) Linear regressions of uncalibrated PSII electron flux (*JV*~PSII~) vs. e^−^ L^−1^ s^−1^ derived from simultaneously measured oxygen evolution Light Response Curves (LRC) under blue LED (Ex~445nm~; open blue circles) or orange (Ex~590nm~; open orange diamonds) excitation. (**C**) Rapid Light Curve (RLC), fit with a three parameter model [@harrisonPhotosynthesisirradianceRelationshipsPolar1986], for PSII electron flux (*JV*~PSII~; µmol e^−^ µmol Chl *a*^−1^ s^−1^) vs. actinic PAR measured under blue LED (Ex~445nm~; open blue circles) or orange (Ex~590nm~; open orange diamonds) excitation.", .sep = " ")
+knitr::include_graphics(file.path( FiguresFP,"Fig_LIFT.png")) 
+```
+
+<br>
+
+
 ```{r Genetics, fig.cap = Genetics_cap, fig.height = 8, fig.width = 6, echo = FALSE}
 Genetics_cap<- glue("Phylogenetic tree derived from partial 16S rRNA gene sequences using topology given by Maximum Likelihood (1000 bootstraps). Support values are indicated by the size of internal nodes. Strains used in this study are shown in bold. Phylogenetic trees were created using IQ-TREE v. 1.6.12 [@hoangUFBoot2ImprovingUltrafast2018], using GTR+F+I+I+R3 model determined by ModelFinder [@kalyaanamoorthyModelFinderFastModel2017]. Bootstrap values were calculated with 1000 replicates [@hoangUFBoot2ImprovingUltrafast2018]. Samples for total genomic DNA were collected by harvesting 10 mL of each culture and centrifuging for 8 minutes at 8,000 x g. DNA was extracted using the FastDNA™ SPIN Kit for Soil (MP Biomedicals) with Matrix E columns following manufacturer instructions with the addition of an incubation with proteinase-K (1% final concentration) at 55°C for one hour. DNA concentration was measured using an Invitrogen Qubit 2.0 fluorometer (Thermo Fisher Scientific Inc.) and purity was assessed using a Thermo Scientific™ NanoDrop 2000 spectrophotometer (Thermo Fisher Scientific Inc.).  ", .sep = " ")
 knitr::include_graphics(file.path(FiguresFP, "SFig.Tree.png"))
@@ -555,9 +575,25 @@ knitr::include_graphics(file.path(FiguresFP,"SFig_GrowthRate_Light_PAR.png"))
 
 <br>
 
+
+```{r PURPARRatio, fig.cap = PURPARRatio_cap, fig.height = 6, fig.width = 8, echo = FALSE}
+PURPARRatio_cap<- glue("Changes in PUR/PAR ratio vs. cumulative diel PAR (µmol photons m^−2^d^−1^). PUR/PAR ratio was estimated for two PC-rich cultures (056; dark green, 077; light green) and two PE-rich cultures (048; light red, 127; dark red) of *Synechococcus* sp. grown at 30 (dark gray), 90 (light gray), 180 (purple), 300 (red), 600 (orange), or 900 (yellow) peak PAR µmol photons m^−2^s^−1^ (µE); and photoperiods of 8 (square), 12 (circle), 16 (triangle), or 24 (diamond) h. Figure presents data (smaller symbols) and means (bigger symbols) from exponential or pre-stationary phase of growth. Blue solid line shows single phase exponential decay fit for data from each strain and growth phase, with fit parameters presented. Different lowercase letters indicate statistically significant differences between the fit models for different strains within a given phase of growth. Different uppercase letters indicate statistically significant differences between the fit models for different phases of growth within a given strain (ANOVA; *p* < 0.05).", .sep = " ")
+knitr::include_graphics(file.path(FiguresFP,"Fig_PURPARRatio.png"))
+```
+
+<br>
+
 ```{r PhycoChlaRatio, fig.cap = PhycoChlaRatio_cap, fig.height = 6, fig.width = 8, echo = FALSE}
 PhycoChlaRatio_cap<- glue("Changes of Phycobiliprotein to Chl *a* ratio (µg:µg) vs. cumulative diel PAR (µmol photons m^−2^d^−1^). Phycobiliprotein to Chl *a* ratio was estimated for two PC-rich cultures (056; dark green, 077; light green) and two PE-rich cultures (048; light red, 127; dark red) of *Synechococcus* sp. grown at 30 (dark gray), 90 (light gray), 180 (purple), 300 (red), 600 (orange), or 900 (yellow) peak PAR µmol photons m^−2^s^−1^ (µE); and photoperiods of 8 (square), 12 (circle), 16 (triangle), or 24 (diamond) h. Figure presents data (smaller symbols) and means (bigger symbols) from exponential or pre-stationary phase of growth. Blue solid line shows single phase exponential decay fit for data from each strain and growth phase, fit parameters are presented. Different lowercase letters indicate statistically significant differences between the fit models for different strains within a given phase of growth. Different uppercase letters indicate statistically significant differences between the fit models for different phases of growth within a given strain (ANOVA; *p* < 0.05).", .sep = " ")
 knitr::include_graphics(file.path(FiguresFP,"SFig_PhycoChlaRatio.png"))
+```
+
+<br>
+
+
+```{r Sigma590, fig.cap = Sigma590_cap, fig.height = 6, fig.width = 8, echo = FALSE}
+Sigma590_cap<- glue("(**A**) Effective absorption cross section of PSII (\u03C3~PSII~ʹ; nm^2^ quanta^−1^) measured under diel peak PAR growth light vs. cumulative diel PAR (µmol photons m^−2^d^−1^); blue solid line shows single phase exponential decay fit for data from each strain and growth phase. (**B**) Changes of \u03C3~PSII~ʹ measured under diel peak PAR growth light vs. the ratio of sum of µg phycobilins (PE, PC, APC protein, Phycobiliprotein) to µg Chl *a*; blue solid line shows linear model fit for data from each strain and growth phase. \u03C3~PSII~ʹ was estimated using FRRf induction curves with excitation of phycobilisomes (Ex~590nm~, orange), for two PC-rich cultures (056; dark green, 077; light green) and two PE-rich cultures (048; light red, 127; dark red) of *Synechococcus* sp. grown at 30 (dark gray), 90 (light gray), 180 (purple), 300 (red), 600 (orange), or 900 (yellow) peak PAR µmol photons m^−2^s^−1^ (µE); and photoperiods of 8 (square), 12 (circle), 16 (triangle), or 24 (diamond) h. Figure presents data (smaller symbols) and means (bigger symbols) from exponential or pre-stationary phase of growth. Different lowercase letters indicate statistically significant differences between the fit models for different strains within a given phase of growth. Different uppercase letters indicate statistically significant differences between the fit models for different phases of growth within a given strain (*p* < 0.05).", .sep = " ")
+knitr::include_graphics(file.path( FiguresFP,"Fig_Sigma590Merge.png"))
 ```
 
 <br>
